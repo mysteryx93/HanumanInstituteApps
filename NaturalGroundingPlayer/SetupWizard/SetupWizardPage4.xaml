@@ -1,0 +1,13 @@
+﻿<Page x:Class="NaturalGroundingPlayer.SetupWizardPage4"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d"
+	Title="Page1" Loaded="Page_Loaded" Height="330" Width="500">
+
+    <Grid>
+        <TextBlock Margin="10" TextWrapping="Wrap"><Run FontWeight="Bold" Text="Playing sample video"/><Run FontWeight="Bold" Text=" with SVP"/><Run FontWeight="Bold" Text=" + madVR"/><Run FontWeight="Bold" Text="..."/><LineBreak/><Run Text="Ellie Goulding"/><Run Text=" - Burn"/><LineBreak/><Run/><LineBreak/><Run/><LineBreak/><Run Text="madVR increases the image quality by resizing the videos with better algorithms."/><LineBreak/><Run/><LineBreak/><Run Text="Press "/><Run FontWeight="Bold" Text="CTRL+J"/><Run Text=" in MPC-HC to view "/><Run Text="rendering "/><Run Text="statistics."/><LineBreak/><Run Text="At 60fps, madVR has 1000 / 60 = 16.6ms to generate each frame."/><LineBreak/><Run Text="Look at &quot;Average stats, rendering&quot;. If it is higher than 16ms, you will see dropped frames."/><LineBreak/><LineBreak/><Run Text="If the video fails to play, or if rendering times with default settings are above 16ms, exit this wizard, go to settings and disable madVR."/><LineBreak/><Run/><LineBreak/><Run Text="If rendering times are below 16ms and it plays smoothly, continue to the next page to tweak madVR settings. You can push even "/><Run Text="the best graphic card"/><Run Text=" to its knees -- with stunning image quality."/></TextBlock>
+
+    </Grid>
+</Page>

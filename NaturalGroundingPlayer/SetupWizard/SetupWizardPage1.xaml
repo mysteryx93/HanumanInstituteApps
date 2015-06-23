@@ -1,0 +1,13 @@
+﻿<Page x:Class="NaturalGroundingPlayer.SetupWizardPage1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d"
+	Title="Page1" Loaded="Page_Loaded" Height="330" Width="500">
+
+    <Grid>
+        <TextBlock Margin="10" TextWrapping="Wrap"><Run FontWeight="Bold" Text="First, let's configure SVP"/><LineBreak/><Run Text="You should see a tray icon in your lower-right corner that says &quot;SVP Manager&quot;."/><LineBreak/><Run Text="1. Right-click on it, and under Interface Type, select Expert."/><LineBreak/><Run Text="2. If your graphic card supports it, enable &quot;GPU-acceleration (OpenCL)&quot;"/><Run Text=". There are cases where you get better performance without GPU-acceleration so you can try both."/><LineBreak/><Run Text="3. In Video Profiles, select Reset to Defaults and then click OK."/><LineBreak/><Run Text="4. Set Turn off on seek to Don't turn off to reduce MPC-HC crashes."/><LineBreak/><Run Text="5. After you're done testing, under Settings, disable &quot;Show OSD messages&quot;"/></TextBlock>
+
+    </Grid>
+</Page>

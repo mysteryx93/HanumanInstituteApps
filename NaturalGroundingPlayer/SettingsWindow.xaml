@@ -1,0 +1,33 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Name="window" x:Class="NaturalGroundingPlayer.SettingsWindow"
+        Title="Settings" Height="252" Width="520" ResizeMode="NoResize" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+    <Window.Resources>
+        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+    </Window.Resources>
+    <Grid>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="180,25,0,0" VerticalAlignment="Top" Width="305" Text="{Binding NaturalGroundingFolder, Mode=TwoWay}" TabIndex="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="18,28,0,0" TextWrapping="Wrap" Text="Natural Grounding Folder" VerticalAlignment="Top" />
+        <TextBox x:Name="SvpPathText" HorizontalAlignment="Left" Height="23" Margin="180,53,0,0" VerticalAlignment="Top" Width="283" Text="{Binding SvpPath, Mode=TwoWay}" TabIndex="2"  IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
+        <TextBlock HorizontalAlignment="Left" Margin="18,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="SVP Path "/><Hyperlink NavigateUri="http://svp-team.com/" RequestNavigate="Hyperlink_RequestNavigate">(download)</Hyperlink></TextBlock>
+        <CheckBox Content="Automatically Download Videos" HorizontalAlignment="Left" Margin="298,150,0,0" VerticalAlignment="Top" IsChecked="{Binding AutoDownload, Mode=TwoWay}" TabIndex="12" />
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="410,179,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="SaveButton_Click" TabIndex="14"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="330,179,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Click="CancelButton_Click" TabIndex="13"/>
+        <Button x:Name="BrowseSvp" Content="..." HorizontalAlignment="Left" Margin="463,53,0,0" VerticalAlignment="Top" Width="22" Height="22" Click="BrowseSvp_Click" TabIndex="3" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
+        <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="18,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="282" Foreground="Red" />
+        <ComboBox x:Name="ZoomComboBox" HorizontalAlignment="Left" Margin="180,138,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="0" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedValue="{Binding Zoom, Mode=TwoWay}" TabIndex="8" />
+        <TextBlock HorizontalAlignment="Left" Margin="18,141,0,0" TextWrapping="Wrap" Text="Zoom" VerticalAlignment="Top"/>
+        <ComboBox x:Name="MediaPlayerCombo" HorizontalAlignment="Left" Margin="180,84,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="{Binding MediaPlayerApp, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay}" TabIndex="6" LostKeyboardFocus="MediaPlayerCombo_LostKeyboardFocus">
+            <ComboBoxItem Content="MPC-HC" />
+            <ComboBoxItem Content="Internal" />
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" Margin="18,87,0,0" TextWrapping="Wrap" Text="Media Player" VerticalAlignment="Top"/>
+        <CheckBox x:Name="EnableSvpCheckbox" Content="Enable SVP (play @ 60 fps)" HorizontalAlignment="Left" Margin="298,87,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableSvp, Mode=TwoWay}" TabIndex="9" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
+        <ComboBox x:Name="MaxDownloadQualityCombo" HorizontalAlignment="Left" Margin="180,111,0,0" VerticalAlignment="Top" Width="80" SelectedValue="{Binding MaxDownloadQuality, Mode=TwoWay}" DisplayMemberPath="Text" SelectedValuePath="Value" TabIndex="7" />
+        <TextBlock HorizontalAlignment="Left" Margin="18,114,0,0" TextWrapping="Wrap" Text="Max Download Quality" VerticalAlignment="Top"/>
+        <CheckBox x:Name="EnableMadvrCheckbox" Content="Enable madVR (higher quality)" HorizontalAlignment="Left" Margin="298,108,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableMadVR, Mode=TwoWay}" TabIndex="10" IsEnabled="{Binding IsMpcPlayer, ElementName=window}"  />
+        <CheckBox Content="Stretch to Widescreen (16:9)" HorizontalAlignment="Left" Margin="298,129,0,0" VerticalAlignment="Top" IsChecked="{Binding Widescreen, Mode=TwoWay}" TabIndex="11" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
+
+    </Grid>
+</Window>

@@ -1,0 +1,69 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib" 
+        xmlns:Business="clr-namespace:Business;assembly=Business"
+        xmlns:DataAccess="clr-namespace:DataAccess;assembly=DataAccess"
+        xmlns:local="clr-namespace:NaturalGroundingPlayer"
+        x:Class="NaturalGroundingPlayer.EditPlaylistWindow"
+        Title="Edit Playlist" Height="503" Width="618" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" Closing="Window_Closing"
+    MinHeight="300" MinWidth="500">
+    <Window.Resources>
+        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <Business:RatingConverter x:Key="RatingConverter"/>
+        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Button x:Name="EditButton" Width="75" VerticalAlignment="Bottom" TabIndex="12" Margin="0,0,10,10" IsDefault="True" Height="22" HorizontalAlignment="Right" Content="Edit" Click="EditButton_Click"/>
+        <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="11" Margin="0,0,90,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
+        <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="62,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,17,0,0" HorizontalAlignment="Left"/>
+        <Rectangle Fill="#FFE4FFE4" HorizontalAlignment="Left" Margin="37,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom"/>
+        <TextBlock HorizontalAlignment="Left" Margin="60,0,0,13" Text="Not in database" Height="16" VerticalAlignment="Bottom"/>
+        <Rectangle Fill="#FFFFDADA" HorizontalAlignment="Left" Margin="171,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom"/>
+        <TextBlock HorizontalAlignment="Left" Margin="194,0,0,13" Text="File not found" Height="16" VerticalAlignment="Bottom"/>
+        <ComboBox x:Name="MediaTypeCombo" HorizontalAlignment="Left" Margin="88,49,0,0" VerticalAlignment="Top" Width="81" SelectionChanged="Settings_Changed" SelectedIndex="{Binding MediaType, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="5">
+            <ComboBoxItem Content="Videos" />
+            <ComboBoxItem Content="Audios" />
+            <ComboBoxItem Content="Images" />
+        </ComboBox>
+        <TextBlock VerticalAlignment="Top" Margin="12,52,0,0" HorizontalAlignment="Left"><Run Text="Media"/><Run Text=" type"/></TextBlock>
+        <ComboBox x:Name="FilterCombo_Copy" HorizontalAlignment="Left" Margin="87,81,0,0" VerticalAlignment="Top" Width="102" SelectionChanged="Settings_Changed" SelectedIndex="{Binding HasRating, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="7">
+            <ComboBoxItem Content="" IsSelected="True"/>
+            <ComboBoxItem Content="With"/>
+            <ComboBoxItem Content="Without"/>
+            <ComboBoxItem Content="Incomplete"/>
+        </ComboBox>
+        <TextBlock VerticalAlignment="Top" Text="Has rating" Margin="18,84,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingCategoryCombo" HorizontalAlignment="Left" Margin="309,16,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="RatingCategoryCombo_SelectionChanged" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />
+        <TextBlock VerticalAlignment="Top" Text="Rating" Margin="260,17,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingOperatorCombo" HorizontalAlignment="Left" Margin="456,16,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding RatingOperator, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="3">
+            <ComboBoxItem Content="&gt;=" />
+            <ComboBoxItem Content="=" />
+            <ComboBoxItem Content="&lt;" />
+        </ComboBox>
+        <TextBox x:Name="RatingValueText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="507,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, ConverterParameter=12, Converter={StaticResource RatingConverter}, Mode=TwoWay}"/>
+        <TextBox x:Name="RatingValueIntText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="507,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, Mode=TwoWay, TargetNullValue={x:Static sys:String.Empty}, UpdateSourceTrigger=PropertyChanged}" Visibility="Hidden" />
+        <Slider x:Name="RatioSlider" HorizontalAlignment="Left" Margin="362,43,0,0" VerticalAlignment="Top" Width="99" Maximum="1" Minimum="-1" TickPlacement="BottomRight" TabIndex="6" Value="{Binding RatingRatio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Settings_Changed" SmallChange="0.2" />
+        <TextBlock HorizontalAlignment="Left" Margin="367,58,0,0" Text="Height" VerticalAlignment="Top" FontSize="10"/>
+        <TextBlock HorizontalAlignment="Left" Margin="428,58,0,0" Text="Depth" VerticalAlignment="Top" FontSize="10"/>
+        <ComboBox x:Name="FilterCombo" HorizontalAlignment="Left" Margin="309,81,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="Settings_Changed" SelectedIndex="{Binding ConditionField, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="8">
+            <ComboBoxItem Content="" IsSelected="True" />
+            <ComboBoxItem Content="Is in database" />
+            <ComboBoxItem Content="File exists" />
+            <ComboBoxItem Content="Has download URL" />
+            <ComboBoxItem Content="Has buy or download URL" />
+            <ComboBoxItem Content="Has performance problem" />
+        </ComboBox>
+        <TextBlock VerticalAlignment="Top" Text="Condition" Margin="245,84,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="FilterCombo_Copy2" HorizontalAlignment="Left" Margin="456,81,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding ConditionValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="9">
+            <ComboBoxItem Content=""/>
+            <ComboBoxItem Content="Yes"/>
+            <ComboBoxItem Content="No"/>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Left" Margin="309,43,0,0" Text="Priority" VerticalAlignment="Top"/>
+        <TextBlock x:Name="StatusText" HorizontalAlignment="Left" Margin="290,0,0,13" Text="" Height="16" VerticalAlignment="Bottom"/>
+        <local:MediaGrid x:Name="MediaList" Margin="10,113,10,37" Width="Auto" Height="Auto" IsolatedPlayer="True" DataLoaded="MediaList_DataLoaded" ItemDoubleClick="MediaList_ItemDoubleClick" />
+    </Grid>
+</Window>

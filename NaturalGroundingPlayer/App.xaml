@@ -1,0 +1,8 @@
+﻿<Application xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer"  x:Class="NaturalGroundingPlayer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        
+    </Application.Resources>
+</Application>

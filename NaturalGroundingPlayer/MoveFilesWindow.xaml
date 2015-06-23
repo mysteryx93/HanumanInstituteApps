@@ -1,0 +1,43 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.MoveFilesWindow"
+        Title="Move Files" Height="436.466" Width="711.655" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+    <Window.Resources>
+        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <Business:RatingConverter x:Key="RatingConverter"/>
+    </Window.Resources>
+    <Grid>
+        <ListView x:Name="FilesView" Margin="10,50,10,37" SelectedValuePath="VideoId" TabIndex="3" SelectionChanged="FilesView_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Tag="{Binding VideoId}" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsSelected}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Current File Name" DisplayMemberBinding="{Binding FileName, Mode=OneWay}" Width="340"/>
+                    <GridViewColumn Header="New File Name" DisplayMemberBinding="{Binding NewFileName, Mode=OneWay}" Width="280"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="Control.MouseDoubleClick" Handler="FilesView_ItemDoubleClick"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FileExists}" Value="False">
+                            <Setter Property="Background" Value="#FFFFDADA" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <TextBox x:Name="SearchText" HorizontalAlignment="Left" Height="23" Margin="57,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" TextChanged="SearchText_TextChanged" TabIndex="1"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,17,0,0" TextWrapping="Wrap" Text="Search" VerticalAlignment="Top"/>
+        <Button x:Name="MoveFilesButton" Content="Move Selected Files" Margin="0,14,10,0" VerticalAlignment="Top" TabIndex="2" Click="MoveFilesButton_Click" HorizontalAlignment="Right" Width="134"/>
+        <Button x:Name="SelectAllButton" Content="Select All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="4" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="UnselectAllButton" Content="Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="5" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="CloseButton" Content="Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="6" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
