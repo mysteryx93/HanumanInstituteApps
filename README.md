@@ -26,7 +26,7 @@ Here's a sample video <a href="https://www.spiritualselftransformation.com/files
 
 <a href="https://github.com/mysteryx93/NaturalGroundingPlayer/releases">Download the Natural Grounding Player v1.1 here</a>
 
-(Optional) For optimal video playback, install <a href="http://svp-team.com/">SVP (Smooth Video Project) from here</a> and select to install madVR during setup.
+For optimal video playback, install <a href="http://svp-team.com/">SVP (Smooth Video Project) from here</a> and select to install madVR during setup. (Optional)
 
 ## License
 
