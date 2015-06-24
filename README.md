@@ -38,7 +38,7 @@ The Natural Grounding Player is built with .NET, C#, WPF and SQLite. If you're i
 
 ## About the author
 
-Etienne Charland helps you get the life that you want to enjoy closer connected relationships, increase your income, and finally feel confident with the direction you are going with your life. Etienne Charland helps you maximize your full potential on all aspects of your life.
+<a href="https://www.spiritualselftransformation.com">Etienne Charland helps you get the life that you want</a> to enjoy closer connected relationships, increase your income, and finally feel confident with the direction you are going with your life. Etienne Charland helps you maximize your full potential on all aspects of your life.
 
 Visit the author's website at <a href="https://www.spiritualselftransformation.com">Spiritual Self Transformation</a>
 
