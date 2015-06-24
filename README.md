@@ -32,8 +32,14 @@ Here's a sample video <a href="https://www.spiritualselftransformation.com/files
 
 The Natural Grounding Player is an Open Source project distributed under the <a href="https://github.com/mysteryx93/NaturalGroundingPlayer/blob/master/Setup/LICENSE.md">BSD license</a>
 
+## Development
+
+The Natural Grounding Player is built with .NET, C#, WPF and SQLite. If you're interested in contributing to the project, <a href="https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/Roadmap">view the Roadmap page</a> and <a href="https://www.spiritualselftransformation.com/about-us/contact-us">contact me</a> to get you started.
+
 ## About the author
 
 Etienne Charland helps you get the life that you want to enjoy closer connected relationships, increase your income, and finally feel confident with the direction you are going with your life. Etienne Charland helps you maximize your full potential on all aspects of your life.
 
 Visit the author's website at <a href="https://www.spiritualselftransformation.com">Spiritual Self Transformation</a>
+
+I do not take donations. If you want to contribute financially, you can purchase any of my products and services. Purchasing any premium resources such as Powerliminal Meditations within the player within the "Buy Resources" tab also help fund the project.
