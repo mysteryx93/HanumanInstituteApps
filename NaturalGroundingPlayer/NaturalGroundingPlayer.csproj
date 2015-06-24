@@ -137,7 +137,7 @@
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="YoutubeExtractor, Version=0.10.6.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\YoutubeExtractor\bin\Release\Full\YoutubeExtractor.dll</HintPath>
+      <HintPath>.\YoutubeExtractor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
