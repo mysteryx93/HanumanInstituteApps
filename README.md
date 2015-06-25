@@ -5,7 +5,7 @@ The primary goal of this application is to automate Natural Grounding sessions b
 
 To learn more about Natural Grounding, you can read the <a href="https://www.shamanicattraction.com/files/ngguide2011.pdf">2011 Natural Grounding Guide</a> or visit the <a href="http://www.naturalgrounding.net/">Natural Grounding website</a>.
 
-Natural Grounding is a very deep topic. I'm currently writing two books to properly explain what it truly is that will be published on Amazon. [Read more](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/What-Is-Natural-Grounding)
+Natural Grounding is a very deep topic. I'm currently writing two books to properly explain what it truly is that will be published on Amazon. [Read more](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki)
 
 [Join the Natural Grounding community on Facebook here.](https://www.facebook.com/groups/sxenergytransformationalentertainment/)
 
