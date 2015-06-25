@@ -40,7 +40,9 @@ SVP and madVR allow you to greatly enhance your video playback quality, if your 
 
 ## Installation
 
-<a href="https://github.com/mysteryx93/NaturalGroundingPlayer/releases">Download the Natural Grounding Player v1.1 here</a>
+[Download the Natural Grounding Player here](https://sourceforge.net/projects/naturalgroundingplayer/)
+
+[Release Notes](https://github.com/mysteryx93/NaturalGroundingPlayer/releases)
 
 (Optional) Install <a href="http://svp-team.com/">SVP from here</a> and select to install madVR during setup.
 
