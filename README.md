@@ -7,6 +7,8 @@ To learn more about Natural Grounding, you can read the <a href="https://www.sha
 
 Natural Grounding is a very deep topic. I'm currently writing two books to properly explain what it truly is that will be published on Amazon. [Read more](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/What-Is-Natural-Grounding)
 
+[Join the Natural Grounding community on Facebook here.](https://www.facebook.com/groups/sxenergytransformationalentertainment/)
+
 ## Screenshots
 <a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot1.png">Main Window</a>
 
