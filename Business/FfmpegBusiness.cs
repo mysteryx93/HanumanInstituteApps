@@ -13,14 +13,25 @@ namespace Business {
         /// </summary>
         /// <param name="file1">The video file with missing audio.</param>
         /// <param name="file2">The video file containing the audio.</param>
-        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
         /// <param name="destination">The output file.</param>
+        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
         public static void JoinAudioVideo(string file1, string file2, string destination, bool silent) {
             File.Delete(destination);
             if (!string.IsNullOrEmpty(file2))
                 Run(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy ""{2}""", file1, file2, destination), silent);
             else
                 Run(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", file1, destination), silent);
+        }
+
+        /// <summary>
+        /// Extracts the video stream from specified video file.
+        /// </summary>
+        /// <param name="source">The video file to extract from.</param>
+        /// <param name="destination">The output file to create.</param>
+        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
+        public static void ExtractVideo(string source, string destination, bool silent) {
+            File.Delete(destination);
+            Run(string.Format(@"-i ""{0}"" -vcodec copy -an ""{1}""", source, destination), silent);
         }
 
         /// <summary>

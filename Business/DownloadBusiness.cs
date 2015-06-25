@@ -67,7 +67,8 @@ namespace Business {
 
             // Get the highest resolution format.
             int MaxResolution = (from v in VideoList
-                                 where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality)
+                                 where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality) &&
+                                    (v.AdaptiveType == AdaptiveType.Video || (v.VideoType != VideoType.Mp4 && v.VideoType != VideoType.WebM))
                                  orderby v.Resolution descending
                                  select v.Resolution).FirstOrDefault();
             if (MaxResolution == 0)
@@ -85,11 +86,10 @@ namespace Business {
                 await DownloadFilesAsync(downloadInfo, downloadInfo.Callback).ConfigureAwait(false);
             } else {
                 // Download audio and video separately.
-                VideoInfo AudioFile = await SelectBestFormat((from v in VideoList
-                                       where (v.CanExtractAudio || v.AdaptiveType == AdaptiveType.Audio) &&
-                                            v.VideoType == VideoFile.VideoType
+                VideoInfo AudioFile = SelectBestAudio(from v in VideoList
+                                       where (v.CanExtractAudio || v.AdaptiveType == AdaptiveType.Audio)
                                        orderby v.AudioBitrate descending
-                                       select v).ToList());
+                                       select v);
                 downloadInfo.Files.Add(new DownloadItem.FileProgress() {
                     Source = VideoFile,
                     Destination = downloadInfo.Destination + GetCodecExtension(VideoFile.VideoType)
@@ -126,8 +126,8 @@ namespace Business {
         /// <returns>The best format available.</returns>
         public static async Task<BestFormatInfo> SelectBestFormatWithStatus(IEnumerable<VideoInfo> list) {
             BestFormatInfo Result = new BestFormatInfo();
-            VideoInfo WebmFile = list.FirstOrDefault(v => v.VideoType == VideoType.WebM);
-            VideoInfo Mp4File = list.FirstOrDefault(v => v.VideoType == VideoType.Mp4);
+            VideoInfo WebmFile = list.FirstOrDefault(v => v.VideoType == VideoType.WebM && v.AdaptiveType == AdaptiveType.Video);
+            VideoInfo Mp4File = list.FirstOrDefault(v => v.VideoType == VideoType.Mp4 && v.AdaptiveType == AdaptiveType.Video);
             VideoInfo FlvFile = list.FirstOrDefault(v => v.VideoType == VideoType.Flash);
             long WebmFileSize = 0;
             long Mp4FileSize = 0;
@@ -166,10 +166,28 @@ namespace Business {
                 if (Result.BestFile != null && Result.Size == 0)
                     Result.Size = await GetDownloadSize(Result.BestFile);
             }
-            if (Result.BestFile != null)
+
+            if (Result.BestFile != null) {
+                // When download H264 video, see whether OGG (Vorbis) audio is available.
+                if (WebmFile != null && (Result.BestFile.VideoType == VideoType.Mp4 || Result.BestFile.VideoType == VideoType.WebM))
+                    Result.HasVorbisAudio = true;
                 return Result;
-            else 
+            }  else
                 return null;
+        }
+
+        /// <summary>
+        /// Selects OGG (Vorbis) audio if available, otherwise AAC.
+        /// </summary>
+        /// <param name="list">The list of available audios.</param>
+        /// <returns>The audio to download.</returns>
+        public static VideoInfo SelectBestAudio(IEnumerable<VideoInfo> list) {
+            VideoInfo Result = list.Where(v => v.AudioType == AudioType.Vorbis).FirstOrDefault();
+            if (Result == null)
+                Result = list.Where(v => v.AudioType == AudioType.Aac).FirstOrDefault();
+            if (Result == null)
+                Result = list.FirstOrDefault();
+            return Result;
         }
 
         /// <summary>
@@ -226,11 +244,13 @@ namespace Business {
         /// </summary>
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        public string GetFinalExtension(VideoType video) {
+        public string GetFinalExtension(VideoType video, AudioType audio) {
             if (video == VideoType.WebM)
                 return ".webm";
-            else if (video == VideoType.Mp4)
+            else if (video == VideoType.Mp4 && audio == AudioType.Aac)
                 return ".mp4";
+            else if (video == VideoType.Mp4 && audio == AudioType.Vorbis)
+                return ".mkv";
             else
                 return GetCodecExtension(video);
         }
@@ -321,6 +341,8 @@ namespace Business {
                 else if (downloadInfo.IsCanceled)
                     await DownloadCanceledAsync(downloadInfo).ConfigureAwait(false);
                 RaiseCallback(downloadInfo);
+
+                await StartNextDownloadAsync().ConfigureAwait(false);
             }
         }
 
@@ -333,9 +355,11 @@ namespace Business {
                 // Remove extension.
                 Destination = Destination.Substring(0, Destination.Length - Path.GetExtension(Destination).Length);
 
-                string File1Ext = GetCodecExtension(downloadInfo.Files[0].Source.VideoType);
-                string File2Ext = GetAudioExtension(downloadInfo.Files[1].Source.AudioType);
-                string OutputExt = GetFinalExtension(downloadInfo.Files[0].Source.VideoType);
+                VideoType File1Type = downloadInfo.Files[0].Source.VideoType;
+                AudioType File2Type = downloadInfo.Files[1].Source.AudioType;
+                string File1Ext = GetCodecExtension(File1Type);
+                string File2Ext = GetAudioExtension(File2Type);
+                string OutputExt = GetFinalExtension(File1Type, File2Type);
 
                 // Make sure output file doesn't already exist.
                 File.Delete(Destination + OutputExt);
@@ -375,8 +399,6 @@ namespace Business {
                 Business.Save();
             }
             downloadInfo.Request.FileName = video.FileName;
-
-            await StartNextDownloadAsync().ConfigureAwait(false);
         }
 
         private async Task DownloadCanceledAsync(DownloadItem downloadInfo) {
@@ -390,8 +412,6 @@ namespace Business {
             foreach (var item in downloadInfo.Files) {
                 File.Delete(item.Destination);
             }
-
-            await StartNextDownloadAsync().ConfigureAwait(false);
         }
 
         private async Task StartNextDownloadAsync() {
@@ -429,6 +449,7 @@ namespace Business {
     public class BestFormatInfo {
         public VideoInfo BestFile { get; set; }
         public long Size { get; set; }
+        public bool HasVorbisAudio { get; set; }
         public string StatusText { get; set; }
     }
 }

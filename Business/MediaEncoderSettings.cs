@@ -78,7 +78,7 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.h264", JobIndex); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mp4", JobIndex); }
         }
 
         public string FinalFile {

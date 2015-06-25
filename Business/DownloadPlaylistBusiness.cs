@@ -14,7 +14,7 @@ namespace Business {
     /// </summary>
     public class DownloadPlaylistBusiness {
         public DownloadBusiness DownloadManager;
-        private Dictionary<Guid, ScanResultItem> scanResults = new Dictionary<Guid,ScanResultItem>();
+        private Dictionary<Guid, ScanResultItem> scanResults = new Dictionary<Guid, ScanResultItem>();
 
         public DownloadPlaylistBusiness() {
         }
@@ -34,7 +34,8 @@ namespace Business {
                             // Get the highest resolution format.
                             List<string> A = VideoList.Where(v => v.Resolution == 240 || v.Resolution == 360).Select(v => v.DownloadUrl).Distinct().ToList();
                             int OnlineResolution = (from v in VideoList
-                                                    where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality)
+                                                    where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality) &&
+                                                        (v.AdaptiveType == AdaptiveType.Video || (v.VideoType != VideoType.Mp4 && v.VideoType != VideoType.WebM))
                                                     orderby v.Resolution descending
                                                     select v.Resolution).FirstOrDefault();
                             // Select format in this order: WebM, Mp4, or Flash.
@@ -88,34 +89,70 @@ namespace Business {
             if (LocalFileExt == ".flv" && serverFile.BestFile.VideoType != VideoType.Flash)
                 return true;
 
-            // MKV files processed with the Media Encoder shouldn't be replaced.
-            if (LocalFileExt == ".mkv")
-                return false;
-
             // Original VCD files shouldn't be replaced.
             MediaInfoReader InfoReader = new MediaInfoReader();
             await InfoReader.LoadInfoAsync(localFile);
             int LocalFileHeight = InfoReader.Height ?? 0;
-            if (LocalFileHeight == 288)
+            if (LocalFileHeight == 288) {
+                serverFile.StatusText = "Original VCD";
                 return false;
+            }
 
             // For server file size, estimate 10% extra for audio. Estimate 35% advantage for WebM format.
             double ServerFileSize = serverFile.Size * 1.1;
             if (serverFile.BestFile.VideoType == VideoType.WebM)
-                ServerFileSize *= .35;
+                ServerFileSize *= 1.35;
             double LocalFileSize = new FileInfo(localFile).Length;
             if (LocalFileExt == ".webm")
-                LocalFileSize *= .35;
+                LocalFileSize *= 1.35;
 
             // If server resolution is better, download unless local file is bigger.
-            if (serverFile.BestFile.Resolution > LocalFileHeight && ServerFileSize > LocalFileSize)
-                return true;
+            if (serverFile.BestFile.Resolution > RoundResolutionUp(LocalFileHeight)) {
+                if (ServerFileSize > LocalFileSize)
+                    return true;
+                else {
+                    serverFile.StatusText = "Local file larger";
+                    return false;
+                }
+            }
 
             // Is estimated server file size is at least 15% larger than local file (for same resolution), download.
             if (ServerFileSize > LocalFileSize * 1.15)
                 return true;
 
+            // If estimated server file size is of a similar size than local file and Vorbis audio is available, download.
+            if (LocalFileExt == ".mp4" && serverFile.HasVorbisAudio) {
+                if (ServerFileSize > LocalFileSize * .9) {
+                    serverFile.StatusText = "Vorbis audio";
+                    return true;
+                } else {
+                    serverFile.StatusText = "Vorbis available";
+                }
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Round the resolution up to a YouTube standard, because sometimes YouTube offers 1440p but give a 1280p video.
+        /// </summary>
+        /// <param name="resolution">The resolution to round up to a standard number.</param>
+        /// <returns>A standard YouTube resolution</returns>
+        public int RoundResolutionUp(int resolution) {
+            if (resolution > 1440)
+                return 2160;
+            else if (resolution > 1080)
+                return 1440;
+            else if (resolution > 720)
+                return 1080;
+            else if (resolution > 480)
+                return 720;
+            else if (resolution > 360)
+                return 480;
+            else if (resolution > 240)
+                return 360;
+            else 
+                return 240;
         }
 
         public async Task StartDownload(List<VideoListItem> selection) {

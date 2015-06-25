@@ -62,8 +62,9 @@ namespace NaturalGroundingPlayer {
                 ListGridView.Columns.Remove(SelectionColumn);
             VideosView.SelectionMode = AllowMultiSelect ? SelectionMode.Multiple : SelectionMode.Single;
 
-            double ColWidth = ListGridView.Columns.Where(c => c != TitleColumn).Sum(c => c.Width);
-            TitleColumn.Width = this.ActualWidth - ColWidth - 28;
+            // Grid column width does not include zoom.
+            double ColWidth = ListGridView.Columns.Where(c => c != TitleColumn).Sum(c => c.ActualWidth);
+            TitleColumn.Width = (this.ActualWidth / Business.Settings.Zoom) - ColWidth - 28 * Business.Settings.Zoom;
 
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
@@ -188,8 +189,10 @@ namespace NaturalGroundingPlayer {
 
         private void VideosView_ItemRightButtonUp(object sender, MouseButtonEventArgs e) {
             if (VideosView.SelectedItem != null && PopupEnabled) {
-                VideoListItem Item = (VideoListItem)VideosView.SelectedItem;
-                ShowEditFormPopup(Item, sender as UIElement);
+                FrameworkElement element = (FrameworkElement)e.OriginalSource;
+                ListViewItem Item = (ListViewItem)VideosView.ItemContainerGenerator.ContainerFromItem(element.DataContext);
+                if (Item != null)
+                    ShowEditFormPopup((VideoListItem)Item.DataContext, sender as UIElement);
             }
         }
 
