@@ -60,6 +60,8 @@ namespace NaturalGroundingPlayer {
                 ListGridView.Columns.Remove(CustomColumn);
             if (!AllowMultiSelect)
                 ListGridView.Columns.Remove(SelectionColumn);
+            if (!IsStatusVisible)
+                ListGridView.Columns.Remove(StatusColumn);
             VideosView.SelectionMode = AllowMultiSelect ? SelectionMode.Multiple : SelectionMode.Single;
 
             // Grid column width does not include zoom.

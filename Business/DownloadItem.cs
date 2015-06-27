@@ -15,7 +15,7 @@ namespace Business {
             this.Files = new List<FileProgress>();
         }
 
-        public DownloadItem(Media request, string destination, string title, int queuePos, EventHandler<DownloadCompletedEventArgs> callback) {
+        public DownloadItem(Media request, string destination, string title, int queuePos, bool upgradeAudio, EventHandler<DownloadCompletedEventArgs> callback) {
             this.Status = DownloadStatus.Waiting;
             this.Request = request;
             this.Destination = destination;
@@ -23,6 +23,7 @@ namespace Business {
             this.Status = DownloadStatus.Waiting;
             UpdateProgress();
             this.QueuePos = queuePos;
+            this.UpgradeAudio = upgradeAudio;
             this.Callback = callback;
             this.Files = new List<FileProgress>();
         }
@@ -39,6 +40,7 @@ namespace Business {
         public int QueuePos { get; set; }
         private DownloadStatus status;
         public string Progress { get; set; }
+        public bool UpgradeAudio { get; set; }
 
         public DownloadStatus Status {
             get {

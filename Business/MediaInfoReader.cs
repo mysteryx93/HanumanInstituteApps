@@ -48,27 +48,6 @@ namespace Business {
         /// <param name="fileName">The full path of the file to read.</param>
         public async Task LoadInfoAsync(string fileName) {
             lastMedia = await Task.Run(() => ReadMediaFile(fileName));
-
-            //// Open file and wait for task to complete with a timeout of 3 seconds.
-            //openFileTask = new TaskCompletionSource<bool>();
-            //viewer.Source = Settings.NaturalGroundingFolder + item.FileName;
-            //if (await Task.WhenAny(openFileTask.Task, Task.Delay(3000)) == openFileTask.Task) {
-            //    viewer.Stop();
-            //    if (openFileTask.Task.Result == true) {
-            //        // Media file opened.
-            //        if (viewer.Duration > 0)
-            //            item.Length = (short)viewer.Duration;
-            //        if (HasDimensions(item)) {
-            //            item.Width = (short)viewer.VideoWidth;
-            //            item.Height = (short)viewer.VideoHeight;
-            //        } else {
-            //            item.Width = null;
-            //            item.Height = null;
-            //        }
-            //        HasChanges = true;
-            //    }
-            //} else
-            //    openFileTask.TrySetCanceled();
         }
 
         public short? Length {
@@ -129,6 +108,17 @@ namespace Business {
         public string AudioFormat {
             get {
                 return lastMedia.Get(StreamKind.Audio, 0, "Format");
+            }
+        }
+
+        public int? AudioBitRate {
+            get {
+                string StrValue = lastMedia.Get(StreamKind.Audio, 0, "BitRate");
+                int Result = 0;
+                if (int.TryParse(StrValue, out Result))
+                    return Result / 1000;
+                else
+                    return null;
             }
         }
 

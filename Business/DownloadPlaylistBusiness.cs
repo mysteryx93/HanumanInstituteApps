@@ -32,21 +32,12 @@ namespace Business {
                         var VideoList = await VTask;
                         if (VideoList != null) {
                             // Get the highest resolution format.
-                            List<string> A = VideoList.Where(v => v.Resolution == 240 || v.Resolution == 360).Select(v => v.DownloadUrl).Distinct().ToList();
-                            int OnlineResolution = (from v in VideoList
-                                                    where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality) &&
-                                                        (v.AdaptiveType == AdaptiveType.Video || (v.VideoType != VideoType.Mp4 && v.VideoType != VideoType.WebM))
-                                                    orderby v.Resolution descending
-                                                    select v.Resolution).FirstOrDefault();
-                            // Select format in this order: WebM, Mp4, or Flash.
-                            BestFormatInfo VideoFormat = await DownloadBusiness.SelectBestFormatWithStatus(VideoList.Where(v => v.Resolution == OnlineResolution));
-                            if (VideoFormat == null || VideoFormat.BestFile == null)
+                            BestFormatInfo VideoFormat = DownloadBusiness.SelectBestFormat(VideoList);
+                            if (VideoFormat == null || VideoFormat.BestVideo == null)
                                 SetStatus(item, VideoListItemStatusEnum.Failed);
-                            else if (await IsHigherQualityAvailable(Settings.NaturalGroundingFolder + VideoData.FileName, VideoFormat)) {
-                                // else if (LocalFileFormat == null || LocalFileHeight < OnlineResolution || (VideoFormat.BestFile.VideoType == VideoType.WebM && (LocalFileFormat == ".mp4" || LocalFileFormat == ".flv")) || ((VideoFormat.BestFile.VideoType == VideoType.WebM && LocalFileFormat == ".flv"))) {
-                                SetStatus(item, VideoListItemStatusEnum.HigherQualityAvailable);
-                            } else
-                                SetStatus(item, VideoListItemStatusEnum.OK);
+                            else {
+                                SetStatus(item, await IsHigherQualityAvailable(Settings.NaturalGroundingFolder + VideoData.FileName, VideoFormat));
+                            }
                             if (VideoFormat != null && !string.IsNullOrEmpty(VideoFormat.StatusText))
                                 SetStatus(item, item.Status, item.StatusText + string.Format(" ({0})", VideoFormat.StatusText));
                         } else
@@ -79,15 +70,15 @@ namespace Business {
         /// <param name="localFile">A path to the local file.</param>
         /// <param name="serverFile">The information of the available server file.</param>
         /// <returns>True if the local file should be replaced.</returns>
-        public async Task<bool> IsHigherQualityAvailable(string localFile, BestFormatInfo serverFile) {
+        public async Task<VideoListItemStatusEnum> IsHigherQualityAvailable(string localFile, BestFormatInfo serverFile) {
             // If there is no local file, it should be downloaded.
             if (!File.Exists(localFile))
-                return true;
+                return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // If local file is FLV and there's another format available, it should be downloaded.
             string LocalFileExt = Path.GetExtension(localFile).ToLower();
-            if (LocalFileExt == ".flv" && serverFile.BestFile.VideoType != VideoType.Flash)
-                return true;
+            if (LocalFileExt == ".flv" && serverFile.BestVideo.VideoType != VideoType.Flash)
+                return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // Original VCD files shouldn't be replaced.
             MediaInfoReader InfoReader = new MediaInfoReader();
@@ -95,42 +86,46 @@ namespace Business {
             int LocalFileHeight = InfoReader.Height ?? 0;
             if (LocalFileHeight == 288) {
                 serverFile.StatusText = "Original VCD";
-                return false;
+                return VideoListItemStatusEnum.OK;
             }
 
             // For server file size, estimate 10% extra for audio. Estimate 35% advantage for WebM format.
-            double ServerFileSize = serverFile.Size * 1.1;
-            if (serverFile.BestFile.VideoType == VideoType.WebM)
-                ServerFileSize *= 1.35;
-            double LocalFileSize = new FileInfo(localFile).Length;
+            long ServerFileSize = (long)(serverFile.BestVideo.FileSize * 1.1);
+            if (serverFile.BestVideo.VideoType == VideoType.WebM)
+                ServerFileSize = (long)(ServerFileSize * 1.35);
+            long LocalFileSize = new FileInfo(localFile).Length;
             if (LocalFileExt == ".webm")
-                LocalFileSize *= 1.35;
+                LocalFileSize = (long)(LocalFileSize * 1.35);
 
             // If server resolution is better, download unless local file is bigger.
-            if (serverFile.BestFile.Resolution > RoundResolutionUp(LocalFileHeight)) {
+            if (serverFile.BestVideo.Resolution > RoundResolutionUp(LocalFileHeight)) {
                 if (ServerFileSize > LocalFileSize)
-                    return true;
-                else {
+                    return VideoListItemStatusEnum.HigherQualityAvailable;
+                else if (ServerFileSize != 0) {
+                    // non-DASH videos have no file size specified, and we won't replace local video with non-DASH video.
                     serverFile.StatusText = "Local file larger";
-                    return false;
+                    return VideoListItemStatusEnum.OK;
                 }
             }
 
             // Is estimated server file size is at least 15% larger than local file (for same resolution), download.
             if (ServerFileSize > LocalFileSize * 1.15)
-                return true;
+                return VideoListItemStatusEnum.HigherQualityAvailable;
 
-            // If estimated server file size is of a similar size than local file and Vorbis audio is available, download.
-            if (LocalFileExt == ".mp4" && serverFile.HasVorbisAudio) {
-                if (ServerFileSize > LocalFileSize * .9) {
-                    serverFile.StatusText = "Vorbis audio";
-                    return true;
-                } else {
-                    serverFile.StatusText = "Vorbis available";
+            // download audio and merge with local video. (that didn't work, ffmpeg failed to merge back)
+            if (serverFile.BestAudio != null) {
+                int? LocalAudioBitRate = InfoReader.AudioBitRate;
+                if (LocalAudioBitRate == null || LocalAudioBitRate < serverFile.BestAudio.AudioBitrate * .8) {
+                    // Only redownload for audio if video file size is similar. Videos with AdaptiveType=None don't have file size.
+                    if (ServerFileSize > LocalFileSize * .9 || serverFile.BestVideo.AdaptiveType == AdaptiveType.None) {
+                        serverFile.StatusText = "Audio";
+                        return VideoListItemStatusEnum.HigherQualityAvailable;
+                    } else
+                        serverFile.StatusText = "Better audio available";
                 }
             }
 
-            return false;
+            return VideoListItemStatusEnum.OK;
         }
 
         /// <summary>
@@ -151,12 +146,12 @@ namespace Business {
                 return 480;
             else if (resolution > 240)
                 return 360;
-            else 
+            else
                 return 240;
         }
 
         public async Task StartDownload(List<VideoListItem> selection) {
-            var DownloadList = selection.Where(s => s.Status == VideoListItemStatusEnum.HigherQualityAvailable);
+            var DownloadList = selection.Where(s => s.Status == VideoListItemStatusEnum.HigherQualityAvailable || s.Status == VideoListItemStatusEnum.BetterAudioAvailable);
             List<Task> TaskList = new List<Task>();
             foreach (VideoListItem item in DownloadList) {
                 TaskList.Add(DownloadFile(item));
@@ -168,12 +163,14 @@ namespace Business {
             if (DownloadManager != null && item != null && item.MediaId != null) {
                 Media ItemData = PlayerAccess.GetVideoById(item.MediaId.Value);
                 if (ItemData != null) {
+                    bool UpgradeAudio = item.Status == VideoListItemStatusEnum.BetterAudioAvailable;
                     SetStatus(item, VideoListItemStatusEnum.Downloading, null);
-                    if (ItemData.FileName != null && File.Exists(Settings.NaturalGroundingFolder + ItemData.FileName))
+                    if (!UpgradeAudio && ItemData.FileName != null && File.Exists(Settings.NaturalGroundingFolder + ItemData.FileName))
                         FileOperationAPIWrapper.MoveToRecycleBin(Settings.NaturalGroundingFolder + ItemData.FileName);
-                    await DownloadManager.DownloadVideoAsync(ItemData, -1, (sender, e) => {
-                        SetStatus(item, e.DownloadInfo.IsCompleted ? VideoListItemStatusEnum.Done : VideoListItemStatusEnum.Failed);
-                    });
+                    await DownloadManager.DownloadVideoAsync(ItemData, -1, UpgradeAudio,
+                        (sender, e) => {
+                            SetStatus(item, e.DownloadInfo.IsCompleted ? VideoListItemStatusEnum.Done : VideoListItemStatusEnum.Failed);
+                        });
                 }
             }
         }

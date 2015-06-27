@@ -363,6 +363,10 @@ namespace NaturalGroundingPlayer {
                     Ext = ".mp2";
                 else if (MInfo.AudioFormat == "PCM")
                     Ext = ".wav";
+                else if (MInfo.AudioFormat == "Vorbis")
+                    Ext = ".ogg";
+                else if (MInfo.AudioFormat == "Opus")
+                    Ext = ".opus";
                 else
                     Ext = ".aac";
 

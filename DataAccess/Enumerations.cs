@@ -53,6 +53,7 @@ namespace DataAccess {
         OK,
         InvalidUrl,
         HigherQualityAvailable,
+        BetterAudioAvailable,
         DownloadingInfo,
         Downloading,
         Done,

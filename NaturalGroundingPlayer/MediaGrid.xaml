@@ -45,7 +45,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding StatusText, Mode=OneWay}" Header="Status" Width="150"/>
+                    <GridViewColumn x:Name="StatusColumn" DisplayMemberBinding="{Binding StatusText, Mode=OneWay}" Header="Status" Width="150"/>
                 </GridView>
             </ListView.View>
             <ListView.ItemContainerStyle>

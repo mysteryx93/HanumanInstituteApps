@@ -47,6 +47,8 @@ namespace DataAccess {
                     StatusText = "Invalid Url";
                 else if (status == VideoListItemStatusEnum.HigherQualityAvailable)
                     StatusText = "Higher Quality Available";
+                else if (status == VideoListItemStatusEnum.BetterAudioAvailable)
+                    StatusText = "Better Audio Available";
                 else if (status == VideoListItemStatusEnum.DownloadingInfo)
                     StatusText = "Downloading Info";
                 else if (status == VideoListItemStatusEnum.Downloading)

@@ -24,17 +24,6 @@ namespace Business {
         }
 
         /// <summary>
-        /// Extracts the video stream from specified video file.
-        /// </summary>
-        /// <param name="source">The video file to extract from.</param>
-        /// <param name="destination">The output file to create.</param>
-        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        public static void ExtractVideo(string source, string destination, bool silent) {
-            File.Delete(destination);
-            Run(string.Format(@"-i ""{0}"" -vcodec copy -an ""{1}""", source, destination), silent);
-        }
-
-        /// <summary>
         /// Converts specified file into AVI format.
         /// </summary>
         /// <param name="source">The file to convert.</param>
@@ -55,6 +44,17 @@ namespace Business {
         public static void ConvertToH264(string source, string destination, int encodingQuality) {
             File.Delete(destination);
             RunX264(string.Format(@"--preset slower --crf {2} -o ""{0}"" ""{1}""", destination, source, encodingQuality), false);
+        }
+
+        /// <summary>
+        /// Extracts the video stream from specified video file.
+        /// </summary>
+        /// <param name="source">The video file to extract from.</param>
+        /// <param name="destination">The output file to create.</param>
+        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
+        public static void ExtractMp4Video(string source, string destination, bool silent) {
+            File.Delete(destination);
+            Run(string.Format(@"-i ""{0}"" -vcodec copy -an -bsf:v h264_mp4toannexb ""{1}""", source, destination), silent);
         }
 
         /// <summary>
