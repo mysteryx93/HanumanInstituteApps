@@ -49,7 +49,7 @@ namespace NaturalGroundingPlayer {
                 ShowAllFiles.Visibility = Visibility.Hidden;
 
             if (settings.ConditionField == FieldConditionEnum.None)
-                settings.SetCondition(FieldConditionEnum.FileExists, BoolConditionEnum.Yes);
+                settings.SetCondition(FieldConditionEnum.FileExists, true);
 
             if (settings.MediaType == MediaType.None)
                 this.Title = "Search Files";
@@ -102,7 +102,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void ShowAllFiles_Click(object sender, RoutedEventArgs e) {
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes);
+            MediaList.Settings.ConditionValue = ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes;
             if (IsLoaded && !MediaList.IsLoading) {
                 await MediaList.LoadDataAsync();
                 SearchText.Focus();

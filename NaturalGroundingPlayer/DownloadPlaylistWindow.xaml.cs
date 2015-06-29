@@ -47,7 +47,7 @@ namespace NaturalGroundingPlayer {
             timerChangeFilters.Tick += timerChangeFilters_Tick;
 
             this.DataContext = MediaList.Settings;
-            MediaList.Settings.SetCondition(FieldConditionEnum.HasDownloadUrl, BoolConditionEnum.Yes);
+            MediaList.Settings.SetCondition(FieldConditionEnum.HasDownloadUrl, true);
             RatingCategoryCombo.ItemsSource = await MediaList.business.GetRatingCategoriesAsync(true);
             await MediaList.LoadDataAsync();
             isLoaded = true;
@@ -90,18 +90,28 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void ScanButton_Click(object sender, RoutedEventArgs e) {
-            ScanButton.IsEnabled = false;
-            ScanCancel = new CancellationTokenSource();
-            await business.StartScan(SelectedItems, ScanCancel.Token);
+            if (ScanCancel == null) {
+                ScanButton.Content = "_Cancel";
+                ScanCancel = new CancellationTokenSource();
+                await business.StartScan(SelectedItems, ScanCancel.Token);
+            } else
+                ScanCancel.Cancel();
             ScanCancel = null;
-            ScanButton.IsEnabled = true;
+            ScanButton.Content = "_Scan";
             DownloadButton.IsEnabled = true;
+            UpgradeButton.IsEnabled = true;
         }
 
         private async void DownloadButton_Click(object sender, RoutedEventArgs e) {
             DownloadButton.IsEnabled = false;
-            await business.StartDownload(SelectedItems);
+            await business.StartDownload(SelectedItems, false);
             DownloadButton.IsEnabled = true;
+        }
+
+        private async void UpgradeButton_Click(object sender, RoutedEventArgs e) {
+            UpgradeButton.IsEnabled = false;
+            await business.StartDownload(SelectedItems, true);
+            UpgradeButton.IsEnabled = true;
         }
 
         private List<VideoListItem> SelectedItems {

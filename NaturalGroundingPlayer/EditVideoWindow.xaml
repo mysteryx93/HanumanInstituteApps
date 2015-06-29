@@ -23,7 +23,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top" Height="16" Width="96"><Run Text="Download "/><Run Text="Name"/></TextBlock>
         <TextBox x:Name="DownloadNameText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,125,0,0" VerticalAlignment="Top" Width="214" Text="{Binding DownloadName, Mode=TwoWay}" TabIndex="5" MaxLength="100"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" Height="16" Width="85"><Run Text="Download"/><Run Text=" "/><Run Text="URL"/></TextBlock>
-        <TextBox x:Name="DownloadUrlText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,153,0,0" VerticalAlignment="Top" Width="241" Text="{Binding DownloadUrl, Mode=TwoWay}" TabIndex="7" MaxLength="100" LostFocus="DownloadUrlText_LostFocus"/>
+        <TextBox x:Name="DownloadUrlText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,153,0,0" VerticalAlignment="Top" Width="241" Text="{Binding DownloadUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="7" MaxLength="100" LostFocus="DownloadUrlText_LostFocus"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,184,0,0" Text="Buy URL" VerticalAlignment="Top" Height="16" Width="85"/>
         <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,181,0,0" VerticalAlignment="Top" Width="241" Text="{Binding BuyUrl, Mode=TwoWay}" TabIndex="8" MaxLength="100"/>
         <Button x:Name="YouTubeSearchButton" Content="S" Grid.Column="1" HorizontalAlignment="Left" Margin="219,125,0,0" VerticalAlignment="Top" Width="22" Height="22" Click="YouTubeSearchButton_Click" TabIndex="6"/>
@@ -111,8 +111,8 @@
         <TextBlock HorizontalAlignment="Left" Text="Preference" VerticalAlignment="Top" Width="73" Height="16" Margin="0,260,0,0" Grid.ColumnSpan="2" Grid.Column="2"/>
         <TextBox x:Name="PreferenceText" HorizontalAlignment="Left" Height="23" Margin="63,257,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Preference, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="42" Grid.Column="3"/>
         <TextBox x:Name="DimensionText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="165,209,0,0" VerticalAlignment="Top" Width="76" IsReadOnly="True" Text="{Binding Dimension, Mode=OneWay}" TabIndex="12" Background="#FFE6E6E6"/>
-        <CheckBox Content="SVP Quality Problem" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.ColumnSpan="2" IsChecked="{Binding SvpQualityProblem, Mode=TwoWay}" TabIndex="15" />
-        <CheckBox Content="SVP Performance Problem" HorizontalAlignment="Left" Margin="54,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding SvpPerformanceProblem, Mode=TwoWay}" TabIndex="16" />
-        <CheckBox Content="MadVR Performance Problem" HorizontalAlignment="Left" Margin="54,286,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding MadVrPerformanceProblem, Mode=TwoWay}" TabIndex="17" />
+        <CheckBox Content="Personal (can export)" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.ColumnSpan="2" IsChecked="{Binding IsPersonal, Mode=TwoWay}" TabIndex="15" />
+        <CheckBox Content="Disable SVP" HorizontalAlignment="Left" Margin="54,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding DisableSvp, Mode=TwoWay}" TabIndex="16" />
+        <CheckBox Content="Disable MadVR" HorizontalAlignment="Left" Margin="54,286,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding DisableMadVr, Mode=TwoWay}" TabIndex="17" />
     </Grid>
 </Window>

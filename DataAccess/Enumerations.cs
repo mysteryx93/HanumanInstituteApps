@@ -26,7 +26,8 @@ namespace DataAccess {
         FileExists,
         HasDownloadUrl,
         HasBuyOrDownloadUrl,
-        PerformanceProblem
+        PerformanceProblem,
+        IsPersonal
     }
 
     public enum BoolConditionEnum {

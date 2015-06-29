@@ -14,7 +14,7 @@ namespace Business {
     /// </summary>
     public class DownloadPlaylistBusiness {
         public DownloadBusiness DownloadManager;
-        private Dictionary<Guid, ScanResultItem> scanResults = new Dictionary<Guid, ScanResultItem>();
+        private Dictionary<Guid, ScanResultItem> scanResults = new Dictionary<Guid, ScanResultItem>(10);
 
         public DownloadPlaylistBusiness() {
         }
@@ -25,6 +25,18 @@ namespace Business {
                 Media VideoData = PlayerAccess.GetVideoById(item.MediaId.Value);
 
                 if (VideoData != null) {
+                    // Test MediaInfo not releasing file.
+                    //string TestFile = Settings.TempFilesPath + Path.GetFileName(VideoData.FileName);
+                    //File.Delete(TestFile);
+                    //File.Copy(Settings.NaturalGroundingFolder + VideoData.FileName, TestFile);
+                    //MediaInfoReader MediaReader = new MediaInfoReader();
+                    //MediaReader.LoadInfo(TestFile);
+                    //// string VFormat = MediaReader.VideoFormat;
+                    //MediaReader.LoadInfo(Settings.NaturalGroundingFolder + VideoData.FileName);
+                    //await Task.Delay(1000);
+                    //MediaReader.Dispose();
+                    //File.Delete(TestFile);
+
                     try {
                         // Query the server for media info.
                         SetStatus(item, VideoListItemStatusEnum.DownloadingInfo);
@@ -80,25 +92,25 @@ namespace Business {
             if (LocalFileExt == ".flv" && serverFile.BestVideo.VideoType != VideoType.Flash)
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
-            // Original VCD files shouldn't be replaced.
+            // Original VCD files and files of unrecognized extensions should not be replaced.
             MediaInfoReader InfoReader = new MediaInfoReader();
             await InfoReader.LoadInfoAsync(localFile);
-            int LocalFileHeight = InfoReader.Height ?? 0;
-            if (LocalFileHeight == 288) {
-                serverFile.StatusText = "Original VCD";
+            if (!DownloadBusiness.DownloadedExtensions.Contains(LocalFileExt) || InfoReader.VideoFormat == "MPEG Video") {
+                serverFile.StatusText = "Not from YouTube";
                 return VideoListItemStatusEnum.OK;
             }
 
-            // For server file size, estimate 10% extra for audio. Estimate 35% advantage for WebM format.
+            // For server file size, estimate 10% extra for audio. Estimate 35% advantage for VP9 format. non-DASH WebM is VP8 and doesn't have that bonus.
             long ServerFileSize = (long)(serverFile.BestVideo.FileSize * 1.1);
-            if (serverFile.BestVideo.VideoType == VideoType.WebM)
+            if (serverFile.BestVideo.VideoType == VideoType.WebM && serverFile.BestVideo.AdaptiveType == AdaptiveType.Video)
                 ServerFileSize = (long)(ServerFileSize * 1.35);
             long LocalFileSize = new FileInfo(localFile).Length;
-            if (LocalFileExt == ".webm")
+            if (InfoReader.VideoFormat == "VP9")
                 LocalFileSize = (long)(LocalFileSize * 1.35);
 
             // If server resolution is better, download unless local file is bigger.
-            if (serverFile.BestVideo.Resolution > RoundResolutionUp(LocalFileHeight)) {
+            int LocalFileHeight = InfoReader.Height ?? 0;
+            if (serverFile.BestVideo.Resolution > LocalFileHeight) {
                 if (ServerFileSize > LocalFileSize)
                     return VideoListItemStatusEnum.HigherQualityAvailable;
                 else if (ServerFileSize != 0) {
@@ -113,61 +125,46 @@ namespace Business {
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // download audio and merge with local video. (that didn't work, ffmpeg failed to merge back)
-            if (serverFile.BestAudio != null) {
-                int? LocalAudioBitRate = InfoReader.AudioBitRate;
-                if (LocalAudioBitRate == null || LocalAudioBitRate < serverFile.BestAudio.AudioBitrate * .8) {
+            int? LocalAudioBitRate = InfoReader.AudioBitRate;
+            int ServerAudioBitRate = serverFile.BestAudio != null ? serverFile.BestAudio.AudioBitrate : serverFile.BestVideo.AudioBitrate;
+            // Fix a bug where MediaInfo returns no bitrate for MKV containers with AAC audio.
+            if (LocalAudioBitRate != null || LocalFileExt != ".mkv") {
+                if ((LocalAudioBitRate == null || LocalAudioBitRate < ServerAudioBitRate * .8) && serverFile.BestVideo.Resolution == LocalFileHeight) {
                     // Only redownload for audio if video file size is similar. Videos with AdaptiveType=None don't have file size.
-                    if (ServerFileSize > LocalFileSize * .9 || serverFile.BestVideo.AdaptiveType == AdaptiveType.None) {
+                    if (ServerFileSize > LocalFileSize * .9 && serverFile.BestVideo.AdaptiveType == AdaptiveType.Video) {
                         serverFile.StatusText = "Audio";
                         return VideoListItemStatusEnum.HigherQualityAvailable;
-                    } else
-                        serverFile.StatusText = "Better audio available";
+                    } else {
+                        serverFile.StatusText = "";
+                        return VideoListItemStatusEnum.BetterAudioAvailable;
+                    }
                 }
             }
 
             return VideoListItemStatusEnum.OK;
         }
 
-        /// <summary>
-        /// Round the resolution up to a YouTube standard, because sometimes YouTube offers 1440p but give a 1280p video.
-        /// </summary>
-        /// <param name="resolution">The resolution to round up to a standard number.</param>
-        /// <returns>A standard YouTube resolution</returns>
-        public int RoundResolutionUp(int resolution) {
-            if (resolution > 1440)
-                return 2160;
-            else if (resolution > 1080)
-                return 1440;
-            else if (resolution > 720)
-                return 1080;
-            else if (resolution > 480)
-                return 720;
-            else if (resolution > 360)
-                return 480;
-            else if (resolution > 240)
-                return 360;
+        public async Task StartDownload(List<VideoListItem> selection, bool upgradeAudio) {
+            IEnumerable<VideoListItem> DownloadList;
+            if (upgradeAudio)
+                DownloadList = selection.Where(s => s.CanUpgradeAudio);
             else
-                return 240;
-        }
-
-        public async Task StartDownload(List<VideoListItem> selection) {
-            var DownloadList = selection.Where(s => s.Status == VideoListItemStatusEnum.HigherQualityAvailable || s.Status == VideoListItemStatusEnum.BetterAudioAvailable);
+                DownloadList = selection.Where(s => s.Status == VideoListItemStatusEnum.HigherQualityAvailable);
             List<Task> TaskList = new List<Task>();
             foreach (VideoListItem item in DownloadList) {
-                TaskList.Add(DownloadFile(item));
+                TaskList.Add(DownloadFile(item, upgradeAudio));
             }
             await Task.WhenAll(TaskList);
         }
 
-        public async Task DownloadFile(VideoListItem item) {
+        private async Task DownloadFile(VideoListItem item, bool upgradeAudio) {
             if (DownloadManager != null && item != null && item.MediaId != null) {
                 Media ItemData = PlayerAccess.GetVideoById(item.MediaId.Value);
                 if (ItemData != null) {
-                    bool UpgradeAudio = item.Status == VideoListItemStatusEnum.BetterAudioAvailable;
                     SetStatus(item, VideoListItemStatusEnum.Downloading, null);
-                    if (!UpgradeAudio && ItemData.FileName != null && File.Exists(Settings.NaturalGroundingFolder + ItemData.FileName))
+                    if (!upgradeAudio && ItemData.FileName != null && File.Exists(Settings.NaturalGroundingFolder + ItemData.FileName))
                         FileOperationAPIWrapper.MoveToRecycleBin(Settings.NaturalGroundingFolder + ItemData.FileName);
-                    await DownloadManager.DownloadVideoAsync(ItemData, -1, UpgradeAudio,
+                    await DownloadManager.DownloadVideoAsync(ItemData, -1, upgradeAudio,
                         (sender, e) => {
                             SetStatus(item, e.DownloadInfo.IsCompleted ? VideoListItemStatusEnum.Done : VideoListItemStatusEnum.Failed);
                         });

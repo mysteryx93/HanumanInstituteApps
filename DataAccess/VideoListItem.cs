@@ -21,13 +21,6 @@ namespace DataAccess {
         public bool HasDownloadUrl { get; set; }
         public string BuyUrl { get; set; }
         public double? Intensity { get; set; }
-        //public double? PhysicalMasculine { get; set; }
-        //public double? PhysicalFeminine { get; set; }
-        //public double? EmotionalMasculine { get; set; }
-        //public double? EmotionalFeminine { get; set; }
-        //public double? SpiritualMasculine { get; set; }
-        //public double? SpiritualFeminine { get; set; }
-        //public double? Love { get; set; }
         public double? Egoless { get; set; }
         public double? Custom { get; set; }
         public bool FileExists { get; set; }
@@ -60,6 +53,12 @@ namespace DataAccess {
             }
         }
         public string StatusText { get; set; }
+
+        public bool CanUpgradeAudio {
+            get {
+                return status == VideoListItemStatusEnum.BetterAudioAvailable || (status == VideoListItemStatusEnum.HigherQualityAvailable && StatusText.Contains("Audio"));
+            }
+        }
 
         public string BuyName {
             get {

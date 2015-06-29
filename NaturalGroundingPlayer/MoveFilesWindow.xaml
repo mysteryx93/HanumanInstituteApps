@@ -35,9 +35,9 @@
         </ListView>
         <TextBox x:Name="SearchText" HorizontalAlignment="Left" Height="23" Margin="57,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="131" TextChanged="SearchText_TextChanged" TabIndex="1"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,17,0,0" TextWrapping="Wrap" Text="Search" VerticalAlignment="Top"/>
-        <Button x:Name="MoveFilesButton" Content="Move Selected Files" Margin="0,14,10,0" VerticalAlignment="Top" TabIndex="2" Click="MoveFilesButton_Click" HorizontalAlignment="Right" Width="134"/>
-        <Button x:Name="SelectAllButton" Content="Select All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="4" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="UnselectAllButton" Content="Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="5" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="CloseButton" Content="Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="6" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="MoveFilesButton" Content="_Move Selected Files" Margin="200,0,0,10" VerticalAlignment="Bottom" TabIndex="2" Click="MoveFilesButton_Click" HorizontalAlignment="Left" Width="120"/>
+        <Button x:Name="SelectAllButton" Content="Select _All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="4" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="UnselectAllButton" Content="_Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="5" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="6" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

@@ -4,26 +4,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess {
     public class VersionAccess {
+        //public static Version GetVersionInfo() {
+        //    using (Entities context = new Entities()) {
+        //        DbVersion Result = context.DbVersions.Single();
+        //        return new Version(Result.Major, Result.Minor, Result.Build, Result.Revision);
+        //    }
+        //}
+
         public static Version GetVersionInfo() {
             using (Entities context = new Entities()) {
-                DbVersion Result = context.DbVersions.Single();
+                // We must query manually because querying entity objects would fail on outdated databases.
+                DbVersion Result = context.Database.SqlQuery<DbVersion>("SELECT Major, Minor, Build, Revision FROM Version").FirstOrDefault();
                 return new Version(Result.Major, Result.Minor, Result.Build, Result.Revision);
-            }
-        }
-
-        public async static Task<Version> GetVersionInfoAsync() {
-            try {
-                return await Task.Run(() => {
-                    using (Entities context = new Entities()) {
-                        // We must query manually because querying entity objects would fail on outdated databases.
-                        DbVersion Result = context.Database.SqlQuery<DbVersion>("SELECT Major, Minor, Build, Revision FROM Version").FirstOrDefault();
-                        //DbVersion Result = context.DbVersions.Single();
-                        return new Version(Result.Major, Result.Minor, Result.Build, Result.Revision);
-                    }
-                });
-            }
-            catch (Exception ex) {
-                throw ex;
             }
         }
 

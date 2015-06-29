@@ -25,6 +25,8 @@
         <RoutedUICommand x:Key="DownloadPlaylist" Text="Download Playlist" />
         <RoutedUICommand x:Key="MoveFiles" Text="Move Files" />
         <RoutedUICommand x:Key="DistributionGraph" Text="Distribution Graph" />
+        <RoutedUICommand x:Key="Export" Text="Export" />
+        <RoutedUICommand x:Key="Import" Text="Import" />
         <RoutedUICommand x:Key="Exit" Text="Exit" />
         <RoutedUICommand x:Key="DownloadVideo" Text="Download Video" />
         <RoutedUICommand x:Key="ViewDownloads" Text="View Downloads" />
@@ -53,6 +55,8 @@
         <CommandBinding Command="{StaticResource DownloadPlaylist}" Executed="CommandBinding_DownloadPlaylist" />
         <CommandBinding Command="{StaticResource MoveFiles}" Executed="CommandBinding_MoveFiles" />
         <CommandBinding Command="{StaticResource DistributionGraph}" Executed="CommandBinding_DistributionGraph" />
+        <CommandBinding Command="{StaticResource Export}" Executed="CommandBinding_Export" />
+        <CommandBinding Command="{StaticResource Import}" Executed="CommandBinding_Import" />
         <CommandBinding Command="{StaticResource Exit}" Executed="CommandBinding_Exit" />
         <CommandBinding Command="{StaticResource DownloadVideo}" Executed="CommandBinding_DownloadVideo" />
         <CommandBinding Command="{StaticResource ViewDownloads}" Executed="CommandBinding_ViewDownloads" />
@@ -95,6 +99,9 @@
                 <MenuItem x:Name="menuDownloadPlaylist" Header="_Download Playlist..." Command="{StaticResource DownloadPlaylist}"  InputGestureText="F7"/>
                 <MenuItem x:Name="menuMoveFiles" Header="_Move Files..." Command="{StaticResource MoveFiles}" InputGestureText="F8"/>
                 <MenuItem x:Name="menuDistributionGraph" Header="Distribution _Graph..." Command="{StaticResource DistributionGraph}" InputGestureText="F9" />
+                <Separator />
+                <MenuItem x:Name="menuExport" Header="_Export..." Command="{StaticResource Export}" />
+                <MenuItem x:Name="menuImport" Header="_Import..." Command="{StaticResource Import}" />
                 <Separator />
                 <MenuItem x:Name="menuExit" Header="E_xit" Command="{StaticResource Exit}" InputGestureText="Alt+F4" />
             </MenuItem>

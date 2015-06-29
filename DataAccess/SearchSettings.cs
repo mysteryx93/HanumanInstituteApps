@@ -99,9 +99,9 @@ namespace DataAccess {
             set { ConditionFilters[0].Value = value; }
         }
 
-        public void SetCondition(FieldConditionEnum conditionField, BoolConditionEnum conditionValue) {
+        public void SetCondition(FieldConditionEnum conditionField, bool conditionValue) {
             this.ConditionField = conditionField;
-            this.ConditionValue = conditionValue;
+            this.ConditionValue = conditionValue ? BoolConditionEnum.Yes : BoolConditionEnum.No;
         }
 
         public SearchSettings Update(List<Guid> excludeVideos, bool allowDownloading) {

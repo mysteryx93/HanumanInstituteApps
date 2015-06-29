@@ -55,6 +55,7 @@
             <ComboBoxItem Content="Has download URL" />
             <ComboBoxItem Content="Has buy or download URL" />
             <ComboBoxItem Content="Has performance problem" />
+            <ComboBoxItem Content="Is personal" />
         </ComboBox>
         <TextBlock VerticalAlignment="Top" Text="Condition" Margin="245,84,0,0" HorizontalAlignment="Left"/>
         <ComboBox x:Name="FilterCombo_Copy2" HorizontalAlignment="Left" Margin="456,81,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding ConditionValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="9">

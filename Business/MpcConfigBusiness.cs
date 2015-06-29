@@ -160,8 +160,8 @@ namespace Business {
             if (videoStatus == null)
                 videoStatus = new Media();
 
-            IsSvpEnabled = Settings.SavedFile.EnableSvp && !videoStatus.SvpQualityProblem && !videoStatus.SvpPerformanceProblem;
-            IsMadvrEnabled = Settings.SavedFile.EnableMadVR && !videoStatus.MadVrPerformanceProblem;
+            IsSvpEnabled = Settings.SavedFile.EnableSvp && !videoStatus.DisableSvp;
+            IsMadvrEnabled = Settings.SavedFile.EnableMadVR && !videoStatus.DisableMadVr;
         }
 
         /// <summary>

@@ -25,7 +25,6 @@ namespace NaturalGroundingPlayer {
         /// </summary>
         public static EditVideoWindow Instance(Guid? videoId, string fileName, IMediaPlayerBusiness player, ClosingCallback callback) {
             EditVideoWindow NewForm = new EditVideoWindow();
-            NewForm.editMode = EditVideoWindowMode.Edit;
             if (videoId != null && videoId != Guid.Empty)
                 NewForm.videoId = videoId;
             else
@@ -37,22 +36,11 @@ namespace NaturalGroundingPlayer {
         }
 
         /// <summary>
-        /// Displays a window to add a new download.
-        /// </summary>
-        public static EditVideoWindow InstanceAddDownload(ClosingCallback callback) {
-            EditVideoWindow NewForm = new EditVideoWindow();
-            NewForm.editMode = EditVideoWindowMode.AddDownload;
-            NewForm.callback = callback;
-            SessionCore.Instance.Windows.Show(NewForm);
-            return NewForm;
-        }
-
-        /// <summary>
         /// Displays a popup containing the FileBinding menu features.
         /// </summary>
         public static EditVideoWindow InstancePopup(UIElement target, PlacementMode placement, Guid? videoId, string fileName, IMediaPlayerBusiness player, ClosingCallback callback) {
             EditVideoWindow NewForm = new EditVideoWindow();
-            NewForm.editMode = EditVideoWindowMode.Popup;
+            NewForm.isPopup = true;
             NewForm.videoId = videoId;
             if (videoId != null && videoId != Guid.Empty)
                 NewForm.videoId = videoId;
@@ -78,7 +66,7 @@ namespace NaturalGroundingPlayer {
         private bool downloaded;
         private bool isNew;
         private bool isUrlValid;
-        private EditVideoWindowMode editMode;
+        private bool isPopup;
         private WindowHelper helper;
 
         public EditVideoWindow() {
@@ -87,28 +75,21 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
-            if (editMode == EditVideoWindowMode.AddDownload) {
-                // Add Download
-                this.Title = "Add Download";
-                SaveButton.Content = "_Download";
-                FileBindingButton.IsEnabled = false;
-                video = business.NewVideo();
-                isNew = true;
+            if (videoId != null) {
+                video = business.GetVideoById(videoId.Value);
+                if (video.MediaId == Guid.Empty)
+                    throw new InvalidDataException("This Media information has an invalid empty GUID.");
             } else {
-                // Edit or Popup
-                if (videoId != null)
-                    video = business.GetVideoById(videoId.Value);
-                else {
-                    video = business.GetVideoByFileName(fileName);
-                    if (video == null) {
-                        video = business.NewVideo();
-                        video.FileName = fileName;
-                        video.MediaTypeId = (int)EditVideoBusiness.GetFileType(fileName);
-                        video.DownloadName = System.IO.Path.GetFileNameWithoutExtension(fileName);
-                        isNew = true;
-                    }
+                video = business.GetVideoByFileName(fileName);
+                if (video == null) {
+                    video = business.NewVideo();
+                    video.FileName = fileName;
+                    video.MediaTypeId = (int)EditVideoBusiness.GetFileType(fileName);
+                    video.DownloadName = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                    isNew = true;
                 }
             }
+
             this.DataContext = video;
             CategoryCombo.ItemsSource = business.GetCategories(video.MediaTypeId);
             Custom1Combo.ItemsSource = business.GetCustomRatingCategories();
@@ -123,7 +104,7 @@ namespace NaturalGroundingPlayer {
                 ErrorText.Text = "File not found.";
             }
 
-            if (editMode == EditVideoWindowMode.Edit && MediaInfoReader.HasMissingInfo(video))
+            if (!isPopup && MediaInfoReader.HasMissingInfo(video))
                 await LoadMediaInfoAsync();
         }
 
@@ -146,8 +127,7 @@ namespace NaturalGroundingPlayer {
                         video.DownloadName = FirstVid.Title;
                         isUrlValid = true;
                     }
-                }
-                catch { }
+                } catch { }
                 if (!isUrlValid)
                     ErrorText.Text = "Please enter a valid URL";
             }
@@ -164,14 +144,9 @@ namespace NaturalGroundingPlayer {
             this.Close();
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e) {
-            if (SaveChanges()) {
+        private void SaveButton_Click(object sender, RoutedEventArgs e) {
+            if (SaveChanges())
                 this.Close();
-
-                // Start download after closing.
-                if (editMode == EditVideoWindowMode.AddDownload)
-                    await menuDownloadVideo_ClickAsync();
-            }
         }
 
         private bool SaveChanges() {
@@ -193,20 +168,8 @@ namespace NaturalGroundingPlayer {
                 return false;
             }
 
-            if (editMode == EditVideoWindowMode.AddDownload) {
-                if (!isUrlValid) {
-                    ErrorText.Text = "Please enter a valid URL";
-                    return false;
-                }
-
-                if (SessionCore.Instance.Business.DownloadManager.IsDownloadDuplicate(video)) {
-                    ErrorText.Text = "You are already downloading this video.";
-                    return false;
-                }
-            }
-
             // Only update EditedOn when directly editing from the Edit window.
-            if (editMode != EditVideoWindowMode.Popup)
+            if (!isPopup)
                 video.EditedOn = DateTime.UtcNow;
 
             ratingBusiness.UpdateChanges();
@@ -214,7 +177,7 @@ namespace NaturalGroundingPlayer {
             isFormSaved = true;
 
             // Update grid when in popup mode. Otherwise Callback is called in Window_Closing.
-            if (editMode == EditVideoWindowMode.Popup)
+            if (isPopup)
                 callback(video);
 
             return true;
@@ -246,9 +209,9 @@ namespace NaturalGroundingPlayer {
             // Set context menu items visibility.
             if (player == null)
                 FileBindingButton.ContextMenu.Items.Remove(menuPlay);
-            else 
+            else
                 menuPlay.IsEnabled = (!fileNotFound && video.FileName != null);
-            if (editMode != EditVideoWindowMode.Popup)
+            if (!isPopup)
                 FileBindingButton.ContextMenu.Items.Remove(menuEdit);
             string DefaultFileName = GetDefaultFileName();
             menuMoveFile.IsEnabled = (video.Title.Length > 0 && video.FileName != null && video.FileName != DefaultFileName);
@@ -318,7 +281,7 @@ namespace NaturalGroundingPlayer {
                             video.Length = null;
                             video.Height = null;
                             await LoadMediaInfoAsync();
-                            if (editMode == EditVideoWindowMode.Popup)
+                            if (isPopup)
                                 SaveChanges();
                         } else
                             MessageBox.Show("This file is already in the database.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -327,7 +290,7 @@ namespace NaturalGroundingPlayer {
                 }
             } else {
                 // Bind file to an existing entry.
-                SearchSettings settings = new SearchSettings() { 
+                SearchSettings settings = new SearchSettings() {
                     MediaType = (MediaType)video.MediaTypeId,
                     ConditionField = FieldConditionEnum.FileExists,
                     ConditionValue = BoolConditionEnum.No
@@ -387,7 +350,7 @@ namespace NaturalGroundingPlayer {
             video.FileName = null;
             video.Length = null;
             video.Height = null;
-            if (editMode == EditVideoWindowMode.Popup)
+            if (isPopup)
                 SaveChanges();
         }
 
@@ -406,8 +369,7 @@ namespace NaturalGroundingPlayer {
                         isFormSaved = true;
                         this.Close(); // A non-loaded window can still be closed...
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     string Msg = "The file cannot be deleted:\r\n" + ex.Message;
                     MessageBox.Show(Msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
@@ -464,14 +426,5 @@ namespace NaturalGroundingPlayer {
             RatingViewerControl.DisplayValue(Custom1ValueText, ratingBusiness.Custom1, 0);
             RatingViewerControl.DisplayValue(Custom2ValueText, ratingBusiness.Custom2, 0);
         }
-    }
-
-    /// <summary>
-    /// Represents the mode in which to display the editor.
-    /// </summary>
-    public enum EditVideoWindowMode {
-        Edit,
-        AddDownload,
-        Popup
     }
 }

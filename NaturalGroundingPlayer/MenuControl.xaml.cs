@@ -126,6 +126,22 @@ namespace NaturalGroundingPlayer {
             DistributionGraphWindow.Instance();
         }
 
+        private void CommandBinding_Export(object sender, ExecutedRoutedEventArgs e) {
+            if (!menuExport.IsEnabled)
+                return;
+
+            PauseSession();
+            ExportWindow.Instance();
+        }
+
+        private void CommandBinding_Import(object sender, ExecutedRoutedEventArgs e) {
+            if (!menuImport.IsEnabled)
+                return;
+
+            PauseSession();
+            ImportWindow.Instance();
+        }
+
         private void CommandBinding_Exit(object sender, ExecutedRoutedEventArgs e) {
             SessionCore.Instance.Windows.Current.Close();
             Application.Current.Shutdown();

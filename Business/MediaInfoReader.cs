@@ -46,6 +46,14 @@ namespace Business {
         /// Loads media information of specified file.
         /// </summary>
         /// <param name="fileName">The full path of the file to read.</param>
+        public void LoadInfo(string fileName) {
+            lastMedia = ReadMediaFile(fileName);
+        }
+
+        /// <summary>
+        /// Loads media information of specified file.
+        /// </summary>
+        /// <param name="fileName">The full path of the file to read.</param>
         public async Task LoadInfoAsync(string fileName) {
             lastMedia = await Task.Run(() => ReadMediaFile(fileName));
         }
@@ -102,6 +110,12 @@ namespace Business {
                     return Result;
                 else
                     return null;
+            }
+        }
+
+        public string VideoFormat {
+            get {
+                return lastMedia.Get(StreamKind.Video, 0, "Format");
             }
         }
 

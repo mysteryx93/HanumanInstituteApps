@@ -154,11 +154,10 @@
     <Compile Include="MediaRating.cs">
       <DependentUpon>DatabaseModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="MediaSync.cs" />
     <Compile Include="RatingCategory.cs">
       <DependentUpon>DatabaseModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="SqlServerManager.cs" />
+    <Compile Include="SyncAccess.cs" />
     <Compile Include="VersionAccess.cs" />
     <Compile Include="DatabaseModelPartial.cs" />
     <Compile Include="Enumerations.cs" />
@@ -194,6 +193,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DatabaseModelReadme.txt" />
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

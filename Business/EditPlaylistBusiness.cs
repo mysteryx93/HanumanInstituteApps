@@ -168,7 +168,6 @@ namespace Business {
         /// <summary>
         /// Loops through the Media table to set the FileName, Length, Width and Height fields.
         /// </summary>
-        /// <param name="cancellationToken">Allows cancelling the operation. The updated data will still get saved into the database.</param>
         /// <param name="progress">Reports the progress of the operation. First report is the amount of files to process, then subsequent reports represent the quantity done.</param>
         /// <returns>Whether some data was modified.</returns>
         public async Task<bool> LoadMediaInfoAsync(IProgress<int> progress) {
@@ -285,53 +284,9 @@ namespace Business {
                 files.Remove(FileEntry);
         }
 
-        //public VideoListItem RefreshPlaylist(Media video, string oldFileName) {
-        //    VideoListItem NewItem = null;
-        //    if (video.MediaId != Guid.Empty)
-        //        NewItem = SearchVideoAccess.GetVideo(video.MediaId);
-        //    if (NewItem != null) {
-        //        NewItem.FileExists = File.Exists(Settings.NaturalGroundingFolder + NewItem.FileName);
-        //        VideoListItem OldItem = playlist.Where(v => v.MediaId == video.MediaId ||
-        //            string.Equals(v.FileName, NewItem.FileName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-        //        if (OldItem != null)
-        //            playlist.Remove(OldItem);
-        //        playlist.Add(NewItem);
-        //        // If FileName was changed, remove any duplicate entry.
-        //        VideoListItem Orphan = playlist.Find(v => v.MediaId == Guid.Empty && v.FileName == video.FileName);
-        //        if (Orphan != null)
-        //            playlist.Remove(Orphan);
-        //        // If FileName was changed, add any missing entry.
-        //        CheckForOrphanFile(oldFileName);
-        //    } else {
-        //        // Remove deleted entry.
-        //        VideoListItem OldItem;
-        //        if (video.MediaId != Guid.Empty)
-        //            OldItem = playlist.Where(v => v.MediaId == video.MediaId).FirstOrDefault();
-        //        else
-        //            OldItem = playlist.Where(v => v.FileName == oldFileName).FirstOrDefault();
-        //        if (OldItem != null)
-        //            playlist.Remove(OldItem);
-
-        //        CheckForOrphanFile(oldFileName);
-        //    }
-        //    return NewItem;
-        //}
-
-        //private void CheckForOrphanFile(string oldFileName) {
-        //    if (oldFileName != null && 
-        //        playlist.Where(v => v.FileName == oldFileName).Any() == false && 
-        //        File.Exists(Settings.NaturalGroundingFolder + oldFileName)) {
-        //            playlist.Add(new VideoListItem() {
-        //                Title = oldFileName,
-        //                FileName = oldFileName,
-        //                FileExists = true,
-        //                IsInDatabase = false
-        //            });
-        //    }
-        //}
-
         public List<VideoListItem> Playlist {
             get { return playlist; }
+            set { playlist = value; }
         }
 
         public List<VideoListItem> GetSortedPlaylist(string search, string orderBy, ListSortDirection orderDirection) {
@@ -384,6 +339,18 @@ namespace Business {
                 // Several words, return the first letter of each word.
                 return new string(Words.Select(w => w[0]).ToArray()).ToUpper();
             }
+        }
+
+        /// <summary>
+        /// Automatically binds files in the playlist and load missing info.
+        /// </summary>
+        public static async Task AutoBindFilesAsync() {
+            // Auto-bind files
+            EditPlaylistBusiness BindBusiness = new EditPlaylistBusiness();
+            SearchSettings BindSettings = new SearchSettings();
+            BindSettings.SetCondition(FieldConditionEnum.IsInDatabase, true);
+            await BindBusiness.LoadPlaylistAsync(BindSettings);
+            await BindBusiness.LoadMediaInfoAsync(null);
         }
     }
 }

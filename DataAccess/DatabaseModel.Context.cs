@@ -15,20 +15,15 @@ namespace DataAccess
     
     public partial class Entities : DbContext
     {
-        //public Entities()
-        //    : base("name=Entities")
-        //{
-        //}
-    
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Media> Media { get; set; }
         public virtual DbSet<MediaCategory> MediaCategories { get; set; }
-        public virtual DbSet<MediaRating> MediaRatings { get; set; }
         public virtual DbSet<RatingCategory> RatingCategories { get; set; }
         public virtual DbSet<DbVersion> DbVersions { get; set; }
+        public virtual DbSet<Media> Media { get; set; }
+        public virtual DbSet<MediaRating> MediaRatings { get; set; }
     }
 }

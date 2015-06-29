@@ -56,7 +56,7 @@ namespace NaturalGroundingPlayer {
             // Keep main window's settings and it will be set back when closing manual mode.
             mainSettings = SessionCore.Instance.Business.FilterSettings;
             MediaList.Settings.RatingRatio = mainSettings.RatingRatio;
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, BoolConditionEnum.Yes);
+            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, true);
             SessionCore.Instance.Business.FilterSettings = MediaList.Settings;
             this.DataContext = MediaList.Settings;
 
@@ -119,7 +119,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void ShowAllFiles_Click(object sender, RoutedEventArgs e) {
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes);
+            MediaList.Settings.ConditionValue = ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes;
             if (IsLoaded && !MediaList.IsLoading) {
                 await MediaList.LoadDataAsync();
                 SearchText.Focus();

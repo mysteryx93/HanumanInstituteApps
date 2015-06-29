@@ -1,0 +1,16 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer" x:Class="NaturalGroundingPlayer.ImportWindow"
+        Title="Import Personal Data" Height="387" Width="630" Loaded="Window_Loaded">
+    <Grid>
+
+        <NaturalGroundingPlayer:MediaGrid x:Name="MediaList" Margin="10,10,10,37" Height="Auto" Width="Auto" AllowMultiSelect="True" IsPreferenceVisible="False" IsIntensityVisible="False" IsCustomVisible="False" DisableLoadData="true" />
+        <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="11" Margin="0,0,10,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
+        <Button x:Name="SelectAllButton" Content="Select _All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="10" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="UnselectAllButton" Content="_Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="11" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="ImportButton" Content="_Import" Margin="200,0,0,10" Click="ImportButton_Click" TabIndex="12" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsDefault="True"/>
+        <TextBlock x:Name="ProgressText" HorizontalAlignment="Left" Margin="311,0,0,13" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+
+    </Grid>
+</Window>

@@ -52,9 +52,10 @@ namespace Business {
         /// <param name="source">The video file to extract from.</param>
         /// <param name="destination">The output file to create.</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        public static void ExtractMp4Video(string source, string destination, bool silent) {
+        public static void ExtractVideo(string source, string destination, bool silent) {
+            MediaInfoReader MediaReader = new MediaInfoReader();
             File.Delete(destination);
-            Run(string.Format(@"-i ""{0}"" -vcodec copy -an -bsf:v h264_mp4toannexb ""{1}""", source, destination), silent);
+            Run(string.Format(@"-i ""{0}"" -vcodec copy -an ""{1}""", source, destination), silent);
         }
 
         /// <summary>

@@ -22,10 +22,11 @@
         <TextBox x:Name="RatingValueText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Text="{Binding RatingValue, ConverterParameter=12, Converter={StaticResource RatingConverter}, Mode=TwoWay}" Margin="507,15,0,0" Height="23" HorizontalAlignment="Left"/>
         <TextBox x:Name="RatingValueIntText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="507,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, Mode=TwoWay, TargetNullValue={x:Static sys:String.Empty}, UpdateSourceTrigger=PropertyChanged}" Visibility="Hidden" />
         <local:MediaGrid x:Name="MediaList" Margin="10,47,10,37" Width="Auto" Height="Auto" IsPreferenceVisible="False" IsIntensityVisible="False" IsCustomVisible="False" IsStatusVisible="True" AllowMultiSelect="True" TabIndex="6" DataLoaded="MediaList_DataLoaded" />
-        <Button x:Name="SelectAllButton" Content="Select All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="10" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="UnselectAllButton" Content="Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="11" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="CloseButton" Content="Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="14" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="ScanButton" Content="Scan" Margin="200,0,0,10" IsCancel="True" Click="ScanButton_Click" TabIndex="12" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom"/>
-        <Button x:Name="DownloadButton" Content="Download Selected" Margin="295,0,0,10" IsCancel="True" Click="DownloadButton_Click" TabIndex="13" HorizontalAlignment="Left" Width="120" Height="22" VerticalAlignment="Bottom" IsEnabled="False"/>
+        <Button x:Name="SelectAllButton" Content="Select _All" HorizontalAlignment="Left" Margin="10,0,0,10" Width="90" Click="SelectAllButton_Click" TabIndex="10" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="UnselectAllButton" Content="_Unselect All" HorizontalAlignment="Left" Margin="105,0,0,10" Width="90" Click="UnselectAllButton_Click" TabIndex="11" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="15" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
+        <Button x:Name="ScanButton" Content="_Scan" Margin="200,0,0,10" Click="ScanButton_Click" TabIndex="12" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsDefault="True"/>
+        <Button x:Name="DownloadButton" Content="_Download" Margin="295,0,0,10" Click="DownloadButton_Click" TabIndex="13" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsEnabled="False"/>
+        <Button x:Name="UpgradeButton" Content="U_pgrade Audio" Margin="390,0,0,10" Click="UpgradeButton_Click" TabIndex="14" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsEnabled="False"/>
     </Grid>
 </Window>

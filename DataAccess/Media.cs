@@ -43,9 +43,9 @@ namespace DataAccess
         public string DownloadName { get; set; }
         public string DownloadUrl { get; set; }
         public string BuyUrl { get; set; }
-        public bool SvpQualityProblem { get; set; }
-        public bool SvpPerformanceProblem { get; set; }
-        public bool MadVrPerformanceProblem { get; set; }
+        public bool DisableSvp { get; set; }
+        public bool DisableMadVr { get; set; }
+        public bool IsPersonal { get; set; }
     
         public virtual MediaCategory MediaCategory { get; set; }
         public virtual ICollection<MediaRating> MediaRatings { get; set; }

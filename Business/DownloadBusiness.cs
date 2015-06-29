@@ -15,6 +15,7 @@ using System.Net;
 namespace Business {
     public class DownloadBusiness {
         private ObservableCollection<DownloadItem> downloadsList = new ObservableCollection<DownloadItem>();
+        public static string[] DownloadedExtensions = new string[] { ".mp4", ".webm", ".mkv", ".flv" };
 
         public ObservableCollection<DownloadItem> DownloadsList {
             get { return downloadsList; }
@@ -22,7 +23,7 @@ namespace Business {
 
         public event EventHandler DownloadAdded;
 
-                /// <summary>
+        /// <summary>
         /// Downloads specified video from YouTube.
         /// </summary>
         /// <param name="video">The video to download.</param>
@@ -101,20 +102,12 @@ namespace Business {
                         });
                     }
                 }
-            } else {
+            } else if (File.Exists(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName)) {
                 // Keep local video and upgrade audio.
                 VideoInfo AudioFile = SelectBestAudio(from v in VideoList
                                                       where (v.CanExtractAudio || v.AdaptiveType == AdaptiveType.Audio)
                                                       orderby v.AudioBitrate descending
                                                       select v);
-                string VideoDest = downloadInfo.Destination + ".h264";
-                FfmpegBusiness.ExtractMp4Video(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName, VideoDest, true);
-                if (!File.Exists(VideoDest) || AudioFile == null) {
-                    downloadInfo.Status = DownloadStatus.Failed;
-                    RaiseCallback(downloadInfo);
-                    return;
-                }
-
                 downloadInfo.Files.Add(new DownloadItem.FileProgress() {
                     Source = AudioFile,
                     Destination = downloadInfo.Destination + GetAudioExtension(AudioFile.AudioType)
@@ -123,7 +116,7 @@ namespace Business {
 
             await DownloadFilesAsync(downloadInfo, downloadInfo.Callback).ConfigureAwait(false);
         }
-        
+
         /// <summary>
         /// Returns the best format from the list in this order of availability: WebM, Mp4 or Flash.
         /// Mp4 will be chosen if WebM is over 35% smaller.
@@ -132,10 +125,10 @@ namespace Business {
         /// <returns>The best format available.</returns>
         public static BestFormatInfo SelectBestFormat(IEnumerable<VideoInfo> list) {
             var MaxResolutionList = (from v in list
-                                 where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality)
-                                    && v.AdaptiveType != AdaptiveType.Audio
-                                 orderby v.Resolution descending
-                                 select v).ToList();
+                                     where (Settings.SavedFile.MaxDownloadQuality == 0 || v.Resolution <= Settings.SavedFile.MaxDownloadQuality)
+                                        && v.AdaptiveType != AdaptiveType.Audio
+                                     orderby v.Resolution descending
+                                     select v).ToList();
             MaxResolutionList = MaxResolutionList.Where(v => v.Resolution == MaxResolutionList.First().Resolution).ToList();
 
             // If for the maximum resolution, only some formats have a file size, the other ones must be queried.
@@ -146,23 +139,22 @@ namespace Business {
             }
 
             VideoInfo BestVideo = (from v in MaxResolutionList
-                                 // WebM encodes ~35% better
-                                 let Preference = (int)(v.VideoType == VideoType.WebM ? v.FileSize * 1.35 : v.FileSize)
-                                 where v.Resolution == MaxResolutionList.First().Resolution
-                                 orderby Preference descending
-                                 select v).FirstOrDefault();
+                                   // WebM VP9 encodes ~35% better. non-DASH is VP8 and isn't better than MP4.
+                                   let Preference = (int)((v.VideoType == VideoType.WebM && v.AdaptiveType == AdaptiveType.Video) ? v.FileSize * 1.35 : v.FileSize)
+                                   where v.Resolution == MaxResolutionList.First().Resolution
+                                   orderby Preference descending
+                                   select v).FirstOrDefault();
 
             if (BestVideo != null) {
                 BestFormatInfo Result = new BestFormatInfo();
                 Result.BestVideo = BestVideo;
-                if (Result.BestVideo.AdaptiveType == AdaptiveType.Video) {
-                    Result.BestAudio = SelectBestAudio(from v in list
-                                                       where (v.CanExtractAudio || v.AdaptiveType == AdaptiveType.Audio)
-                                                       orderby v.AudioBitrate descending
-                                                       select v);
-                }
+                // Even for non-DASH videos, we still want to know what audio is available even though it may not be downloaded.
+                Result.BestAudio = SelectBestAudio(from v in list
+                                                   where (v.CanExtractAudio || v.AdaptiveType == AdaptiveType.Audio)
+                                                   orderby v.AudioBitrate descending
+                                                   select v);
                 return Result;
-            } else 
+            } else
                 return null;
         }
 
@@ -213,7 +205,7 @@ namespace Business {
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
         public string GetFinalExtension(VideoType video, AudioType audio) {
-            if (video == VideoType.WebM && audio == AudioType.Vorbis)
+            if (video == VideoType.WebM && (audio == AudioType.Vorbis || audio == AudioType.Opus))
                 return ".webm";
             else if (video == VideoType.Mp4 && audio == AudioType.Aac)
                 return ".mp4";
@@ -221,6 +213,30 @@ namespace Business {
                 return ".mkv";
             else
                 return GetCodecExtension(video);
+        }
+
+        /// <summary>
+        /// Returns the file extension for specified video type.
+        /// To avoid conflicting file names, the codec extension must be different than the final extension.
+        /// </summary>
+        /// <param name="video">The video type to get file extension for.</param>
+        /// <returns>The file extension.</returns>
+        public string GetFinalExtension(string video, string audio) {
+            video = video.ToLower();
+            audio = audio.ToLower();
+            if (video == ".vp8" || video == ".vp9")
+                video = ".webm";
+            if (video == ".h264")
+                video = ".mp4";
+
+            if (video == ".webm" && (audio == ".ogg" || audio == ".opus"))
+                return ".webm";
+            else if (video == ".mp4" && audio == ".aac")
+                return ".mp4";
+            else if (video == ".mp4" || video == ".webm")
+                return ".mkv";
+            else
+                return video;
         }
 
         /// <summary>
@@ -303,6 +319,8 @@ namespace Business {
             // Detect whether this is the last file.
             fileInfo.Done = true;
             if (downloadInfo.Files.Any(d => !d.Done) == false) {
+                var NextDownload = StartNextDownloadAsync().ConfigureAwait(false);
+
                 // Raise events for the last file part only.
                 if (downloadInfo.IsCompleted) {
                     try {
@@ -314,12 +332,11 @@ namespace Business {
                     DownloadCanceled(downloadInfo);
                 RaiseCallback(downloadInfo);
 
-                await StartNextDownloadAsync().ConfigureAwait(false);
+                await NextDownload;
             }
         }
 
         private async Task DownloadCompletedAsync(DownloadItem downloadInfo) {
-            downloadInfo.Status = DownloadStatus.Done;
             // Separate file extension.
             string Destination = downloadInfo.Files[0].Destination;
             string DestinationExt = Path.GetExtension(Destination);
@@ -343,23 +360,35 @@ namespace Business {
                 File.Delete(Destination + File1Ext);
                 File.Delete(Destination + File2Ext);
             } else if (downloadInfo.UpgradeAudio) {
-                // Keep existing video and upgrade audio.
-                DestinationExt = ".mkv";
+                // Get original video format.
+                MediaInfoReader MediaReader = new MediaInfoReader();
+                //await MediaReader.LoadInfoAsync(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName);
+                string VideoDestExt = ".mkv";
+                //if (MediaReader.VideoFormat == "VP8" || MediaReader.VideoFormat == "VP9")
+                //    VideoDestExt = ".webm";
+                string VideoDest = downloadInfo.Destination + " (extract)" + VideoDestExt;
 
-                // Remove extension.
-                Destination = Destination.Substring(0, Destination.Length - Path.GetExtension(Destination).Length);
+                // Keep existing video and upgrade audio.
+                string AudioExt = GetAudioExtension(downloadInfo.Files[0].Source.AudioType);
+                DestinationExt = GetFinalExtension(Path.GetExtension(downloadInfo.Request.FileName), AudioExt);
 
                 // Merge audio and video files.
-                string AudioExt = GetAudioExtension(downloadInfo.Files[0].Source.AudioType);
-                await Task.Run(() => FfmpegBusiness.JoinAudioVideo(Destination + ".h264", Destination + AudioExt, Destination + DestinationExt, true));
+                await Task.Run(() => {
+                    FfmpegBusiness.ExtractVideo(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName, VideoDest, true);
+                    if (FileHasContent(VideoDest))
+                        FfmpegBusiness.JoinAudioVideo(VideoDest, Destination + AudioExt, Destination + DestinationExt, true);
+                });
 
                 // Delete source files
-                File.Delete(Destination + ".h264");
+                File.Delete(VideoDest);
                 File.Delete(Destination + AudioExt);
+
+                if (FileHasContent(Destination + DestinationExt) && File.Exists(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName))
+                    FileOperationAPIWrapper.MoveToRecycleBin(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName);
             }
 
             // Ensure download and merge succeeded.
-            if (File.Exists(Destination + DestinationExt) && new FileInfo(Destination + DestinationExt).Length > 524288) {
+            if (FileHasContent(Destination + DestinationExt)) {
                 // Get final file name.
                 DefaultMediaPath PathCalc = new DefaultMediaPath();
                 string NewFileName = PathCalc.GetDefaultFileName(video.Artist, video.Title, video.MediaCategoryId, (MediaType)video.MediaTypeId);
@@ -386,6 +415,8 @@ namespace Business {
                 Business.Save();
             }
             downloadInfo.Request.FileName = video.FileName;
+
+            downloadInfo.Status = DownloadStatus.Done;
         }
 
         private void DownloadCanceled(DownloadItem downloadInfo) {
@@ -406,6 +437,15 @@ namespace Business {
             DownloadItem NextDownload = downloadsList.Where(d => d.Status == DownloadStatus.Waiting).LastOrDefault();
             if (NextDownload != null)
                 await StartDownloadAsync(NextDownload).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Returns whether specified file exists and contains data (at least 500KB).
+        /// </summary>
+        /// <param name="fileName">The path of the file to check.</param>
+        /// <returns>Whether the file contains data.</returns>
+        private bool FileHasContent(string fileName) {
+            return File.Exists(fileName) && new FileInfo(fileName).Length > 524288;
         }
 
         public bool IsDownloadDuplicate(Media request) {

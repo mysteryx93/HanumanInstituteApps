@@ -17,9 +17,9 @@ namespace Business {
             return stringwriter.ToString();
         }
 
-        public static T Deserialize<T>(string xmlText) {
+        public static T Deserialize<T>(string xmlText, string root) where T : class, new() {
             var stringReader = new StringReader(xmlText);
-            var serializer = new XmlSerializer(typeof(T));
+            var serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(root));
             return (T)serializer.Deserialize(stringReader);
         }
     }

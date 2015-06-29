@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Data.SQLite;
 using System.Linq;
 using System.Linq.Expressions;

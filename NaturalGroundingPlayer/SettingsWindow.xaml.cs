@@ -89,12 +89,7 @@ namespace NaturalGroundingPlayer {
                 if (IsFirstRun || settings.MediaPlayerApp != currentPlayer)
                     SessionCore.Instance.Business.SetPlayer(SessionCore.Instance.GetNewPlayer());
 
-                // Auto-bind files
-                EditPlaylistBusiness BindBusiness = new EditPlaylistBusiness();
-                SearchSettings BindSettings = new SearchSettings();
-                BindSettings.SetCondition(FieldConditionEnum.IsInDatabase, BoolConditionEnum.Yes);
-                await BindBusiness.LoadPlaylistAsync(BindSettings);
-                await BindBusiness.LoadMediaInfoAsync(null);
+                await EditPlaylistBusiness.AutoBindFilesAsync();
             }
         }
 

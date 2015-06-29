@@ -27,9 +27,8 @@ namespace Business {
             Version CurrentVersion = null;
             try {
                 // Test query.
-                CurrentVersion = await VersionAccess.GetVersionInfoAsync();
-            }
-            catch {
+                CurrentVersion = await Task.Run(() => VersionAccess.GetVersionInfo());
+            } catch {
             }
 
             if (CurrentVersion == null) {
@@ -37,7 +36,7 @@ namespace Business {
                 if (!File.Exists(Settings.DatabasePath) || new FileInfo(Settings.DatabasePath).Length == 0)
                     await CreateNewDatabaseAsync();
 
-                await QueryUntilTimeout(10000);
+                await TryUntilTimeout(() => VersionAccess.GetVersionInfo(), 10000);
             }
 
             // If database connection is successfull, ensure database file is up to date.
@@ -51,12 +50,12 @@ namespace Business {
         public async Task UpdateDatabaseAsync() {
             Version databaseVersion = VersionAccess.GetVersionInfo();
 
-            if (databaseVersion < new Version(1, 1, 0, 0)) {
+            if (databaseVersion < new Version(1, 2, 0, 0)) {
                 if (isDatabaseRecreated)
                     throw new Exception(string.Format("InitialDatabase version {0} is outdated.", databaseVersion.ToString()));
 
-                DetachDatabase();
-                File.Delete(Settings.DatabasePath);
+                GC.Collect();
+                await TryUntilTimeout(() => File.Delete(Settings.DatabasePath), 10000);
                 isDatabaseRecreated = true;
                 await EnsureAvailableAsync();
 
@@ -95,46 +94,58 @@ namespace Business {
             }
         }
 
-        private async Task QueryUntilTimeout(int timeout) {
+        private async Task TryUntilTimeout(Action action, int timeout) {
             DateTime StartTime = DateTime.Now;
-            Exception DbError = null;
-
-            // First try
-            try {
-                await VersionAccess.GetVersionInfoAsync();
-            }
-            catch (Exception ex) {
-                DbError = ex;
-            }
-
-            // Keep trying until timeout
-            while (DbError != null && (DateTime.Now - StartTime).TotalMilliseconds < timeout) {
+            while (true) {
                 try {
-                    await Task.Delay(500);
-                    await VersionAccess.GetVersionInfoAsync();
-                    DbError = null;
+                    await Task.Run(action);
+                    return;
+                } catch {
+                    if ((DateTime.Now - StartTime).TotalMilliseconds > timeout)
+                        throw;
                 }
-                catch (Exception ex) {
-                    DbError = ex;
-                }
-            }
-
-            // If it still fails, throw exception
-            if (DbError != null)
-                throw DbError;
-        }
-
-        private void DetachDatabase() {
-            var db = Settings.DatabasePath.ToUpper();
-            using (var conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True")) {
-                conn.Open();
-                var cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format(@"ALTER DATABASE [{0}] SET OFFLINE WITH ROLLBACK IMMEDIATE", db);
-                cmd.ExecuteNonQuery();
-                cmd.CommandText = string.Format(@"exec sp_detach_db '{0}'", db);
-                cmd.ExecuteNonQuery();
+                await Task.Delay(500);
             }
         }
+
+        //private async Task QueryUntilTimeout(int timeout) {
+        //    DateTime StartTime = DateTime.Now;
+        //    Exception DbError = null;
+
+        //    // First try
+        //    try {
+        //        await VersionAccess.GetVersionInfoAsync();
+        //    } catch (Exception ex) {
+        //        DbError = ex;
+        //    }
+
+        //    // Keep trying until timeout
+        //    while (DbError != null && (DateTime.Now - StartTime).TotalMilliseconds < timeout) {
+        //        try {
+        //            await Task.Delay(500);
+        //            await VersionAccess.GetVersionInfoAsync();
+        //            DbError = null;
+        //        } catch (Exception ex) {
+        //            DbError = ex;
+        //        }
+        //    }
+
+        //    // If it still fails, throw exception
+        //    if (DbError != null)
+        //        throw DbError;
+        //}
+
+        //private void DetachDatabase() {
+        //    var db = Settings.DatabasePath.ToUpper();
+        //    using (var conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True")) {
+        //        conn.Open();
+        //        var cmd = conn.CreateCommand();
+        //        cmd.CommandText = string.Format(@"ALTER DATABASE [{0}] SET OFFLINE WITH ROLLBACK IMMEDIATE", db);
+        //        cmd.ExecuteNonQuery();
+        //        cmd.CommandText = string.Format(@"exec sp_detach_db '{0}'", db);
+        //        cmd.ExecuteNonQuery();
+        //    }
+        //}
 
         /// <summary>
         /// Runs the specified database script.

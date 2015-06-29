@@ -34,6 +34,7 @@ namespace NaturalGroundingPlayer {
         public bool IsIntensityVisible { get; set; }
         public bool IsCustomVisible { get; set; }
         public bool IsStatusVisible { get; set; }
+        public bool DisableLoadData { get; set; }
         public bool AllowMultiSelect { get; set; }
         public bool IsLoading { get; private set; }
         public event EventHandler DataLoaded;
@@ -98,26 +99,44 @@ namespace NaturalGroundingPlayer {
         }
 
         public async Task LoadDataAsync() {
+            if (DisableLoadData)
+                return;
+
             IsLoading = true;
-            if (lastHeaderClicked.DisplayMemberBinding != null)
+            if (lastHeaderClicked == StatusColumn)
+                Settings.OrderBy = "Artist";
+            else if (lastHeaderClicked.DisplayMemberBinding != null)
                 Settings.OrderBy = ((Binding)lastHeaderClicked.DisplayMemberBinding).Path.Path;
             else
                 Settings.OrderBy = lastHeaderClicked.HeaderStringFormat;
             Settings.OrderByDirection = lastDirection;
             await business.LoadPlaylistAsync(Settings, true);
-            DisplayData();
-            IsLoading = false;
             if (DataLoaded != null)
                 DataLoaded(this, null);
+            DisplayData();
+            IsLoading = false;
         }
 
         public void Clear() {
             VideosView.ItemsSource = null;
         }
 
+        public void DisplayData(List<VideoListItem> items) {
+            business.Playlist = items;
+            DisplayData();
+        }
+
         private void DisplayData() {
             int CurrentSelection = VideosView.SelectedIndex;
-            VideosView.ItemsSource = business.Playlist;
+            // Sort after loading for Status column.
+            List<VideoListItem> SortList = business.Playlist;
+            if (lastHeaderClicked == StatusColumn) {
+                if (lastDirection == ListSortDirection.Ascending)
+                    SortList = SortList.OrderBy(v => v.StatusText).ToList();
+                else
+                    SortList = SortList.OrderByDescending(v => v.StatusText).ToList();
+            }
+            VideosView.ItemsSource = SortList;
 
             // Display custom column header when custom rating is selected.
             if (string.IsNullOrEmpty(Settings.RatingCategory) || business.Playlist.Where(v => v.Custom != null).Any() == false)
@@ -142,7 +161,7 @@ namespace NaturalGroundingPlayer {
                   e.OriginalSource as GridViewColumnHeader;
             ListSortDirection direction;
 
-            if (headerClicked != null && headerClicked.Role != GridViewColumnHeaderRole.Padding && !string.IsNullOrEmpty((string)headerClicked.Column.Header) && (string)headerClicked.Column.Header != "Status") {
+            if (headerClicked != null && headerClicked.Role != GridViewColumnHeaderRole.Padding && !string.IsNullOrEmpty((string)headerClicked.Column.Header)) {
                 if (headerClicked.Column != lastHeaderClicked) {
                     direction = ListSortDirection.Ascending;
                 } else {
