@@ -34,17 +34,25 @@ The media encoder is one piece of the software that will be very useful for anyo
 
 Here's a sample video <a href="https://www.spiritualselftransformation.com/files/media-encoder-old.mpg">before</a> and <a href="https://www.spiritualselftransformation.com/files/media-encoder-new.mkv">after</a>.
 
+[How to Convert Videos to 60fps](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/Convert-Videos-to-60fps)
+
+[How to Rip and Optimize VCDs](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/How-to-Rip-VCDs)
+
+[How to Rip and Optimize DVDs](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/How-to-Rip-DVDs)
+
 ## Best Playback Quality
 
 SVP and madVR allow you to greatly enhance your video playback quality, if your computer can handle it. SVP will run on any good CPU and increase the frame rate to 60fps, while madVR will take the most out of your graphic card to resize videos with better algorithms. These components are very powerful but difficult to configure. The SVP Setup Wizard will make it easy and simple. Furthermore, the Natural Grounding Player will enable and disable these components automatically. If one video doesn't play well with SVP, you can configure the player to disable SVP only for that video.
 
 ## Installation
 
+(Optional) Install [SVP from here](http://svp-team.com/) and select to install madVR during setup.
+
+(Optional) [Install a Codec Pack](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/Should-I-Install-a-Codec-Pack)
+
 [Download the Natural Grounding Player here](https://sourceforge.net/projects/naturalgroundingplayer/)
 
 [Release Notes](https://github.com/mysteryx93/NaturalGroundingPlayer/releases)
-
-(Optional) Install <a href="http://svp-team.com/">SVP from here</a> and select to install madVR during setup.
 
 ## License
 
