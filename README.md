@@ -1,3 +1,5 @@
+>> [Download the Natural Grounding Player here](https://sourceforge.net/projects/naturalgroundingplayer/)
+
 # Natural Grounding Player
 Provides the ultimate media playback experience by sequencing videos based on their energy readings. It contains the best catalog of videos, the best YouTube downloader and the best media encoder you can find.
 
@@ -50,7 +52,7 @@ SVP and madVR allow you to greatly enhance your video playback quality, if your 
 
 (Optional) [Install a Codec Pack](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/Should-I-Install-a-Codec-Pack)
 
-[Download the Natural Grounding Player here](https://sourceforge.net/projects/naturalgroundingplayer/)
+>> [Download the Natural Grounding Player here](https://sourceforge.net/projects/naturalgroundingplayer/)
 
 [Release Notes](https://github.com/mysteryx93/NaturalGroundingPlayer/releases)
 
