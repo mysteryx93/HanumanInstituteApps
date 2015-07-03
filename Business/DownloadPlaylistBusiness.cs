@@ -26,16 +26,13 @@ namespace Business {
 
                 if (VideoData != null) {
                     // Test MediaInfo not releasing file.
-                    //string TestFile = Settings.TempFilesPath + Path.GetFileName(VideoData.FileName);
-                    //File.Delete(TestFile);
-                    //File.Copy(Settings.NaturalGroundingFolder + VideoData.FileName, TestFile);
-                    //MediaInfoReader MediaReader = new MediaInfoReader();
-                    //MediaReader.LoadInfo(TestFile);
-                    //// string VFormat = MediaReader.VideoFormat;
-                    //MediaReader.LoadInfo(Settings.NaturalGroundingFolder + VideoData.FileName);
-                    //await Task.Delay(1000);
-                    //MediaReader.Dispose();
-                    //File.Delete(TestFile);
+                    string TestFile = Settings.TempFilesPath + Path.GetFileName(VideoData.FileName);
+                    File.Delete(TestFile);
+                    File.Copy(Settings.NaturalGroundingFolder + VideoData.FileName, TestFile);
+                    MediaInfoReader MediaReader = new MediaInfoReader();
+                    MediaReader.LoadInfo(TestFile);
+                    string VFormat = MediaReader.VideoFormat;
+                    File.Delete(TestFile);
 
                     try {
                         // Query the server for media info.

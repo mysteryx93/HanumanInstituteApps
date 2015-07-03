@@ -10,6 +10,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Business;
 using DataAccess;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Navigation;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -29,6 +33,7 @@ namespace NaturalGroundingPlayer {
         private MpcPlayerBusiness playerMpc = new MpcPlayerBusiness();
         private MediaEncoderSettings encodeSettings = new MediaEncoderSettings();
         private MediaEncoderBusiness business = new MediaEncoderBusiness();
+        private bool isBinding = false;
 
         public MediaEncoderWindow() {
             InitializeComponent();
@@ -37,6 +42,7 @@ namespace NaturalGroundingPlayer {
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
             this.DataContext = encodeSettings;
+            ScriptTab.Items.CurrentChanging += new CurrentChangingEventHandler(Items_CurrentChanging);
             playerOriginal.Title = "Original";
             playerOriginal.WindowState = WindowState.Maximized;
             playerChanges.Title = "Preview Changes";
@@ -84,26 +90,29 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void SelectVideoButton_Click(object sender, RoutedEventArgs e) {
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { 
-                MediaType = MediaType.Video, 
-                ConditionField = FieldConditionEnum.FileExists, 
+            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() {
+                MediaType = MediaType.Video,
+                ConditionField = FieldConditionEnum.FileExists,
                 ConditionValue = BoolConditionEnum.Yes,
                 RatingCategory = "Height",
-                RatingOperator = OperatorConditionEnum.Smaller}, false);
+                RatingOperator = OperatorConditionEnum.Smaller
+            }, false);
             if (Result != null && Result.FileName != null) {
                 ClosePreview();
+                encodeSettings.FileName = null;
+                encodeSettings.CustomScript = null;
+                ScriptTab.SelectedIndex = 0;
                 encodeSettings.FileName = Result.FileName;
 
                 try {
-                    await business.ConvertToAvi(Result.FileName, encodeSettings);
+                    await business.OpenPreview(encodeSettings, true);
                     encodeSettings.Crop = false;
                     encodeSettings.CropLeft = 0;
                     encodeSettings.CropTop = 0;
                     encodeSettings.CropRight = 0;
                     encodeSettings.CropBottom = 0;
                     PresetCombo_SelectionChanged(null, null);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
                     encodeSettings.FileName = "";
                 }
@@ -111,8 +120,11 @@ namespace NaturalGroundingPlayer {
         }
 
         public void SetEncodeSettings(MediaEncoderSettings value) {
+            isBinding = true;
+            ScriptTab.SelectedIndex = (String.IsNullOrEmpty(value.CustomScript) ? 0 : 1);
             encodeSettings = value;
             this.DataContext = value;
+            isBinding = false;
         }
 
         public void ClosePreview() {
@@ -128,13 +140,17 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void PreviewChangesButton_Click(object sender, RoutedEventArgs e) {
-            business.GenerateScript(encodeSettings, true, false);
-            await PlayVideoAsync(playerChanges, Settings.TempFilesPath + "Preview.avs");
+            if (Validate()) {
+                business.GenerateScript(encodeSettings, true, false);
+                await PlayVideoAsync(playerChanges, Settings.TempFilesPath + "Preview.avs");
+            }
         }
 
         private async void PreviewMpcButton_Click(object sender, RoutedEventArgs e) {
-            business.GenerateScript(encodeSettings, false, false);
-            await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
+            if (Validate()) {
+                business.GenerateScript(encodeSettings, false, false);
+                await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
+            }
         }
 
         private async Task PlayVideoAsync(WmpPlayerWindow playerWindow, string fileName) {
@@ -149,10 +165,8 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void EncodeButton_Click(object sender, RoutedEventArgs e) {
-            if (!Validate()) {
-                MessageBox.Show(this, "You must enter required file information.", "Validation Error");
+            if (!Validate())
                 return;
-            }
 
             MediaEncoderSettings EncodeSettings = encodeSettings;
             try {
@@ -161,9 +175,8 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.FileName = "";
                 await Task.Delay(100); // Wait for media player file to be released.
                 await business.EncodeFileAsync(EncodeSettings);
-            }
-            catch (Exception ex) {
-                if (System.IO.File.Exists(Settings.TempFilesPath + "Preview.avi"))
+            } catch (Exception ex) {
+                if (!encodeSettings.ConvertToAvi || System.IO.File.Exists(Settings.TempFilesPath + "Preview.avi"))
                     SetEncodeSettings(EncodeSettings);
                 MessageBox.Show(this, ex.Message, "Encoding Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -179,6 +192,8 @@ namespace NaturalGroundingPlayer {
                 !encodeSettings.SourceHeight.HasValue ||
                 !encodeSettings.SourceWidth.HasValue ||
                 !encodeSettings.SourceFrameRate.HasValue;
+            if (Error)
+                MessageBox.Show(this, "You must enter required file information.", "Validation Error");
             return !Error;
         }
 
@@ -192,14 +207,6 @@ namespace NaturalGroundingPlayer {
         }
 
         private void PresetCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            //MediaEncoderSettings NewSettings = new MediaEncoderSettings();
-            //NewSettings.FileName = settings.FileName;
-            //NewSettings.SourceHeight = settings.SourceHeight;
-            //NewSettings.SourceWidth = settings.SourceWidth;
-            //NewSettings.SourceAspectRatio = settings.SourceAspectRatio;
-            //NewSettings.SourceFrameRate = settings.SourceFrameRate;
-            //NewSettings.Position = settings.Position;
-
             if (PresetCombo.SelectedIndex == 0) {
                 // Good SD
                 encodeSettings.DoubleNNEDI3Before = true;
@@ -207,10 +214,11 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3 = true;
                 encodeSettings.Denoise = true;
                 encodeSettings.DenoiseStrength = 30;
+                encodeSettings.DenoiseSharpen = 20;
                 encodeSettings.SharpenAfterDouble = true;
-                encodeSettings.SharpenAfterDoubleStrength = 10;
-                encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 10;
+                encodeSettings.SharpenAfterDoubleStrength = 20;
+                encodeSettings.SharpenFinal = false;
+                encodeSettings.SharpenFinalStrength = 20;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 720;
                 encodeSettings.EncodeQuality = 24;
@@ -227,10 +235,11 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3 = false;
                 encodeSettings.Denoise = true;
                 encodeSettings.DenoiseStrength = 30;
+                encodeSettings.DenoiseSharpen = 20;
                 encodeSettings.SharpenAfterDouble = true;
-                encodeSettings.SharpenAfterDoubleStrength = 10;
+                encodeSettings.SharpenAfterDoubleStrength = 30;
                 encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 10;
+                encodeSettings.SharpenFinalStrength = 30;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 720;
                 encodeSettings.EncodeQuality = 24;
@@ -247,13 +256,14 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3 = true;
                 encodeSettings.Denoise = true;
                 encodeSettings.DenoiseStrength = 30;
+                encodeSettings.DenoiseSharpen = 10;
                 encodeSettings.SharpenAfterDouble = true;
                 encodeSettings.SharpenAfterDoubleStrength = 10;
                 encodeSettings.SharpenFinal = true;
                 encodeSettings.SharpenFinalStrength = 25;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 720;
-                encodeSettings.EncodeQuality = 25;
+                encodeSettings.EncodeQuality = 24;
                 encodeSettings.IncreaseFrameRate = true;
                 encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.fps60;
                 if (encodeSettings.SourceHeight == 360) {
@@ -267,6 +277,7 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3 = true;
                 encodeSettings.Denoise = true;
                 encodeSettings.DenoiseStrength = 10;
+                encodeSettings.DenoiseSharpen = 5;
                 encodeSettings.SharpenAfterDouble = false;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.Resize = true;
@@ -281,6 +292,7 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3 = false;
                 encodeSettings.Denoise = false;
                 encodeSettings.DenoiseStrength = 10;
+                encodeSettings.DenoiseSharpen = 5;
                 encodeSettings.SharpenAfterDouble = false;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.Resize = false;
@@ -294,6 +306,7 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleEEDI3 = false;
                 encodeSettings.DoubleNNEDI3 = true;
                 encodeSettings.DenoiseStrength = 30;
+                encodeSettings.DenoiseSharpen = 20;
                 encodeSettings.SharpenFinalStrength = 20;
                 encodeSettings.Denoise = false;
                 encodeSettings.SharpenAfterDouble = false;
@@ -309,6 +322,42 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.FixColors = false;
             else
                 encodeSettings.FixColors = (encodeSettings.SourceHeight <= 480);
+        }
+
+        private async void OpenMethod_Checked(object sender, RoutedEventArgs e) {
+            if (!isBinding)
+                await business.OpenPreview(encodeSettings, false);
+        }
+
+        private void Items_CurrentChanging(object sender, CurrentChangingEventArgs e) {
+            if (string.IsNullOrEmpty(encodeSettings.FileName))
+                return;
+
+            ScriptTab.Focus();
+            var item = ((ICollectionView)sender).CurrentItem;
+            bool Cancel = false;
+            if (ScriptTab.SelectedIndex == 1 && string.IsNullOrEmpty(encodeSettings.CustomScript)) {
+                if (Validate())
+                    business.GenerateCustomScript(encodeSettings);
+                else
+                    Cancel = true;
+            } else if (ScriptTab.SelectedIndex == 0) {
+                if (business.CustomScriptHasChanges(encodeSettings))
+                    if (MessageBox.Show("You will lose any changes to your script. Are you sure?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
+                        Cancel = true;
+                if (!Cancel)
+                    encodeSettings.CustomScript = null;
+            }
+
+            if (Cancel) {
+                e.Cancel = true;
+                ScriptTab.SelectedItem = item;
+            }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e) {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

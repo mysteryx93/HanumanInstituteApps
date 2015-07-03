@@ -12,6 +12,7 @@ namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
     public class MediaEncoderSettings : ICloneable {
+        public bool ConvertToAvi { get; set; }
         public string FileName { get; set; }
         [DefaultValue(null)]
         public double? Position { get; set; }
@@ -22,6 +23,15 @@ namespace Business {
         public double SourceAspectRatio { get; set; }
         [DefaultValue(null)]
         public double? SourceFrameRate { get; set; }
+        private bool audioRequiresMkv;
+        public bool AudioRequiresMkv {
+            get { return audioRequiresMkv; }
+            set {
+                audioRequiresMkv = value;
+                if (value && !ignoreAudio)
+                    EncodeMp4 = false;
+            }
+        }
         public bool FixColors { get; set; }
         public bool DoubleNNEDI3Before { get; set; }
         public bool DoubleEEDI3 { get; set; }
@@ -30,6 +40,7 @@ namespace Business {
         public int ResizeHeight { get; set; }
         public bool Denoise { get; set; }
         public int DenoiseStrength { get; set; }
+        public int DenoiseSharpen { get; set; }
         public bool SharpenAfterDouble { get; set; }
         public int SharpenAfterDoubleStrength { get; set; }
         public bool SharpenFinal { get; set; }
@@ -42,23 +53,60 @@ namespace Business {
         public int CropTop { get; set; }
         public int CropRight { get; set; }
         public int CropBottom { get; set; }
-        public bool EncodeMp4 { get; set; }
-        public bool Trim { get; set; }
+        private bool trim = false;
+        public bool Trim {
+            get { return trim; }
+            set { 
+                trim = value;
+                if (value)
+                    IgnoreAudio = true;
+            }
+        }
         [DefaultValue(null)]
         public int? TrimStart { get; set; }
         [DefaultValue(null)]
         public int? TrimEnd { get; set; }
-        public bool ChangeSpeed { get; set; }
+        private bool changeSpeed;
+        public bool ChangeSpeed {
+            get { return changeSpeed; }
+            set { 
+                changeSpeed = value;
+                if (value)
+                    IgnoreAudio = true;
+            }
+        }
         public int ChangeSpeedValue { get; set; }
+        private bool ignoreAudio;
+        public bool IgnoreAudio {
+            get { return ignoreAudio; }
+            set {
+                ignoreAudio = value;
+                if (!ignoreAudio) {
+                    Trim = false;
+                    ChangeSpeed = false;
+                    if (audioRequiresMkv)
+                        EncodeMp4 = false;
+                }
+            }
+        }
+        public bool EncodeMp4 { get; set; }
+        public string CustomScript { get; set; }
         public int JobIndex { get; set; }
 
         public MediaEncoderSettings() {
+            ConvertToAvi = true;
             SourceAspectRatio = 1;
             ResizeHeight = 720;
             EncodeQuality = 25;
             DenoiseStrength = 20;
             SharpenFinalStrength = 3;
             ChangeSpeedValue = 100;
+        }
+
+        public bool CanEncodeMp4 {
+            get {
+                return !AudioRequiresMkv || ignoreAudio;
+            }
         }
 
         public bool HasFileName {
@@ -74,7 +122,12 @@ namespace Business {
         }
 
         public string InputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex); }
+            get {
+                if (ConvertToAvi)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
+                else
+                    return Settings.NaturalGroundingFolder + FileName;
+            }
         }
 
         public string OutputFile {

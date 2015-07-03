@@ -50,7 +50,7 @@ namespace Business {
         public async Task UpdateDatabaseAsync() {
             Version databaseVersion = VersionAccess.GetVersionInfo();
 
-            if (databaseVersion < new Version(1, 2, 0, 0)) {
+            if (databaseVersion < new Version(1, 2, 1, 0)) {
                 if (isDatabaseRecreated)
                     throw new Exception(string.Format("InitialDatabase version {0} is outdated.", databaseVersion.ToString()));
 

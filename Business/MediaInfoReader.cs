@@ -60,13 +60,20 @@ namespace Business {
 
         public short? Length {
             get {
-                string StrValue = lastMedia.Get(StreamKind.Video, 0, "Duration");
-                int Result = 0;
-                if (int.TryParse(StrValue, out Result))
-                    return (short)(Result / 1000);
-                else
-                    return null;
+                short? Result = GetLength(StreamKind.Video);
+                if (Result == null)
+                    Result = GetLength(StreamKind.Audio);
+                return Result;
             }
+        }
+
+        private short? GetLength(StreamKind stream) {
+            string StrValue = lastMedia.Get(stream, 0, "Duration");
+            int Result = 0;
+            if (int.TryParse(StrValue, out Result))
+                return (short)(Result / 1000);
+            else
+                return null;
         }
 
         public short? Width {
@@ -193,6 +200,7 @@ namespace Business {
 
             //Finalizing
             MI.Open_Buffer_Finalize(); //This is the end of the stream, MediaInfo must finnish some work
+            From.Close();
 
             return MI;
         }

@@ -163,7 +163,6 @@ namespace Business {
 
     [ValueConversion(typeof(long), typeof(string))]
     public class FileSizeConverter : IValueConverter {
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
             double size = (long)value;
@@ -182,10 +181,18 @@ namespace Business {
         }
     }
 
+    public class RadioButtonCheckedConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+            return value.Equals(parameter);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+            return value.Equals(true) ? parameter : Binding.DoNothing;
+        }
+    }
+
     [ValueConversion(typeof(bool), typeof(bool))]
     public class InverseBooleanConverter : IValueConverter {
-        #region IValueConverter Members
-
         public object Convert(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture) {
             if (targetType != typeof(bool))
@@ -198,8 +205,17 @@ namespace Business {
             System.Globalization.CultureInfo culture) {
             throw new NotSupportedException();
         }
+    }
 
-        #endregion
+    [ValueConversion(typeof(bool), typeof(System.Windows.Visibility))]
+    public class VisibilityConverter : IValueConverter {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            return (bool)value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            return (System.Windows.Visibility)value == System.Windows.Visibility.Visible;
+        }
     }
 
     /// <summary>

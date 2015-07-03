@@ -18,6 +18,7 @@ begin
   if not RegKeyExists(HKEY_CLASSES_ROOT, 'AppID\UtVideoMFT.dll') then
   begin
 		if (not IsIA64()) then
+      ExtractTemporaryFile('utvideo.exe');
 			AddProduct('utvideo.exe',
 				'',
 				CustomMessage('utvideo_title'),

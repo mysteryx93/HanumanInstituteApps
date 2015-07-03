@@ -37,7 +37,7 @@
 ; #define use_sql2014localdb
 
 #define MyAppSetupName 'Natural Grounding Player'
-#define MyAppVersion '1.2.0.0'
+#define MyAppVersion '1.2.1.0'
 
 [Setup]
 AppName={#MyAppSetupName}

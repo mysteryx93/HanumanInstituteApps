@@ -11,16 +11,17 @@ namespace Business {
         /// <summary>
         /// Merge audio and video files.
         /// </summary>
-        /// <param name="file1">The video file with missing audio.</param>
-        /// <param name="file2">The video file containing the audio.</param>
+        /// <param name="videoFile">The video file with missing audio.</param>
+        /// <param name="audioFile">The video file containing the audio.</param>
         /// <param name="destination">The output file.</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        public static void JoinAudioVideo(string file1, string file2, string destination, bool silent) {
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool silent) {
             File.Delete(destination);
-            if (!string.IsNullOrEmpty(file2))
-                Run(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy ""{2}""", file1, file2, destination), silent);
+            if (!string.IsNullOrEmpty(audioFile))
+                return Run(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a ""{2}""", videoFile, audioFile, destination), silent);
             else
-                Run(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", file1, destination), silent);
+                return Run(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
         }
 
         /// <summary>
@@ -29,10 +30,14 @@ namespace Business {
         /// <param name="source">The file to convert.</param>
         /// <param name="destination">The destination file, ending with .AVI</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        public static void ConvertToAVI(string source, string destination, bool silent) {
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool ConvertToAVI(string source, string destination, bool silent) {
             File.Delete(destination);
-            Run(string.Format(@"-i ""{0}"" -vcodec utvideo -an ""{1}""", source, destination), silent);
             // -vcodec huffyuv or utvideo, -acodec pcm_s16le
+            bool Success = Run(string.Format(@"-i ""{0}"" -vcodec utvideo -an ""{1}""", source, destination), silent);
+            if (!Success)
+                File.Delete(destination);
+            return Success;
         }
 
         /// <summary>
@@ -41,9 +46,10 @@ namespace Business {
         /// <param name="source">The file to convert.</param>
         /// <param name="destination">The destination file, ending with .264</param>
         /// <param name="encodingQuality">The quality of the encoded x264 file, normally between 18 and 30.</param>
-        public static void ConvertToH264(string source, string destination, int encodingQuality) {
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool ConvertToH264(string source, string destination, int encodingQuality) {
             File.Delete(destination);
-            RunX264(string.Format(@"--preset slower --crf {2} -o ""{0}"" ""{1}""", destination, source, encodingQuality), false);
+            return RunX264(string.Format(@"--preset slower --crf {2} -o ""{0}"" ""{1}""", destination, source, encodingQuality), false);
         }
 
         /// <summary>
@@ -52,10 +58,11 @@ namespace Business {
         /// <param name="source">The video file to extract from.</param>
         /// <param name="destination">The output file to create.</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        public static void ExtractVideo(string source, string destination, bool silent) {
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool ExtractVideo(string source, string destination, bool silent) {
             MediaInfoReader MediaReader = new MediaInfoReader();
             File.Delete(destination);
-            Run(string.Format(@"-i ""{0}"" -vcodec copy -an ""{1}""", source, destination), silent);
+            return Run(string.Format(@"-i ""{0}"" -vcodec copy -an ""{1}""", source, destination), silent);
         }
 
         /// <summary>
@@ -63,9 +70,10 @@ namespace Business {
         /// </summary>
         /// <param name="source">The video to extract the audio from.</param>
         /// <param name="destination">The destination file</param>
-        public static void ExtractAudio(string source, string destination) {
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool ExtractAudio(string source, string destination) {
             File.Delete(destination);
-            Run(string.Format(@"-i ""{0}"" -vn -acodec copy ""{1}""", source, destination), false);
+            return Run(string.Format(@"-i ""{0}"" -vn -acodec copy ""{1}""", source, destination), false);
         }
 
         /// <summary>
@@ -73,14 +81,22 @@ namespace Business {
         /// </summary>
         /// <param name="arguments">FFMPEG startup arguments.</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
-        private static void Run(string arguments, bool silent) {
+        /// <returns>Whether the operation was completed.</returns>
+        private static bool Run(string arguments, bool silent) {
             Process P = new Process();
-            if (silent)
+            if (silent) {
                 P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                //P.StartInfo.RedirectStandardError = true;
+                //P.StartInfo.UseShellExecute = false;
+            }
             P.StartInfo.FileName = @"Encoder\ffmpeg.exe";
             P.StartInfo.Arguments = arguments;
+            // P.ErrorDataReceived += P_ErrorDataReceived;
             P.Start();
+            // P.BeginErrorReadLine();
             P.WaitForExit();
+            // ExitCode is 0 for normal exit. Different value when closing the console.
+            return P.ExitCode == 0;
         }
 
         /// <summary>
@@ -88,7 +104,7 @@ namespace Business {
         /// </summary>
         /// <param name="arguments">x264 startup arguments.</param>
         /// <param name="silent">If true, the x264 window will be hidden.</param>
-        private static void RunX264(string arguments, bool silent) {
+        private static bool RunX264(string arguments, bool silent) {
             Process P = new Process();
             if (silent)
                 P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -100,6 +116,7 @@ namespace Business {
                 P.PriorityClass = ProcessPriorityClass.BelowNormal;
                 P.WaitForExit();
             }
+            return P.ExitCode == 0;
         }
     }
 }

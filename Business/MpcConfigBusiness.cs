@@ -36,7 +36,7 @@ namespace Business {
         /// <param name="svpPath">The path to SVP to help find MPC-HC if its registry key is missing.</param>
         /// <returns>The path to MPC-HC.exe, or null if not found.</returns>
         public static string MpcPath(string svpPath) {
-            string Result = Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\", "ExePath", "").ToString();
+            string Result = Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\", "ExePath", "") as string;
             if ((string.IsNullOrEmpty(Result) || !File.Exists(Result)) && !string.IsNullOrEmpty(svpPath))
                 Result = Path.Combine(Path.GetDirectoryName(svpPath), @"MPC-HC\mpc-hc.exe");
             // Ensure file exists.

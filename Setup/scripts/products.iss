@@ -62,7 +62,6 @@ begin
 
 	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + FileName;
 	if not FileExists(path) then begin
-    ExtractTemporaryFile(FileName);
   	path := ExpandConstant('{tmp}{\}') + FileName;
   	if not FileExists(path) then begin
       //path := ExpandConstant('{tmp}{\}') + FileName;
