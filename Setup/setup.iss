@@ -37,7 +37,7 @@
 ; #define use_sql2014localdb
 
 #define MyAppSetupName 'Natural Grounding Player'
-#define MyAppVersion '1.2.1.0'
+#define MyAppVersion '1.2.2.0'
 
 [Setup]
 AppName={#MyAppSetupName}
@@ -111,7 +111,8 @@ Source: "..\NaturalGroundingPlayer\Encoder\InterFrame2.avsi"; DestDir: "{app}\En
 Source: "..\NaturalGroundingPlayer\Encoder\nnedi3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\svpflow1.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\svpflow2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\x264.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
+Source: "..\NaturalGroundingPlayer\Encoder\x264-32bit.exe"; DestDir: "{app}\Encoder"; DestName: "x264.exe"; Check: not Is64BitInstallMode; Flags: replacesameversion ignoreversion
+Source: "..\NaturalGroundingPlayer\Encoder\x264.exe"; DestDir: "{app}\Encoder"; DestName: "x264.exe"; Check: Is64BitInstallMode; Flags: replacesameversion ignoreversion
 Source: "..\NaturalGroundingPlayer\Encoder\fftw3.dll"; DestDir: "{syswow64}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\DevIL.dll"; DestDir: "{syswow64}";
 Source: "Dependencies\utvideo.exe"; DestDir: "{app}"; Flags: dontcopy

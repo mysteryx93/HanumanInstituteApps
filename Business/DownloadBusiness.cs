@@ -408,6 +408,8 @@ namespace Business {
             if (ExistingData != null) {
                 // Edit video info.
                 ExistingData.FileName = video.FileName;
+                ExistingData.Length = null;
+                ExistingData.Height = null;
                 Business.Save();
             } else {
                 // Add new video info.

@@ -21,6 +21,12 @@ namespace NaturalGroundingPlayer {
             window.Icon = SessionCore.Instance.Icon;
             window.UseLayoutRounding = true;
 
+            // Set vertical content align for all textboxes
+            foreach (TextBox item in FindVisualChildren<TextBox>(window)) {
+                if (item.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
+                    item.VerticalContentAlignment = VerticalAlignment.Center;
+            }
+
             // Set the focus to the first control.
             window.SourceInitialized += (sender, e) => {
                 window.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));

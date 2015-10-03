@@ -42,7 +42,7 @@ namespace NaturalGroundingPlayer {
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
             this.DataContext = encodeSettings;
-            ScriptTab.Items.CurrentChanging += new CurrentChangingEventHandler(Items_CurrentChanging);
+            SettingsTab.Items.CurrentChanging += new CurrentChangingEventHandler(Items_CurrentChanging);
             playerOriginal.Title = "Original";
             playerOriginal.WindowState = WindowState.Maximized;
             playerChanges.Title = "Preview Changes";
@@ -101,7 +101,7 @@ namespace NaturalGroundingPlayer {
                 ClosePreview();
                 encodeSettings.FileName = null;
                 encodeSettings.CustomScript = null;
-                ScriptTab.SelectedIndex = 0;
+                SettingsTab.SelectedIndex = 0;
                 encodeSettings.FileName = Result.FileName;
 
                 try {
@@ -121,7 +121,7 @@ namespace NaturalGroundingPlayer {
 
         public void SetEncodeSettings(MediaEncoderSettings value) {
             isBinding = true;
-            ScriptTab.SelectedIndex = (String.IsNullOrEmpty(value.CustomScript) ? 0 : 1);
+            SettingsTab.SelectedIndex = (String.IsNullOrEmpty(value.CustomScript) ? 0 : 2);
             encodeSettings = value;
             this.DataContext = value;
             isBinding = false;
@@ -212,11 +212,14 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = true;
                 encodeSettings.DoubleEEDI3 = false;
                 encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise = true;
-                encodeSettings.DenoiseStrength = 30;
-                encodeSettings.DenoiseSharpen = 20;
-                encodeSettings.SharpenAfterDouble = true;
-                encodeSettings.SharpenAfterDoubleStrength = 20;
+                encodeSettings.Denoise1 = true;
+                encodeSettings.Denoise1Strength = 30;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 30;
+                encodeSettings.Denoise2Sharpen = 15;
+                encodeSettings.SuperRes = true;
+                encodeSettings.SuperResStrength = 100;
+                encodeSettings.SuperResSoftness = 0;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.SharpenFinalStrength = 20;
                 encodeSettings.Resize = true;
@@ -233,13 +236,16 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = true;
                 encodeSettings.DoubleEEDI3 = true;
                 encodeSettings.DoubleNNEDI3 = false;
-                encodeSettings.Denoise = true;
-                encodeSettings.DenoiseStrength = 30;
-                encodeSettings.DenoiseSharpen = 20;
-                encodeSettings.SharpenAfterDouble = true;
-                encodeSettings.SharpenAfterDoubleStrength = 30;
+                encodeSettings.Denoise1 = true;
+                encodeSettings.Denoise1Strength = 30;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 30;
+                encodeSettings.Denoise2Sharpen = 15;
+                encodeSettings.SuperRes = true;
+                encodeSettings.SuperResStrength = 100;
+                encodeSettings.SuperResSoftness = 0;
                 encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 30;
+                encodeSettings.SharpenFinalStrength = 20;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 720;
                 encodeSettings.EncodeQuality = 24;
@@ -254,13 +260,16 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = false;
                 encodeSettings.DoubleEEDI3 = true;
                 encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise = true;
-                encodeSettings.DenoiseStrength = 30;
-                encodeSettings.DenoiseSharpen = 10;
-                encodeSettings.SharpenAfterDouble = true;
-                encodeSettings.SharpenAfterDoubleStrength = 10;
+                encodeSettings.Denoise1 = true;
+                encodeSettings.Denoise1Strength = 30;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 30;
+                encodeSettings.Denoise2Sharpen = 15;
+                encodeSettings.SuperRes = true;
+                encodeSettings.SuperResStrength = 100;
+                encodeSettings.SuperResSoftness = 0;
                 encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 25;
+                encodeSettings.SharpenFinalStrength = 20;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 720;
                 encodeSettings.EncodeQuality = 24;
@@ -275,10 +284,12 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = (encodeSettings.SourceHeight.HasValue && encodeSettings.SourceHeight.Value < 540);
                 encodeSettings.DoubleEEDI3 = false;
                 encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise = true;
-                encodeSettings.DenoiseStrength = 10;
-                encodeSettings.DenoiseSharpen = 5;
-                encodeSettings.SharpenAfterDouble = false;
+                encodeSettings.Denoise1 = true;
+                encodeSettings.Denoise1Strength = 10;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 10;
+                encodeSettings.Denoise2Sharpen = 5;
+                encodeSettings.SuperRes = false;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.Resize = true;
                 encodeSettings.ResizeHeight = 1080;
@@ -290,10 +301,12 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = false;
                 encodeSettings.DoubleEEDI3 = false;
                 encodeSettings.DoubleNNEDI3 = false;
-                encodeSettings.Denoise = false;
-                encodeSettings.DenoiseStrength = 10;
-                encodeSettings.DenoiseSharpen = 5;
-                encodeSettings.SharpenAfterDouble = false;
+                encodeSettings.Denoise1 = false;
+                encodeSettings.Denoise1Strength = 10;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 10;
+                encodeSettings.Denoise2Sharpen = 5;
+                encodeSettings.SuperRes = false;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.Resize = false;
                 encodeSettings.ResizeHeight = 720;
@@ -305,11 +318,13 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.DoubleNNEDI3Before = (encodeSettings.SourceHeight.HasValue && encodeSettings.SourceHeight.Value < 480);
                 encodeSettings.DoubleEEDI3 = false;
                 encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.DenoiseStrength = 30;
-                encodeSettings.DenoiseSharpen = 20;
+                encodeSettings.Denoise1 = false;
+                encodeSettings.Denoise1Strength = 30;
+                encodeSettings.Denoise2 = false;
+                encodeSettings.Denoise2Strength = 30;
+                encodeSettings.Denoise2Sharpen = 20;
                 encodeSettings.SharpenFinalStrength = 20;
-                encodeSettings.Denoise = false;
-                encodeSettings.SharpenAfterDouble = false;
+                encodeSettings.SuperRes = false;
                 encodeSettings.SharpenFinal = false;
                 encodeSettings.Resize = false;
                 encodeSettings.IncreaseFrameRate = true;
@@ -319,9 +334,11 @@ namespace NaturalGroundingPlayer {
 
             // Fix colors when converting SD to HD. Flv files generally don't need this.
             if (String.Compare(Path.GetExtension(encodeSettings.FileName), ".flv", true) == 0)
-                encodeSettings.FixColors = false;
+                encodeSettings.SourceColorMatrix = ColorMatrix.Rec709;
+            else if (encodeSettings.SourceHeight <= 480)
+                encodeSettings.SourceColorMatrix = ColorMatrix.Rec601;
             else
-                encodeSettings.FixColors = (encodeSettings.SourceHeight <= 480);
+                encodeSettings.SourceColorMatrix = ColorMatrix.Rec709;
         }
 
         private async void OpenMethod_Checked(object sender, RoutedEventArgs e) {
@@ -329,19 +346,24 @@ namespace NaturalGroundingPlayer {
                 await business.OpenPreview(encodeSettings, false);
         }
 
+        /// <summary>
+        /// Generates script when going to Script tab, and prevents returning to Transform tab without a confirmation to lose changes.
+        /// </summary>
         private void Items_CurrentChanging(object sender, CurrentChangingEventArgs e) {
             if (string.IsNullOrEmpty(encodeSettings.FileName))
                 return;
 
-            ScriptTab.Focus();
+            SettingsTab.Focus();
             var item = ((ICollectionView)sender).CurrentItem;
             bool Cancel = false;
-            if (ScriptTab.SelectedIndex == 1 && string.IsNullOrEmpty(encodeSettings.CustomScript)) {
+            // Generate script when going to Script tab.
+            if (SettingsTab.SelectedIndex == 2 && string.IsNullOrEmpty(encodeSettings.CustomScript)) {
                 if (Validate())
                     business.GenerateCustomScript(encodeSettings);
                 else
                     Cancel = true;
-            } else if (ScriptTab.SelectedIndex == 0) {
+            } else if (SettingsTab.SelectedIndex == 0 && !string.IsNullOrEmpty(encodeSettings.CustomScript)) {
+                // Ask for confirmation before going back to Transform tab and losing changes.
                 if (business.CustomScriptHasChanges(encodeSettings))
                     if (MessageBox.Show("You will lose any changes to your script. Are you sure?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
                         Cancel = true;
@@ -349,9 +371,10 @@ namespace NaturalGroundingPlayer {
                     encodeSettings.CustomScript = null;
             }
 
+            // Revert to previously-selected tab.
             if (Cancel) {
                 e.Cancel = true;
-                ScriptTab.SelectedItem = item;
+                SettingsTab.SelectedItem = item;
             }
         }
 

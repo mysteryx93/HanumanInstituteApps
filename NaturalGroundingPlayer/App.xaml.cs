@@ -17,6 +17,9 @@ namespace NaturalGroundingPlayer {
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Set content vertical align for all textboxes
+            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.LoadedEvent,
+                new RoutedEventHandler(TextLoaded));
             // Select the text in a TextBox when it receives focus.
             EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
                 new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
@@ -25,6 +28,12 @@ namespace NaturalGroundingPlayer {
             EventManager.RegisterClassHandler(typeof(TextBox), TextBox.MouseDoubleClickEvent,
                 new RoutedEventHandler(SelectAllText));
             base.OnStartup(e);
+        }
+
+        void TextLoaded(object sender, RoutedEventArgs e) {
+            TextBox obj = sender as TextBox;
+            if (obj.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
+                obj.VerticalContentAlignment = VerticalAlignment.Center;
         }
 
         void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)

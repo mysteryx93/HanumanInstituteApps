@@ -12,7 +12,7 @@ namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
     public class MediaEncoderSettings : ICloneable {
-        public bool ConvertToAvi { get; set; }
+        public OpenMethods OpenMethod { get; set; }
         public string FileName { get; set; }
         [DefaultValue(null)]
         public double? Position { get; set; }
@@ -23,89 +23,113 @@ namespace Business {
         public double SourceAspectRatio { get; set; }
         [DefaultValue(null)]
         public double? SourceFrameRate { get; set; }
-        private bool audioRequiresMkv;
-        public bool AudioRequiresMkv {
-            get { return audioRequiresMkv; }
-            set {
-                audioRequiresMkv = value;
-                if (value && !ignoreAudio)
-                    EncodeMp4 = false;
-            }
-        }
-        public bool FixColors { get; set; }
+        [DefaultValue(null)]
+        public string SourceAudioFormat { get; set; }
+        [DefaultValue(null)]
+        public int? SourceAudioBitrate { get; set; }
+        public ColorMatrix SourceColorMatrix { get; set; }
         public bool DoubleNNEDI3Before { get; set; }
         public bool DoubleEEDI3 { get; set; }
         public bool DoubleNNEDI3 { get; set; }
         public bool Resize { get; set; }
         public int ResizeHeight { get; set; }
-        public bool Denoise { get; set; }
-        public int DenoiseStrength { get; set; }
-        public int DenoiseSharpen { get; set; }
-        public bool SharpenAfterDouble { get; set; }
-        public int SharpenAfterDoubleStrength { get; set; }
+        public bool Denoise1 { get; set; }
+        public int Denoise1Strength { get; set; }
+        public bool Denoise2 { get; set; }
+        public int Denoise2Strength { get; set; }
+        public int Denoise2Sharpen { get; set; }
+        public bool SuperRes { get; set; }
+        public int SuperResStrength { get; set; }
+        public int SuperResSoftness { get; set; }
         public bool SharpenFinal { get; set; }
         public int SharpenFinalStrength { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
-        public int EncodeQuality { get; set; }
         public bool Crop { get; set; }
         public int CropLeft { get; set; }
         public int CropTop { get; set; }
         public int CropRight { get; set; }
         public int CropBottom { get; set; }
-        private bool trim = false;
-        public bool Trim {
-            get { return trim; }
-            set { 
-                trim = value;
-                if (value)
-                    IgnoreAudio = true;
-            }
-        }
+        public bool Trim { get; set; }
         [DefaultValue(null)]
         public int? TrimStart { get; set; }
         [DefaultValue(null)]
         public int? TrimEnd { get; set; }
-        private bool changeSpeed;
-        public bool ChangeSpeed {
-            get { return changeSpeed; }
-            set { 
-                changeSpeed = value;
-                if (value)
-                    IgnoreAudio = true;
-            }
-        }
+        public bool ChangeSpeed { get; set; }
         public int ChangeSpeedValue { get; set; }
-        private bool ignoreAudio;
-        public bool IgnoreAudio {
-            get { return ignoreAudio; }
+
+        public int EncodeQuality { get; set; }
+        public EncodePresets EncodePreset { get; set; }
+        public VideoFormats EncodeFormat { get; set; }
+        private AudioActions audioAction;
+        public AudioActions AudioAction {
+            get { return audioAction; }
             set {
-                ignoreAudio = value;
-                if (!ignoreAudio) {
+                audioAction = value;
+                if (audioAction == AudioActions.Copy) {
                     Trim = false;
                     ChangeSpeed = false;
-                    if (audioRequiresMkv)
-                        EncodeMp4 = false;
+                    if (!IsAudioMp4)
+                        EncodeFormat = VideoFormats.Mkv;
                 }
             }
         }
-        public bool EncodeMp4 { get; set; }
+        [DefaultValue(null)]
+        public AudioBitrates EncodeAudioBitrate { get; set; }
+        [DefaultValue(null)]
+        public float? EncodeAudioGain { get; set; }
+
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
 
         public MediaEncoderSettings() {
-            ConvertToAvi = true;
+            OpenMethod = OpenMethods.ConvertToAvi;
             SourceAspectRatio = 1;
+            SourceColorMatrix = ColorMatrix.Rec709;
             ResizeHeight = 720;
-            EncodeQuality = 25;
-            DenoiseStrength = 20;
+            Denoise1Strength = 20;
+            Denoise2Strength = 20;
+            Denoise2Sharpen = 10;
             SharpenFinalStrength = 3;
             ChangeSpeedValue = 100;
+            EncodeQuality = 25;
+            EncodePreset = EncodePresets.veryslow;
+            EncodeAudioBitrate = AudioBitrates.b256;
         }
 
         public bool CanEncodeMp4 {
             get {
-                return !AudioRequiresMkv || ignoreAudio;
+                return IsAudioMp4 || AudioAction != AudioActions.Copy;
+            }
+        }
+
+        public bool IsAudioMp4 {
+            get {
+                return SourceAudioFormat == "AAC" || SourceAudioFormat == "AC3" || SourceAudioFormat == "MP3" || string.IsNullOrEmpty(SourceAudioFormat);
+            }
+        }
+
+        public bool CanCopyAudio {
+            get {
+                return (IsAudioMp4 || EncodeFormat == VideoFormats.Mkv) && !Trim && !ChangeSpeed;
+            }
+        }
+
+        public bool CanAlterAudio {
+            get {
+                return audioAction == AudioActions.Ignore || audioAction == AudioActions.Encode;
+            }
+        }
+
+        public string FileExtension {
+            get {
+                return EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv";
+            }
+        }
+
+        public bool ConvertToAvi {
+            get {
+                return OpenMethod == OpenMethods.ConvertToAvi;
             }
         }
 
@@ -123,7 +147,7 @@ namespace Business {
 
         public string InputFile {
             get {
-                if (ConvertToAvi)
+                if (OpenMethod == OpenMethods.ConvertToAvi)
                     return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
                 else
                     return Settings.NaturalGroundingFolder + FileName;
@@ -131,15 +155,53 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mp4", JobIndex); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.264", JobIndex); }
         }
 
         public string FinalFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Final.{1}", JobIndex, EncodeMp4 ? "mp4" : "mkv"); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Final.{1}", JobIndex, EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv"); }
         }
 
         public object Clone() {
             return (MediaEncoderSettings)DataHelper.DeepClone(this);
         }
+    }
+
+    public enum OpenMethods {
+        ConvertToAvi,
+        DirectShowSource
+    }
+
+    public enum ColorMatrix {
+        Rec601,
+        Rec709
+    }
+
+    public enum VideoFormats {
+        Mp4,
+        Mkv
+    }
+
+    public enum AudioActions {
+        Copy,
+        Ignore,
+        Encode
+    }
+
+    public enum EncodePresets {
+        medium,
+        slow,
+        slower,
+        veryslow,
+        placebo
+    }
+
+    public enum AudioBitrates {
+        b64,
+        b96,
+        b128,
+        b192,
+        b256,
+        b384
     }
 }

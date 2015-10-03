@@ -88,7 +88,7 @@ namespace Business {
             string[] FileInfo = msg.Message.Split('|');
 
             // In later version of MPC-HC, this event keeps firing repeatedly, so ignore when file path is the same.
-            if (nowPlayingPath != FileInfo[3]) {
+            if (!string.IsNullOrEmpty(FileInfo[3]) && nowPlayingPath != FileInfo[3]) {
                 nowPlayingPath = FileInfo[3];
                 position = 0;
                 CurrentVideo.Length = (short)double.Parse(FileInfo[4], CultureInfo.InvariantCulture);
@@ -106,9 +106,12 @@ namespace Business {
         /// </summary>
         private void Player_MPC_CurrentPosition(MPC.MSGIN msg) {
             if (TimerGetPositionEnabled) {
-                position = Convert.ToDouble(msg.Message, System.Globalization.CultureInfo.InvariantCulture);
-                if (PositionChanged != null)
-                    PositionChanged(this, new EventArgs());
+                double PositionValue = 0;
+                if (Double.TryParse(msg.Message, NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out PositionValue)) {
+                    position = PositionValue;
+                    if (PositionChanged != null)
+                        PositionChanged(this, new EventArgs());
+                }
             }
         }
 

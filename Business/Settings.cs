@@ -47,7 +47,7 @@ namespace Business {
         //public static string DownloadsFolder = "Downloads";
         public static int SimultaneousDownloads = 2;
 
-        public static readonly string[] VideoExtensions = new string[] { ".mp4", ".webm", ".avi", ".flv", ".mpg", ".mkv", ".wmv", ".tp", ".ts", ".avs" };
+        public static readonly string[] VideoExtensions = new string[] { ".mp4", ".webm", ".avi", ".flv", ".mpg", ".mkv", ".wmv", ".tp", ".ts", ".mov", ".avs", ".m2v", ".vob" };
         public static readonly string[] AudioExtensions = new string[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a" };
         public static readonly string[] ImageExtensions = new string[] { ".gif", ".jpg", ".png", ".bmp", ".tiff" };
 
