@@ -56,7 +56,7 @@ namespace NaturalGroundingPlayer {
                 await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, fileName);
                 await SessionCore.Instance.Business.SkipVideoAsync();
             } else
-                await player.PlayVideoAsync(new Media() { FileName = fileName });
+                await player.PlayVideoAsync(new Media() { FileName = fileName }, false);
         }
 
         private async void OkButton_Click(object sender, RoutedEventArgs e) {

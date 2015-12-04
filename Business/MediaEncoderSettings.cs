@@ -27,22 +27,19 @@ namespace Business {
         public string SourceAudioFormat { get; set; }
         [DefaultValue(null)]
         public int? SourceAudioBitrate { get; set; }
+        [DefaultValue(null)]
+        public string SourceVideoFormat { get; set; }
         public ColorMatrix SourceColorMatrix { get; set; }
-        public bool DoubleNNEDI3Before { get; set; }
-        public bool DoubleEEDI3 { get; set; }
-        public bool DoubleNNEDI3 { get; set; }
-        public bool Resize { get; set; }
-        public int ResizeHeight { get; set; }
+        public int OutputHeight { get; set; }
         public bool Denoise1 { get; set; }
         public int Denoise1Strength { get; set; }
         public bool Denoise2 { get; set; }
         public int Denoise2Strength { get; set; }
         public int Denoise2Sharpen { get; set; }
         public bool SuperRes { get; set; }
+        public bool SuperResDoublePass { get; set; }
         public int SuperResStrength { get; set; }
         public int SuperResSoftness { get; set; }
-        public bool SharpenFinal { get; set; }
-        public int SharpenFinalStrength { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
         public bool Crop { get; set; }
@@ -58,7 +55,7 @@ namespace Business {
         public bool ChangeSpeed { get; set; }
         public int ChangeSpeedValue { get; set; }
 
-        public int EncodeQuality { get; set; }
+        public float EncodeQuality { get; set; }
         public EncodePresets EncodePreset { get; set; }
         public VideoFormats EncodeFormat { get; set; }
         private AudioActions audioAction;
@@ -74,10 +71,10 @@ namespace Business {
                 }
             }
         }
+        public int AudioQuality { get; set; }
         [DefaultValue(null)]
-        public AudioBitrates EncodeAudioBitrate { get; set; }
-        [DefaultValue(null)]
-        public float? EncodeAudioGain { get; set; }
+        public float? AudioGain { get; set; }
+        public bool ChangeAudioPitch { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
@@ -85,16 +82,23 @@ namespace Business {
         public MediaEncoderSettings() {
             OpenMethod = OpenMethods.ConvertToAvi;
             SourceAspectRatio = 1;
-            SourceColorMatrix = ColorMatrix.Rec709;
-            ResizeHeight = 720;
-            Denoise1Strength = 20;
-            Denoise2Strength = 20;
+            SourceColorMatrix = ColorMatrix.Rec601;
+            OutputHeight = 720;
+            Denoise1 = true;
+            Denoise1Strength = 30;
+            Denoise2Strength = 30;
             Denoise2Sharpen = 10;
-            SharpenFinalStrength = 3;
+            SuperRes = true;
+            SuperResDoublePass = true;
+            SuperResStrength = 43;
+            SuperResSoftness = 0;
+            IncreaseFrameRate = true;
+            IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             ChangeSpeedValue = 100;
-            EncodeQuality = 25;
+            EncodeQuality = 24;
             EncodePreset = EncodePresets.veryslow;
-            EncodeAudioBitrate = AudioBitrates.b256;
+            AudioQuality = 50;
+            ChangeAudioPitch = false;
         }
 
         public bool CanEncodeMp4 {
@@ -105,7 +109,7 @@ namespace Business {
 
         public bool IsAudioMp4 {
             get {
-                return SourceAudioFormat == "AAC" || SourceAudioFormat == "AC3" || SourceAudioFormat == "MP3" || string.IsNullOrEmpty(SourceAudioFormat);
+                return string.IsNullOrEmpty(SourceAudioFormat) || new string[] { "AAC", "AC3", "MP3" }.Contains(SourceAudioFormat);
             }
         }
 
@@ -155,11 +159,23 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.264", JobIndex); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mp4", JobIndex); }
+        }
+
+        public string AudioFileWav {
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.wav", JobIndex); }
+        }
+
+        public string AudioFileAac {
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.aac", JobIndex); }
         }
 
         public string FinalFile {
             get { return Settings.TempFilesPath + string.Format("Job{0}_Final.{1}", JobIndex, EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv"); }
+        }
+
+        public string TempFile {
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Temp", JobIndex); }
         }
 
         public object Clone() {
@@ -169,7 +185,7 @@ namespace Business {
 
     public enum OpenMethods {
         ConvertToAvi,
-        DirectShowSource
+        Direct
     }
 
     public enum ColorMatrix {
@@ -194,14 +210,5 @@ namespace Business {
         slower,
         veryslow,
         placebo
-    }
-
-    public enum AudioBitrates {
-        b64,
-        b96,
-        b128,
-        b192,
-        b256,
-        b384
     }
 }

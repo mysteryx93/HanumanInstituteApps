@@ -103,15 +103,13 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.CustomScript = null;
                 SettingsTab.SelectedIndex = 0;
                 encodeSettings.FileName = Result.FileName;
+                encodeSettings.CropBottom = 0;
+                encodeSettings.CropLeft = 0;
+                encodeSettings.CropRight = 0;
+                encodeSettings.CropTop = 0;
 
                 try {
-                    await business.OpenPreview(encodeSettings, true);
-                    encodeSettings.Crop = false;
-                    encodeSettings.CropLeft = 0;
-                    encodeSettings.CropTop = 0;
-                    encodeSettings.CropRight = 0;
-                    encodeSettings.CropBottom = 0;
-                    PresetCombo_SelectionChanged(null, null);
+                    await business.PreparePreviewFile(encodeSettings, true);
                 } catch (Exception ex) {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
                     encodeSettings.FileName = "";
@@ -206,144 +204,9 @@ namespace NaturalGroundingPlayer {
                 .All(IsValid);
         }
 
-        private void PresetCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if (PresetCombo.SelectedIndex == 0) {
-                // Good SD
-                encodeSettings.DoubleNNEDI3Before = true;
-                encodeSettings.DoubleEEDI3 = false;
-                encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise1 = true;
-                encodeSettings.Denoise1Strength = 30;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 30;
-                encodeSettings.Denoise2Sharpen = 15;
-                encodeSettings.SuperRes = true;
-                encodeSettings.SuperResStrength = 100;
-                encodeSettings.SuperResSoftness = 0;
-                encodeSettings.SharpenFinal = false;
-                encodeSettings.SharpenFinalStrength = 20;
-                encodeSettings.Resize = true;
-                encodeSettings.ResizeHeight = 720;
-                encodeSettings.EncodeQuality = 24;
-                encodeSettings.IncreaseFrameRate = true;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.fps60;
-                if (encodeSettings.SourceHeight == 360) {
-                    encodeSettings.Resize = false;
-                    encodeSettings.DoubleNNEDI3 = false;
-                }
-            } else if (PresetCombo.SelectedIndex == 1) {
-                // Average SD
-                encodeSettings.DoubleNNEDI3Before = true;
-                encodeSettings.DoubleEEDI3 = true;
-                encodeSettings.DoubleNNEDI3 = false;
-                encodeSettings.Denoise1 = true;
-                encodeSettings.Denoise1Strength = 30;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 30;
-                encodeSettings.Denoise2Sharpen = 15;
-                encodeSettings.SuperRes = true;
-                encodeSettings.SuperResStrength = 100;
-                encodeSettings.SuperResSoftness = 0;
-                encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 20;
-                encodeSettings.Resize = true;
-                encodeSettings.ResizeHeight = 720;
-                encodeSettings.EncodeQuality = 24;
-                encodeSettings.IncreaseFrameRate = true;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.fps60;
-                if (encodeSettings.SourceHeight == 360) {
-                    encodeSettings.Resize = false;
-                    encodeSettings.DoubleEEDI3 = false;
-                }
-            } else if (PresetCombo.SelectedIndex == 2) {
-                // Noisy SD
-                encodeSettings.DoubleNNEDI3Before = false;
-                encodeSettings.DoubleEEDI3 = true;
-                encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise1 = true;
-                encodeSettings.Denoise1Strength = 30;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 30;
-                encodeSettings.Denoise2Sharpen = 15;
-                encodeSettings.SuperRes = true;
-                encodeSettings.SuperResStrength = 100;
-                encodeSettings.SuperResSoftness = 0;
-                encodeSettings.SharpenFinal = true;
-                encodeSettings.SharpenFinalStrength = 20;
-                encodeSettings.Resize = true;
-                encodeSettings.ResizeHeight = 720;
-                encodeSettings.EncodeQuality = 24;
-                encodeSettings.IncreaseFrameRate = true;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.fps60;
-                if (encodeSettings.SourceHeight == 360) {
-                    encodeSettings.Resize = false;
-                    encodeSettings.DoubleNNEDI3 = false;
-                }
-            } else if (PresetCombo.SelectedIndex == 3) {
-                // DVD
-                encodeSettings.DoubleNNEDI3Before = (encodeSettings.SourceHeight.HasValue && encodeSettings.SourceHeight.Value < 540);
-                encodeSettings.DoubleEEDI3 = false;
-                encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise1 = true;
-                encodeSettings.Denoise1Strength = 10;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 10;
-                encodeSettings.Denoise2Sharpen = 5;
-                encodeSettings.SuperRes = false;
-                encodeSettings.SharpenFinal = false;
-                encodeSettings.Resize = true;
-                encodeSettings.ResizeHeight = 1080;
-                encodeSettings.EncodeQuality = 24;
-                encodeSettings.IncreaseFrameRate = false;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.Double;
-            } else if (PresetCombo.SelectedIndex == 4) {
-                // Convert to 60fps
-                encodeSettings.DoubleNNEDI3Before = false;
-                encodeSettings.DoubleEEDI3 = false;
-                encodeSettings.DoubleNNEDI3 = false;
-                encodeSettings.Denoise1 = false;
-                encodeSettings.Denoise1Strength = 10;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 10;
-                encodeSettings.Denoise2Sharpen = 5;
-                encodeSettings.SuperRes = false;
-                encodeSettings.SharpenFinal = false;
-                encodeSettings.Resize = false;
-                encodeSettings.ResizeHeight = 720;
-                encodeSettings.EncodeQuality = 24;
-                encodeSettings.IncreaseFrameRate = true;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.fps60;
-            } else {
-                // Upscale For Production
-                encodeSettings.DoubleNNEDI3Before = (encodeSettings.SourceHeight.HasValue && encodeSettings.SourceHeight.Value < 480);
-                encodeSettings.DoubleEEDI3 = false;
-                encodeSettings.DoubleNNEDI3 = true;
-                encodeSettings.Denoise1 = false;
-                encodeSettings.Denoise1Strength = 30;
-                encodeSettings.Denoise2 = false;
-                encodeSettings.Denoise2Strength = 30;
-                encodeSettings.Denoise2Sharpen = 20;
-                encodeSettings.SharpenFinalStrength = 20;
-                encodeSettings.SuperRes = false;
-                encodeSettings.SharpenFinal = false;
-                encodeSettings.Resize = false;
-                encodeSettings.IncreaseFrameRate = true;
-                encodeSettings.IncreaseFrameRateValue = FrameRateModeEnum.Double;
-                encodeSettings.EncodeQuality = 16;
-            }
-
-            // Fix colors when converting SD to HD. Flv files generally don't need this.
-            if (String.Compare(Path.GetExtension(encodeSettings.FileName), ".flv", true) == 0)
-                encodeSettings.SourceColorMatrix = ColorMatrix.Rec709;
-            else if (encodeSettings.SourceHeight <= 480)
-                encodeSettings.SourceColorMatrix = ColorMatrix.Rec601;
-            else
-                encodeSettings.SourceColorMatrix = ColorMatrix.Rec709;
-        }
-
         private async void OpenMethod_Checked(object sender, RoutedEventArgs e) {
             if (!isBinding)
-                await business.OpenPreview(encodeSettings, false);
+                await business.PreparePreviewFile(encodeSettings, false);
         }
 
         /// <summary>
@@ -381,6 +244,20 @@ namespace NaturalGroundingPlayer {
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e) {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void AudioQuality_TextChanged(object sender, TextChangedEventArgs e) {
+            AudioBitrateLabel.Content = string.Format("~{0} kbps", business.ConvertAudioQualityToBitrate(encodeSettings.AudioQuality));
+        }
+
+        private async void CalculateAudioGain_Click(object sender, RoutedEventArgs e) {
+            CalculateAudioGain.IsEnabled = false;
+            CalculateAudioGain.Content = "Wait";
+            float? Gain = await Task.Run(() => FfmpegBusiness.GetAudioGain(encodeSettings));
+            if (Gain.HasValue)
+                encodeSettings.AudioGain = Gain;
+            CalculateAudioGain.IsEnabled = true;
+            CalculateAudioGain.Content = "Auto";
         }
     }
 }

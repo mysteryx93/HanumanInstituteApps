@@ -36,7 +36,7 @@ namespace NaturalGroundingPlayer {
             playerBusiness = new WmpPlayerBusiness(Player);
             playerBusiness.PositionChanged += playerBusiness_PositionChanged;
             playerBusiness.Show();
-            await playerBusiness.PlayVideoAsync(Item);
+            await playerBusiness.PlayVideoAsync(Item, false);
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e) {

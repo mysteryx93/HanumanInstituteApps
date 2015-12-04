@@ -45,7 +45,7 @@ namespace NaturalGroundingPlayer {
                 if (VideoInfo.FileName != null && VideoInfo.FileExists) {
                     MpcConfigBusiness.IsWidescreenEnabled = WidescreenCheckBox.IsChecked.Value;
                     // File exists, play.
-                    await owner.Player.PlayVideoAsync(PlayerAccess.GetVideoByFileName(VideoInfo.FileName));
+                    await owner.Player.PlayVideoAsync(PlayerAccess.GetVideoByFileName(VideoInfo.FileName), false);
                 } else if (VideoInfo.HasDownloadUrl) {
                     // File doesn't exist, download.
                     await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(PlayerAccess.GetVideoById(VideoInfo.MediaId.Value), -1, DownloadBusiness_DownloadCompleted);

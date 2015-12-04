@@ -37,6 +37,7 @@ namespace NaturalGroundingPlayer {
         public bool DisableLoadData { get; set; }
         public bool AllowMultiSelect { get; set; }
         public bool IsLoading { get; private set; }
+        private bool isFormLoaded = false;
         public event EventHandler DataLoaded;
         public event EventHandler ItemDoubleClick;
         public event EventHandler SelectionChanged;
@@ -85,6 +86,8 @@ namespace NaturalGroundingPlayer {
             foreach (TextBox item in Window.GetWindow(this).FindVisualChildren<TextBox>()) {
                 item.PreviewKeyDown += SearchTextControl_PreviewKeyDown;
             }
+
+            isFormLoaded = true;
         }
 
         void MediaGrid_Closed(object sender, EventArgs e) {
@@ -101,6 +104,11 @@ namespace NaturalGroundingPlayer {
         public async Task LoadDataAsync() {
             if (DisableLoadData)
                 return;
+
+            // Make sure UserControl_Loaded is completed.
+            while (!isFormLoaded) {
+                await Task.Delay(50);
+            }
 
             IsLoading = true;
             if (lastHeaderClicked == StatusColumn)

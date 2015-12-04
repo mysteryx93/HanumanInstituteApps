@@ -23,6 +23,7 @@ namespace Business {
         private MPC apiAccess = new MPC();
         private ProcessWatcher watcher;
         public Media CurrentVideo { get; set; }
+        private bool isAutoPitchEnabled;
         private string customFileName;
         private double position;
         private DateTime lastStartTime;
@@ -125,8 +126,7 @@ namespace Business {
                 nowPlayingPath = null;
 
                 await Task.Delay(1000);
-                string FileName = customFileName != null ? customFileName : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
-                await apiAccess.OpenFileAsync(FileName);
+                await apiAccess.OpenFileAsync(MediaFileName);
             }
         }
 
@@ -177,15 +177,16 @@ namespace Business {
             }
         }
 
-        public async Task PlayVideoAsync(Media video) {
-            this.CurrentVideo = video;
+        public async Task PlayVideoAsync(Media video, bool enableAutoPitch) {
+            CurrentVideo = video;
+            isAutoPitchEnabled = enableAutoPitch;
             customFileName = null;
             TimerGetPositionEnabled = false;
             position = 0;
             nowPlayingPath = null;
             lastStartTime = DateTime.Now;
             watcher.EnsureRunning();
-            await apiAccess.OpenFileAsync(Settings.NaturalGroundingFolder + video.FileName);
+            await apiAccess.OpenFileAsync(MediaFileName);
             // If video doesn't load after 5 seconds, send the play command again.
             timerPlayTimeout.Stop();
             timerPlayTimeout.Start();
@@ -196,7 +197,8 @@ namespace Business {
         /// </summary>
         /// <param name="fileName">The path of the file to play.</param>
         public async Task PlayVideoAsync(string fileName) {
-            this.CurrentVideo = new Media() { };
+            CurrentVideo = new Media() { };
+            isAutoPitchEnabled = false;
             customFileName = fileName;
             TimerGetPositionEnabled = false;
             position = 0;
@@ -207,6 +209,12 @@ namespace Business {
             // If video doesn't load after 5 seconds, send the play command again.
             timerPlayTimeout.Stop();
             timerPlayTimeout.Start();
+        }
+
+        private string MediaFileName {
+            get {
+                return customFileName != null ? customFileName : isAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+            }
         }
 
         public double Position {
@@ -259,8 +267,10 @@ namespace Business {
             if (TimerGetPositionEnabled) {
                 if ((CurrentVideo.EndPos.HasValue && position > CurrentVideo.EndPos && !IgnorePos) || position > CurrentVideo.Length - 1) {
                     // End position reached.
-                    if (PlayNext != null)
+                    if (PlayNext != null) {
                         PlayNext(this, new EventArgs());
+                        return;
+                    }
                 } else if (restorePosition == 0 && position < 10 && CurrentVideo.StartPos.HasValue && CurrentVideo.StartPos > 10 && position < CurrentVideo.StartPos && !IgnorePos) {
                     // Skip to start position.
                     restorePosition = CurrentVideo.StartPos.Value;
@@ -289,9 +299,7 @@ namespace Business {
         /// </summary>
         private async void timerPlayTimeout_Tick(object sender, EventArgs e) {
             timerPlayTimeout.Stop();
-
-            string FileName = customFileName != null ? customFileName : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
-            await apiAccess.OpenFileAsync(FileName);
+            await apiAccess.OpenFileAsync(MediaFileName);
         }
 
         /// <summary>

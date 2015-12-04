@@ -89,7 +89,7 @@ namespace DataAccess {
                     else if (item.Field == FieldConditionEnum.HasBuyOrDownloadUrl)
                         Query = Query.Where(v => (v.DownloadUrl != "" || v.BuyUrl != "") == CondValue);
                     else if (item.Field == FieldConditionEnum.PerformanceProblem)
-                        Query = Query.Where(v => (v.DisableMadVr || v.DisableSvp) == CondValue);
+                        Query = Query.Where(v => (v.DisableMadVr || v.DisableSvp || v.DisablePitch) == CondValue);
                     else if (item.Field == FieldConditionEnum.IsPersonal)
                         Query = Query.Where(v => v.IsPersonal == CondValue);
                 }

@@ -49,7 +49,7 @@
             </ContentControl>
             <TextBlock x:Name="txtCurrentVideo" HorizontalAlignment="Left" VerticalAlignment="Top" Width="241" Height="16" Margin="93,106,0,0"/>
             <TextBlock HorizontalAlignment="Left" Text="Session Time" VerticalAlignment="Top" Width="79" Height="16" Margin="9,148,0,0"/>
-            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="16" Margin="9,127,0,0"><Run Text="Next "/><Run Text="Video"/></TextBlock>
+            <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="16" Margin="9,127,0,0"><Hyperlink ToolTip="Skip" Click="SkipNextVideo_Click">Next Video</Hyperlink></TextBlock>
             <TextBlock x:Name="txtNextVideo" HorizontalAlignment="Left" VerticalAlignment="Top" Width="241" Height="16" Margin="93,127,0,0"/>
             <TextBlock x:Name="txtSessionTime" HorizontalAlignment="Left" VerticalAlignment="Top" Width="241" Height="16" Margin="93,148,0,0"/>
             <TextBlock HorizontalAlignment="Left" Text="Now Playing" VerticalAlignment="Top" Width="79" Height="16" Margin="9,106,0,0"/>

@@ -219,8 +219,10 @@ namespace Business {
                     }
 
                     // Load media file to set Length, Width and Height.
-                    if (item.FileName != null && await MediaInfo.LoadInfoAsync(item))
+                    if (item.FileName != null && MediaInfoReader.HasMissingInfo(item)) {
+                        await MediaInfo.LoadInfoAsync(item);
                         HasChanges = true;
+                    }
 
                     // Send update with the quantity of files completed.
                     if (loadingMediaInfoProgress != null)

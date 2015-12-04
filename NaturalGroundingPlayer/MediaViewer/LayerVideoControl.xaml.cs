@@ -45,7 +45,7 @@ namespace NaturalGroundingPlayer {
             playerBusiness.Closed += playerBusiness_Closed;
             playerBusiness.PositionChanged += playerBusiness_PositionChanged;
             playerBusiness.Show();
-            await playerBusiness.PlayVideoAsync(Item);
+            await playerBusiness.PlayVideoAsync(Item, false);
         }
 
         private void playerBusiness_Closed(object sender, EventArgs e) {

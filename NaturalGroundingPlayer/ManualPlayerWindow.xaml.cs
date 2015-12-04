@@ -87,7 +87,7 @@ namespace NaturalGroundingPlayer {
             this.Close();
         }
 
-        private void window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+        private async void window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             if (isClosingManual) {
                 DetachControls();
                 SessionCore.Instance.Business.NowPlaying -= business_NowPlaying;
@@ -99,7 +99,8 @@ namespace NaturalGroundingPlayer {
                 SessionCore.Instance.Business.ResetPlayerMode();
                 mainSettings.RatingRatio = MediaList.Settings.RatingRatio;
                 SessionCore.Instance.Business.FilterSettings = mainSettings;
-                mainForm.business_PlaylistChanged(null, null);
+                await SessionCore.Instance.Business.SelectNextVideoAsync(1);
+                // mainForm.business_PlaylistChanged(null, null);
             } else
                 Application.Current.Shutdown();
         }

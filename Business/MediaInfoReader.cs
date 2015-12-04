@@ -31,15 +31,10 @@ namespace Business {
         /// </summary>
         /// <param name="item">The media file to read.</param>
         /// <returns>True if data was loaded, false if no data was needed.</returns>
-        public async Task<bool> LoadInfoAsync(Media item) {
-            bool HasChanges = false;
-            if (HasMissingInfo(item)) {
-                await LoadInfoAsync(Settings.NaturalGroundingFolder + item.FileName);
-                item.Length = Length;
-                item.Height = Height;
-                HasChanges = true;
-            }
-            return HasChanges;
+        public async Task LoadInfoAsync(Media item) {
+            await LoadInfoAsync(Settings.NaturalGroundingFolder + item.FileName);
+            item.Length = Length;
+            item.Height = Height;
         }
 
         /// <summary>

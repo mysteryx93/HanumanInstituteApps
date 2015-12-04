@@ -380,7 +380,10 @@ namespace Business {
                 return;
             }
 
-            await player.PlayVideoAsync(nextVideo);
+            // Auto-pitch to 432hz
+            bool EnableAutoPitch = AutoPitchBusiness.AppyAutoPitch(nextVideo);
+
+            await player.PlayVideoAsync(nextVideo, EnableAutoPitch);
             playedVideos.Add(nextVideo.MediaId);
             nextVideo = null;
 
@@ -402,7 +405,7 @@ namespace Business {
         /// </summary>
         /// <param name="queuePos">The video position to select. 0 for current, 1 for next.</param>
         /// <returns>Whether the file is downloading.</returns>
-        private async Task<bool> SelectNextVideoAsync(int queuePos) {
+        public async Task<bool> SelectNextVideoAsync(int queuePos) {
             return await SelectNextVideoAsync(queuePos, 0);
         }
 
@@ -526,7 +529,10 @@ namespace Business {
                     // Enable/Disable SVP if necessary.
                     MpcConfigBusiness.AutoConfigure(nextVideo);
 
-                    await player.PlayVideoAsync(LastVideo);
+                    // Auto-pitch to 432hz
+                    bool EnableAutoPitch = AutoPitchBusiness.AppyAutoPitch(LastVideo);
+
+                    await player.PlayVideoAsync(LastVideo, EnableAutoPitch);
                     if (PlaylistChanged != null)
                         PlaylistChanged(this, new EventArgs());
                 }
@@ -624,7 +630,7 @@ namespace Business {
             player.Resume += player_Resume;
 
             if (player.CurrentVideo != null)
-                player.PlayVideoAsync(player.CurrentVideo);
+                player.PlayVideoAsync(player.CurrentVideo, false);
         }
 
         public string GetVideoDisplayTitle(Media video) {

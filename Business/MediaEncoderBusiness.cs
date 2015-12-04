@@ -18,26 +18,26 @@ namespace Business {
         private static Task<EncodingCompletedEventArgs> EncoderTask = null;
         public static ObservableCollection<string> ProcessingQueue = new ObservableCollection<string>();
         public event EventHandler<EncodingCompletedEventArgs> EncodingCompleted;
-        private string PreviewScriptFile = Settings.TempFilesPath + "Preview.avs";
-        private string PreviewSettingsFile = Settings.TempFilesPath + "Preview.xml";
-        private string PreviewSourceFile = Settings.TempFilesPath + "Preview.avi";
+        static public string PreviewScriptFile = Settings.TempFilesPath + "Preview.avs";
+        static public string PreviewSettingsFile = Settings.TempFilesPath + "Preview.xml";
+        static public string PreviewSourceFile = Settings.TempFilesPath + "Preview.avi";
 
         public void GenerateScript(MediaEncoderSettings settings, bool preview, bool multiThreaded) {
-            string Script = settings.CustomScript;
-            if (string.IsNullOrEmpty(Script))
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
+            if (Script.IsEmpty)
                 Script = GenerateVideoScript(settings, GetPreviewSourceFile(settings), preview, multiThreaded);
             else if (preview)
-                Script = ConvertScriptForPreview(Script);
-            WriteFile(Script, PreviewScriptFile);
+                Script.ConvertForPreview();
+            Script.WriteToFile(PreviewScriptFile);
             SaveSettingsFile(settings, PreviewSettingsFile);
         }
 
         public void GenerateCustomScript(MediaEncoderSettings settings) {
-            settings.CustomScript = GenerateVideoScript(settings, GetPreviewSourceFile(settings), false, true);
+            settings.CustomScript = GenerateVideoScript(settings, GetPreviewSourceFile(settings), false, true).Script;
         }
 
         public bool CustomScriptHasChanges(MediaEncoderSettings settings) {
-            return settings.CustomScript != GenerateVideoScript(settings, GetPreviewSourceFile(settings), false, true);
+            return settings.CustomScript != GenerateVideoScript(settings, GetPreviewSourceFile(settings), false, true).Script;
         }
 
         public string GetPreviewSourceFile(MediaEncoderSettings settings) {
@@ -75,13 +75,12 @@ namespace Business {
             if (settings.ConvertToAvi)
                 SafeMove(PreviewSourceFile, settings.InputFile);
             SaveSettingsFile(settings, settings.SettingsFile);
-            string Script = settings.CustomScript;
-            if (string.IsNullOrEmpty(Script))
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
+            if (Script.IsEmpty)
                 Script = GenerateVideoScript(settings, settings.InputFile, false, true);
             else
-                Script = Script.Replace(GetAsciiPath(PreviewSourceFile), GetAsciiPath(settings.InputFile));
-            WriteFile(Script, settings.ScriptFile);
-
+                Script.Replace(Script.GetAsciiPath(PreviewSourceFile), Script.GetAsciiPath(settings.InputFile));
+            Script.WriteToFile(settings.ScriptFile);
             await StartEncodeFileAsync(settings);
         }
 
@@ -124,9 +123,23 @@ namespace Business {
         private EncodingCompletedEventArgs EncodeFileThread(MediaEncoderSettings settings) {
             EncodingCompletedEventArgs Result = null;
             DateTime StartTime = DateTime.Now;
-            FfmpegBusiness.ConvertToH264(settings.ScriptFile, settings.OutputFile, settings.EncodeQuality, settings.EncodePreset);
+            // int FrameCount = FfmpegBusiness.GetFrameCount(settings, true);
+            Task<bool> VideoEnc = Task.Run(() => FfmpegBusiness.ConvertToH264(settings));
+
+            // Encode audio stream with Nero Aac Encoder
+            if (settings.AudioAction == AudioActions.Encode) {
+                Task<bool> AudioEnc = Task.Run(() => EncodeAudio(settings));
+                Task.WaitAll(VideoEnc, AudioEnc);
+            } else
+                Task.WaitAll(VideoEnc);
+
             Result = FinalizeEncoding(settings, StartTime);
             return Result;
+        }
+
+        public bool EncodeAudio(MediaEncoderSettings settings) {
+            FfmpegBusiness.SaveAudioToWav(settings);
+            return FfmpegBusiness.EncodeAudio(settings);
         }
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
@@ -134,11 +147,12 @@ namespace Business {
             if (File.Exists(settings.OutputFile)) {
                 // Muxe video with audio.
                 string FinalFile = GetNextAvailableFileName(settings.FinalFile);
+                string AudioFile = null;
                 if (settings.AudioAction == AudioActions.Copy)
-                    FfmpegBusiness.JoinAudioVideo(settings.OutputFile, Settings.NaturalGroundingFolder + settings.FileName, FinalFile, true);
-                else
-                    FfmpegBusiness.JoinAudioVideo(settings.OutputFile, null, FinalFile, true);
-
+                    AudioFile = Settings.NaturalGroundingFolder + settings.FileName;
+                else if (settings.AudioAction == AudioActions.Encode)
+                    AudioFile = settings.AudioFileAac;
+                FfmpegBusiness.JoinAudioVideo(settings.OutputFile, AudioFile, FinalFile, true);
                 Result = GetEncodingResults(settings, FinalFile, startTime);
             }
 
@@ -163,10 +177,10 @@ namespace Business {
             return Result;
         }
 
-        public string GenerateVideoScript(MediaEncoderSettings settings, string inputFile, bool preview, bool multiThreaded) {
+        public AviSynthScriptBuilder GenerateVideoScript(MediaEncoderSettings settings, string inputFile, bool preview, bool multiThreaded) {
             int CPU = Environment.ProcessorCount;
-            //if (settings.DoubleEEDI3)
-            //    CPU = 1 + CPU / 4; // Limit threads when using EEDI3 which already uses most cores.
+            if (CPU <= 1)
+                multiThreaded = false;
             bool AviSynthPlus = false;
             // multiThreaded = true;
 
@@ -174,21 +188,18 @@ namespace Business {
             Rect CropSource = new Rect();
             Rect CropAfter = new Rect();
             if (settings.Crop) {
-                // CropSource must be a factor of two.
+                // CropSource must be a factor of 4.
                 CropSource = new Rect(
-                    settings.CropLeft / 2 * 2,
-                    settings.CropTop / 2 * 2,
-                    settings.CropRight / 2 * 2,
-                    settings.CropBottom / 2 * 2);
+                    settings.CropLeft / 4 * 4,
+                    settings.CropTop / 4 * 4,
+                    settings.CropRight / 4 * 4,
+                    settings.CropBottom / 4 * 4);
             }
-            int ScaleFactor = (settings.DoubleNNEDI3Before ? 2 : 1) * (settings.DoubleEEDI3 ? 2 : 1) * (settings.DoubleNNEDI3 ? 2 : 1);
-            int ExtraDouble = 0;
-            // If cropping makes the output smaller than the resize dimension, keep doubling to enlarge.
-            if (settings.Resize) {
-                while ((settings.SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactor < settings.ResizeHeight) {
-                    ExtraDouble += 2;
-                    ScaleFactor *= 2;
-                }
+            int FrameDouble = 0;
+            int ScaleFactor = 1;
+            while ((settings.SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactor < settings.OutputHeight) {
+                FrameDouble += 1;
+                ScaleFactor *= 2;
             }
             if (settings.Crop) {
                 CropAfter = new Rect(
@@ -197,15 +208,13 @@ namespace Business {
                     (settings.CropRight - CropSource.Right) * ScaleFactor,
                     (settings.CropBottom - CropSource.Bottom) * ScaleFactor);
             }
-            if (!settings.Resize) // If pixels are not square, we must always resize to preserve aspect ratio.
-                settings.ResizeHeight = settings.SourceHeight.Value * ScaleFactor;
             int CropHeight = ((settings.SourceHeight.Value - CropSource.Top - CropSource.Bottom) * ScaleFactor);
             int CropWidth = ((settings.SourceWidth.Value - CropSource.Left - CropSource.Right) * ScaleFactor);
             if (CropAfter.HasValue) {
                 CropHeight = CropHeight - CropAfter.Top - CropAfter.Bottom;
                 CropWidth = CropWidth - CropAfter.Left - CropAfter.Right;
             }
-            int FinalHeight = settings.Resize ? settings.ResizeHeight : CropHeight;
+            int FinalHeight = settings.OutputHeight;
             int FinalWidth = (int)Math.Round((double)CropWidth * settings.SourceAspectRatio / CropHeight * FinalHeight / 4) * 4;
 
             // Calculate encoding and final frame rates.
@@ -213,7 +222,7 @@ namespace Business {
             double FrameRateBefore = settings.SourceFrameRate.Value * ChangeSpeedValue;
 
             // Generate video script.
-            StringBuilder Script = new StringBuilder();
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AppendLine(); // After clean-up, this adds a line after LoadPlugin commands.
             if (multiThreaded) {
                 // Script.AppendLine("Setmemorymax(1500)");
@@ -223,126 +232,105 @@ namespace Business {
                     if (settings.Denoise1)
                         Script.AppendLine(@"SetFilterMTMode(""KNLMeansCL"",5)");
                 } else {
-                    Script.AppendFormat("SetMTMode(3,{0})", CPU).AppendLine();
+                    Script.AppendLine("SetMTMode(3,{0})", CPU);
                 }
             }
-            Script.AppendFormat(@"PluginPath=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath)).AppendLine();
+            Script.AddPluginPath();
+            Script.AppendLine(@"file = ""{0}""", Script.GetAsciiPath(inputFile));
             if (settings.ConvertToAvi)
-                Script.AppendFormat(@"AviSource(""{0}"", audio=false, pixel_type=""YV12"")", GetAsciiPath(inputFile)).AppendLine(); //.ConvertToYV12()
-            else
-                Script.AppendFormat(@"DirectShowSource(""{0}"", audio=false, pixel_type=""YV12""{1})", GetAsciiPath(inputFile), settings.SourceFrameRate.HasValue ? ", fps=" + settings.SourceFrameRate : string.Empty).AppendLine(); //.ConvertToYV12()
-            if (multiThreaded && !AviSynthPlus)
-                Script.AppendLine("SetMTMode(2)");
-            if (settings.SourceColorMatrix == ColorMatrix.Rec601 && !preview) {
-                LoadPluginDll(Script, "ColorMatrix.dll");
-                Script.AppendLine(@"ColorMatrix(mode=""Rec.601->Rec.709"")");
-            }
-            if (FrameRateBefore != settings.SourceFrameRate)
-                Script.AppendFormat(CultureInfo.InvariantCulture, "AssumeFPS({0})", FrameRateBefore).AppendLine();
-            if (settings.Trim) {
-                Script.AppendFormat("Trim({0}, {1})",
-                    settings.TrimStart.HasValue ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
-                    settings.TrimEnd.HasValue && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0).AppendLine();
-            }
-            if (CropSource.HasValue) {
-                Script.AppendFormat("Crop({0}, {1}, -{2}, -{3})", CropSource.Left, CropSource.Top, CropSource.Right, CropSource.Bottom).AppendLine();
+                Script.AppendLine(@"AviSource(file, audio=true, pixel_type=""YV12"")");
+            else {
+                Script.LoadPluginDll("LSMASHSource.dll");
+                Script.AppendLine("LWLibavVideoSource(file, cache=false, threads=1)");
+                Script.AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
             }
             if (settings.Denoise1) {
-                LoadPluginDll(Script, "KNLMeansCL.dll");
+                Script.LoadPluginDll("KNLMeansCL.dll");
                 if (multiThreaded && !AviSynthPlus)
                     Script.AppendLine("SetMTMode(5)");
-                Script.AppendFormat(CultureInfo.InvariantCulture, @"KNLMeansCL(D=2, A=1, h={0}, device_type=""GPU"")", ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture)).AppendLine();
-                if (multiThreaded && !AviSynthPlus)
-                    Script.AppendLine("SetMTMode(2)");
+                Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D=2, A=1, h={0}, device_type=""GPU"")", ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture));
+            }
+            if (multiThreaded && !AviSynthPlus)
+                Script.AppendLine("SetMTMode(2)");
+            if (FrameDouble > 0 || settings.SourceColorMatrix == ColorMatrix.Rec601)
+                Script.LoadPluginDll("Shader.dll");
+            if (settings.SourceColorMatrix == ColorMatrix.Rec601 && !preview && (FrameDouble == 0 || !settings.SuperRes)) {
+                Script.LoadPluginAvsi("ColorMatrix.avsi");
+                Script.AppendLine("ColorMatrix601to709()");
+            }
+            if (FrameRateBefore != settings.SourceFrameRate)
+                Script.AppendLine(CultureInfo.InvariantCulture, "AssumeFPS({0})", FrameRateBefore);
+            if (settings.Trim) {
+                Script.AppendLine("Trim({0}, {1})",
+                    settings.TrimStart.HasValue ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
+                    settings.TrimEnd.HasValue && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
+            }
+            if (CropSource.HasValue) {
+                Script.AppendLine("Crop({0}, {1}, -{2}, -{3})", CropSource.Left, CropSource.Top, CropSource.Right, CropSource.Bottom);
             }
             if (settings.Denoise2) {
-                LoadPluginDll(Script, "FFT3DFilter.dll");
-                Script.AppendFormat(CultureInfo.InvariantCulture, @"fft3dfilter(sigma={0}, bt=5, bw=48, bh=48, ow=24, oh=24, sharpen={1})",
+                Script.LoadPluginDll("FFT3DFilter.dll");
+                Script.AppendLine(CultureInfo.InvariantCulture, @"fft3dfilter(sigma={0}, bt=5, bw=48, bh=48, ow=24, oh=24, sharpen={1})",
                     ((double)settings.Denoise2Strength / 10).ToString(CultureInfo.InvariantCulture),
-                    (double)settings.Denoise2Sharpen / 100).AppendLine();
+                    (double)settings.Denoise2Sharpen / 100);
             }
-            //} else if (settings.SharpenFinal)
-            //    LoadPluginDll(Script, "FFT3DFilter.dll");
-            if (settings.SuperRes || settings.SharpenFinal) {
-                LoadPluginDll(Script, "Shader.dll");
-                LoadPluginAvsi(Script, "SuperRes.avsi");
-            }
-            if (settings.DoubleNNEDI3 || settings.DoubleNNEDI3Before || ExtraDouble > 0) {
-                LoadPluginDll(Script, "nnedi3.dll");
-                LoadPluginDll(Script, "fturn.dll"); // The UI doesn't allow applying EEDI3 twice so FTurn is only necessary when NNEDI3 is used.
-            }
-            int DoubleCount = 0; // InterFrame can be applied in either of 2 locations based on the frame double order.
-            if (settings.DoubleNNEDI3Before) {
-                DoubleCount++;
-                bool HasOtherDouble = settings.SuperRes && (settings.DoubleEEDI3 || (settings.DoubleNNEDI3 || ExtraDouble > 0));
-                string DoubleScript = string.Format(@"nnedi3_rpow2(2, nns=4, {0}, Threads=2)", GetPixelShiftResize(HasOtherDouble, FinalWidth, FinalHeight, CropAfter));
-                DoubleAndSharpen(Script, settings, HasOtherDouble, DoubleScript);
-            }
-            if (DoubleCount == 1)
-                ApplyInterFrame(Script, settings, CPU);
-            if (settings.DoubleEEDI3) {
-                DoubleCount++;
-                bool HasOtherDouble = settings.SuperRes && (settings.DoubleNNEDI3 || ExtraDouble > 0);
-                LoadPluginDll(Script, "eedi3.dll");
-                string DoubleScript = string.Format("eedi3_rpow2(2, {0}, Threads=2)", GetPixelShiftResize(HasOtherDouble, FinalWidth, FinalHeight, CropAfter));
-                DoubleAndSharpen(Script, settings, HasOtherDouble, DoubleScript);
-            }
-            if (DoubleCount <= 1)
-                ApplyInterFrame(Script, settings, CPU);
-            if (settings.DoubleNNEDI3)
-                ExtraDouble++;
-            if (ExtraDouble > 0) {
-                for (int i = 0; i < ExtraDouble; i++) {
-                    DoubleCount++;
-                    string DoubleScript = string.Format("nnedi3_rpow2(2, nns=4, {0}, Threads=2)", GetPixelShiftResize(false, FinalWidth, FinalHeight, CropAfter));
-                    DoubleAndSharpen(Script, settings, i < ExtraDouble - 1, DoubleScript);
+            if (FrameDouble > 0) {
+                Script.LoadPluginDll("nnedi3.dll");
+                Script.LoadPluginAvsi("edi_rpow2.avsi");
+                Script.LoadPluginAvsi("ResizeX.avsi");
+                if (settings.SuperRes) {
+                    Script.LoadPluginAvsi("SuperRes.avsi");
+                }
+
+                for (int i = 0; i < FrameDouble; i++) {
+                    string DoubleScript = string.Format("edi_rpow2(2, nns=4, {0}, Threads={1})", GetPixelShiftResize(i < FrameDouble - 1, FinalWidth, FinalHeight, CropAfter), multiThreaded ? 2 : 0);
+                    DoubleAndSharpen(Script, settings, DoubleScript, i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601);
+
+                    if (i == 0 && settings.IncreaseFrameRate)
+                        ApplyInterFrame(Script, settings, CPU);
                 }
             }
-            //if (settings.Resize || settings.SourceAspectRatio != 1 || CropAfter.HasValue) {
+
             // Calculate width for resize.
             if (CropAfter.HasValue) {
-                Script.AppendFormat("Spline36Resize({0}, {1}, {2}, {3}, -{4}, -{5})",
-                    FinalWidth, FinalHeight, CropAfter.Left, CropAfter.Top, CropAfter.Right, CropAfter.Bottom).AppendLine();
+                Script.AppendLine("Spline36Resize({0}, {1}, {2}, {3}, -{4}, -{5})",
+                    FinalWidth, FinalHeight, CropAfter.Left, CropAfter.Top, CropAfter.Right, CropAfter.Bottom);
             } else {
-                Script.AppendFormat("Spline36Resize({0}, {1})", FinalWidth, FinalHeight).AppendLine();
+                Script.AppendLine("Spline36Resize({0}, {1})", FinalWidth, FinalHeight);
             }
-            //}
             if (preview && (settings.Crop))
                 Script.AppendLine("AddBorders(2, 2, 2, 2, $FFFFFF)");
             if (preview)
                 Script.AppendLine("ConvertToRGB32()");
             if (multiThreaded) {
                 if (AviSynthPlus)
-                    Script.AppendFormat("Prefetch({0})", CPU).AppendLine();
-                else
-                    Script.AppendLine("Distributor()");
+                    Script.AppendLine("Prefetch({0})", CPU);
             }
 
-            return CleanupScript(Script.ToString());
+            Script.Cleanup();
+            return Script;
         }
 
-        public void ApplyInterFrame(StringBuilder Script, MediaEncoderSettings settings, int CPU) {
-            if (settings.IncreaseFrameRate) {
-                LoadPluginDll(Script, "svpflow1.dll");
-                LoadPluginDll(Script, "svpflow2.dll");
-                LoadPluginAvsi(Script, "InterFrame2.avsi");
-                if (settings.IncreaseFrameRateValue == FrameRateModeEnum.Double)
-                    Script.AppendFormat(@"InterFrame(Cores={0}, Tuning=""Smooth"", FrameDouble=true{1})", CPU, Settings.SavedFile.EnableMadVR ? ", GPU=true" : "").AppendLine();
-                else {
-                    int NewNum = 0;
-                    int NewDen = 0;
-                    if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps30) {
-                        NewNum = 30000;
-                        NewDen = 1001;
-                    } else if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps60) {
-                        NewNum = 60000;
-                        NewDen = 1001;
-                    } else if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps120) {
-                        NewNum = 120000;
-                        NewDen = 1001;
-                    }
-                    Script.AppendFormat(@"InterFrame(Cores={0}, Tuning=""Smooth"", NewNum={1}, NewDen={2}{3})", CPU, NewNum, NewDen, Settings.SavedFile.EnableMadVR ? ", GPU=true" : "").AppendLine();
+        public void ApplyInterFrame(AviSynthScriptBuilder Script, MediaEncoderSettings settings, int CPU) {
+            Script.LoadPluginDll("svpflow1.dll");
+            Script.LoadPluginDll("svpflow2.dll");
+            Script.LoadPluginAvsi("InterFrame2.avsi");
+            if (settings.IncreaseFrameRateValue == FrameRateModeEnum.Double)
+                Script.AppendLine(@"InterFrame(Cores={0}, Tuning=""Smooth"", FrameDouble=true{1})", CPU, Settings.SavedFile.EnableMadVR ? ", GPU=true" : "");
+            else {
+                int NewNum = 0;
+                int NewDen = 0;
+                if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps30) {
+                    NewNum = 30000;
+                    NewDen = 1001;
+                } else if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps60) {
+                    NewNum = 60000;
+                    NewDen = 1001;
+                } else if (settings.IncreaseFrameRateValue == FrameRateModeEnum.fps120) {
+                    NewNum = 120000;
+                    NewDen = 1001;
                 }
+                Script.AppendLine(@"InterFrame(Cores={0}, Tuning=""Smooth"", NewNum={1}, NewDen={2}{3})", CPU, NewNum, NewDen, Settings.SavedFile.EnableMadVR ? ", GPU=true" : "");
             }
         }
 
@@ -356,93 +344,62 @@ namespace Business {
             }
         }
 
-        public void DoubleAndSharpen(StringBuilder Script, MediaEncoderSettings settings, bool hasOtherDouble, string upscaleScript) {
-            if ((hasOtherDouble && settings.SuperRes) || (!hasOtherDouble && settings.SharpenFinal)) {
-                float Strength = hasOtherDouble ? settings.SuperResStrength : settings.SharpenFinalStrength;
-                Script.AppendFormat(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, true, """"""{3}"""""", ""{4}"")", 1, Strength / 100, settings.SuperResSoftness / 100, upscaleScript, GetAsciiPath(Settings.AviSynthPluginsPath)).AppendLine();
-                // Script.AppendFormat(CultureInfo.InvariantCulture, @"fft3dfilter(bt=-1, sharpen={0})", Strength / 100).AppendLine();
-                // Script.AppendFormat(@"LSFmod(strength={0}, defaults=""slow"")", settings.SharpenAfterDoubleStrength).AppendLine();
-                //Script.AppendFormat(@"SuperRes(passes={0}, strength={1}, softness={2}, upscalecommand=""""""{3}"""""")", 5, Strength / 100, .25, upscaleScript).AppendLine();
-            } else
+        public void DoubleAndSharpen(AviSynthScriptBuilder Script, MediaEncoderSettings settings, string upscaleScript, bool convertColorMatrix) {
+            if (settings.SuperRes)
+                Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4})", 
+                    2, settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f, upscaleScript,
+                    convertColorMatrix ? ", srcMatrix601=true" : "");
+            else
                 Script.AppendLine(upscaleScript);
         }
 
-        /// <summary>
-        /// Moves all LoadPlugin and Import commands to the beginning to make the script more readable.
-        /// </summary>
-        /// <param name="script">The script to clean up.</param>
-        /// <returns>An updated script.</returns>
-        public string CleanupScript(string script) {
-            string[] Lines = script.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "PluginPath", "LoadPlugin", "Import" };
-            var NewScriptLines = Lines.Where(l => CommandsToComment.Any(c => l.StartsWith(c))).Concat(Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))));
-            return string.Join(Environment.NewLine, NewScriptLines);
-        }
-
-        /// <summary>
-        /// Removes commands from the script to allow displaying it as a preview.
-        /// </summary>
-        /// <param name="script">The script to modify.</param>
-        /// <returns>An updated script.</returns>
-        public string ConvertScriptForPreview(string script) {
-            string[] Lines = script.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "ColorMatrix", "SetMTMode", "Prefetch", "Distributor" };
-            for (int i = 0; i < Lines.Length; i++) {
-                if (CommandsToComment.Any(c => Lines[i].StartsWith(c)))
-                    Lines[i] = "# " + Lines[i];
-            }
-            return string.Join(Environment.NewLine, Lines) + Environment.NewLine + "ConvertToRGB32()";
-        }
-
-        public void LoadPluginDll(StringBuilder script, string fileName) {
-            script.AppendFormat(@"LoadPlugin(PluginPath+""{0}"")", fileName).AppendLine();
-        }
-
-        public void LoadPluginAvsi(StringBuilder script, string fileName) {
-            script.AppendFormat(@"Import(PluginPath+""{0}"")", fileName).AppendLine();
-        }
-
-        private void WriteFile(string content, string fileName) {
-            if (!Directory.Exists(Settings.TempFilesPath))
-                Directory.CreateDirectory(Settings.TempFilesPath);
-
-            File.WriteAllText(fileName, content, Encoding.ASCII);
-        }
-
-        public async Task OpenPreview(MediaEncoderSettings settings, bool overwrite) {
+        public async Task PreparePreviewFile(MediaEncoderSettings settings, bool overwrite) {
             if (string.IsNullOrEmpty(settings.FileName))
                 return;
 
             if (overwrite)
                 File.Delete(PreviewSourceFile);
 
-            bool IsCompleted = File.Exists(PreviewSourceFile) || !settings.ConvertToAvi ||
-                await Task.Run(() => FfmpegBusiness.ConvertToAVI(Settings.NaturalGroundingFolder + settings.FileName, PreviewSourceFile, false));
-            if (IsCompleted && settings.ConvertToAvi)
+            bool AviFileReady = File.Exists(PreviewSourceFile);
+            if (!AviFileReady && settings.ConvertToAvi) 
+                AviFileReady = await Task.Run(() => FfmpegBusiness.ConvertToAVI(Settings.NaturalGroundingFolder + settings.FileName, PreviewSourceFile, false));
+
+            if (AviFileReady && settings.ConvertToAvi)
                 await GetMediaInfo(PreviewSourceFile, settings);
             else {
-                settings.OpenMethod = OpenMethods.DirectShowSource;
+                settings.OpenMethod = OpenMethods.Direct;
                 await GetMediaInfo(Settings.NaturalGroundingFolder + settings.FileName, settings);
             }
-        }
 
+            // Auto-calculate crop settings.
+            if (settings.CropLeft == 0 && settings.CropTop == 0 && settings.CropRight == 0 && settings.CropBottom == 0) {
+                Rect AutoCrop = await Task.Run(() => FfmpegBusiness.GetAutoCropRect(settings, true));
+                settings.CropLeft = AutoCrop.Left;
+                settings.CropTop = AutoCrop.Top;
+                settings.CropRight = AutoCrop.Right;
+                settings.CropBottom = AutoCrop.Bottom;
+            }
+        }
+        
         private async Task GetMediaInfo(string previewFile, MediaEncoderSettings settings) {
-            MediaInfoReader InfoReader = new MediaInfoReader();
-            await InfoReader.LoadInfoAsync(previewFile);
-            settings.SourceWidth = InfoReader.Width;
-            settings.SourceHeight = InfoReader.Height;
-            settings.SourceAspectRatio = InfoReader.PixelAspectRatio ?? 1;
-            // Fix last track of VCDs that is widescreen.
-            if (settings.SourceHeight == 288 && settings.SourceWidth == 352 && settings.SourceAspectRatio == 1.485f)
-                settings.SourceAspectRatio = 1.092f;
-            settings.SourceFrameRate = InfoReader.FrameRate;
-            if (settings.ConvertToAvi)
-                await InfoReader.LoadInfoAsync(Settings.NaturalGroundingFolder + settings.FileName);
-            settings.SourceAudioFormat = InfoReader.AudioFormat;
-            if (!settings.CanCopyAudio)
-                settings.EncodeFormat = VideoFormats.Mkv;
-            settings.SourceAudioBitrate = InfoReader.AudioBitRate;
-            settings.Position = (InfoReader.Length ?? 0) / 2;
+            using (MediaInfoReader InfoReader = new MediaInfoReader()) {
+                await InfoReader.LoadInfoAsync(previewFile);
+                settings.SourceWidth = InfoReader.Width;
+                settings.SourceHeight = InfoReader.Height;
+                settings.SourceAspectRatio = InfoReader.PixelAspectRatio ?? 1;
+                // Fix last track of VCDs that is widescreen.
+                if (settings.SourceHeight == 288 && settings.SourceWidth == 352 && settings.SourceAspectRatio == 1.485f)
+                    settings.SourceAspectRatio = 1.092f;
+                settings.SourceFrameRate = InfoReader.FrameRate;
+                if (settings.ConvertToAvi)
+                    await InfoReader.LoadInfoAsync(Settings.NaturalGroundingFolder + settings.FileName);
+                settings.SourceAudioFormat = InfoReader.AudioFormat;
+                settings.SourceVideoFormat = InfoReader.VideoFormat;
+                if (!settings.CanCopyAudio)
+                    settings.EncodeFormat = VideoFormats.Mkv;
+                settings.SourceAudioBitrate = InfoReader.AudioBitRate;
+                settings.Position = (InfoReader.Length ?? 0) / 2;
+            }
         }
 
         public async Task FinalizeReplaceAsync(EncodingCompletedEventArgs jobInfo) {
@@ -479,6 +436,8 @@ namespace Business {
             if (settings.ConvertToAvi)
                 File.Delete(settings.InputFile);
             File.Delete(settings.OutputFile);
+            File.Delete(settings.AudioFileWav);
+            File.Delete(settings.AudioFileAac);
             File.Delete(settings.FinalFile);
             File.Delete(settings.ScriptFile);
             File.Delete(settings.SettingsFile);
@@ -523,7 +482,7 @@ namespace Business {
                 MediaEncoderSettings settings = LoadSettingsFile(PreviewSettingsFile);
                 if (!File.Exists(PreviewSourceFile) && File.Exists(Settings.NaturalGroundingFolder + settings.FileName)) {
                     double? SourceFps = settings.SourceFrameRate; // Keep FPS in case it cannot be read from the file.
-                    await OpenPreview(settings, false);
+                    await PreparePreviewFile(settings, false);
                     if (!settings.SourceFrameRate.HasValue)
                         settings.SourceFrameRate = SourceFps;
                 }
@@ -664,28 +623,6 @@ namespace Business {
             throw new IOException(string.Format("Cannot move file '{0}' because it is being used by another process.", source));
         }
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetShortPathName([MarshalAs(UnmanagedType.LPTStr)] string path, [MarshalAs(UnmanagedType.LPTStr)] StringBuilder shortPath, int shortPathLength);
-
-        private static string GetShortPath(string path) {
-            const int MAX_PATH = 255;
-            var shortPath = new StringBuilder(MAX_PATH);
-            GetShortPathName(path, shortPath, MAX_PATH);
-            return shortPath.ToString();
-        }
-
-        public bool IsASCII(string value) {
-            // ASCII encoding replaces non-ascii with question marks, so we use UTF8 to see if multi-byte sequences are there
-            return Encoding.UTF8.GetByteCount(value) == value.Length;
-        }
-
-        private string GetAsciiPath(string path) {
-            if (!IsASCII(path))
-                return GetShortPath(path);
-            else
-                return path;
-        }
-
         /// <summary>
         /// Clears the temp folder (unfinished downloads) except Media Encoder files.
         /// </summary>
@@ -704,6 +641,16 @@ namespace Business {
                     }
                 }
             }
+        }
+
+        public int ConvertAudioQualityToBitrate(int q) {
+            return (int)Math.Round(400 * Math.Pow(q / 100.0, 1.28) + 8, 0);
+            //400 * B22 ^ 1.28 + 8
+        }
+
+        public int ConvertAudioBitrateToQuality(int bitrate) {
+            return (int)Math.Round(Math.Pow((bitrate - 8) / 400, 1 / 1.28) / 100.0, 0);
+            //((C22 - 8) / 400) ^ (1 / 1.28)
         }
     }
 

@@ -104,15 +104,18 @@ namespace NaturalGroundingPlayer {
                 ErrorText.Text = "File not found.";
             }
 
-            if (!isPopup && MediaInfoReader.HasMissingInfo(video))
-                await LoadMediaInfoAsync();
+            //if (!isPopup && MediaInfoReader.HasMissingInfo(video))
+            await LoadMediaInfoAsync();
         }
 
         private async Task LoadMediaInfoAsync() {
-            MediaInfoReader MediaInfo = new MediaInfoReader();
-            await MediaInfo.LoadInfoAsync(video);
-            MediaInfo.Dispose();
-            DimensionText.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+            using (MediaInfoReader MediaInfo = new MediaInfoReader()) {
+                await MediaInfo.LoadInfoAsync(video);
+                DimensionText.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+                DisablePitchCheckBox.IsEnabled = MediaInfo.PixelAspectRatio == 1;
+                if (!DisablePitchCheckBox.IsEnabled)
+                    video.DisablePitch = false;
+            }
         }
 
         private async void DownloadUrlText_LostFocus(object sender, RoutedEventArgs e) {
@@ -185,7 +188,7 @@ namespace NaturalGroundingPlayer {
 
         private async void PlayButton_Click(object sender, RoutedEventArgs e) {
             if (player != null && video.FileName != null)
-                await player.PlayVideoAsync(video);
+                await player.PlayVideoAsync(video, false);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

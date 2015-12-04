@@ -44,6 +44,10 @@ namespace Business {
             get { return SavedFile.NaturalGroundingFolder + @"Temp\"; }
         }
 
+        public static string AutoPitchFile {
+            get { return SavedFile.NaturalGroundingFolder + @"Player.avs"; }
+        }
+
         //public static string DownloadsFolder = "Downloads";
         public static int SimultaneousDownloads = 2;
 
@@ -55,11 +59,7 @@ namespace Business {
         public static readonly string UnhandledExceptionLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\Log.txt");
         public static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\NaturalGroundingVideos.db");
         public static readonly string InitialDatabasePath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "InitialDatabase.db");
-        // public static readonly string TempFilesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\Temp\");
-        // public static readonly string MediaEncoderTempFile = TempFilesPath + "MediaEncoder.avs";
-        // public static readonly string MediaEncoderAviFile = TempFilesPath + "Preview.avi";
         public static readonly string AviSynthPluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Encoder\");
-        // public static readonly string AviSynthPluginsPath64 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Encoder_x64\");
 
         public static string[] GetMediaTypeExtensions(MediaType mediaType) {
             if (mediaType == MediaType.Video)

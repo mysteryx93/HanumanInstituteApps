@@ -19,6 +19,7 @@ namespace DataAccess
             this.Artist = "";
             this.Title = "";
             this.Album = "";
+            this.FileName = "";
             this.DownloadName = "";
             this.DownloadUrl = "";
             this.BuyUrl = "";
@@ -45,6 +46,7 @@ namespace DataAccess
         public string BuyUrl { get; set; }
         public bool DisableSvp { get; set; }
         public bool DisableMadVr { get; set; }
+        public bool DisablePitch { get; set; }
         public bool IsPersonal { get; set; }
     
         public virtual MediaCategory MediaCategory { get; set; }

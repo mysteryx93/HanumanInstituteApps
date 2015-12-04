@@ -44,8 +44,8 @@ namespace NaturalGroundingPlayer {
 
         public async Task InitializationCompleted() {
             settings = SessionCore.Instance.Business.FilterSettings;
-            this.DataContext = settings;
             PolarityFocus.ItemsSource = await SessionCore.Instance.Business.GetFocusCategoriesAsync();
+            this.DataContext = settings;
             PolarityFocus.SelectedIndex = 0;
             Settings_Changed(null, null);
         }
@@ -84,7 +84,7 @@ namespace NaturalGroundingPlayer {
         /// Update the display of conditions and notify the business layer of changes.
         /// </summary>
         private void Settings_Changed(object sender, RoutedEventArgs e) {
-            if (this.IsLoaded) {
+            if (this.DataContext != null) {
                 if (IntensitySlider.Value == IntensitySlider.Maximum && GrowthSlider.Value > 0)
                     GrowthSlider.Value = 0;
                 if (IntensitySlider.Value == IntensitySlider.Minimum && GrowthSlider.Value < 0)
@@ -268,6 +268,11 @@ namespace NaturalGroundingPlayer {
 
         private void window_Closed(object sender, EventArgs e) {
             MediaEncoderBusiness.ClearTempFolder();
+        }
+
+        private async void SkipNextVideo_Click(object sender, RoutedEventArgs e) {
+            if (SessionCore.Instance.Business.IsStarted)
+                await SessionCore.Instance.Business.SelectNextVideoAsync(1);
         }
     }
 }

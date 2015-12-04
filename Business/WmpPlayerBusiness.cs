@@ -19,6 +19,7 @@ namespace Business {
 
         public IMediaPlayerControl player;
         public Media CurrentVideo { get; set; }
+        private bool isAutoPitchEnabled;
         public bool IsVisible;
         private double position;
         private DateTime lastStartTime;
@@ -130,18 +131,26 @@ namespace Business {
                 player.Close();
         }
 
-        public async Task PlayVideoAsync(Media video) {
+        public async Task PlayVideoAsync(Media video, bool enableAutoPitch) {
             this.CurrentVideo = video;
+            this.isAutoPitchEnabled = enableAutoPitch;
             timerGetPositionEnabled = false;
             position = 0;
             lastStartTime = DateTime.Now;
             if (player == null)
                 Show();
             timerGetPositionEnabled = false;
-            await player.OpenFileAsync(Settings.NaturalGroundingFolder + video.FileName);
+            await player.OpenFileAsync(MediaFileName);
             // Ensures timerGetPositionEnabled gets re-activated even if play failed, after 5 seconds.
             timerPlayTimeout.Stop();
             timerPlayTimeout.Start();
+        }
+
+        private string MediaFileName {
+            get {
+                // customFileName != null ? customFileName : 
+                return isAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+            }
         }
 
         public double Position {

@@ -76,13 +76,13 @@ namespace NaturalGroundingPlayer {
 
             await TestDatabaseConnectionAsync();
 
-            InitWin.Close();
-            await InitWinTask;
-
             if (Settings.SavedFile == null)
                 SettingsWindow.Instance();
 
             await Main.InitializationCompleted();
+
+            InitWin.Close();
+            await InitWinTask;
         }
 
         /// <summary>

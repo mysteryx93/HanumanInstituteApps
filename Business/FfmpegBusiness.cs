@@ -17,25 +17,11 @@ namespace Business {
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
         /// <returns>Whether the operation was completed.</returns>
         public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool silent) {
-            bool Result = true;
             File.Delete(destination);
-            if (!string.IsNullOrEmpty(audioFile)) {
-                // FFMPEG fails to muxe H264 into MKV container. Converting to MP4 and then muxing with the audio, however, works.
-                string OriginalVideoFile = videoFile;
-                if (videoFile.EndsWith(".264") && destination.EndsWith(".mkv")) {
-                    videoFile = videoFile.Substring(0, videoFile.Length - 4) + ".mp4";
-                    Result = JoinAudioVideo(OriginalVideoFile, null, videoFile, silent);
-                }
-                // Join audio and video files.
-                if (Result)
-                    Result = RunFfmpeg(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a ""{2}""", videoFile, audioFile, destination), silent);
-                // Delete temp file.
-                if (OriginalVideoFile != videoFile)
-                    File.Delete(videoFile);
-                return Result;
-            } else
-                Result = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
-            return Result;
+            if (!string.IsNullOrEmpty(audioFile))
+                return RunFfmpeg(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a ""{2}""", videoFile, audioFile, destination), silent);
+            else
+                return RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
         }
 
         /// <summary>
@@ -48,24 +34,10 @@ namespace Business {
         public static bool ConvertToAVI(string source, string destination, bool silent) {
             File.Delete(destination);
             // -vcodec huffyuv or utvideo, -acodec pcm_s16le
-            bool Success = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec utvideo -an ""{1}""", source, destination), silent);
+            bool Success = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec utvideo -acodec pcm_s16le ""{1}""", source, destination), silent);
             if (!Success)
                 File.Delete(destination);
             return Success;
-        }
-
-        /// <summary>
-        /// Converts specified file into H264 format.
-        /// </summary>
-        /// <param name="source">The file to convert.</param>
-        /// <param name="destination">The destination file, ending with .mp4</param>
-        /// <param name="encodeQuality">The quality of the encoded x264 file, normally between 18 and 30.</param>
-        /// <param name="encodePreset">The preset used during encoding. Slower gives smaller files.</param>
-        /// <returns>Whether the operation was completed.</returns>
-        public static bool ConvertToH264(string source, string destination, int encodeQuality, EncodePresets encodePreset) {
-            File.Delete(destination);
-            // return RunX264(string.Format(@"--preset veryslow --crf {2} -o ""{0}"" ""{1}""", destination, source, encodingQuality), false);
-            return RunX264Pipe(string.Format(@"--preset {0} --crf {1} -o ""{2}""", encodePreset, encodeQuality, destination), source, false);
         }
 
         /// <summary>
@@ -123,23 +95,138 @@ namespace Business {
         }
 
         /// <summary>
-        /// Runs x264 with specified arguments.
+        /// Converts specified file into H264 format. The script file must already be written.
         /// </summary>
-        /// <param name="arguments">x264 startup arguments.</param>
-        /// <param name="silent">If true, the x264 window will be hidden.</param>
-        private static bool RunX264(string arguments, string source, bool silent) {
-            return Run(@"Encoder\x264.exe", arguments + " \"" + source + "\"", silent, ProcessPriorityClass.BelowNormal);
+        /// <param name="settings">An object containing the encoding settings.</param>
+        /// <returns>Whether the operation was completed.</returns>
+        public static bool ConvertToH264(MediaEncoderSettings settings) {
+            File.Delete(settings.OutputFile);
+            string PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx264 -preset {1} -crf {2} -psy-rd 1:0.05 ""{3}""", 
+                settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
+            return Run("cmd", PipeArgs, false);
+        }
+        
+        /// <summary>
+        /// Saves the audio output of specified script into a WAV file.
+        /// </summary>
+        /// <param name="settings">An object containing the encoding settings.</param>
+        public static void SaveAudioToWav(MediaEncoderSettings settings) {
+            string TempFile = settings.TempFile + ".avs";
+            // Read source script.
+            string FileContent = File.ReadAllText(settings.ScriptFile);
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
+            // Remote MT code.
+            Script.ConvertForPreview();
+            // Add audio gain.
+            if (settings.AudioGain.HasValue && settings.AudioGain != 0) {
+                Script.AppendLine("AmplifydB({0})", settings.AudioGain.Value);
+            }
+            if (settings.ChangeAudioPitch) {
+                // Change pitch to 432hz.
+                Script.LoadPluginDll("TimeStretch.dll");
+                Script.AppendLine("ResampleAudio(48000)");
+                Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
+            }
+            Script.AppendLine("ConvertAudioTo16bit()");
+            // Add TWriteWAV.
+            Script.AppendLine();
+            Script.LoadPluginDll("TWriteAVI.dll");
+            Script.AppendLine(@"TWriteWAV(""{0}"", true)", Script.GetAsciiPath(settings.AudioFileWav));
+            Script.AppendLine("ForceProcessWAV()");
+            // Write temp script.
+            Script.WriteToFile(TempFile);
+            // Execute.
+            // It aways returns an error but file is generated.
+            string Args = string.Format(@"""{0}"" -o -", TempFile);
+            Run("Encoder\\avs2yuv.exe", Args, false);
+            File.Delete(TempFile);
+        }
+
+        public static bool EncodeAudio(MediaEncoderSettings settings) {
+            string Args = string.Format(@"-q {0} -if ""{1}"" -of ""{2}""", settings.AudioQuality / 100f, settings.AudioFileWav, settings.AudioFileAac);
+            return Run("Encoder\\NeroAacEnc.exe", Args, false);
         }
 
         /// <summary>
-        /// Runs x264 through a Avs2uuv pipe to allow AviSynth and x264.exe to have separate memory spaces (each limited to 2GB).
+        /// Returns the audio gain that can be applied to an audio file.
         /// </summary>
-        /// <param name="arguments">x264 startup arguments.</param>
-        /// <param name="silent">If true, the x264 window will be hidden.</param>
-        private static bool RunX264Pipe(string arguments, string source, bool silent) {
-            int FrameCount = GetFrameCount(source, true);
-            string PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\x264.exe - {1} --demuxer y4m --frames {2}", source, arguments, FrameCount);
-            return Run("cmd", PipeArgs, silent, ProcessPriorityClass.BelowNormal);
+        /// <param name="settings">The settings pointing to the file to analyze.</param>
+        /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
+        public static float? GetAudioGain(MediaEncoderSettings settings) {
+            string TempResult = settings.TempFile + ".txt";
+            string Args = string.Format(@"/c Encoder\\ffmpeg.exe -i ""{0}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1", 
+                Settings.NaturalGroundingFolder + settings.FileName, TempResult);
+            Run("cmd", Args, true);
+            float? Result = null;
+            if (File.Exists(TempResult)) {
+                string FileString = File.ReadAllText(TempResult);
+                // Find max_volume.
+                string SearchVal = "max_volume: ";
+                int Pos1 = FileString.IndexOf(SearchVal);
+                if (Pos1 >= 0) {
+                    Pos1 += SearchVal.Length;
+                    // Find end of line.
+                    int Pos2 = FileString.IndexOf('\r', Pos1);
+                    if (Pos2 >= 0) {
+                        string MaxVolString = FileString.Substring(Pos1, Pos2 - Pos1);
+                        if (MaxVolString.Length > 3) {
+                            // Remove ' dB'
+                            MaxVolString = MaxVolString.Substring(0, MaxVolString.Length - 3);
+                            float MaxVol = 0;
+                            if (float.TryParse(MaxVolString, out MaxVol))
+                                Result = Math.Abs(MaxVol);
+                        }
+                    }
+                }
+            }
+            return Result;
+        }
+
+        public static Rect GetAutoCropRect(MediaEncoderSettings settings, bool silent) {
+            string TempScript = settings.TempFile + ".avs";
+            string TempResult = settings.TempFile + ".txt";
+            string TempOut = settings.TempFile + ".y4m";
+
+            // Create script to get auto-crop coordinates
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
+            Script.AddPluginPath();
+            Script.LoadPluginDll("LSMASHSource.dll");
+            Script.AppendLine(@"LWLibavVideoSource(""{0}"", cache=false, threads=1)", Script.GetAsciiPath(Settings.NaturalGroundingFolder + settings.FileName));
+            Script.LoadPluginDll("RoboCrop26.dll");
+            Script.AppendLine(@"RoboCrop(LogFn=""{0}"")", Script.GetAsciiPath(TempResult));
+            Script.AppendLine("Trim(0,-1)");
+            Script.WriteToFile(TempScript);
+
+            // Run script.
+            Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o {1}", TempScript, TempOut), true);
+
+            // Read auto crop coordinates
+            Rect Result = new Rect();
+            if (File.Exists(TempResult)) {
+                string[] Values = File.ReadAllText(TempResult).Split(' ');
+                if (Values.Length >= 13) {
+                    Result.Left = int.Parse(Values[10]);
+                    Result.Top = int.Parse(Values[11]);
+                    Result.Right = settings.SourceWidth.Value - int.Parse(Values[12]);
+                    Result.Bottom = settings.SourceHeight.Value - int.Parse(Values[13]);
+                    // Make result conservative, we have to visually see a line of black border to know the right dimensions.
+                    if (Result.Left > 0)
+                        Result.Left--;
+                    if (Result.Top > 0)
+                        Result.Top--;
+                    if (Result.Right > 0)
+                        Result.Right--;
+                    if (Result.Bottom > 0)
+                        Result.Bottom--;
+                }
+            }
+
+            // Delete temp files.
+            File.Delete(TempScript);
+            File.Delete(TempResult);
+            File.Delete(TempOut); // Dummy file that received avs2yuv output.
+
+            return Result;
         }
 
         /// <summary>
@@ -148,19 +235,21 @@ namespace Business {
         /// <param name="source">The AviSynth script to get frame count for.</param>
         /// <param name="silent">If true, the x264 window will be hidden.</param>
         /// <returns>The video frame count.</returns>
-        private static int GetFrameCount(string source, bool silent) {
-            string TempScript = Settings.TempFilesPath + "Framecount.avs";
-            string TempResult = Settings.TempFilesPath + "Framecount.txt";
+        public static int GetFrameCount(MediaEncoderSettings settings, bool silent) {
+            string TempScript = settings.TempFile + ".avs";
+            string TempResult = settings.TempFile + ".txt";
+            string TempOut = settings.TempFile + ".y4m";
 
             // Create script to get frame count.
-            StringBuilder FrameCountScript = new StringBuilder();
-            FrameCountScript.AppendFormat(@"AviSource(""{0}"")", source);
-            FrameCountScript.AppendLine(@"WriteFileStart(""Framecount.txt"", ""Framecount()"")");
-            FrameCountScript.AppendLine("Trim(0,-1)");
-            File.WriteAllText(TempScript, FrameCountScript.ToString());
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
+            Script.AppendLine(@"AviSource(""{0}"")", settings.ScriptFile);
+            Script.AppendLine(@"WriteFileStart(""{0}"", ""Framecount()"")", TempResult);
+            Script.AppendLine("Trim(0,-1)");
+            Script.ConvertForPreview();
+            Script.WriteToFile(TempScript);
 
             // Run script.
-            Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o Framecount.y4m", TempScript), true);
+            Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o {1}", TempScript, TempOut), true);
 
             // Read frame count
             int FrameCount = 0;
@@ -172,7 +261,7 @@ namespace Business {
             // Delete temp files.
             File.Delete(TempScript);
             File.Delete(TempResult);
-            File.Delete(Settings.TempFilesPath + "Framecount.y4m"); // Dummy file that received avs2yuv output.
+            File.Delete(TempOut); // Dummy file that received avs2yuv output.
 
             return FrameCount;
         }

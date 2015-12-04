@@ -29,6 +29,7 @@
           <Property Name="BuyUrl" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
           <Property Name="DisableSvp" Type="bit" Nullable="false" />
           <Property Name="DisableMadVr" Type="bit" Nullable="false" />
+          <Property Name="DisablePitch" Type="bit" Nullable="false" />
           <Property Name="IsPersonal" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="MediaCategories">
@@ -211,6 +212,7 @@
           <Property Name="BuyUrl" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
           <Property Name="DisableSvp" Type="Boolean" Nullable="false" />
           <Property Name="DisableMadVr" Type="Boolean" Nullable="false" />
+          <Property Name="DisablePitch" Type="Boolean" Nullable="false" />
           <Property Name="IsPersonal" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="MediaCategory" Relationship="NaturalGroundingVideosModel.FK_Media_0_0" FromRole="Medium" ToRole="MediaCategory" />
           <NavigationProperty Name="MediaRatings" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_0_0" FromRole="Media" ToRole="MediaRating" />
@@ -304,6 +306,7 @@
                 <ScalarProperty Name="IsPersonal" ColumnName="IsPersonal" />
                 <ScalarProperty Name="DisableMadVr" ColumnName="DisableMadVr" />
                 <ScalarProperty Name="DisableSvp" ColumnName="DisableSvp" />
+                <ScalarProperty Name="DisablePitch" ColumnName="DisablePitch" />
                 <ScalarProperty Name="BuyUrl" ColumnName="BuyUrl" />
                 <ScalarProperty Name="DownloadUrl" ColumnName="DownloadUrl" />
                 <ScalarProperty Name="DownloadName" ColumnName="DownloadName" />

@@ -15,6 +15,7 @@ namespace Business {
         public bool AutoDownload { get; set; }
         public bool EnableSvp { get; set; }
         public bool EnableMadVR { get; set; }
+        public bool ChangeAudioPitch { get; set; }
         public bool Widescreen { get; set; }
         public MediaPlayerApplication MediaPlayerApp { get; set; }
         public int MaxDownloadQuality { get; set; }
@@ -24,6 +25,8 @@ namespace Business {
             AutoDownload = true;
             EnableSvp = true;
             EnableMadVR = false;
+            ChangeAudioPitch = false;
+            Widescreen = false;
             MediaPlayerApp = MediaPlayerApplication.Mpc;
             MaxDownloadQuality = 0; // Max
             Zoom = 1;
@@ -102,6 +105,7 @@ namespace Business {
             Result.AutoDownload = AutoDownload;
             Result.EnableSvp = EnableSvp;
             Result.EnableMadVR = EnableMadVR;
+            Result.ChangeAudioPitch = ChangeAudioPitch;
             Result.Widescreen = Widescreen;
             Result.MediaPlayerApp = MediaPlayerApp;
             Result.MaxDownloadQuality = MaxDownloadQuality;

@@ -100,7 +100,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async Task PlayVideo(Media video) {
-            await Player.PlayVideoAsync(video);
+            await Player.PlayVideoAsync(video, false);
             await Task.Delay(500);
             this.Activate();
         }
