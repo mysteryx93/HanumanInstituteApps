@@ -5,9 +5,13 @@ Provides the ultimate media playback experience by sequencing videos based on th
 
 The primary goal of this application is to automate Natural Grounding sessions by downloading and playing videos in the right sequence to gradually increase the intensity and bring you into higher states of consciousness. It is a spiritual awakening tool.
 
-To learn more about Natural Grounding, you can read the <a href="https://www.shamanicattraction.com/files/ngguide2011.pdf">2011 Natural Grounding Guide</a> or visit the <a href="http://www.naturalgrounding.net/">Natural Grounding website</a>.
+[Read more in the Wiki.](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki)
 
-Natural Grounding is a very deep topic. I'm currently writing two books to properly explain what it truly is that will be published on Amazon. [Read more](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki)
+To learn more about Natural Grounding, you can read the [2011 Natural Grounding Guide](https://www.shamanicattraction.com/files/ngguide2011.pdf) or get access to [various resources here](http://sexenergysuccess.com/natural-grounding-resources-official/).
+
+Or just take a look at what various people wrote about Natural Grounding in various blogs [here](http://claimingpower.com/natural-grounding-powerful-energies/) and [there](http://relationalmastery.com/amember/forum/viewtopic.php?f=8&t=344) (years before this software existed, doing sessions manually).
+
+Natural Grounding is a very deep topic. I'm currently writing two books to properly explain what it truly is that will be published on Amazon.
 
 [Join the Natural Grounding community on Facebook here.](https://www.facebook.com/groups/sxenergytransformationalentertainment/)
 
