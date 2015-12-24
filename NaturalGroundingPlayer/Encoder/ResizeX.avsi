@@ -1,4 +1,4 @@
-/* ResizeX v1.0
+/* ResizeX v1.0.1
 
 ResizeX is a wrapper function for AviSynth's internal resizers and Dither_resize16
 that corrects for the chroma shift caused by the internal resizers when they're
@@ -65,7 +65,7 @@ src_width  = src_width  == 0 ? iw
 \          : src_width  <  0 ? iw-src_left+src_width
 \                            : src_width
 src_height = src_height == 0 ? ih
-\          : src_height <  0 ? iw-src_top+src_height
+\          : src_height <  0 ? ih-src_top+src_height
 \                            : src_height
 
 # Get the input clip's colorspace

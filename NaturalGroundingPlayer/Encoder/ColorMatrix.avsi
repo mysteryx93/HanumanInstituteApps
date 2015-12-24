@@ -1,28 +1,19 @@
 # Performs color matrix conversion with 16 bit depth to avoid banding
-function ColorMatrix601to709(clip input)
-{
+function ColorMatrixShader(clip input, string "MatrixIn", string "MatrixOut") {
+	MatrixIn = default(MatrixIn, "709")
+	MatrixOut = default(MatrixOut, "709")
+
+	Assert(MatrixIn == "601" || MatrixIn == "709", "MatrixIn must be 601 or 709")
+	Assert(MatrixOut == "601" || MatrixOut == "709", "MatrixOut must be 601 or 709")
+	Assert(MatrixIn != MatrixOut, "MatrixIn and MatrixOut must be different")
+
 	input
-	srcYuv = !IsRGB
-	sourceFormat = IsYV12 ? "YV12" : IsYV24 ? "YV24" : IsRGB24 ? "RGB24" : IsRGB32 ? "RGB32" : ""
-	Assert(sourceFormat != "", chr(10) + "Source must be YV12, YV24, RGB24 or RGB32" + chr(10))
+	sourceFormat = IsYV12 ? "YV12" : IsYV24 ? "YV24" : ""
+	Assert(sourceFormat != "", chr(10) + "Source must be YV12 or YV24" + chr(10))
 
-	input = ConvertToShader(precision=1)
-	Shader(srcYuv ? "Yuv601ToGamma.cso" : "GammaToYuv601.cso")
-	Shader(srcYuv ? "GammaToYuv.cso" : "YuvToGamma.cso")
-	ExecuteShader(last, input, precision=2, precisionIn=1, precisionOut=1)
-	ConvertFromShader(format=sourceFormat, precision=1)
-}
-
-function ColorMatrix709to601(clip input)
-{
-	input
-	srcYuv = !IsRGB
-	sourceFormat = IsYV12 ? "YV12" : IsYV24 ? "YV24" : IsRGB24 ? "RGB24" : IsRGB32 ? "RGB32" : ""
-	Assert(sourceFormat != "", chr(10) + "Source must be YV12, YV24, RGB24 or RGB32" + chr(10))
-
-	input = ConvertToShader(precision=1)
-	Shader(srcYuv ? "YuvToGamma.cso" : "GammaToYuv.cso")
-	Shader(srcYuv ? "GammaToYuv601.cso" : "Yuv601ToGamma.cso")
-	ExecuteShader(last, input, precision=2, precisionIn=1, precisionOut=1)
-	ConvertFromShader(format=sourceFormat, precision=1)
+	input = ConvertToShader(1)
+	Shader(MatrixIn == "601" ? "Yuv601ToGamma.cso" : "YuvToGamma.cso")
+	Shader(MatrixOut == "601" ? "GammaToYuv601.cso" : "GammaToYuv.cso")
+	ExecuteShader(last, input, Precision=2, Clip1Precision=1, OutputPrecision=1)
+	ConvertFromShader(1, format=sourceFormat)
 }

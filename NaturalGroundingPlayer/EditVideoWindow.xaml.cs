@@ -99,13 +99,15 @@ namespace NaturalGroundingPlayer {
             EditRating_LostFocus(null, null);
             if (player == null)
                 PlayButton.Visibility = System.Windows.Visibility.Hidden;
-            if (video.FileName != null && !File.Exists(Settings.NaturalGroundingFolder + video.FileName)) {
-                fileNotFound = true;
-                ErrorText.Text = "File not found.";
-            }
 
-            //if (!isPopup && MediaInfoReader.HasMissingInfo(video))
-            await LoadMediaInfoAsync();
+            if (video.FileName != null) {
+                if (File.Exists(Settings.NaturalGroundingFolder + video.FileName))
+                    await LoadMediaInfoAsync();
+                else {
+                    fileNotFound = true;
+                    ErrorText.Text = "File not found.";
+                }
+            }
         }
 
         private async Task LoadMediaInfoAsync() {

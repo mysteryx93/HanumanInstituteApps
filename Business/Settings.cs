@@ -48,6 +48,11 @@ namespace Business {
             get { return SavedFile.NaturalGroundingFolder + @"Player.avs"; }
         }
 
+        public static string AutoPitchCache
+        {
+            get { return SavedFile.NaturalGroundingFolder + @"Player.ffindex"; }
+        }
+
         //public static string DownloadsFolder = "Downloads";
         public static int SimultaneousDownloads = 2;
 

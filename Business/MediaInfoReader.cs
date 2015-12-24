@@ -115,6 +115,19 @@ namespace Business {
             }
         }
 
+        public int? BitDepth
+        {
+            get
+            {
+                string StrValue = lastMedia.Get(StreamKind.Video, 0, "BitDepth");
+                int Result = 0;
+                if (int.TryParse(StrValue, out Result))
+                    return Result;
+                else
+                    return null;
+            }
+        }
+
         public string VideoFormat {
             get {
                 return lastMedia.Get(StreamKind.Video, 0, "Format");

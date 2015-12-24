@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
@@ -16,11 +17,32 @@ namespace Business {
         public string FileName { get; set; }
         [DefaultValue(null)]
         public double? Position { get; set; }
+        private int? sourceHeight;
         [DefaultValue(null)]
-        public int? SourceHeight { get; set; }
+        public int? SourceHeight {
+            get { return sourceHeight; }
+            set {
+                sourceHeight = value;
+                CalculateSize();
+            }
+        }
+        private int? sourceWidth;
         [DefaultValue(null)]
-        public int? SourceWidth { get; set; }
-        public double SourceAspectRatio { get; set; }
+        public int? SourceWidth {
+            get { return sourceWidth; }
+            set {
+                sourceWidth = value;
+                CalculateSize();
+            }
+        }
+        private double sourceAspectRatio;
+        public double SourceAspectRatio {
+            get { return sourceAspectRatio; }
+            set {
+                sourceAspectRatio = value;
+                CalculateSize();
+            }
+        }
         [DefaultValue(null)]
         public double? SourceFrameRate { get; set; }
         [DefaultValue(null)]
@@ -30,9 +52,18 @@ namespace Business {
         [DefaultValue(null)]
         public string SourceVideoFormat { get; set; }
         public ColorMatrix SourceColorMatrix { get; set; }
-        public int OutputHeight { get; set; }
+        public int? SourceBitDepth { get; set; }
+        private int outputHeight;
+        public int OutputHeight {
+            get { return outputHeight; }
+            set {
+                outputHeight = value;
+                CalculateSize();
+            }
+        }
         public bool Denoise1 { get; set; }
         public int Denoise1Strength { get; set; }
+        public bool Denoise1Compatibility { get; set; }
         public bool Denoise2 { get; set; }
         public int Denoise2Strength { get; set; }
         public int Denoise2Sharpen { get; set; }
@@ -42,11 +73,47 @@ namespace Business {
         public int SuperResSoftness { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
-        public bool Crop { get; set; }
-        public int CropLeft { get; set; }
-        public int CropTop { get; set; }
-        public int CropRight { get; set; }
-        public int CropBottom { get; set; }
+        public bool IncreaseFrameRateSmooth { get; set; }
+        private bool crop;
+        public bool Crop {
+            get { return crop; }
+            set {
+                crop = value;
+                CalculateSize();
+            }
+        }
+        private int cropLeft;
+        public int CropLeft {
+            get { return cropLeft; }
+            set {
+                cropLeft = value;
+                CalculateSize();
+            }
+        }
+        private int cropTop;
+        public int CropTop {
+            get { return cropTop; }
+            set {
+                cropTop = value;
+                CalculateSize();
+            }
+        }
+        private int cropRight;
+        public int CropRight {
+            get { return cropRight; }
+            set {
+                cropRight = value;
+                CalculateSize();
+            }
+        }
+        private int cropBottom;
+        public int CropBottom {
+            get { return cropBottom; }
+            set {
+                cropBottom = value;
+                CalculateSize();
+            }
+        }
         public bool Trim { get; set; }
         [DefaultValue(null)]
         public int? TrimStart { get; set; }
@@ -58,6 +125,7 @@ namespace Business {
         public float EncodeQuality { get; set; }
         public EncodePresets EncodePreset { get; set; }
         public VideoFormats EncodeFormat { get; set; }
+        public bool Encode10bit { get; set; }
         private AudioActions audioAction;
         public AudioActions AudioAction {
             get { return audioAction; }
@@ -75,6 +143,27 @@ namespace Business {
         [DefaultValue(null)]
         public float? AudioGain { get; set; }
         public bool ChangeAudioPitch { get; set; }
+
+        private bool autoCalculateSize;
+        [IgnoreDataMember()]
+        public bool AutoCalculateSize {
+            get { return autoCalculateSize; }
+            set {
+                if (value && autoCalculateSize != value) {
+                    autoCalculateSize = value;
+                    CalculateSize();
+                } else
+                    autoCalculateSize = value;
+            }
+        }
+        [IgnoreDataMember()]
+        public int? OutputWidth { get; set; }
+        [IgnoreDataMember()]
+        public Rect CropSource { get; set; }
+        [IgnoreDataMember()]
+        public Rect CropAfter { get; set; }
+        [IgnoreDataMember()]
+        public int FrameDouble { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
@@ -94,11 +183,58 @@ namespace Business {
             SuperResSoftness = 0;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
+            IncreaseFrameRateSmooth = true;
             ChangeSpeedValue = 100;
             EncodeQuality = 24;
             EncodePreset = EncodePresets.veryslow;
+            //Encode10bit = true;
             AudioQuality = 50;
             ChangeAudioPitch = false;
+        }
+
+        /// <summary>
+        /// Calculates FrameDouble, CropSource, CropAfter and OutputWidth values.
+        /// </summary>
+        public void CalculateSize() {
+            if (!AutoCalculateSize)
+                return;
+
+            if (!SourceWidth.HasValue || !SourceHeight.HasValue || OutputHeight > 10000) {
+                OutputWidth = null;
+                return;
+            }
+
+            // Calculate CropSource and CropAfter values.
+            if (Crop) {
+                // CropSource must be a factor of 4.
+                CropSource = new Rect(
+                    CropLeft / 4 * 4,
+                    CropTop / 4 * 4,
+                    CropRight / 4 * 4,
+                    CropBottom / 4 * 4);
+            } else
+                CropSource = new Rect();
+            FrameDouble = 0;
+            int ScaleFactor = 1;
+            while ((SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactor < OutputHeight) {
+                FrameDouble += 1;
+                ScaleFactor *= 2;
+            }
+            if (Crop) {
+                CropAfter = new Rect(
+                    (CropLeft - CropSource.Left) * ScaleFactor,
+                    (CropTop - CropSource.Top) * ScaleFactor,
+                    (CropRight - CropSource.Right) * ScaleFactor,
+                    (CropBottom - CropSource.Bottom) * ScaleFactor);
+            } else
+                CropAfter = new Rect();
+            int CropHeight = ((SourceHeight.Value - CropSource.Top - CropSource.Bottom) * ScaleFactor);
+            int CropWidth = ((SourceWidth.Value - CropSource.Left - CropSource.Right) * ScaleFactor);
+            if (CropAfter.HasValue) {
+                CropHeight = CropHeight - CropAfter.Top - CropAfter.Bottom;
+                CropWidth = CropWidth - CropAfter.Left - CropAfter.Right;
+            }
+            OutputWidth = (int)Math.Round((double)CropWidth * SourceAspectRatio / CropHeight * OutputHeight / 4) * 4;
         }
 
         public bool CanEncodeMp4 {
@@ -159,7 +295,7 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mp4", JobIndex); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.264", JobIndex); }
         }
 
         public string AudioFileWav {

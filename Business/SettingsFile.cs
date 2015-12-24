@@ -39,11 +39,30 @@ namespace Business {
             SettingsFile Result = new SettingsFile();
             string Root = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System));
             Result.NaturalGroundingFolder = Root + "Natural Grounding\\";
-            Result.SvpPath = Root + @"Program Files (x86)\SVP\SVPMgr.exe";
-            if (!File.Exists(Result.SvpPath))
-                Result.SvpPath = Root + @"Program Files\SVP\SVPMgr.exe";
-                //Result.MpcPath = Root + @"Program Files (x86)\SVP\MPC-HC\mpc-hc.exe";
-                //Result.MpcPath = Root + @"Program Files\SVP\MPC-HC\mpc-hc.exe";
+
+            // Auto-detect SVP path.
+            string[] DefaultPaths = {
+                @"SVP 4\SVPManager.exe",
+                @"SVP 4 Free\SVPManager.exe",
+                @"SVP 4 Dev\SVPManager.exe",
+                @"SVP\SVPMgr.exe"
+            };
+            string ItemPath;
+            foreach (string item in DefaultPaths) {
+                ItemPath = Root + "Program Files\\" + item;
+                if (File.Exists(ItemPath)) {
+                    Result.SvpPath = ItemPath;
+                    break;
+                }
+                ItemPath = Root + "Program Files (x86)\\" + item;
+                if (File.Exists(ItemPath)) {
+                    Result.SvpPath = ItemPath;
+                    break;
+                }
+            }
+            if (string.IsNullOrEmpty(Result.SvpPath))
+                Result.SvpPath = Root + "Program Files\\" + DefaultPaths[0];
+
             return Result;
         }
 

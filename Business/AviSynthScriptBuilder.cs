@@ -79,7 +79,7 @@ namespace Business {
         /// Adds a line containing the plugin path. Must be called before loading any other plugin.
         /// </summary>
         public void AddPluginPath() {
-            AppendLine(@"PluginPath=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath));
+            AppendLine(@"P=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath));
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Business {
         /// </summary>
         public void Cleanup() {
             string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "PluginPath", "LoadPlugin", "Import" };
+            string[] CommandsToComment = new string[] { "P=", "LoadPlugin", "Import" };
             var NewScriptLines = Lines.Where(l => CommandsToComment.Any(c => l.StartsWith(c))).Concat(Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))));
             script = new StringBuilder(string.Join(Environment.NewLine, NewScriptLines));
         }
@@ -105,12 +105,41 @@ namespace Business {
             script = new StringBuilder(string.Join(Environment.NewLine, Lines) + Environment.NewLine + "ConvertToRGB32()");
         }
 
+        /// <summary>
+        /// If script ends with DitherPost(), replace it with Dither_out()
+        /// </summary>
+        public void DitherOut() {
+            string StrPost = "DitherPost()";
+            string StrOut = "Dither_out()";
+            string Val = Script.TrimEnd('\r', '\n', ' ');
+            if (Val.EndsWith(StrPost)) {
+                int Pos = Val.LastIndexOf(StrPost);
+                script.Replace(StrPost, StrOut, Pos, script.Length - Pos);
+            }
+        }
+
         public void LoadPluginDll(string fileName) {
-            script.AppendFormat(@"LoadPlugin(PluginPath+""{0}"")", fileName).AppendLine();
+            AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
         }
 
         public void LoadPluginAvsi(string fileName) {
-            script.AppendFormat(@"Import(PluginPath+""{0}"")", fileName).AppendLine();
+            AppendLine(@"Import(P+""{0}"")", fileName);
+        }
+
+        public void OpenAvi(string fileName, bool audio) {
+            AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
+            AppendLine(@"AviSource(file, audio={0}, pixel_type=""YV12"")", audio);
+        }
+
+        public void OpenDirect(string fileName, string cacheFile, bool audio, bool highBitDepth, bool multiThreaded) {
+            LoadPluginDll(highBitDepth ? "ffms2-10bit.dll" : "ffms2.dll");
+            AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
+            AppendLine("FFVideoSource(file{0}{1}{2})",
+                string.IsNullOrEmpty(cacheFile) ? ", cache=false" : string.Format(@", cachefile=""{0}""", cacheFile),
+                highBitDepth ? ", enable10bithack=true" : "",
+                multiThreaded ? ", threads=1" : "");
+            if (audio)
+                AppendLine("AudioDub(FFAudioSource(file, cache=false))");
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
@@ -142,7 +171,5 @@ namespace Business {
 
             File.WriteAllText(fileName, script.ToString(), Encoding.ASCII);
         }
-
-
     }
 }

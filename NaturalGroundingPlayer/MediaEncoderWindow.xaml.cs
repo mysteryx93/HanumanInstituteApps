@@ -58,6 +58,9 @@ namespace NaturalGroundingPlayer {
             MediaEncoderSettings RecoverSettings = await business.AutoLoadPreviewFileAsync();
             if (RecoverSettings != null)
                 SetEncodeSettings(RecoverSettings);
+
+            encodeSettings.AutoCalculateSize = true;
+
             // Only recover jobs if there are no jobs running
             if (!MediaEncoderBusiness.ProcessingQueue.Any())
                 await business.AutoLoadJobsAsync();
@@ -99,6 +102,7 @@ namespace NaturalGroundingPlayer {
             }, false);
             if (Result != null && Result.FileName != null) {
                 ClosePreview();
+                encodeSettings.AutoCalculateSize = false;
                 encodeSettings.FileName = null;
                 encodeSettings.CustomScript = null;
                 SettingsTab.SelectedIndex = 0;
@@ -114,6 +118,7 @@ namespace NaturalGroundingPlayer {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
                     encodeSettings.FileName = "";
                 }
+                encodeSettings.AutoCalculateSize = true;
             }
         }
 

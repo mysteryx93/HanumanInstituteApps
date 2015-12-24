@@ -33,28 +33,35 @@ namespace Business {
         /// <param name="inputFile">The video to play.</param>
         /// <param name="infoReader">An object to read media information.</param>
         public static void CreateScript(string inputFile, MediaInfoReader infoReader) {
-            int CPU = Environment.ProcessorCount;
+            int CPU = Environment.ProcessorCount / 2;
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            Script.LoadPluginDll("LSMASHSource.dll");
+            //Script.LoadPluginDll("LSMASHSource.dll");
+            //Script.LoadPluginDll(infoReader.BitDepth == 10 ? "ffms2-10bit" : "ffms2.dll");
             Script.LoadPluginDll("TimeStretch.dll");
             Script.LoadPluginAvsi("UUSize4.avsi");
+            Script.LoadPluginDll("dither.dll");
+            Script.LoadPluginAvsi("dither.avsi");
             Script.AppendLine("SetMTMode(3,{0})", CPU);
-            Script.AppendLine(@"file = ""{0}""", Script.GetAsciiPath(inputFile));
-
+            Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), infoReader.BitDepth == 10, true);
+            //Script.AppendLine(@"file = ""{0}""", Script.GetAsciiPath(inputFile));
             //if (new string[] { ".mp4", ".mov" }.Contains(Path.GetExtension(inputFile).ToLower())) {
-            //    Script.AppendLine("LSMASHVideoSource(file, threads=1)");
-            //    Script.AppendLine("AudioDub(LSMASHAudioSource(file))");
+            //Script.AppendLine("LSMASHVideoSource(file, threads=1, stacked=true)");
+            //Script.AppendLine("AudioDub(LSMASHAudioSource(file))");
             //} else {
             //}
-            Script.AppendLine("LWLibavVideoSource(file, cache=false, threads=1)");
-            Script.AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
-
+            //Script.AppendLine("LWLibavVideoSource(file, cache=false, threads=1, stacked=true)");
+            //Script.AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
+            //Script.AppendLine("FFVideoSource(file, cache=false, threads=1{0})", infoReader.BitDepth == 10 ? ", enable10bithack=true" : "");
+            //Script.AppendLine("AudioDub(FFAudioSource(file, cache=false))");
             Script.AppendLine("SetMTMode(2)");
+            if (infoReader.BitDepth == 10)
+                Script.AppendLine("DitherPost()");
             Script.AppendLine("UUSize4(mod=4)");
             Script.AppendLine("ResampleAudio(48000)");
             Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
             Script.WriteToFile(Settings.AutoPitchFile);
+            File.Delete(Settings.AutoPitchCache);
         }
     }
 }

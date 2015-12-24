@@ -87,12 +87,12 @@ namespace Business {
             timerGetPosition.Start();
 
             string[] FileInfo = msg.Message.Split('|');
+            CurrentVideo.Length = (short)double.Parse(FileInfo[4], CultureInfo.InvariantCulture);
 
             // In later version of MPC-HC, this event keeps firing repeatedly, so ignore when file path is the same.
             if (!string.IsNullOrEmpty(FileInfo[3]) && nowPlayingPath != FileInfo[3]) {
                 nowPlayingPath = FileInfo[3];
                 position = 0;
-                CurrentVideo.Length = (short)double.Parse(FileInfo[4], CultureInfo.InvariantCulture);
                 timerPlayTimeout.Stop();
 
                 if (NowPlaying != null)
