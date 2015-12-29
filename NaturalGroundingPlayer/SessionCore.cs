@@ -118,14 +118,14 @@ namespace NaturalGroundingPlayer {
             string ErrorMessage = "An unhandled exception has occured. Do you want to see the error details? You may send this report by email to etienne@spiritualselftransformation.com";
             ErrorMessage += Environment.NewLine + Environment.NewLine + e.Message;
             if (MessageBox.Show(ErrorMessage, "Unhandled Exception", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                DatabaseHandler Handler = new DatabaseHandler();
+                DatabaseHandler Handler = new DatabaseHandler(Main);
                 Handler.LogException(e);
             }
         }
 
         private async Task TestDatabaseConnectionAsync() {
             // Test connection to database.
-            DatabaseHandler db = new DatabaseHandler();
+            DatabaseHandler db = new DatabaseHandler(Main);
             try {
                 await db.EnsureAvailableAsync();
             }

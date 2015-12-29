@@ -19,7 +19,6 @@ namespace DataAccess
             this.Artist = "";
             this.Title = "";
             this.Album = "";
-            this.FileName = "";
             this.DownloadName = "";
             this.DownloadUrl = "";
             this.BuyUrl = "";

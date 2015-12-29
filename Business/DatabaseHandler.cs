@@ -2,7 +2,7 @@
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
-using System.Windows.Forms;
+using System.Windows;
 using DataAccess;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
@@ -12,10 +12,12 @@ namespace Business {
     /// Ensures server and database are up and running.
     /// </summary>
     public sealed class DatabaseHandler {
-        public DatabaseHandler() {
+        public DatabaseHandler(Window owner) {
+            this.owner = owner;
         }
 
         private bool isDatabaseRecreated;
+        private Window owner;
 
         /// <summary>
         /// Checks server and database availability. 
@@ -50,12 +52,16 @@ namespace Business {
         public async Task UpdateDatabaseAsync() {
             Version databaseVersion = VersionAccess.GetVersionInfo();
 
-            if (databaseVersion < new Version(1, 2, 1, 0)) {
+            if (databaseVersion < new Version(1, 3, 0, 0)) {
                 if (isDatabaseRecreated)
                     throw new Exception(string.Format("InitialDatabase version {0} is outdated.", databaseVersion.ToString()));
 
+                string Msg = string.Format("Database v{0} is outdated. Do you wish to delete it and recreate an updated database? All your personal data will be lost.", databaseVersion.ToString(3));
+                if (MessageBox.Show(owner, Msg, "Database Update", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    throw new Exception(string.Format("Database is outdated."));
+
                 GC.Collect();
-                await TryUntilTimeout(() => File.Delete(Settings.DatabasePath), 10000);
+                await TryUntilTimeout(() => FileOperationAPIWrapper.MoveToRecycleBin(Settings.DatabasePath), 10000);
                 isDatabaseRecreated = true;
                 await EnsureAvailableAsync();
 
@@ -107,45 +113,6 @@ namespace Business {
                 await Task.Delay(500);
             }
         }
-
-        //private async Task QueryUntilTimeout(int timeout) {
-        //    DateTime StartTime = DateTime.Now;
-        //    Exception DbError = null;
-
-        //    // First try
-        //    try {
-        //        await VersionAccess.GetVersionInfoAsync();
-        //    } catch (Exception ex) {
-        //        DbError = ex;
-        //    }
-
-        //    // Keep trying until timeout
-        //    while (DbError != null && (DateTime.Now - StartTime).TotalMilliseconds < timeout) {
-        //        try {
-        //            await Task.Delay(500);
-        //            await VersionAccess.GetVersionInfoAsync();
-        //            DbError = null;
-        //        } catch (Exception ex) {
-        //            DbError = ex;
-        //        }
-        //    }
-
-        //    // If it still fails, throw exception
-        //    if (DbError != null)
-        //        throw DbError;
-        //}
-
-        //private void DetachDatabase() {
-        //    var db = Settings.DatabasePath.ToUpper();
-        //    using (var conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True")) {
-        //        conn.Open();
-        //        var cmd = conn.CreateCommand();
-        //        cmd.CommandText = string.Format(@"ALTER DATABASE [{0}] SET OFFLINE WITH ROLLBACK IMMEDIATE", db);
-        //        cmd.ExecuteNonQuery();
-        //        cmd.CommandText = string.Format(@"exec sp_detach_db '{0}'", db);
-        //        cmd.ExecuteNonQuery();
-        //    }
-        //}
 
         /// <summary>
         /// Runs the specified database script.

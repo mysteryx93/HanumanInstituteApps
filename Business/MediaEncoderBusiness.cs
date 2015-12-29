@@ -32,8 +32,10 @@ namespace Business {
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
             if (Script.IsEmpty)
                 Script = GenerateVideoScript(settings, GetPreviewSourceFile(settings), preview, multiThreaded);
-            else if (preview)
-                Script.ConvertForPreview();
+            else if (preview) {
+                Script.RemoveMT();
+                Script.AppendLine(@"ConvertToRGB32(matrix=""Rec709"")");
+            }
             Script.WriteToFile(PreviewScriptFile);
             SaveSettingsFile(settings, PreviewSettingsFile);
         }
@@ -86,7 +88,7 @@ namespace Business {
                 Script = GenerateVideoScript(settings, settings.InputFile, false, true);
             else
                 Script.Replace(Script.GetAsciiPath(PreviewSourceFile), Script.GetAsciiPath(settings.InputFile));
-            Script.DitherOut();
+            Script.DitherOut(true);
             Script.WriteToFile(settings.ScriptFile);
             await StartEncodeFileAsync(settings);
         }
@@ -233,7 +235,9 @@ namespace Business {
                     Script.LoadPluginDll("KNLMeansCL.dll");
                 if (multiThreaded && !AviSynthPlus)
                     Script.AppendLine("SetMTMode(5)");
-                Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D=2, A=1, h={0}, device_type=""GPU"")", ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture));
+                Script.AppendLine("ConvertToYV24()");
+                Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D=1, A=2, h={0}, cmode=true, device_type=""GPU"", device_id={1})", ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture), Settings.SavedFile.GraphicDeviceId);
+                Script.AppendLine("ConvertToYV12()");
             }
             if (multiThreaded && !AviSynthPlus)
                 Script.AppendLine("SetMTMode(2)");
@@ -247,8 +251,8 @@ namespace Business {
                 Script.AppendLine(CultureInfo.InvariantCulture, "AssumeFPS({0})", FrameRateBefore);
             if (settings.Trim) {
                 Script.AppendLine("Trim({0}, {1})",
-                    settings.TrimStart.HasValue ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
-                    settings.TrimEnd.HasValue && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
+                    (settings.TrimStart ?? 0) > 0 ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
+                    (settings.TrimEnd ?? 0) > 0 && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
             }
             if (settings.CropSource.HasValue) {
                 Script.AppendLine("Crop({0}, {1}, -{2}, -{3})", settings.CropSource.Left, settings.CropSource.Top, settings.CropSource.Right, settings.CropSource.Bottom);
@@ -280,7 +284,7 @@ namespace Business {
                     if (i == 0 && settings.IncreaseFrameRate)
                         ApplyInterFrame(Script, settings, CPU);
                 }
-            } else
+            } else if (settings.IncreaseFrameRate)
                 ApplyInterFrame(Script, settings, CPU);
 
             ApplyCropAfter(Script, settings);
@@ -291,7 +295,7 @@ namespace Business {
             if (preview) {
                 if (settings.Crop)
                     Script.AppendLine("AddBorders(2, 2, 2, 2, $FFFFFF)");
-                Script.AppendLine("ConvertToRGB32()");
+                Script.AppendLine(@"ConvertToRGB32(matrix=""Rec709"")");
             }
             //if (multiThreaded) {
             //    if (AviSynthPlus)
@@ -342,9 +346,10 @@ namespace Business {
 
         public void DoubleAndSharpen(AviSynthScriptBuilder Script, MediaEncoderSettings settings, string upscaleScript, bool isLast, bool convertColorMatrix) {
             if (settings.SuperRes) {
+                int Passes = settings.SuperResDoublePass ? 2 : 1;
                 Script.AppendLine(@"Double=""""""{0}""""""", upscaleScript);
                 Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, Double{3}{4}{5})",
-                    2, settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f, 
+                    Passes, settings.SuperResStrength / 100f / Passes, 0,
                     convertColorMatrix ? ", MatrixIn=\"601\"" : "",
                     isLast ? ", lsb_upscale=true" : "",
                     isLast && settings.Encode10bit ? ", lsb_out=true" : "");
@@ -425,11 +430,7 @@ namespace Business {
                 settings.SourceAudioBitrate = InfoReader.AudioBitRate;
                 settings.SourceBitDepth = InfoReader.BitDepth;
                 settings.Position = (InfoReader.Length ?? 0) / 2;
-
-                if (!settings.AutoCalculateSize) {
-                    settings.AutoCalculateSize = true;
-                    settings.AutoCalculateSize = false;
-                }
+                settings.CalculateSize();
             }
         }
 
@@ -559,7 +560,7 @@ namespace Business {
                             EncodingCompletedEventArgs EncodeResult = GetEncodingResults(settings, settings.FinalFile, null);
                             if (EncodeResult != null)
                                 EncodingCompleted(this, EncodeResult);
-                        } else if (File.Exists(settings.OutputFile)) {
+                        } else if (File.Exists(settings.OutputFile) && new FileInfo(settings.OutputFile).Length > 0) {
                             if (!IsFileLocked(settings.OutputFile)) {
                                 // Encoding was completed
                                 EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
@@ -576,6 +577,7 @@ namespace Business {
                             }
                         } else {
                             // Encoding had not yet started.
+                            File.Delete(settings.OutputFile);
                             TaskList.Add(StartEncodeFileAsync(settings));
                         }
                     } else {

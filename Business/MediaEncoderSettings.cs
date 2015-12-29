@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
+using System.Xml.Serialization;
 
 namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
@@ -23,7 +24,7 @@ namespace Business {
             get { return sourceHeight; }
             set {
                 sourceHeight = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private int? sourceWidth;
@@ -32,7 +33,7 @@ namespace Business {
             get { return sourceWidth; }
             set {
                 sourceWidth = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private double sourceAspectRatio;
@@ -40,7 +41,7 @@ namespace Business {
             get { return sourceAspectRatio; }
             set {
                 sourceAspectRatio = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         [DefaultValue(null)]
@@ -58,7 +59,7 @@ namespace Business {
             get { return outputHeight; }
             set {
                 outputHeight = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         public bool Denoise1 { get; set; }
@@ -70,7 +71,6 @@ namespace Business {
         public bool SuperRes { get; set; }
         public bool SuperResDoublePass { get; set; }
         public int SuperResStrength { get; set; }
-        public int SuperResSoftness { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
         public bool IncreaseFrameRateSmooth { get; set; }
@@ -79,7 +79,7 @@ namespace Business {
             get { return crop; }
             set {
                 crop = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private int cropLeft;
@@ -87,7 +87,7 @@ namespace Business {
             get { return cropLeft; }
             set {
                 cropLeft = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private int cropTop;
@@ -95,7 +95,7 @@ namespace Business {
             get { return cropTop; }
             set {
                 cropTop = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private int cropRight;
@@ -103,7 +103,7 @@ namespace Business {
             get { return cropRight; }
             set {
                 cropRight = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         private int cropBottom;
@@ -111,7 +111,7 @@ namespace Business {
             get { return cropBottom; }
             set {
                 cropBottom = value;
-                CalculateSize();
+                CalculateSize(false);
             }
         }
         public bool Trim { get; set; }
@@ -145,45 +145,46 @@ namespace Business {
         public bool ChangeAudioPitch { get; set; }
 
         private bool autoCalculateSize;
-        [IgnoreDataMember()]
+        [XmlIgnore()]
         public bool AutoCalculateSize {
             get { return autoCalculateSize; }
             set {
                 if (value && autoCalculateSize != value) {
                     autoCalculateSize = value;
-                    CalculateSize();
+                    CalculateSize(false);
                 } else
                     autoCalculateSize = value;
             }
         }
-        [IgnoreDataMember()]
+        [XmlIgnore()]
         public int? OutputWidth { get; set; }
-        [IgnoreDataMember()]
+        [XmlIgnore()]
         public Rect CropSource { get; set; }
-        [IgnoreDataMember()]
+        [XmlIgnore()]
         public Rect CropAfter { get; set; }
-        [IgnoreDataMember()]
+        [XmlIgnore()]
         public int FrameDouble { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
 
         public MediaEncoderSettings() {
+            JobIndex = -1;
             OpenMethod = OpenMethods.ConvertToAvi;
             SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
             OutputHeight = 720;
             Denoise1 = true;
-            Denoise1Strength = 30;
+            Denoise1Strength = 21;
             Denoise2Strength = 30;
             Denoise2Sharpen = 10;
             SuperRes = true;
             SuperResDoublePass = true;
-            SuperResStrength = 43;
-            SuperResSoftness = 0;
+            SuperResStrength = 100;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             IncreaseFrameRateSmooth = true;
+            TrimStart = 0;
             ChangeSpeedValue = 100;
             EncodeQuality = 24;
             EncodePreset = EncodePresets.veryslow;
@@ -196,7 +197,15 @@ namespace Business {
         /// Calculates FrameDouble, CropSource, CropAfter and OutputWidth values.
         /// </summary>
         public void CalculateSize() {
-            if (!AutoCalculateSize)
+            CalculateSize(true);
+        }
+
+        /// <summary>
+        /// Calculates FrameDouble, CropSource, CropAfter and OutputWidth values.
+        /// </summary>
+        /// <param name="force">When false, this call is ignored when AutoCalculateSize is false.</param>
+        private void CalculateSize(bool force) {
+            if (!force && !AutoCalculateSize)
                 return;
 
             if (!SourceWidth.HasValue || !SourceHeight.HasValue || OutputHeight > 10000) {
@@ -311,7 +320,12 @@ namespace Business {
         }
 
         public string TempFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Temp", JobIndex); }
+            get {
+                if (JobIndex >= 0)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Temp", JobIndex);
+                else
+                    return Settings.TempFilesPath + "Preview_Temp";
+            }
         }
 
         public object Clone() {

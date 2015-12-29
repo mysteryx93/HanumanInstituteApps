@@ -1,14 +1,15 @@
 # Performs color matrix conversion with 16 bit depth to avoid banding
-function ColorMatrixShader(clip input, string "MatrixIn", string "MatrixOut") {
+function ColorMatrixShader(clip input, string "MatrixIn", string "MatrixOut", strong "FormatOut") {
 	MatrixIn = default(MatrixIn, "709")
 	MatrixOut = default(MatrixOut, "709")
+	FormatOut = default(FormatOut, "")
 
 	Assert(MatrixIn == "601" || MatrixIn == "709", "MatrixIn must be 601 or 709")
 	Assert(MatrixOut == "601" || MatrixOut == "709", "MatrixOut must be 601 or 709")
 	Assert(MatrixIn != MatrixOut, "MatrixIn and MatrixOut must be different")
 
 	input
-	sourceFormat = IsYV12 ? "YV12" : IsYV24 ? "YV24" : ""
+	sourceFormat = FormatOut != "" ? FormatOut : IsYV12 ? "YV12" : IsYV24 ? "YV24" : ""
 	Assert(sourceFormat != "", chr(10) + "Source must be YV12 or YV24" + chr(10))
 
 	input = ConvertToShader(1)

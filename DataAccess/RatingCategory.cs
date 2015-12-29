@@ -16,6 +16,7 @@ namespace DataAccess
     {
         public RatingCategory()
         {
+            this.Name = "";
             this.MediaRatings = new HashSet<MediaRating>();
         }
     

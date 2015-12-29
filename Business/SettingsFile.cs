@@ -20,6 +20,8 @@ namespace Business {
         public MediaPlayerApplication MediaPlayerApp { get; set; }
         public int MaxDownloadQuality { get; set; }
         public double Zoom { get; set; }
+        // Hidden properly allowing to change KNLMeans.device_id when encoding videos. It can only be set by editing Settings.xml
+        public int GraphicDeviceId { get; set; }
 
         public SettingsFile() {
             AutoDownload = true;

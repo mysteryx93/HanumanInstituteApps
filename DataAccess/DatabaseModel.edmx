@@ -1,364 +1,365 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
-  <!-- EF Runtime content -->
-  <edmx:Runtime>
-    <!-- SSDL content -->
-    <edmx:StorageModels>
-    <Schema Namespace="NaturalGroundingVideosModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\Etienne\Documents\Natural Grounding Player\NaturalGroundingVideos.db&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Media">
-          <Key>
-            <PropertyRef Name="MediaId" />
-          </Key>
-          <Property Name="MediaId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="MediaTypeId" Type="int" Nullable="false" />
-          <Property Name="EditedOn" Type="datetime" Nullable="false" />
-          <Property Name="LastSyncOn" Type="datetime" />
-          <Property Name="Artist" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="Title" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="Album" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="MediaCategoryId" Type="uniqueidentifier" />
-          <Property Name="FileName" Type="nvarchar" MaxLength="2147483647" />
-          <Property Name="Preference" Type="real" />
-          <Property Name="IsCustomPreference" Type="bit" Nullable="false" />
-          <Property Name="Height" Type="smallint" />
-          <Property Name="Length" Type="smallint" />
-          <Property Name="StartPos" Type="smallint" />
-          <Property Name="EndPos" Type="smallint" />
-          <Property Name="DownloadName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="DownloadUrl" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="BuyUrl" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="DisableSvp" Type="bit" Nullable="false" />
-          <Property Name="DisableMadVr" Type="bit" Nullable="false" />
-          <Property Name="DisablePitch" Type="bit" Nullable="false" />
-          <Property Name="IsPersonal" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="MediaCategories">
-          <Key>
-            <PropertyRef Name="MediaCategoryId" />
-          </Key>
-          <Property Name="MediaCategoryId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="MediaTypeId" Type="int" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="Folder" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-        </EntityType>
-        <EntityType Name="MediaRatings">
-          <Key>
-            <PropertyRef Name="MediaId" />
-            <PropertyRef Name="RatingId" />
-          </Key>
-          <Property Name="MediaId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="RatingId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Height" Type="real" />
-          <Property Name="Depth" Type="real" />
-        </EntityType>
-        <EntityType Name="RatingCategories">
-          <Key>
-            <PropertyRef Name="RatingId" />
-          </Key>
-          <Property Name="RatingId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
-          <Property Name="Custom" Type="bit" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Version">
-          <Key>
-            <PropertyRef Name="Major" />
-          </Key>
-          <Property Name="Major" Type="int" Nullable="false" />
-          <Property Name="Minor" Type="int" Nullable="false" />
-          <Property Name="Build" Type="int" Nullable="false" />
-          <Property Name="Revision" Type="int" Nullable="false" />
-        </EntityType>
-        <Association Name="FK_Media_0_0">
-          <End Role="MediaCategories" Type="Self.MediaCategories" Multiplicity="0..1" />
-          <End Role="Media" Type="Self.Media" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MediaCategories">
-              <PropertyRef Name="MediaCategoryId" />
-            </Principal>
-            <Dependent Role="Media">
-              <PropertyRef Name="MediaCategoryId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MediaRatings_0_0">
-          <End Role="Media" Type="Self.Media" Multiplicity="1" />
-          <End Role="MediaRatings" Type="Self.MediaRatings" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Media">
-              <PropertyRef Name="MediaId" />
-            </Principal>
-            <Dependent Role="MediaRatings">
-              <PropertyRef Name="MediaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MediaRatings_1_0">
-          <End Role="RatingCategories" Type="Self.RatingCategories" Multiplicity="1" />
-          <End Role="MediaRatings" Type="Self.MediaRatings" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RatingCategories">
-              <PropertyRef Name="RatingId" />
-            </Principal>
-            <Dependent Role="MediaRatings">
-              <PropertyRef Name="RatingId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-      <Function Name="DbGetRatingValue" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="real">
-        <Parameter Name="height" Type="real" Mode="In" />
-        <Parameter Name="depth" Type="real" Mode="In" />
-        <Parameter Name="ratio" Type="real" Mode="In" />
-      </Function>
-      <Function Name="DbCompareValues" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="bit">
-        <Parameter Name="value1" Type="real" Mode="In" />
-        <Parameter Name="compareOp" Type="int" Mode="In" />
-        <Parameter Name="value2" Type="real" Mode="In" />
-      </Function>
-      <Function Name="substr" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="nvarchar">
-        <Parameter Name="text" Type="nvarchar" Mode="In" />
-        <Parameter Name="startPos" Type="int" Mode="In" />
-      </Function>
-      <EntityContainer Name="NaturalGroundingVideosModelStoreContainer">
-          <EntitySet Name="Media" EntityType="Self.Media" store:Type="Tables" />
-          <EntitySet Name="MediaCategories" EntityType="Self.MediaCategories" store:Type="Tables" />
-          <EntitySet Name="MediaRatings" EntityType="Self.MediaRatings" store:Type="Tables" />
-          <EntitySet Name="RatingCategories" EntityType="Self.RatingCategories" store:Type="Tables" />
-          <EntitySet Name="Version" EntityType="Self.Version" store:Type="Tables" />
-          <AssociationSet Name="FK_Media_0_0" Association="Self.FK_Media_0_0">
-            <End Role="MediaCategories" EntitySet="MediaCategories" />
-            <End Role="Media" EntitySet="Media" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MediaRatings_0_0" Association="Self.FK_MediaRatings_0_0">
-            <End Role="Media" EntitySet="Media" />
-            <End Role="MediaRatings" EntitySet="MediaRatings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MediaRatings_1_0" Association="Self.FK_MediaRatings_1_0">
-            <End Role="RatingCategories" EntitySet="RatingCategories" />
-            <End Role="MediaRatings" EntitySet="MediaRatings" />
-          </AssociationSet>
-        </EntityContainer>
-      </Schema></edmx:StorageModels>
-    <!-- CSDL content -->
-    <edmx:ConceptualModels>
-      <Schema Namespace="NaturalGroundingVideosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="MediaCategories" EntityType="NaturalGroundingVideosModel.MediaCategory" />
-          <EntitySet Name="RatingCategories" EntityType="NaturalGroundingVideosModel.RatingCategory" />
-          <EntitySet Name="DbVersions" EntityType="NaturalGroundingVideosModel.DbVersion" />
-          <EntitySet Name="Media" EntityType="NaturalGroundingVideosModel.Media" />
-          <AssociationSet Name="FK_Media_0_0" Association="NaturalGroundingVideosModel.FK_Media_0_0">
-            <End Role="MediaCategory" EntitySet="MediaCategories" />
-            <End Role="Medium" EntitySet="Media" />
-          </AssociationSet>
-          <EntitySet Name="MediaRatings" EntityType="NaturalGroundingVideosModel.MediaRating" />
-          <AssociationSet Name="FK_MediaRatings_0_0" Association="NaturalGroundingVideosModel.FK_MediaRatings_0_0">
-            <End Role="Media" EntitySet="Media" />
-            <End Role="MediaRating" EntitySet="MediaRatings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_MediaRatings_1_0" Association="NaturalGroundingVideosModel.FK_MediaRatings_1_0">
-            <End Role="RatingCategory" EntitySet="RatingCategories" />
-            <End Role="MediaRating" EntitySet="MediaRatings" />
-          </AssociationSet>
-          </EntityContainer>
-        <EntityType Name="MediaCategory">
-          <Key>
-            <PropertyRef Name="MediaCategoryId" />
-          </Key>
-          <Property Name="MediaCategoryId" Type="Guid" Nullable="false" />
-          <Property Name="MediaTypeId" Type="Int32" Nullable="false" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="Folder" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <NavigationProperty Name="Media" Relationship="NaturalGroundingVideosModel.FK_Media_0_0" FromRole="MediaCategory" ToRole="Medium" />
-        </EntityType>
-        <EntityType Name="RatingCategory">
-          <Key>
-            <PropertyRef Name="RatingId" />
-          </Key>
-          <Property Name="RatingId" Type="Guid" Nullable="false" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="Custom" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="MediaRatings" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_1_0" FromRole="RatingCategory" ToRole="MediaRating" />
-        </EntityType>
-        <EntityType Name="DbVersion">
-          <Key>
-            <PropertyRef Name="Major" />
-          </Key>
-          <Property Name="Major" Type="Int32" Nullable="false" />
-          <Property Name="Minor" Type="Int32" Nullable="false" />
-          <Property Name="Build" Type="Int32" Nullable="false" />
-          <Property Name="Revision" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Media">
-          <Key>
-            <PropertyRef Name="MediaId" />
-          </Key>
-          <Property Name="MediaId" Type="Guid" Nullable="false" />
-          <Property Name="MediaTypeId" Type="Int32" Nullable="false" />
-          <Property Name="EditedOn" Type="DateTime" Nullable="false" />
-          <Property Name="LastSyncOn" Type="DateTime" />
-          <Property Name="Artist" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="Title" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="Album" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="MediaCategoryId" Type="Guid" />
-          <Property Name="FileName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-          <Property Name="Preference" Type="Double" />
-          <Property Name="IsCustomPreference" Type="Boolean" Nullable="false" />
-          <Property Name="Height" Type="Int16" />
-          <Property Name="Length" Type="Int16" />
-          <Property Name="StartPos" Type="Int16" />
-          <Property Name="EndPos" Type="Int16" />
-          <Property Name="DownloadName" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="DownloadUrl" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="BuyUrl" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
-          <Property Name="DisableSvp" Type="Boolean" Nullable="false" />
-          <Property Name="DisableMadVr" Type="Boolean" Nullable="false" />
-          <Property Name="DisablePitch" Type="Boolean" Nullable="false" />
-          <Property Name="IsPersonal" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="MediaCategory" Relationship="NaturalGroundingVideosModel.FK_Media_0_0" FromRole="Medium" ToRole="MediaCategory" />
-          <NavigationProperty Name="MediaRatings" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_0_0" FromRole="Media" ToRole="MediaRating" />
-        </EntityType>
-        <Association Name="FK_Media_0_0">
-          <End Type="NaturalGroundingVideosModel.MediaCategory" Role="MediaCategory" Multiplicity="0..1" />
-          <End Type="NaturalGroundingVideosModel.Media" Role="Medium" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MediaCategory">
-              <PropertyRef Name="MediaCategoryId" />
-            </Principal>
-            <Dependent Role="Medium">
-              <PropertyRef Name="MediaCategoryId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="MediaRating">
-          <Key>
-            <PropertyRef Name="MediaId" />
-            <PropertyRef Name="RatingId" />
-          </Key>
-          <Property Name="MediaId" Type="Guid" Nullable="false" />
-          <Property Name="RatingId" Type="Guid" Nullable="false" />
-          <Property Name="Height" Type="Double" />
-          <Property Name="Depth" Type="Double" />
-          <NavigationProperty Name="Medium" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_0_0" FromRole="MediaRating" ToRole="Media" />
-          <NavigationProperty Name="RatingCategory" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_1_0" FromRole="MediaRating" ToRole="RatingCategory" />
-        </EntityType>
-        <Association Name="FK_MediaRatings_0_0">
-          <End Type="NaturalGroundingVideosModel.Media" Role="Media" Multiplicity="1" />
-          <End Type="NaturalGroundingVideosModel.MediaRating" Role="MediaRating" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Media">
-              <PropertyRef Name="MediaId" />
-            </Principal>
-            <Dependent Role="MediaRating">
-              <PropertyRef Name="MediaId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_MediaRatings_1_0">
-          <End Type="NaturalGroundingVideosModel.RatingCategory" Role="RatingCategory" Multiplicity="1" />
-          <End Type="NaturalGroundingVideosModel.MediaRating" Role="MediaRating" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RatingCategory">
-              <PropertyRef Name="RatingId" />
-            </Principal>
-            <Dependent Role="MediaRating">
-              <PropertyRef Name="RatingId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        </Schema>
-    </edmx:ConceptualModels>
-    <!-- C-S mapping content -->
-    <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="NaturalGroundingVideosModelStoreContainer" CdmEntityContainer="Entities">
-          <EntitySetMapping Name="MediaCategories">
-            <EntityTypeMapping TypeName="NaturalGroundingVideosModel.MediaCategory">
-              <MappingFragment StoreEntitySet="MediaCategories">
-                <ScalarProperty Name="Folder" ColumnName="Folder" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="MediaTypeId" ColumnName="MediaTypeId" />
-                <ScalarProperty Name="MediaCategoryId" ColumnName="MediaCategoryId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="RatingCategories">
-            <EntityTypeMapping TypeName="NaturalGroundingVideosModel.RatingCategory">
-              <MappingFragment StoreEntitySet="RatingCategories">
-                <ScalarProperty Name="Custom" ColumnName="Custom" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="RatingId" ColumnName="RatingId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DbVersions">
-            <EntityTypeMapping TypeName="NaturalGroundingVideosModel.DbVersion">
-              <MappingFragment StoreEntitySet="Version">
-                <ScalarProperty Name="Revision" ColumnName="Revision" />
-                <ScalarProperty Name="Build" ColumnName="Build" />
-                <ScalarProperty Name="Minor" ColumnName="Minor" />
-                <ScalarProperty Name="Major" ColumnName="Major" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Media">
-            <EntityTypeMapping TypeName="NaturalGroundingVideosModel.Media">
-              <MappingFragment StoreEntitySet="Media">
-                <ScalarProperty Name="IsPersonal" ColumnName="IsPersonal" />
-                <ScalarProperty Name="DisableMadVr" ColumnName="DisableMadVr" />
-                <ScalarProperty Name="DisableSvp" ColumnName="DisableSvp" />
-                <ScalarProperty Name="DisablePitch" ColumnName="DisablePitch" />
-                <ScalarProperty Name="BuyUrl" ColumnName="BuyUrl" />
-                <ScalarProperty Name="DownloadUrl" ColumnName="DownloadUrl" />
-                <ScalarProperty Name="DownloadName" ColumnName="DownloadName" />
-                <ScalarProperty Name="EndPos" ColumnName="EndPos" />
-                <ScalarProperty Name="StartPos" ColumnName="StartPos" />
-                <ScalarProperty Name="Length" ColumnName="Length" />
-                <ScalarProperty Name="Height" ColumnName="Height" />
-                <ScalarProperty Name="IsCustomPreference" ColumnName="IsCustomPreference" />
-                <ScalarProperty Name="Preference" ColumnName="Preference" />
-                <ScalarProperty Name="FileName" ColumnName="FileName" />
-                <ScalarProperty Name="MediaCategoryId" ColumnName="MediaCategoryId" />
-                <ScalarProperty Name="Album" ColumnName="Album" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Artist" ColumnName="Artist" />
-                <ScalarProperty Name="LastSyncOn" ColumnName="LastSyncOn" />
-                <ScalarProperty Name="EditedOn" ColumnName="EditedOn" />
-                <ScalarProperty Name="MediaTypeId" ColumnName="MediaTypeId" />
-                <ScalarProperty Name="MediaId" ColumnName="MediaId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="MediaRatings">
-            <EntityTypeMapping TypeName="NaturalGroundingVideosModel.MediaRating">
-              <MappingFragment StoreEntitySet="MediaRatings">
-                <ScalarProperty Name="Depth" ColumnName="Depth" />
-                <ScalarProperty Name="Height" ColumnName="Height" />
-                <ScalarProperty Name="RatingId" ColumnName="RatingId" />
-                <ScalarProperty Name="MediaId" ColumnName="MediaId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
-  </edmx:Runtime>
-  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
-  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
-    <Connection>
-      <DesignerInfoPropertySet>
-        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
-      </DesignerInfoPropertySet>
-    </Connection>
-    <Options>
-      <DesignerInfoPropertySet>
-        <DesignerProperty Name="ValidateOnBuild" Value="true" />
-        <DesignerProperty Name="EnablePluralization" Value="true" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
-        <DesignerProperty Name="UseLegacyProvider" Value="false" />
-        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
-      </DesignerInfoPropertySet>
-    </Options>
-    <!-- Diagram content (shape and connector positions) -->
-    <Diagrams></Diagrams>
-  </Designer>
+    <!-- EF Runtime content -->
+    <edmx:Runtime>
+        <!-- SSDL content -->
+        <edmx:StorageModels>
+            <Schema Namespace="NaturalGroundingVideosModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\Etienne\Documents\Natural Grounding Player\NaturalGroundingVideos.db&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+                <EntityType Name="Media">
+                    <Key>
+                        <PropertyRef Name="MediaId" />
+                    </Key>
+                    <Property Name="MediaId" Type="uniqueidentifier" Nullable="false" />
+                    <Property Name="MediaTypeId" Type="int" Nullable="false" />
+                    <Property Name="EditedOn" Type="datetime" Nullable="false" />
+                    <Property Name="LastSyncOn" Type="datetime" />
+                    <Property Name="Artist" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="Title" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="Album" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="MediaCategoryId" Type="uniqueidentifier" />
+                    <Property Name="FileName" Type="nvarchar" MaxLength="2147483647" />
+                    <Property Name="Preference" Type="real" />
+                    <Property Name="IsCustomPreference" Type="bit" Nullable="false" />
+                    <Property Name="Height" Type="smallint" />
+                    <Property Name="Length" Type="smallint" />
+                    <Property Name="StartPos" Type="smallint" />
+                    <Property Name="EndPos" Type="smallint" />
+                    <Property Name="DownloadName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="DownloadUrl" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="BuyUrl" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="DisableSvp" Type="bit" Nullable="false" />
+                    <Property Name="DisableMadVr" Type="bit" Nullable="false" />
+                    <Property Name="DisablePitch" Type="bit" Nullable="false" />
+                    <Property Name="IsPersonal" Type="bit" Nullable="false" />
+                </EntityType>
+                <EntityType Name="MediaCategories">
+                    <Key>
+                        <PropertyRef Name="MediaCategoryId" />
+                    </Key>
+                    <Property Name="MediaCategoryId" Type="uniqueidentifier" Nullable="false" />
+                    <Property Name="MediaTypeId" Type="int" Nullable="false" />
+                    <Property Name="Name" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="Folder" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                </EntityType>
+                <EntityType Name="MediaRatings">
+                    <Key>
+                        <PropertyRef Name="MediaId" />
+                        <PropertyRef Name="RatingId" />
+                    </Key>
+                    <Property Name="MediaId" Type="uniqueidentifier" Nullable="false" />
+                    <Property Name="RatingId" Type="uniqueidentifier" Nullable="false" />
+                    <Property Name="Height" Type="real" />
+                    <Property Name="Depth" Type="real" />
+                </EntityType>
+                <EntityType Name="RatingCategories">
+                    <Key>
+                        <PropertyRef Name="RatingId" />
+                    </Key>
+                    <Property Name="RatingId" Type="uniqueidentifier" Nullable="false" />
+                    <Property Name="Name" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+                    <Property Name="Custom" Type="bit" Nullable="false" />
+                </EntityType>
+                <EntityType Name="Version">
+                    <Key>
+                        <PropertyRef Name="Major" />
+                    </Key>
+                    <Property Name="Major" Type="int" Nullable="false" />
+                    <Property Name="Minor" Type="int" Nullable="false" />
+                    <Property Name="Build" Type="int" Nullable="false" />
+                    <Property Name="Revision" Type="int" Nullable="false" />
+                </EntityType>
+                <Association Name="FK_Media_0_0">
+                    <End Role="MediaCategories" Type="Self.MediaCategories" Multiplicity="0..1" />
+                    <End Role="Media" Type="Self.Media" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="MediaCategories">
+                            <PropertyRef Name="MediaCategoryId" />
+                        </Principal>
+                        <Dependent Role="Media">
+                            <PropertyRef Name="MediaCategoryId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+                <Association Name="FK_MediaRatings_0_0">
+                    <End Role="Media" Type="Self.Media" Multiplicity="1" />
+                    <End Role="MediaRatings" Type="Self.MediaRatings" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="Media">
+                            <PropertyRef Name="MediaId" />
+                        </Principal>
+                        <Dependent Role="MediaRatings">
+                            <PropertyRef Name="MediaId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+                <Association Name="FK_MediaRatings_1_0">
+                    <End Role="RatingCategories" Type="Self.RatingCategories" Multiplicity="1" />
+                    <End Role="MediaRatings" Type="Self.MediaRatings" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="RatingCategories">
+                            <PropertyRef Name="RatingId" />
+                        </Principal>
+                        <Dependent Role="MediaRatings">
+                            <PropertyRef Name="RatingId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+                <Function Name="DbGetRatingValue" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="real">
+                    <Parameter Name="height" Type="real" Mode="In" />
+                    <Parameter Name="depth" Type="real" Mode="In" />
+                    <Parameter Name="ratio" Type="real" Mode="In" />
+                </Function>
+                <Function Name="DbCompareValues" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="bit">
+                    <Parameter Name="value1" Type="real" Mode="In" />
+                    <Parameter Name="compareOp" Type="int" Mode="In" />
+                    <Parameter Name="value2" Type="real" Mode="In" />
+                </Function>
+                <Function Name="substr" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="nvarchar">
+                    <Parameter Name="text" Type="nvarchar" Mode="In" />
+                    <Parameter Name="startPos" Type="int" Mode="In" />
+                </Function>
+                <EntityContainer Name="NaturalGroundingVideosModelStoreContainer">
+                    <EntitySet Name="Media" EntityType="Self.Media" store:Type="Tables" />
+                    <EntitySet Name="MediaCategories" EntityType="Self.MediaCategories" store:Type="Tables" />
+                    <EntitySet Name="MediaRatings" EntityType="Self.MediaRatings" store:Type="Tables" />
+                    <EntitySet Name="RatingCategories" EntityType="Self.RatingCategories" store:Type="Tables" />
+                    <EntitySet Name="Version" EntityType="Self.Version" store:Type="Tables" />
+                    <AssociationSet Name="FK_Media_0_0" Association="Self.FK_Media_0_0">
+                        <End Role="MediaCategories" EntitySet="MediaCategories" />
+                        <End Role="Media" EntitySet="Media" />
+                    </AssociationSet>
+                    <AssociationSet Name="FK_MediaRatings_0_0" Association="Self.FK_MediaRatings_0_0">
+                        <End Role="Media" EntitySet="Media" />
+                        <End Role="MediaRatings" EntitySet="MediaRatings" />
+                    </AssociationSet>
+                    <AssociationSet Name="FK_MediaRatings_1_0" Association="Self.FK_MediaRatings_1_0">
+                        <End Role="RatingCategories" EntitySet="RatingCategories" />
+                        <End Role="MediaRatings" EntitySet="MediaRatings" />
+                    </AssociationSet>
+                </EntityContainer>
+            </Schema>
+        </edmx:StorageModels>
+        <!-- CSDL content -->
+        <edmx:ConceptualModels>
+            <Schema Namespace="NaturalGroundingVideosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+                <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+                    <EntitySet Name="MediaCategories" EntityType="NaturalGroundingVideosModel.MediaCategory" />
+                    <EntitySet Name="RatingCategories" EntityType="NaturalGroundingVideosModel.RatingCategory" />
+                    <EntitySet Name="DbVersions" EntityType="NaturalGroundingVideosModel.DbVersion" />
+                    <EntitySet Name="Media" EntityType="NaturalGroundingVideosModel.Media" />
+                    <AssociationSet Name="FK_Media_0_0" Association="NaturalGroundingVideosModel.FK_Media_0_0">
+                        <End Role="MediaCategory" EntitySet="MediaCategories" />
+                        <End Role="Medium" EntitySet="Media" />
+                    </AssociationSet>
+                    <EntitySet Name="MediaRatings" EntityType="NaturalGroundingVideosModel.MediaRating" />
+                    <AssociationSet Name="FK_MediaRatings_0_0" Association="NaturalGroundingVideosModel.FK_MediaRatings_0_0">
+                        <End Role="Media" EntitySet="Media" />
+                        <End Role="MediaRating" EntitySet="MediaRatings" />
+                    </AssociationSet>
+                    <AssociationSet Name="FK_MediaRatings_1_0" Association="NaturalGroundingVideosModel.FK_MediaRatings_1_0">
+                        <End Role="RatingCategory" EntitySet="RatingCategories" />
+                        <End Role="MediaRating" EntitySet="MediaRatings" />
+                    </AssociationSet>
+                </EntityContainer>
+                <EntityType Name="MediaCategory">
+                    <Key>
+                        <PropertyRef Name="MediaCategoryId" />
+                    </Key>
+                    <Property Name="MediaCategoryId" Type="Guid" Nullable="false" />
+                    <Property Name="MediaTypeId" Type="Int32" Nullable="false" />
+                    <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="Folder" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <NavigationProperty Name="Media" Relationship="NaturalGroundingVideosModel.FK_Media_0_0" FromRole="MediaCategory" ToRole="Medium" />
+                </EntityType>
+                <EntityType Name="RatingCategory">
+                    <Key>
+                        <PropertyRef Name="RatingId" />
+                    </Key>
+                    <Property Name="RatingId" Type="Guid" Nullable="false" />
+                    <Property Name="Name" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="Custom" Type="Boolean" Nullable="false" />
+                    <NavigationProperty Name="MediaRatings" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_1_0" FromRole="RatingCategory" ToRole="MediaRating" />
+                </EntityType>
+                <EntityType Name="DbVersion">
+                    <Key>
+                        <PropertyRef Name="Major" />
+                    </Key>
+                    <Property Name="Major" Type="Int32" Nullable="false" />
+                    <Property Name="Minor" Type="Int32" Nullable="false" />
+                    <Property Name="Build" Type="Int32" Nullable="false" />
+                    <Property Name="Revision" Type="Int32" Nullable="false" />
+                </EntityType>
+                <EntityType Name="Media">
+                    <Key>
+                        <PropertyRef Name="MediaId" />
+                    </Key>
+                    <Property Name="MediaId" Type="Guid" Nullable="false" />
+                    <Property Name="MediaTypeId" Type="Int32" Nullable="false" />
+                    <Property Name="EditedOn" Type="DateTime" Nullable="false" />
+                    <Property Name="LastSyncOn" Type="DateTime" />
+                    <Property Name="Artist" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="Title" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="Album" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="MediaCategoryId" Type="Guid" />
+                    <Property Name="FileName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+                    <Property Name="Preference" Type="Double" />
+                    <Property Name="IsCustomPreference" Type="Boolean" Nullable="false" />
+                    <Property Name="Height" Type="Int16" />
+                    <Property Name="Length" Type="Int16" />
+                    <Property Name="StartPos" Type="Int16" />
+                    <Property Name="EndPos" Type="Int16" />
+                    <Property Name="DownloadName" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="DownloadUrl" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="BuyUrl" Type="String" Nullable="false" MaxLength="2147483647" FixedLength="false" Unicode="true" DefaultValue="" />
+                    <Property Name="DisableSvp" Type="Boolean" Nullable="false" />
+                    <Property Name="DisableMadVr" Type="Boolean" Nullable="false" />
+                    <Property Name="DisablePitch" Type="Boolean" Nullable="false" />
+                    <Property Name="IsPersonal" Type="Boolean" Nullable="false" />
+                    <NavigationProperty Name="MediaCategory" Relationship="NaturalGroundingVideosModel.FK_Media_0_0" FromRole="Medium" ToRole="MediaCategory" />
+                    <NavigationProperty Name="MediaRatings" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_0_0" FromRole="Media" ToRole="MediaRating" />
+                </EntityType>
+                <Association Name="FK_Media_0_0">
+                    <End Type="NaturalGroundingVideosModel.MediaCategory" Role="MediaCategory" Multiplicity="0..1" />
+                    <End Type="NaturalGroundingVideosModel.Media" Role="Medium" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="MediaCategory">
+                            <PropertyRef Name="MediaCategoryId" />
+                        </Principal>
+                        <Dependent Role="Medium">
+                            <PropertyRef Name="MediaCategoryId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+                <EntityType Name="MediaRating">
+                    <Key>
+                        <PropertyRef Name="MediaId" />
+                        <PropertyRef Name="RatingId" />
+                    </Key>
+                    <Property Name="MediaId" Type="Guid" Nullable="false" />
+                    <Property Name="RatingId" Type="Guid" Nullable="false" />
+                    <Property Name="Height" Type="Double" />
+                    <Property Name="Depth" Type="Double" />
+                    <NavigationProperty Name="Medium" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_0_0" FromRole="MediaRating" ToRole="Media" />
+                    <NavigationProperty Name="RatingCategory" Relationship="NaturalGroundingVideosModel.FK_MediaRatings_1_0" FromRole="MediaRating" ToRole="RatingCategory" />
+                </EntityType>
+                <Association Name="FK_MediaRatings_0_0">
+                    <End Type="NaturalGroundingVideosModel.Media" Role="Media" Multiplicity="1" />
+                    <End Type="NaturalGroundingVideosModel.MediaRating" Role="MediaRating" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="Media">
+                            <PropertyRef Name="MediaId" />
+                        </Principal>
+                        <Dependent Role="MediaRating">
+                            <PropertyRef Name="MediaId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+                <Association Name="FK_MediaRatings_1_0">
+                    <End Type="NaturalGroundingVideosModel.RatingCategory" Role="RatingCategory" Multiplicity="1" />
+                    <End Type="NaturalGroundingVideosModel.MediaRating" Role="MediaRating" Multiplicity="*" />
+                    <ReferentialConstraint>
+                        <Principal Role="RatingCategory">
+                            <PropertyRef Name="RatingId" />
+                        </Principal>
+                        <Dependent Role="MediaRating">
+                            <PropertyRef Name="RatingId" />
+                        </Dependent>
+                    </ReferentialConstraint>
+                </Association>
+            </Schema>
+        </edmx:ConceptualModels>
+        <!-- C-S mapping content -->
+        <edmx:Mappings>
+            <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+                <EntityContainerMapping StorageEntityContainer="NaturalGroundingVideosModelStoreContainer" CdmEntityContainer="Entities">
+                    <EntitySetMapping Name="MediaCategories">
+                        <EntityTypeMapping TypeName="NaturalGroundingVideosModel.MediaCategory">
+                            <MappingFragment StoreEntitySet="MediaCategories">
+                                <ScalarProperty Name="Folder" ColumnName="Folder" />
+                                <ScalarProperty Name="Name" ColumnName="Name" />
+                                <ScalarProperty Name="MediaTypeId" ColumnName="MediaTypeId" />
+                                <ScalarProperty Name="MediaCategoryId" ColumnName="MediaCategoryId" />
+                            </MappingFragment>
+                        </EntityTypeMapping>
+                    </EntitySetMapping>
+                    <EntitySetMapping Name="RatingCategories">
+                        <EntityTypeMapping TypeName="NaturalGroundingVideosModel.RatingCategory">
+                            <MappingFragment StoreEntitySet="RatingCategories">
+                                <ScalarProperty Name="Custom" ColumnName="Custom" />
+                                <ScalarProperty Name="Name" ColumnName="Name" />
+                                <ScalarProperty Name="RatingId" ColumnName="RatingId" />
+                            </MappingFragment>
+                        </EntityTypeMapping>
+                    </EntitySetMapping>
+                    <EntitySetMapping Name="DbVersions">
+                        <EntityTypeMapping TypeName="NaturalGroundingVideosModel.DbVersion">
+                            <MappingFragment StoreEntitySet="Version">
+                                <ScalarProperty Name="Revision" ColumnName="Revision" />
+                                <ScalarProperty Name="Build" ColumnName="Build" />
+                                <ScalarProperty Name="Minor" ColumnName="Minor" />
+                                <ScalarProperty Name="Major" ColumnName="Major" />
+                            </MappingFragment>
+                        </EntityTypeMapping>
+                    </EntitySetMapping>
+                    <EntitySetMapping Name="Media">
+                        <EntityTypeMapping TypeName="NaturalGroundingVideosModel.Media">
+                            <MappingFragment StoreEntitySet="Media">
+                                <ScalarProperty Name="IsPersonal" ColumnName="IsPersonal" />
+                                <ScalarProperty Name="DisableMadVr" ColumnName="DisableMadVr" />
+                                <ScalarProperty Name="DisableSvp" ColumnName="DisableSvp" />
+                                <ScalarProperty Name="DisablePitch" ColumnName="DisablePitch" />
+                                <ScalarProperty Name="BuyUrl" ColumnName="BuyUrl" />
+                                <ScalarProperty Name="DownloadUrl" ColumnName="DownloadUrl" />
+                                <ScalarProperty Name="DownloadName" ColumnName="DownloadName" />
+                                <ScalarProperty Name="EndPos" ColumnName="EndPos" />
+                                <ScalarProperty Name="StartPos" ColumnName="StartPos" />
+                                <ScalarProperty Name="Length" ColumnName="Length" />
+                                <ScalarProperty Name="Height" ColumnName="Height" />
+                                <ScalarProperty Name="IsCustomPreference" ColumnName="IsCustomPreference" />
+                                <ScalarProperty Name="Preference" ColumnName="Preference" />
+                                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                                <ScalarProperty Name="MediaCategoryId" ColumnName="MediaCategoryId" />
+                                <ScalarProperty Name="Album" ColumnName="Album" />
+                                <ScalarProperty Name="Title" ColumnName="Title" />
+                                <ScalarProperty Name="Artist" ColumnName="Artist" />
+                                <ScalarProperty Name="LastSyncOn" ColumnName="LastSyncOn" />
+                                <ScalarProperty Name="EditedOn" ColumnName="EditedOn" />
+                                <ScalarProperty Name="MediaTypeId" ColumnName="MediaTypeId" />
+                                <ScalarProperty Name="MediaId" ColumnName="MediaId" />
+                            </MappingFragment>
+                        </EntityTypeMapping>
+                    </EntitySetMapping>
+                    <EntitySetMapping Name="MediaRatings">
+                        <EntityTypeMapping TypeName="NaturalGroundingVideosModel.MediaRating">
+                            <MappingFragment StoreEntitySet="MediaRatings">
+                                <ScalarProperty Name="Depth" ColumnName="Depth" />
+                                <ScalarProperty Name="Height" ColumnName="Height" />
+                                <ScalarProperty Name="RatingId" ColumnName="RatingId" />
+                                <ScalarProperty Name="MediaId" ColumnName="MediaId" />
+                            </MappingFragment>
+                        </EntityTypeMapping>
+                    </EntitySetMapping>
+                </EntityContainerMapping>
+            </Mapping>
+        </edmx:Mappings>
+    </edmx:Runtime>
+    <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+    <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+        <Connection>
+            <DesignerInfoPropertySet>
+                <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+            </DesignerInfoPropertySet>
+        </Connection>
+        <Options>
+            <DesignerInfoPropertySet>
+                <DesignerProperty Name="ValidateOnBuild" Value="true" />
+                <DesignerProperty Name="EnablePluralization" Value="true" />
+                <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+                <DesignerProperty Name="UseLegacyProvider" Value="false" />
+                <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+            </DesignerInfoPropertySet>
+        </Options>
+        <!-- Diagram content (shape and connector positions) -->
+        <Diagrams></Diagrams>
+    </Designer>
 </edmx:Edmx>

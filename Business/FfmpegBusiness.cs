@@ -156,7 +156,7 @@ namespace Business {
             string FileContent = File.ReadAllText(settings.ScriptFile);
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
             // Remote MT code.
-            Script.ConvertForPreview();
+            Script.RemoveMT();
             Script.AppendLine();
             // Add audio gain.
             if (settings.AudioGain.HasValue && settings.AudioGain != 0) {
@@ -165,19 +165,19 @@ namespace Business {
             if (settings.ChangeAudioPitch) {
                 // Change pitch to 432hz.
                 Script.LoadPluginDll("TimeStretch.dll");
-                Script.AppendLine("ResampleAudio(48000)");
+                //Script.AppendLine("ResampleAudio(48000)"); // This line causes audio out distortion
                 Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
             }
-            Script.AppendLine("ConvertAudioTo32bit()");
+            // Script.AppendLine("ConvertAudioTo32bit()");
             // Add TWriteWAV.
             Script.AppendLine();
             Script.LoadPluginDll("TWriteAVI.dll");
             Script.AppendLine(@"TWriteWAV(""{0}"", true)", Script.GetAsciiPath(settings.AudioFileWav));
             Script.AppendLine("ForceProcessWAV()");
+
             // Write temp script.
             Script.WriteToFile(TempFile);
-            // Execute.
-            // It aways returns an error but file is generated.
+            // Execute. It aways returns an error but file is generated.
             string Args = string.Format(@"""{0}"" -o -", TempFile);
             Run("Encoder\\avs2yuv.exe", Args, silent);
             File.Delete(TempFile);
@@ -219,6 +219,7 @@ namespace Business {
                         }
                     }
                 }
+                File.Delete(TempResult);
             }
             return Result;
         }
@@ -292,12 +293,16 @@ namespace Business {
             string TempResult = settings.TempFile + ".txt";
             string TempOut = settings.TempFile + ".y4m";
 
-            // Create script to get frame count.
-            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
-            Script.AppendLine(@"AviSource(""{0}"")", settings.ScriptFile);
+            // Read source script and remove MT.
+            string FileContent = File.ReadAllText(settings.ScriptFile);
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
+            Script.RemoveMT();
+            Script.DitherOut(false);
+
+            // Get frame count.
+            Script.AppendLine();
             Script.AppendLine(@"WriteFileStart(""{0}"", ""FrameRate""{1}""Framecount"")", TempResult, @", """""" "","" """""", ");
             Script.AppendLine("Trim(0,-1)");
-            Script.ConvertForPreview();
             Script.WriteToFile(TempScript);
 
             // Run script.

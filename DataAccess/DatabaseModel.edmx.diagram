@@ -6,7 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="9ed028e6436d4ece983b910aa7788a98" Name="Diagram1">
         <EntityTypeShape EntityType="NaturalGroundingVideosModel.MediaCategory" Width="1.5" PointX="3" PointY="3.875" />
-        <EntityTypeShape EntityType="NaturalGroundingVideosModel.RatingCategory" Width="1.5" PointX="5.25" PointY="0.875" />
+        <EntityTypeShape EntityType="NaturalGroundingVideosModel.RatingCategory" Width="1.5" PointX="5.125" PointY="0.875" />
         <EntityTypeShape EntityType="NaturalGroundingVideosModel.DbVersion" Width="1.5" PointX="5.125" PointY="3.875" />
         <EntityTypeShape EntityType="NaturalGroundingVideosModel.Media" Width="1.5" PointX="0.875" PointY="0.75" />
         <AssociationConnector Association="NaturalGroundingVideosModel.FK_Media_0_0" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Business {
@@ -111,9 +112,10 @@ namespace Business {
         /// Send file silently to recycle bin.  Surpress dialog, surpress errors, delete if too large.
         /// </summary>
         /// <param name="path">Location of directory or file to recycle</param>
-        public static bool MoveToRecycleBin(string path) {
-            return Send(path, FileOperationFlags.FOF_NOCONFIRMATION | FileOperationFlags.FOF_NOERRORUI | FileOperationFlags.FOF_SILENT);
-
+        public static void MoveToRecycleBin(string path) {
+            Send(path, FileOperationFlags.FOF_NOCONFIRMATION | FileOperationFlags.FOF_NOERRORUI | FileOperationFlags.FOF_SILENT);
+            if (File.Exists(path))
+                throw new IOException(string.Format(@"Cannot delete file ""{0}""", path));
         }
 
         private static bool deleteFile(string path, FileOperationFlags flags) {
