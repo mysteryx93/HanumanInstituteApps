@@ -19,7 +19,7 @@ namespace Business {
         public static bool AppyAutoPitch(Media video) {
             using (MediaInfoReader InfoReader = new MediaInfoReader()) {
                 InfoReader.LoadInfo(Settings.NaturalGroundingFolder + video.FileName);
-                if (Settings.SavedFile.ChangeAudioPitch && InfoReader.PixelAspectRatio == 1 && !video.DisablePitch) {
+                if (Settings.SavedFile.ChangeAudioPitch && InfoReader.PixelAspectRatio == 1 && !video.DisablePitch && (InfoReader.BitDepth ?? 8) == 8) {
                     CreateScript(Settings.NaturalGroundingFolder + video.FileName, InfoReader);
                     return true;
                 } else
@@ -33,33 +33,35 @@ namespace Business {
         /// <param name="inputFile">The video to play.</param>
         /// <param name="infoReader">An object to read media information.</param>
         public static void CreateScript(string inputFile, MediaInfoReader infoReader) {
+            bool AviSynthPlus = MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynthPlus;
             int CPU = Environment.ProcessorCount / 2;
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            //Script.LoadPluginDll("LSMASHSource.dll");
-            //Script.LoadPluginDll(infoReader.BitDepth == 10 ? "ffms2-10bit" : "ffms2.dll");
             Script.LoadPluginDll("TimeStretch.dll");
             Script.LoadPluginAvsi("UUSize4.avsi");
-            Script.LoadPluginDll("dither.dll");
-            Script.LoadPluginAvsi("dither.avsi");
-            Script.AppendLine("SetMTMode(3,{0})", CPU);
-            Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), infoReader.BitDepth == 10, true);
-            //Script.AppendLine(@"file = ""{0}""", Script.GetAsciiPath(inputFile));
-            //if (new string[] { ".mp4", ".mov" }.Contains(Path.GetExtension(inputFile).ToLower())) {
-            //Script.AppendLine("LSMASHVideoSource(file, threads=1, stacked=true)");
-            //Script.AppendLine("AudioDub(LSMASHAudioSource(file))");
-            //} else {
-            //}
-            //Script.AppendLine("LWLibavVideoSource(file, cache=false, threads=1, stacked=true)");
-            //Script.AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
-            //Script.AppendLine("FFVideoSource(file, cache=false, threads=1{0})", infoReader.BitDepth == 10 ? ", enable10bithack=true" : "");
-            //Script.AppendLine("AudioDub(FFAudioSource(file, cache=false))");
-            Script.AppendLine("SetMTMode(2)");
-            if (infoReader.BitDepth == 10)
-                Script.AppendLine("DitherPost()");
+            if (AviSynthPlus) {
+                Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
+                Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
+                Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
+            } else {
+                Script.AppendLine("SetMTMode(3,{0})", CPU);
+            }
+            Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), 2);
+            if (!AviSynthPlus)
+                Script.AppendLine("SetMTMode(2)");
             Script.AppendLine("UUSize4(mod=4)");
-            Script.AppendLine("ResampleAudio(48000)");
-            Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
+            if (AviSynthPlus) {
+                // This causes a slight audio delay in AviSynth 2.6
+                Script.AppendLine("ResampleAudio(48000)");
+                Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
+                Script.AppendLine("Prefetch({0})", CPU);
+            } else {
+                // This slightly slows down playback speed but audio stays in sync
+                Script.AppendLine("V = AssumeFPS(432.0 / 440.0 * FrameRate)");
+                Script.AppendLine("A = AssumeSampleRate(int(432.0 / 440.0 * AudioRate))");
+                Script.AppendLine("AudioDub(V, A)");
+            }
+
             Script.WriteToFile(Settings.AutoPitchFile);
             File.Delete(Settings.AutoPitchCache);
         }

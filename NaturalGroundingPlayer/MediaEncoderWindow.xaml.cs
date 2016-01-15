@@ -151,7 +151,7 @@ namespace NaturalGroundingPlayer {
 
         private async void PreviewMpcButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
-                business.GenerateScript(encodeSettings, false, false);
+                business.GenerateScript(encodeSettings, false, true);
                 await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
             }
         }
@@ -209,9 +209,13 @@ namespace NaturalGroundingPlayer {
                 .All(IsValid);
         }
 
-        private async void OpenMethod_Checked(object sender, RoutedEventArgs e) {
-            if (!isBinding)
-                await business.PreparePreviewFile(encodeSettings, false);
+
+        private async void ConvertToAviCheckbox_Click(object sender, RoutedEventArgs e) {
+            if (isBinding)
+                return;
+            ConvertToAviCheckbox.IsEnabled = false;
+            await business.PreparePreviewFile(encodeSettings, false);
+            ConvertToAviCheckbox.IsEnabled = true;
         }
 
         /// <summary>
@@ -263,6 +267,16 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.AudioGain = Gain;
             CalculateAudioGain.IsEnabled = true;
             CalculateAudioGain.Content = "Auto";
+        }
+
+        private void Codec264Option_Click(object sender, RoutedEventArgs e) {
+            encodeSettings.EncodeQuality = 24;
+            encodeSettings.EncodePreset = EncodePresets.veryslow;
+        }
+
+        private void Codec265Option_Click(object sender, RoutedEventArgs e) {
+            encodeSettings.EncodeQuality = 23;
+            encodeSettings.EncodePreset = EncodePresets.medium;
         }
     }
 }

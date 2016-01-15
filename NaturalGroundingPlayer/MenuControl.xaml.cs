@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Navigation;
 using Business;
 using DataAccess;
+using System.Diagnostics;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -70,14 +71,6 @@ namespace NaturalGroundingPlayer {
                 SessionCore.Instance.Business.ResumeSession();
                 menuStartSession.Header = "Pause _Session";
             }
-        }
-
-        private void CommandBinding_BuyResources(object sender, ExecutedRoutedEventArgs e) {
-            if (!menuBuyResources.IsEnabled)
-                return;
-
-            PauseSession();
-            BuyResourcesWindow.Instance(null);
         }
 
         private void CommandBinding_EditVideo(object sender, ExecutedRoutedEventArgs e) {
@@ -359,6 +352,30 @@ namespace NaturalGroundingPlayer {
                 return;
 
             SettingsWindow.Instance();
+        }
+
+        private void CommandBinding_ForceOfLife(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("https://www.forceoflife.net/"));
+        }
+
+        private void CommandBinding_BuyResources(object sender, ExecutedRoutedEventArgs e) {
+            if (!menuBuyResources.IsEnabled)
+                return;
+
+            PauseSession();
+            BuyResourcesWindow.Instance(null);
+        }
+
+        private void CommandBinding_EnergyTuneUp(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("https://www.spiritualselftransformation.com/energy-tune-up"));
+        }
+
+        private void CommandBinding_OfficialResources(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("http://sexenergysuccess.com/natural-grounding-resources-official/"));
+        }
+
+        private void CommandBinding_AboutUs(object sender, ExecutedRoutedEventArgs e) {
+            AboutWindow.Instance();
         }
 
         private void Downloads_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {

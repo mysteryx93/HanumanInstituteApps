@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Business {
     public class SettingsFile {
         public string NaturalGroundingFolder { get; set; }
         public string SvpPath { get; set; }
+        public string MpcPath { get; set; }
         public bool AutoDownload { get; set; }
         public bool EnableSvp { get; set; }
         public bool EnableMadVR { get; set; }
@@ -49,21 +51,22 @@ namespace Business {
                 @"SVP 4 Dev\SVPManager.exe",
                 @"SVP\SVPMgr.exe"
             };
+            string ProgramFiles = Environment.GetFolderPath(Environment.Is64BitOperatingSystem ? Environment.SpecialFolder.ProgramFilesX86 : Environment.SpecialFolder.ProgramFiles);
             string ItemPath;
             foreach (string item in DefaultPaths) {
-                ItemPath = Root + "Program Files\\" + item;
-                if (File.Exists(ItemPath)) {
-                    Result.SvpPath = ItemPath;
-                    break;
-                }
-                ItemPath = Root + "Program Files (x86)\\" + item;
+                ItemPath = Path.Combine(ProgramFiles, item);
                 if (File.Exists(ItemPath)) {
                     Result.SvpPath = ItemPath;
                     break;
                 }
             }
             if (string.IsNullOrEmpty(Result.SvpPath))
-                Result.SvpPath = Root + "Program Files\\" + DefaultPaths[0];
+                Result.SvpPath = Path.Combine(ProgramFiles, DefaultPaths[0]);
+
+            // Auto-detect MPC-HC path.
+            Result.MpcPath = Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\", "ExePath", "") as string;
+            if ((string.IsNullOrEmpty(Result.MpcPath) || !File.Exists(Result.MpcPath)))
+                Result.MpcPath = Path.Combine(ProgramFiles, @"MPC-HC\mpc-hc.exe");
 
             return Result;
         }
@@ -110,8 +113,8 @@ namespace Business {
                 return "Invalid Natural Grounding folder";
 
             if (MediaPlayerApp == MediaPlayerApplication.Mpc) {
-                if (MpcConfigBusiness.MpcPath(SvpPath) == null)
-                    return "MPC-HC not found";
+                if (!File.Exists(MpcPath))
+                    return "Invalid MPC-HC path";
                 if (SvpPath.Length > 0 && !File.Exists(SvpPath))
                     return "Invalid SVP path";
             }
@@ -123,6 +126,7 @@ namespace Business {
             SettingsFile Result = new SettingsFile();
             Result.NaturalGroundingFolder = NaturalGroundingFolder;
             Result.SvpPath = SvpPath;
+            Result.MpcPath = MpcPath;
             Result.AutoDownload = AutoDownload;
             Result.EnableSvp = EnableSvp;
             Result.EnableMadVR = EnableMadVR;
@@ -131,6 +135,7 @@ namespace Business {
             Result.MediaPlayerApp = MediaPlayerApp;
             Result.MaxDownloadQuality = MaxDownloadQuality;
             Result.Zoom = Zoom;
+            Result.GraphicDeviceId = GraphicDeviceId;
             return Result;
         }
     }

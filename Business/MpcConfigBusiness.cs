@@ -20,33 +20,6 @@ namespace Business {
         }
 
         /// <summary>
-        /// Returns the path of MPC-HC's executable file.
-        /// </summary>
-        /// <returns>The path to MPC-HC.exe, or null if not found.</returns>
-        public static string MpcPath() {
-            if (Settings.SavedFile != null)
-                return MpcPath(Settings.SavedFile.SvpPath);
-            else 
-                return MpcPath(null);
-        }
-
-        /// <summary>
-        /// Returns the path of MPC-HC's executable file.
-        /// </summary>
-        /// <param name="svpPath">The path to SVP to help find MPC-HC if its registry key is missing.</param>
-        /// <returns>The path to MPC-HC.exe, or null if not found.</returns>
-        public static string MpcPath(string svpPath) {
-            string Result = Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\", "ExePath", "") as string;
-            if ((string.IsNullOrEmpty(Result) || !File.Exists(Result)) && !string.IsNullOrEmpty(svpPath))
-                Result = Path.Combine(Path.GetDirectoryName(svpPath), @"MPC-HC\mpc-hc.exe");
-            // Ensure file exists.
-            if (!string.IsNullOrEmpty(Result) && File.Exists(Result))
-                return Result;
-            else
-                return null;
-        }
-
-        /// <summary>
         /// Gets or sets whether MadVR is enabled in MPC-HC.
         /// </summary>
         public static bool IsMadvrEnabled {
@@ -54,7 +27,7 @@ namespace Business {
                 return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "DSVidRen", 0) == 12;
             }
             set {
-                if (value != IsMadvrEnabled && MpcPath() != null) {
+                if (value != IsMadvrEnabled && Settings.SavedFile.MpcPath.Length > 0) {
                     KillMpcProcesses();
                     Registry.SetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "DSVidRen", value ? 12 : 0);
                 }
@@ -69,7 +42,7 @@ namespace Business {
                 return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "Loop", 0) > 0;
             }
             set {
-                if (value != Loop && MpcPath() != null) {
+                if (value != Loop && Settings.SavedFile.MpcPath.Length > 0) {
                     KillMpcProcesses();
                     Registry.SetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "Loop", value ? 1 : 0);
                 }
@@ -84,7 +57,7 @@ namespace Business {
                 return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "RememberFilePos", 0) > 0;
             }
             set {
-                if (value != RememberFilePos && MpcPath() != null) {
+                if (value != RememberFilePos && Settings.SavedFile.MpcPath.Length > 0) {
                     KillMpcProcesses();
                     Registry.SetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "RememberFilePos", value ? 1 : 0);
                 }
@@ -99,7 +72,7 @@ namespace Business {
                 return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "AspectRatioX", 0) > 0;
             }
             set {
-                if (value != IsWidescreenEnabled && MpcPath() != null) {
+                if (value != IsWidescreenEnabled && Settings.SavedFile.MpcPath.Length > 0) {
                     KillMpcProcesses();
                     Registry.SetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "AspectRatioX", value ? 16 : 0);
                     Registry.SetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "AspectRatioY", value ? 9 : 0);
@@ -111,7 +84,7 @@ namespace Business {
         /// Kills any MPC-HC running instance.
         /// </summary>
         public static void KillMpcProcesses() {
-            string AppName = Path.GetFileNameWithoutExtension(MpcConfigBusiness.MpcPath());
+            string AppName = Path.GetFileNameWithoutExtension(Settings.SavedFile.MpcPath);
             foreach (Process item in Process.GetProcessesByName(AppName)) {
                 try {
                     item.Kill();
@@ -209,5 +182,24 @@ namespace Business {
             string AppName = Path.GetFileNameWithoutExtension(Settings.SavedFile.SvpPath);
             return Process.GetProcessesByName(AppName).FirstOrDefault();
         }
+
+        private static AviSynthVersion avisynthVersionCache;
+
+        public static AviSynthVersion GetAviSynthVersion() {
+            if (avisynthVersionCache != AviSynthVersion.None)
+                return avisynthVersionCache;
+
+            string AviSynthFile = Path.Combine(Environment.SystemDirectory, "AviSynth.dll");
+            if (File.Exists(AviSynthFile)) {
+                FileVersionInfo Info = FileVersionInfo.GetVersionInfo(AviSynthFile);
+                if (Info.ProductName.ToLower().StartsWith("avisynth+"))
+                    avisynthVersionCache = AviSynthVersion.AviSynthPlus;
+                else
+                    avisynthVersionCache = AviSynthVersion.AviSynth26;
+            } else
+                avisynthVersionCache = AviSynthVersion.None;
+            return avisynthVersionCache;
+        }
     }
+
 }

@@ -20,22 +20,25 @@ namespace Business {
         public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool silent) {
             bool Result = true;
             File.Delete(destination);
-            if (!string.IsNullOrEmpty(audioFile)) {
-                // FFMPEG fails to muxe H264 into MKV container. Converting to MP4 and then muxing with the audio, however, works.
-                string OriginalVideoFile = videoFile;
-                if (videoFile.EndsWith(".264") && destination.EndsWith(".mkv")) {
-                    videoFile = videoFile.Substring(0, videoFile.Length - 4) + ".mp4";
-                    Result = JoinAudioVideo(OriginalVideoFile, null, videoFile, silent);
-                }
+
+            // FFMPEG fails to muxe H264 into MKV container. Converting to MP4 and then muxing with the audio, however, works.
+            string OriginalVideoFile = videoFile;
+            if ((videoFile.EndsWith(".264") || videoFile.EndsWith(".265")) && destination.EndsWith(".mkv")) {
+                videoFile = videoFile.Substring(0, videoFile.Length - 4) + ".mp4";
+                Result = JoinAudioVideo(OriginalVideoFile, null, videoFile, silent);
+            }
+
+            if (Result) {
                 // Join audio and video files.
-                if (Result)
+                if (!string.IsNullOrEmpty(audioFile)) {
                     Result = RunFfmpeg(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a ""{2}""", videoFile, audioFile, destination), silent);
-                // Delete temp file.
-                if (OriginalVideoFile != videoFile)
-                    File.Delete(videoFile);
-                return Result;
-            } else
-                Result = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
+                } else
+                    Result = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
+            }
+
+            // Delete temp file.
+            if (OriginalVideoFile != videoFile)
+                File.Delete(videoFile);
             return Result;
         }
 
@@ -104,9 +107,27 @@ namespace Business {
             P.StartInfo.Arguments = arguments;
             // P.ErrorDataReceived += P_ErrorDataReceived;
             P.Start();
+            try {
+                if (!P.HasExited)
+                    P.PriorityClass = priority;
+            }
+            catch { }
             P.WaitForExit();
             // ExitCode is 0 for normal exit. Different value when closing the console.
             return P.ExitCode == 0;
+        }
+
+        private static string RunToString(string command, string arguments) {
+            Process P = new Process();
+            P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            P.StartInfo.CreateNoWindow = true;
+            P.StartInfo.RedirectStandardError = true;
+            P.StartInfo.UseShellExecute = false;
+            P.StartInfo.FileName = command;
+            P.StartInfo.Arguments = arguments;
+            P.Start();
+            P.WaitForExit();
+            return P.StandardError.ReadToEnd();
         }
 
         /// <summary>
@@ -127,36 +148,58 @@ namespace Business {
         public static bool EncodeH264(MediaEncoderSettings settings) {
             File.Delete(settings.OutputFile);
             string PipeArgs;
-            if (settings.Encode10bit) {
-                // x264-10b provides 10-bit encoding.
-                settings.CalculateSize();
-                ClipInfo Clip = GetClipInfo(settings, true);
-                if (Clip == null) // Sometimes it fails; try again
-                    Clip = GetClipInfo(settings, true);
-                //PipeArgs = string.Format(@"/c Encoder\avs4x26x --x26x-binary ""Encoder\x264-10bit.exe"" --depth 16 ""{0}"" --preset {1} --crf {2} --psy-rd 1:0.05 --output ""{3}"" --frames {4} -",
-                //    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
-                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe -raw ""{0}"" -o - | Encoder\x264-10bit.exe --demuxer raw --input-depth 16 --input-res {1}x{2} --fps {3} --preset {4} --crf {5} --psy-rd 1:0.05 --output ""{6}"" --frames {7} -",
-                    settings.ScriptFile, settings.OutputWidth, settings.OutputHeight, Clip.FrameRate,
-                    settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
+            //if (settings.Encode10bit) {
+            //    // x264-10b provides 10-bit encoding.
+            //    settings.CalculateSize();
+            //    ClipInfo Clip = GetClipInfo(settings, true);
+            //    if (Clip == null) // Sometimes it fails; try again
+            //        Clip = GetClipInfo(settings, true);
+            //    //PipeArgs = string.Format(@"/c Encoder\avs4x26x --x26x-binary ""Encoder\x264-10bit.exe"" --depth 16 ""{0}"" --preset {1} --crf {2} --psy-rd 1:0.05 --output ""{3}"" --frames {4} -",
+            //    //    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
+            //    if (settings.VideoCodec == VideoCodecs.x264) {
+            //        PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe -raw ""{0}"" -o - | Encoder\x264-10bit.exe --demuxer raw --input-depth 16 --input-res {1}x{2} --fps {3} --preset {4} --crf {5} --psy-rd 1:0.05 --output ""{6}"" --frames {7} -",
+            //            settings.ScriptFile, settings.OutputWidth, settings.OutputHeight, Clip.FrameRate,
+            //            settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
+            //    } else {
+            //        PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe -raw ""{0}"" -o - | Encoder\x265-10bit.exe --input-depth 16 --input-res {1}x{2} --fps {3} --preset {4} --crf {5} --output ""{6}"" --frames {7} -",
+            //            settings.ScriptFile, settings.OutputWidth, settings.OutputHeight, Clip.FrameRate,
+            //            settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
+            //    }
+            //} else {
+            // Ffmpeg contains x264 with 8-bit encoding.
+            if (settings.VideoCodec == VideoCodecs.x264) {
+                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {1} -crf {2} ""{3}""",
+                    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             } else {
-                // Ffmpeg contains x264 with 8-bit encoding.
-                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx264 -preset {1} -crf {2} -psy-rd 1:0.05 ""{3}""", 
+                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx265 -preset {1} -crf {2} ""{3}""",
                     settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             }
+            //}
             return Run("cmd", PipeArgs, false);
         }
-        
+
         /// <summary>
         /// Saves the audio output of specified script into a WAV file.
         /// </summary>
         /// <param name="settings">An object containing the encoding settings.</param>
         public static void SaveAudioToWav(MediaEncoderSettings settings, bool silent) {
             string TempFile = settings.TempFile + ".avs";
-            // Read source script.
-            string FileContent = File.ReadAllText(settings.ScriptFile);
-            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
-            // Remote MT code.
-            Script.RemoveMT();
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
+            if (settings.VideoCodec != VideoCodecs.Copy) {
+                // Read source script.
+                Script.Script = File.ReadAllText(settings.ScriptFile);
+                // Remote MT code.
+                Script.RemoveMT();
+                Script.AppendLine("Trim(0,0)");
+            } else {
+                // Read full video file.
+                Script.AddPluginPath();
+                if (settings.ConvertToAvi || settings.InputFile.ToLower().EndsWith(".avi"))
+                    Script.OpenAvi(settings.InputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
+                else
+                    Script.OpenDirect(settings.InputFile, null, !string.IsNullOrEmpty(settings.SourceAudioFormat), 1);
+                Script.AppendLine("KillVideo()");
+            }
             Script.AppendLine();
             // Add audio gain.
             if (settings.AudioGain.HasValue && settings.AudioGain != 0) {
@@ -165,10 +208,9 @@ namespace Business {
             if (settings.ChangeAudioPitch) {
                 // Change pitch to 432hz.
                 Script.LoadPluginDll("TimeStretch.dll");
-                //Script.AppendLine("ResampleAudio(48000)"); // This line causes audio out distortion
+                Script.AppendLine("ResampleAudio(48000)"); // This line causes audio out distortion
                 Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
             }
-            // Script.AppendLine("ConvertAudioTo32bit()");
             // Add TWriteWAV.
             Script.AppendLine();
             Script.LoadPluginDll("TWriteAVI.dll");
@@ -188,6 +230,25 @@ namespace Business {
             return Run("Encoder\\NeroAacEnc.exe", Args, true);
         }
 
+        public static float? GetPixelAspectRatio(MediaEncoderSettings settings) {
+            string ConsoleOut = RunToString("Encoder\\ffmpeg.exe", string.Format(@"-i ""{0}""", Settings.NaturalGroundingFolder + settings.FileName));
+            int PosStart = ConsoleOut.IndexOf("[SAR ") + 5;
+            int PosEnd = ConsoleOut.IndexOf(" DAR ", PosStart);
+            if (PosStart < 0 || PosEnd < 0)
+                return null;
+            string SARText = ConsoleOut.Substring(PosStart, PosEnd - PosStart);
+            string[] SAR = SARText.Split(':');
+            if (SAR.Length != 2)
+                return null;
+            try {
+                float Result = (float)Math.Round((decimal)int.Parse(SAR[0]) / int.Parse(SAR[1]), 3);
+                return Result;
+            }
+            catch {
+                return null;
+            }
+        }
+
         /// <summary>
         /// Returns the audio gain that can be applied to an audio file.
         /// </summary>
@@ -195,7 +256,7 @@ namespace Business {
         /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
         public static float? GetAudioGain(MediaEncoderSettings settings) {
             string TempResult = settings.TempFile + ".txt";
-            string Args = string.Format(@"/c Encoder\\ffmpeg.exe -i ""{0}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1", 
+            string Args = string.Format(@"/c Encoder\\ffmpeg.exe -i ""{0}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1",
                 Settings.NaturalGroundingFolder + settings.FileName, TempResult);
             Run("cmd", Args, true);
             float? Result = null;
@@ -232,7 +293,7 @@ namespace Business {
             // Create script to get auto-crop coordinates
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            Script.OpenDirect(Settings.NaturalGroundingFolder + settings.FileName, null, false, settings.SourceBitDepth == 10, false);
+            Script.OpenDirect(Settings.NaturalGroundingFolder + settings.FileName, null, false, 0);
             Script.LoadPluginDll("RoboCrop26.dll");
             Script.AppendLine(@"RoboCrop(LogFn=""{0}"")", Script.GetAsciiPath(TempResult));
             Script.AppendLine("Trim(0,-1)");
@@ -297,7 +358,7 @@ namespace Business {
             string FileContent = File.ReadAllText(settings.ScriptFile);
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
             Script.RemoveMT();
-            Script.DitherOut(false);
+            //Script.DitherOut(false);
 
             // Get frame count.
             Script.AppendLine();

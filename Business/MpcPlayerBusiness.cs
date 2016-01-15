@@ -153,12 +153,12 @@ namespace Business {
         #region Methods / Properties
 
         public void Show() {
-            apiAccess.Run(MpcConfigBusiness.MpcPath());
+            apiAccess.Run(Settings.SavedFile.MpcPath);
             watcher.Start();
         }
 
         public void SetPath() {
-            apiAccess.SetPath(MpcConfigBusiness.MpcPath());
+            apiAccess.SetPath(Settings.SavedFile.MpcPath);
         }
 
         public void Hide() {

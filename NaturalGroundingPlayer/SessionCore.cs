@@ -76,8 +76,10 @@ namespace NaturalGroundingPlayer {
 
             await TestDatabaseConnectionAsync();
 
-            if (Settings.SavedFile == null)
+            if (Settings.SavedFile == null) {
+                AboutWindow.Instance();
                 SettingsWindow.Instance();
+            }
 
             await Main.InitializationCompleted();
 

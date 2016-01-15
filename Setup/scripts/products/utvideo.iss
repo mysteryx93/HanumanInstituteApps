@@ -8,14 +8,13 @@ utvideo_title=UT Video Codec Suite
 utvideo_size=0.6 MB
 
 [Code]
-const
-	utvideo_url = 'http://www.videohelp.com/download/utvideo-15.2.0-win.exe';
+//const utvideo_url = 'http://www.videohelp.com/download/utvideo-15.2.0-win.exe';
 
 procedure utvideo();
 var
 	version: cardinal;
 begin
-  if not RegKeyExists(HKEY_CLASSES_ROOT, 'AppID\UtVideoMFT.dll') then
+  if not RegKeyExists(HKEY_CLASSES_ROOT, 'AppID\UtVideoDMO.dll') then
   begin
 		if (not IsIA64()) then
       ExtractTemporaryFile('utvideo.exe');
@@ -23,7 +22,7 @@ begin
 				'',
 				CustomMessage('utvideo_title'),
 				CustomMessage('utvideo_size'),
-        utvideo_url,
+        '',
 				false, false);
 	end;
 end;

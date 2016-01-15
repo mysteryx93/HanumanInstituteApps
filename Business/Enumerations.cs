@@ -18,4 +18,10 @@ namespace Business {
         p360 = 4,
         p240 = 5
     }
+
+    public enum AviSynthVersion {
+        None,
+        AviSynth26,
+        AviSynthPlus
+    }
 }

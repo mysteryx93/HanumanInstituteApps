@@ -43,12 +43,12 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" DataContext="{Binding Items}" Background="#FFE40000">
+                            <StackPanel Orientation="Horizontal" DataContext="{Binding Items}" Background="#FF00AE20">
                                 <TextBlock Margin="6">
                                     <Hyperlink NavigateUri="{Binding Path=BuyUrl}" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None">
-                                        <TextBlock Text="{Binding Path=BuyName}" FontSize="16" Foreground="#FFC8FBC8" FontWeight="Bold" />
+                                        <TextBlock Text="{Binding Path=BuyName}" FontSize="16" Foreground="Black" FontWeight="Bold" />
                                         <!--<TextBlock Text="{Binding Path=BuyUrl, StringFormat=' ({0})'}" FontSize="16" Foreground="#FFC8FBC8" />-->
-                                        <TextBlock Text=" (click to purchase)" FontSize="16" Foreground="#FFC8FBC8" />
+                                        <TextBlock Text=" (click to purchase)" FontSize="16" Foreground="Black" />
                                     </Hyperlink>
                                 </TextBlock>
                             </StackPanel>

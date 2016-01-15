@@ -93,22 +93,22 @@ namespace Business {
             }
         }
 
-        public double? PixelAspectRatio {
+        public float? PixelAspectRatio {
             get {
                 string StrValue = lastMedia.Get(StreamKind.Video, 0, "PixelAspectRatio");
-                double Result = 0;
-                if (double.TryParse(StrValue, out Result))
+                float Result = 0;
+                if (float.TryParse(StrValue, out Result))
                     return Result;
                 else
                     return null;
             }
         }
 
-        public double? FrameRate {
+        public float? FrameRate {
             get {
                 string StrValue = lastMedia.Get(StreamKind.Video, 0, "FrameRate");
-                double Result = 0;
-                if (double.TryParse(StrValue, out Result))
+                float Result = 0;
+                if (float.TryParse(StrValue, out Result))
                     return Result;
                 else
                     return null;

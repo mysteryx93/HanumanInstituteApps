@@ -14,8 +14,8 @@ namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
     public class MediaEncoderSettings : ICloneable {
-        public OpenMethods OpenMethod { get; set; }
         public string FileName { get; set; }
+        public bool ConvertToAvi { get; set; }
         [DefaultValue(null)]
         public double? Position { get; set; }
         private int? sourceHeight;
@@ -36,8 +36,8 @@ namespace Business {
                 CalculateSize(false);
             }
         }
-        private double sourceAspectRatio;
-        public double SourceAspectRatio {
+        private float sourceAspectRatio;
+        public float SourceAspectRatio {
             get { return sourceAspectRatio; }
             set {
                 sourceAspectRatio = value;
@@ -68,12 +68,15 @@ namespace Business {
         public bool Denoise2 { get; set; }
         public int Denoise2Strength { get; set; }
         public int Denoise2Sharpen { get; set; }
-        public bool SuperRes { get; set; }
-        public bool SuperResDoublePass { get; set; }
-        public int SuperResStrength { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
         public bool IncreaseFrameRateSmooth { get; set; }
+        public UpscaleMethods UpscaleMethod { get; set; }
+        public int SuperXbrStrength { get; set; }
+        public int SuperXbrSharpness { get; set; }
+        public bool SuperRes { get; set; }
+        public bool SuperResDoublePass { get; set; }
+        public int SuperResStrength { get; set; }
         private bool crop;
         public bool Crop {
             get { return crop; }
@@ -120,12 +123,12 @@ namespace Business {
         [DefaultValue(null)]
         public int? TrimEnd { get; set; }
         public bool ChangeSpeed { get; set; }
-        public int ChangeSpeedValue { get; set; }
+        public float ChangeSpeedValue { get; set; }
 
+        public VideoCodecs VideoCodec { get; set; }
         public float EncodeQuality { get; set; }
         public EncodePresets EncodePreset { get; set; }
         public VideoFormats EncodeFormat { get; set; }
-        public bool Encode10bit { get; set; }
         private AudioActions audioAction;
         public AudioActions AudioAction {
             get { return audioAction; }
@@ -170,25 +173,27 @@ namespace Business {
 
         public MediaEncoderSettings() {
             JobIndex = -1;
-            OpenMethod = OpenMethods.ConvertToAvi;
             SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
-            OutputHeight = 720;
+            OutputHeight = 768;
             Denoise1 = true;
             Denoise1Strength = 21;
             Denoise2Strength = 30;
             Denoise2Sharpen = 10;
-            SuperRes = true;
-            SuperResDoublePass = true;
-            SuperResStrength = 100;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             IncreaseFrameRateSmooth = true;
+            UpscaleMethod = UpscaleMethods.SuperXbr;
+            SuperXbrStrength = 20;
+            SuperXbrSharpness = 12;
+            SuperRes = true;
+            SuperResDoublePass = true;
+            SuperResStrength = 120;
             TrimStart = 0;
             ChangeSpeedValue = 100;
-            EncodeQuality = 24;
-            EncodePreset = EncodePresets.veryslow;
-            //Encode10bit = true;
+            VideoCodec = VideoCodecs.x265;
+            EncodeQuality = 23;
+            EncodePreset = EncodePresets.medium;
             AudioQuality = 50;
             ChangeAudioPitch = false;
         }
@@ -223,12 +228,25 @@ namespace Business {
                     CropBottom / 4 * 4);
             } else
                 CropSource = new Rect();
+
             FrameDouble = 0;
             int ScaleFactor = 1;
-            while ((SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactor < OutputHeight) {
-                FrameDouble += 1;
-                ScaleFactor *= 2;
+            int FrameDoubleX = 0, FrameDoubleY = 0;
+            int ScaleFactorX = 1, ScaleFactorY = 1;
+            // Calculate scale factor based on height
+            while ((SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactorY < OutputHeight) {
+                FrameDoubleY += 1;
+                ScaleFactorY *= 2;
             }
+            // Calculate scale factor based on width
+            while ((SourceWidth - CropSource.Left - CropSource.Right) * ScaleFactorX * SourceAspectRatio < OutputWidth) {
+                FrameDoubleX += 1;
+                ScaleFactorX *= 2;
+            }
+            // Take highest ratio
+            FrameDouble = FrameDoubleX > FrameDoubleY ? FrameDoubleX : FrameDoubleY;
+            ScaleFactor = ScaleFactorX > ScaleFactorY ? ScaleFactorX : ScaleFactorY;
+
             if (Crop) {
                 CropAfter = new Rect(
                     (CropLeft - CropSource.Left) * ScaleFactor,
@@ -243,7 +261,20 @@ namespace Business {
                 CropHeight = CropHeight - CropAfter.Top - CropAfter.Bottom;
                 CropWidth = CropWidth - CropAfter.Left - CropAfter.Right;
             }
-            OutputWidth = (int)Math.Round((double)CropWidth * SourceAspectRatio / CropHeight * OutputHeight / 4) * 4;
+            // Make width divisible by 4 without distorting pixels
+            float TotalWidth = (float)CropWidth * SourceAspectRatio / CropHeight * OutputHeight;
+            OutputWidth = (int)Math.Round(TotalWidth / 4) * 4;
+            if (TotalWidth >= OutputWidth.Value) {
+                float WidthAdjust = TotalWidth - OutputWidth.Value;
+                int WidthAdjustInt = (int)Math.Round(WidthAdjust / 2);
+                CropAfter.Left += WidthAdjustInt;
+                CropAfter.Right += WidthAdjustInt;
+            } else {
+                float HeightAdjust = (OutputWidth.Value - TotalWidth) / SourceAspectRatio;
+                int HeightAdjustInt = (int)Math.Round(HeightAdjust / 2);
+                CropAfter.Top += HeightAdjustInt;
+                CropAfter.Bottom += HeightAdjustInt;
+            }
         }
 
         public bool CanEncodeMp4 {
@@ -276,12 +307,6 @@ namespace Business {
             }
         }
 
-        public bool ConvertToAvi {
-            get {
-                return OpenMethod == OpenMethods.ConvertToAvi;
-            }
-        }
-
         public bool HasFileName {
             get { return !string.IsNullOrEmpty(FileName); }
         }
@@ -296,7 +321,7 @@ namespace Business {
 
         public string InputFile {
             get {
-                if (OpenMethod == OpenMethods.ConvertToAvi)
+                if (ConvertToAvi)
                     return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
                 else
                     return Settings.NaturalGroundingFolder + FileName;
@@ -304,7 +329,7 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.264", JobIndex); }
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mkv", JobIndex, VideoCodec == VideoCodecs.x265 ? "265" : "264"); }
         }
 
         public string AudioFileWav {
@@ -333,14 +358,20 @@ namespace Business {
         }
     }
 
-    public enum OpenMethods {
-        ConvertToAvi,
-        Direct
-    }
-
     public enum ColorMatrix {
         Rec601,
         Rec709
+    }
+
+    public enum UpscaleMethods {
+        SuperXbr,
+        NNedi3
+    }
+
+    public enum VideoCodecs {
+        Copy,
+        x264,
+        x265
     }
 
     public enum VideoFormats {
@@ -355,6 +386,8 @@ namespace Business {
     }
 
     public enum EncodePresets {
+        faster,
+        fast,
         medium,
         slow,
         slower,

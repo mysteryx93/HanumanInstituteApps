@@ -106,18 +106,18 @@ namespace Business {
         /// If script ends with DitherPost(), replace it with Dither_out() when rawOutput is true. If rawOutput is false, it does the reverse.
         /// </summary>
         /// <param name="rawOutput">True to replace DitherPost with Dither_out, false to replace Dither_out with DitherPost.</param>
-        public void DitherOut(bool rawOutput) {
-            string StrPost = "DitherPost()";
-            string StrOut = "Dither_out()";
-            string Val = Script.TrimEnd('\r', '\n', ' ');
-            if (rawOutput && Val.EndsWith(StrPost)) {
-                int Pos = Val.LastIndexOf(StrPost);
-                script.Replace(StrPost, StrOut, Pos, script.Length - Pos);
-            } else if (!rawOutput && Val.EndsWith(StrOut)) {
-                int Pos = Val.LastIndexOf(StrOut);
-                script.Replace(StrOut, StrPost, Pos, script.Length - Pos);
-            }
-        }
+        //public void DitherOut(bool rawOutput) {
+        //    string StrPost = "DitherPost()";
+        //    string StrOut = "Dither_out()";
+        //    string Val = Script.TrimEnd('\r', '\n', ' ');
+        //    if (rawOutput && Val.EndsWith(StrPost)) {
+        //        int Pos = Val.LastIndexOf(StrPost);
+        //        script.Replace(StrPost, StrOut, Pos, script.Length - Pos);
+        //    } else if (!rawOutput && Val.EndsWith(StrOut)) {
+        //        int Pos = Val.LastIndexOf(StrOut);
+        //        script.Replace(StrOut, StrPost, Pos, script.Length - Pos);
+        //    }
+        //}
 
         public void LoadPluginDll(string fileName) {
             AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
@@ -132,15 +132,20 @@ namespace Business {
             AppendLine(@"AviSource(file, audio={0}, pixel_type=""YV12"")", audio);
         }
 
-        public void OpenDirect(string fileName, string cacheFile, bool audio, bool highBitDepth, bool multiThreaded) {
-            LoadPluginDll(highBitDepth ? "ffms2-10bit.dll" : "ffms2.dll");
+        public void OpenDirect(string fileName, string cacheFile, bool audio, int threads) {
+            //LoadPluginDll("ffms2.dll");
+            //AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
+            //AppendLine("FFVideoSource(file{0}{1})",
+            //    string.IsNullOrEmpty(cacheFile) ? ", cache=false" : string.Format(@", cachefile=""{0}""", cacheFile),
+            //    multiThreaded ? ", threads=1" : "");
+            //if (audio)
+            //    AppendLine("AudioDub(FFAudioSource(file, cache=false))");
+
+            LoadPluginDll("LSMASHSource.dll");
             AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
-            AppendLine("FFVideoSource(file{0}{1}{2})",
-                string.IsNullOrEmpty(cacheFile) ? ", cache=false" : string.Format(@", cachefile=""{0}""", cacheFile),
-                highBitDepth ? ", enable10bithack=true" : "",
-                multiThreaded ? ", threads=1" : "");
+            AppendLine("LWLibavVideoSource(file, cache=false{0})", threads > 0 ? ", threads=" + threads.ToString() : "");
             if (audio)
-                AppendLine("AudioDub(FFAudioSource(file, cache=false))");
+                AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
