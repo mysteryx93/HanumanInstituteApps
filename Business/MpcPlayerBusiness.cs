@@ -23,7 +23,7 @@ namespace Business {
         private MPC apiAccess = new MPC();
         private ProcessWatcher watcher;
         public Media CurrentVideo { get; set; }
-        private bool isAutoPitchEnabled;
+        public bool IsAutoPitchEnabled { get; set; }
         private string customFileName;
         private double position;
         private DateTime lastStartTime;
@@ -179,7 +179,7 @@ namespace Business {
 
         public async Task PlayVideoAsync(Media video, bool enableAutoPitch) {
             CurrentVideo = video;
-            isAutoPitchEnabled = enableAutoPitch;
+            IsAutoPitchEnabled = enableAutoPitch;
             customFileName = null;
             TimerGetPositionEnabled = false;
             position = 0;
@@ -198,7 +198,7 @@ namespace Business {
         /// <param name="fileName">The path of the file to play.</param>
         public async Task PlayVideoAsync(string fileName) {
             CurrentVideo = new Media() { };
-            isAutoPitchEnabled = false;
+            IsAutoPitchEnabled = false;
             customFileName = fileName;
             TimerGetPositionEnabled = false;
             position = 0;
@@ -213,7 +213,7 @@ namespace Business {
 
         private string MediaFileName {
             get {
-                return customFileName != null ? customFileName : isAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+                return customFileName != null ? customFileName : IsAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
             }
         }
 
@@ -265,15 +265,15 @@ namespace Business {
         /// </summary>
         private async void timerGetPosition_Tick(object sender, EventArgs e) {
             if (TimerGetPositionEnabled) {
-                if ((CurrentVideo.EndPos.HasValue && position > CurrentVideo.EndPos && !IgnorePos) || position > CurrentVideo.Length - 1) {
+                if ((EndPos.HasValue && position > EndPos && !IgnorePos) || position > CurrentVideo.Length - 1) {
                     // End position reached.
                     if (PlayNext != null) {
                         PlayNext(this, new EventArgs());
                         return;
                     }
-                } else if (restorePosition == 0 && position < 10 && CurrentVideo.StartPos.HasValue && CurrentVideo.StartPos > 10 && position < CurrentVideo.StartPos && !IgnorePos) {
+                } else if (restorePosition == 0 && position < 10 && StartPos.HasValue && StartPos > 10 && position < StartPos && !IgnorePos) {
                     // Skip to start position.
-                    restorePosition = CurrentVideo.StartPos.Value;
+                    restorePosition = StartPos.Value;
                 }
 
                 if (restorePosition > 0) {
@@ -308,6 +308,30 @@ namespace Business {
         private void timerDisablePosTimeout_Tick(object sender, EventArgs e) {
             timerDisablePosTimeout.Stop();
             timerGetPositionEnabledInternal = true;
+        }
+
+        /// <summary>
+        /// Returns the current video's start position, taking into account the slowdown when playing at 432hz.
+        /// </summary>
+        public short? StartPos {
+            get {
+                if (CurrentVideo != null && CurrentVideo.StartPos != null)
+                    return (short)((double)CurrentVideo.StartPos.Value * 440 / 432);
+                else
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current video's end position, taking into account the slowdown when playing at 432hz.
+        /// </summary>
+        public short? EndPos {
+            get {
+                if (CurrentVideo != null && CurrentVideo.EndPos != null)
+                    return (short)((double)CurrentVideo.EndPos.Value * 440 / 432);
+                else
+                    return null;
+            }
         }
     }
 }

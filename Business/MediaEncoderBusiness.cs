@@ -268,6 +268,10 @@ namespace Business {
 
             if (settings.FrameDouble > 0) {
                 string FinalResize = string.Format("fWidth={0}, fHeight={1}", settings.OutputWidth + settings.CropAfter.Left + settings.CropAfter.Right, settings.OutputHeight + settings.CropAfter.Top + settings.CropAfter.Bottom);
+                int Passes = settings.SuperResDoublePass ? 2 : 1;
+                float Strength = settings.SuperResStrength / 100f / Passes;
+                if (Strength > 1)
+                    Strength = 1;
 
                 if (settings.UpscaleMethod == UpscaleMethods.NNedi3) {
                     if (IsYV24) {
@@ -282,7 +286,8 @@ namespace Business {
                         string DoubleScript = string.Format("edi_rpow2(2, nns=4, {0}, Threads=2)",
                             i < settings.FrameDouble - 1 ? @"cshift=""Spline16Resize""" : @"cshift=""Bicubic"", a1=0, a2=.75, " + FinalResize);
                         if (settings.SuperRes) {
-                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes(2, .42, 0, """"""{0}""""""{1})", DoubleScript,
+                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4})", 
+                                Passes, Strength, settings.SuperResSoftness / 100f, DoubleScript,
                                 i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "");                                
                         } else
                             Script.AppendLine(DoubleScript);
@@ -290,15 +295,10 @@ namespace Business {
                             ApplyInterFrame(Script, settings, CPU);
                     }
                 } else {
-                    int Passes = settings.SuperResDoublePass ? 2 : 1;
-                    float Strength = settings.SuperResStrength / 100f / Passes;
-                    if (Strength > 1)
-                        Strength = 1;
-
                     for (int i = 0; i < settings.FrameDouble; i++) {
                         if (settings.SuperRes) {
-                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperResXBR({0}, {1}, XbrStr={2}, XbrSharp={3}{4}{5})",
-                                Passes, Strength,
+                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperResXBR({0}, {1}, {2}, XbrStr={3}, XbrSharp={4}{5}{6})",
+                                Passes, Strength, settings.SuperResSoftness / 100f,
                                 settings.SuperXbrStrength / 10f, settings.SuperXbrSharpness / 10f,
                                 i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "",
                                 i == settings.FrameDouble - 1 ? ", " + FinalResize : "");
@@ -367,9 +367,9 @@ namespace Business {
                     NewNum = 120; // 120000;
                     NewDen = 1; // 1001;
                 }
-                Script.AppendLine(@"InterFrame(Cores={0}{1}, NewNum={2}, NewDen={3}{4})", CPU, 
+                Script.AppendLine(@"InterFrame(Cores={0}{1}, NewNum={2}, NewDen={3}, GPU=true)", CPU, 
                     settings.IncreaseFrameRateSmooth ? @", Tuning=""Smooth""" : "",
-                    NewNum, NewDen, Settings.SavedFile.EnableMadVR ? ", GPU=true" : "");
+                    NewNum, NewDen);
             }
         }
         
@@ -602,7 +602,7 @@ namespace Business {
         }
 
         private Process Getx264Process() {
-            return Process.GetProcessesByName("x264").FirstOrDefault();
+            return Process.GetProcessesByName("ffmpeg").FirstOrDefault();
         }
 
         /// <summary>

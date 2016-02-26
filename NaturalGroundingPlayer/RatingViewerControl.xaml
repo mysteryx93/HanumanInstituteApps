@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Business="clr-namespace:Business;assembly=Business" 
-             mc:Ignorable="d" Height="218" Width="176" FocusManager.IsFocusScope="True" KeyboardNavigation.TabNavigation="Local">
+             mc:Ignorable="d" Height="218" Width="176" KeyboardNavigation.TabNavigation="Local">
     <Control.Resources>
         <Business:RatingConverter x:Key="RatingConverter"/>
     </Control.Resources>
@@ -29,7 +29,7 @@
         <TextBlock x:Name="Custom1Text" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" FontWeight="Bold" Margin="90,130,0,0" />
         <TextBlock x:Name="Custom2Text" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" FontWeight="Bold" Margin="90,150,0,0" />
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="73" Height="16" Margin="0,192,0,0" Text="Preference"></TextBlock>
-        <TextBox x:Name="PreferenceText" HorizontalAlignment="Left" Height="23" Margin="90,190,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Video.Preference, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="1" Background="White" IsEnabled="False" FontWeight="Bold" Opacity="0.6"/>
+        <TextBox x:Name="PreferenceText" HorizontalAlignment="Left" Height="23" Margin="90,190,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Video.Preference, Converter={StaticResource RatingConverter}, ConverterParameter=10, Mode=TwoWay}" TabIndex="1" Background="White" IsEnabled="False" FontWeight="Bold" Opacity="0.6"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Intensity" VerticalAlignment="Top" Width="73" Height="16" Margin="1,170,0,0"/>
         <TextBlock x:Name="IntensityText" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" FontWeight="Bold" Margin="90,170,0,0" />
     </Grid>

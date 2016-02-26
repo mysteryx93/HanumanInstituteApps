@@ -14,7 +14,7 @@
         <ListView x:Name="VideosView" TabIndex="10" SelectedValuePath="MediaId" ButtonBase.Click="VideosView_ColumnHeaderClick" SelectionChanged="VideosView_SelectionChanged">
             <ListView.View>
                 <GridView x:Name="ListGridView">
-                    <GridViewColumn x:Name="SelectionColumn" Width="26">
+                    <GridViewColumn x:Name="SelectionColumn" Width="27">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox Tag="{Binding VideoId}" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsSelected}" />

@@ -143,8 +143,8 @@ namespace Business {
                 DownloadItem VideoDownload = GetNextVideoDownloading();
                 if (VideoDownload == null) {
                     if (playMode == PlayerMode.Manual && nextVideo == null) {
-                        if (player.CurrentVideo != null && player.CurrentVideo.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
-                            await player.SetPositionAsync(player.CurrentVideo.StartPos.HasValue ? player.CurrentVideo.StartPos.Value : 0);
+                        if (player.CurrentVideo != null && player.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
+                            await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0);
                     } else {
                         // Play next video if it is not downloading.
                         if (PlayMode == PlayerMode.Normal) {
@@ -156,13 +156,13 @@ namespace Business {
                 } else {
                     // If next video still downloading, restart current video.
                     // This method will be called again once download is completed.
-                    if (player.CurrentVideo != null && player.CurrentVideo.StartPos.HasValue && !player.IgnorePos)
-                        await player.SetPositionAsync(player.CurrentVideo.StartPos.Value);
+                    if (player.CurrentVideo != null && player.StartPos.HasValue && !player.IgnorePos)
+                        await player.SetPositionAsync(player.StartPos.Value);
                     if (PlaylistChanged != null)
                         PlaylistChanged(this, new EventArgs());
                 }
-            } else if (player.CurrentVideo != null && player.CurrentVideo.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
-                await player.SetPositionAsync(player.CurrentVideo.StartPos.HasValue ? player.CurrentVideo.StartPos.Value : 0);
+            } else if (player.CurrentVideo != null && player.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
+                await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0);
         }
 
         /// <summary>

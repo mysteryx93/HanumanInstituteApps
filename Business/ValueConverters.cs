@@ -51,16 +51,24 @@ namespace Business {
     }
 
     /// <summary>
-    /// Converts ratings such as '9.5'. Parameter specifies the maximum value, which is 10 if not specified.
+    /// Converts ratings such as '9.5'. Parameter is maximum allowed value.
     /// </summary>
     [ValueConversion(typeof(double?), typeof(String))]
     public class RatingConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            double? MaxValue = null;
+            double MaxValueOut;
+            if (parameter != null) {
+                double.TryParse(parameter.ToString(), out MaxValueOut);
+                MaxValue = MaxValueOut;
+            }
+
             double? DecValue = value as double?;
             if (DecValue == null)
                 return "";
             else
-                return DecValue.Value.ToString("0.0");
+                // Display the digit for up to 10 for Height and Depth, and up to 100 for Power.
+                return DecValue.Value.ToString(DecValue < (MaxValue == 10 ? 10 : 100) ? "0.0" : "0");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -69,11 +77,15 @@ namespace Business {
                 return null;
             else {
                 double Result = 0;
-                double MaxValue = 10;
-                if (parameter != null)
-                    double.TryParse(parameter.ToString(), out MaxValue);
-                if (double.TryParse(strValue, out Result) && Result >= 0 && Result <= MaxValue)
-                    return (double)Math.Round(Result, 1);
+                double? MaxValue = null;
+                double MaxValueOut;
+                if (parameter != null) {
+                    double.TryParse(parameter.ToString(), out MaxValueOut);
+                    MaxValue = MaxValueOut;
+                }
+
+                if (double.TryParse(strValue, out Result) && Result >= 0 && (!MaxValue.HasValue || Result <= MaxValue))
+                    return (double)Math.Round(Result, Result < 100 ? 1 : 0); // Allow digit only for up to 100.
                 else
                     return null;
             }
@@ -88,6 +100,8 @@ namespace Business {
             Color Result = Color.FromRgb(0, 0, 0);
             double? DecValue = value as double?;
             if (DecValue != null) {
+                if (DecValue > 10)
+                    DecValue = 10;
                 double Hue = (11 - DecValue.Value) / 11 * .5f;
                 Result = HSBtoRGB(Hue, 1, .7f);
             }

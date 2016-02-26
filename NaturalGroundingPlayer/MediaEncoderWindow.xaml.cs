@@ -149,10 +149,11 @@ namespace NaturalGroundingPlayer {
             }
         }
 
-        private async void PreviewMpcButton_Click(object sender, RoutedEventArgs e) {
+        private void PreviewMpcButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
                 business.GenerateScript(encodeSettings, false, true);
-                await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
+                // await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
+                MpcConfigBusiness.StartMpc(Settings.TempFilesPath + "Preview.avs");
             }
         }
 

@@ -83,7 +83,7 @@ namespace NaturalGroundingPlayer {
             RatingConverter Conv = new RatingConverter();
             RatingToColorConverter ColorConv = new RatingToColorConverter();
             double? Value = rating.GetValue(ratio);
-            obj.Text = Conv.Convert(Value, typeof(string), null, null).ToString();
+            obj.Text = Conv.Convert(Value, typeof(string), -1, null).ToString();
             obj.Foreground = (SolidColorBrush)ColorConv.Convert(Value, typeof(SolidColorBrush), null, null);
         }
 

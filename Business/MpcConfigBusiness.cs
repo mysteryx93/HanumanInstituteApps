@@ -171,8 +171,17 @@ namespace Business {
             }
         }
 
-        private static string FixBlackListLine(string line) {
-            return line;
+        /// <summary>
+        /// Starts a MPC process without hooking into it.
+        /// </summary>
+        /// <param name="fileName">The video file to open.</param>
+        public static void StartMpc(string fileName) {
+            if (!string.IsNullOrEmpty(Settings.SavedFile.MpcPath) && File.Exists(Settings.SavedFile.MpcPath)) {
+                Process P = new Process();
+                P.StartInfo.FileName = Settings.SavedFile.MpcPath;
+                P.StartInfo.Arguments = "\"" + fileName + "\"";
+                P.Start();
+            }
         }
 
         /// <summary>

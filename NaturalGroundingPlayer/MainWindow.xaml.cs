@@ -135,14 +135,15 @@ namespace NaturalGroundingPlayer {
                         // Min/Max Values.
                         SearchRatingSetting MinFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.GreaterOrEqual, Math.Round(MaxCond - ToleranceSlider.Value, 1));
                         SearchRatingSetting MaxFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.Smaller, Math.Round(MaxCond, 1));
-                        Filters.Add(MinFilter);
-                        Filters.Add(MaxFilter);
                         if (PolarityFocus.Text == "Intensity" && MaxCond == IntensitySlider.Maximum - 1)
                             MaxFilter.Value = IntensitySlider.Maximum;
                         if (e.IncreaseTolerance) {
                             MinFilter.Value -= .5f;
                             MaxFilter.Value += .5f;
                         }
+                        Filters.Add(MinFilter);
+                        if (MaxFilter.Value < IntensitySlider.Maximum) // When at max heat, don't limit greater values
+                            Filters.Add(MaxFilter);
                         if (PolarityFocus.Text == "Physical" || PolarityFocus.Text == "Emotional" || PolarityFocus.Text == "Spiritual") {
                             // Don't get videos that are more than .5 stronger on other values.
                             Filters.Add(new SearchRatingSetting("!" + PolarityFocus.Text, OperatorConditionEnum.Smaller, MaxFilter.Value + .5f));
@@ -207,13 +208,10 @@ namespace NaturalGroundingPlayer {
                     case PlayerMode.SpecialRequest:
                     case PlayerMode.Water:
                         double MaxCond = IntensitySlider.Value;
-                        bool IsMaxIntensity = false;
-                        if (((RatingCategory)PolarityFocus.SelectedItem).Name == "Intensity") {
-                            if (MaxCond == IntensitySlider.Maximum)
-                                IsMaxIntensity = true;
+                        bool IsMaxIntensity = (MaxCond == IntensitySlider.Maximum);
+                        if (((RatingCategory)PolarityFocus.SelectedItem).Name == "Intensity")
                             MaxCond -= 1;
-                        }
-                        IntensitySliderValue.Text = string.Format("{0:0.0} - {1:0.0}", MaxCond - ToleranceSlider.Value, IsMaxIntensity ? IntensitySlider.Maximum : MaxCond);
+                        IntensitySliderValue.Text = string.Format("{0:0.0} - {1:0.0}{2}", MaxCond - ToleranceSlider.Value, IsMaxIntensity ? IntensitySlider.Maximum : MaxCond, IsMaxIntensity ? "+" : "");
                         break;
                     case PlayerMode.WarmPause:
                         IntensitySliderValue.Text = "Warm Pause";

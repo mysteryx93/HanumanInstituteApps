@@ -134,7 +134,7 @@
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <CheckBox x:Name="SuperResDoublePass" Content="2 passes" HorizontalAlignment="Left" Margin="230,271,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" IsChecked="{Binding SuperResDoublePass}" TabIndex="38"/>
+                    <CheckBox x:Name="SuperResDoublePass" Content="SuperRes Pass 2" HorizontalAlignment="Left" Margin="258,251,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" IsChecked="{Binding SuperResDoublePass}" TabIndex="38"/>
                     <TextBlock HorizontalAlignment="Left" Margin="10,295,0,0" Text="Output Height" VerticalAlignment="Top"/>
                     <TextBox HorizontalAlignment="Left" Height="23" Margin="91,7,0,0" VerticalAlignment="Top" Width="75" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="10">
                         <Binding Path="SourceWidth" TargetNullValue="">
@@ -198,6 +198,14 @@
                     <RadioButton x:Name="UpscaleOptionSuperXBR" Content="Super-xBR Strength (0-50)" HorizontalAlignment="Left" Margin="7,231,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod" IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.SuperXbr}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="32" />
                     <RadioButton x:Name="UpscaleOptionNNEDI3" Content="NNEDI3" HorizontalAlignment="Left" Margin="7,251,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod"  IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.NNedi3}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="35" />
                     <CheckBox x:Name="SuperResCheckbox" Content="SuperRes Strength (0-200)" HorizontalAlignment="Left" Margin="7,271,0,0" VerticalAlignment="Top" IsChecked="{Binding SuperRes}" TabIndex="36"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="315,267,0,0" VerticalAlignment="Top" Width="50" TabIndex="34" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <Binding Path="SuperResSoftness" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <Business:NumericRangeRule Min="0" Max="100" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox>
+                    <TextBlock HorizontalAlignment="Left" Margin="223,270,0,0" VerticalAlignment="Top"><Run Text="Softness"/><Run Text=" (0-"/><Run Text="1"/><Run Text="00"/><Run Text=")"/><Run Text=" "/></TextBlock>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabEncoding" Header="Encoding" TabIndex="6">

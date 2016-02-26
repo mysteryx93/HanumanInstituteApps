@@ -5,9 +5,12 @@ namespace Business {
         bool AllowClose { get; set; }
         void Close();
         DataAccess.Media CurrentVideo { get; set; }
+        bool IsAutoPitchEnabled { get; set; }
         bool IsPlaying { get; }
         bool IsAvailable { get; }
         bool IgnorePos { get; set; }
+        short? StartPos { get; }
+        short? EndPos { get; }
         event EventHandler NowPlaying;
         event EventHandler Pause;
         event EventHandler PlayNext;

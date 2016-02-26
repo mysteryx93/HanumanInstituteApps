@@ -77,6 +77,7 @@ namespace Business {
         public bool SuperRes { get; set; }
         public bool SuperResDoublePass { get; set; }
         public int SuperResStrength { get; set; }
+        public int SuperResSoftness { get; set; }
         private bool crop;
         public bool Crop {
             get { return crop; }

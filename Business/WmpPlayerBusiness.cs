@@ -19,7 +19,7 @@ namespace Business {
 
         public IMediaPlayerControl player;
         public Media CurrentVideo { get; set; }
-        private bool isAutoPitchEnabled;
+        public bool IsAutoPitchEnabled { get; set; }
         public bool IsVisible;
         private double position;
         private DateTime lastStartTime;
@@ -133,7 +133,7 @@ namespace Business {
 
         public async Task PlayVideoAsync(Media video, bool enableAutoPitch) {
             this.CurrentVideo = video;
-            this.isAutoPitchEnabled = enableAutoPitch;
+            this.IsAutoPitchEnabled = enableAutoPitch;
             timerGetPositionEnabled = false;
             position = 0;
             lastStartTime = DateTime.Now;
@@ -149,7 +149,7 @@ namespace Business {
         private string MediaFileName {
             get {
                 // customFileName != null ? customFileName : 
-                return isAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+                return IsAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
             }
         }
 
@@ -193,15 +193,15 @@ namespace Business {
         /// </summary>
         private void timerGetPosition_Tick(object sender, EventArgs e) {
             if (timerGetPositionEnabled) {
-                if ((CurrentVideo.EndPos.HasValue && position > CurrentVideo.EndPos && !IgnorePos) || position > CurrentVideo.Length - 1) {
+                if ((EndPos.HasValue && position > EndPos && !IgnorePos) || position > CurrentVideo.Length - 1) {
                     // End position reached.
                     if (PlayNext != null) {
                         //timerGetPositionEnabled = false;
                         player.Dispatcher.Invoke(() => PlayNext(this, new EventArgs()));
                     }
-                } else if (restorePosition == 0 && CurrentVideo.StartPos.HasValue && CurrentVideo.StartPos > 10 && position < CurrentVideo.StartPos && !IgnorePos) {
+                } else if (restorePosition == 0 && StartPos.HasValue && StartPos > 10 && position < StartPos && !IgnorePos) {
                     // Skip to start position.
-                    restorePosition = CurrentVideo.StartPos.Value;
+                    restorePosition = StartPos.Value;
                 }
 
                 if (restorePosition > 0) {
@@ -234,5 +234,29 @@ namespace Business {
 
         #endregion
 
+
+        /// <summary>
+        /// Returns the current video's start position, taking into account the slowdown when playing at 432hz.
+        /// </summary>
+        public short? StartPos {
+            get {
+                if (CurrentVideo != null && CurrentVideo.StartPos != null)
+                    return (short)((double)CurrentVideo.StartPos.Value * 440 / 432);
+                else
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current video's end position, taking into account the slowdown when playing at 432hz.
+        /// </summary>
+        public short? EndPos {
+            get {
+                if (CurrentVideo != null && CurrentVideo.EndPos != null)
+                    return (short)((double)CurrentVideo.EndPos.Value * 440 / 432);
+                else
+                    return null;
+            }
+        }
     }
 }
