@@ -16,6 +16,7 @@ using Business;
 using DataAccess;
 using System.ComponentModel;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -28,32 +29,33 @@ namespace NaturalGroundingPlayer {
         public EditPlaylistBusiness business = new EditPlaylistBusiness();
         public IMediaPlayerBusiness player;
         public SearchSettings Settings { get; set; }
+        public SearchFilterEnum SearchGroupType { get; set; } = SearchFilterEnum.Artist;
         public bool IsolatedPlayer { get; set; }
-        public bool PopupEnabled { get; set; }
-        public bool IsPreferenceVisible { get; set; }
-        public bool IsIntensityVisible { get; set; }
-        public bool IsCustomVisible { get; set; }
-        public bool IsStatusVisible { get; set; }
+        public bool PopupEnabled { get; set; } = true;
+        public bool IsPreferenceVisible { get; set; } = true;
+        public bool IsIntensityVisible { get; set; } = true;
+        public bool IsCustomVisible { get; set; } = true;
+        public bool IsStatusVisible { get; set; } = false;
         public bool DisableLoadData { get; set; }
-        public bool AllowMultiSelect { get; set; }
+        public bool AllowMultiSelect { get; set; } = false;
         public bool IsLoading { get; private set; }
+        public bool IsDetailView { get; set; }
+        public UIElement FocusControl { get; set; }
         private bool isFormLoaded = false;
         public event EventHandler DataLoaded;
         public event EventHandler ItemDoubleClick;
         public event EventHandler SelectionChanged;
+        private Storyboard StoryboardOpenDetail;
+        private Storyboard StoryboardCloseDetail;
 
         public MediaGrid() {
             InitializeComponent();
             Settings = new SearchSettings();
-            PopupEnabled = true;
-            IsPreferenceVisible = true;
-            IsIntensityVisible = true;
-            IsCustomVisible = true;
-            IsStatusVisible = false;
-            AllowMultiSelect = false;
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e) {
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e) {
+            StoryboardOpenDetail = (Storyboard)FindResource("StoryboardOpenDetail");
+            StoryboardCloseDetail = (Storyboard)FindResource("StoryboardCloseDetail");
             if (!IsPreferenceVisible)
                 ListGridView.Columns.Remove(PreferenceColumn);
             if (!IsIntensityVisible)
@@ -65,10 +67,6 @@ namespace NaturalGroundingPlayer {
             if (!IsStatusVisible)
                 ListGridView.Columns.Remove(StatusColumn);
             VideosView.SelectionMode = AllowMultiSelect ? SelectionMode.Multiple : SelectionMode.Single;
-
-            // Grid column width does not include zoom.
-            double ColWidth = ListGridView.Columns.Where(c => c != TitleColumn).Sum(c => c.ActualWidth);
-            TitleColumn.Width = (this.ActualWidth / Business.Settings.Zoom) - ColWidth - 28 * Business.Settings.Zoom;
 
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
@@ -82,10 +80,18 @@ namespace NaturalGroundingPlayer {
                 player.AllowClose = true;
             }
 
+            // Bind to parent window
+            Window.GetWindow(this).PreviewKeyDown += Window_PreviewKeyDown;
+            // Bind to search box.
+            var ParentBoxes = Window.GetWindow(this).FindVisualChildren<TextBox>();
+            if (FocusControl == null && ParentBoxes.Count() > 0)
+                FocusControl = ParentBoxes.First();
             // Bind PreviewKeyDown to every TextBox on the page.
-            foreach (TextBox item in Window.GetWindow(this).FindVisualChildren<TextBox>()) {
+            foreach (TextBox item in ParentBoxes) {
                 item.PreviewKeyDown += SearchTextControl_PreviewKeyDown;
             }
+
+            await LoadCategoriesAsync();
 
             isFormLoaded = true;
         }
@@ -97,7 +103,10 @@ namespace NaturalGroundingPlayer {
 
         public VideoListItem SelectedItem {
             get {
-                return (VideoListItem)VideosView.SelectedItem;
+                if (IsDetailView)
+                    return (VideoListItem)VideosView.SelectedItem;
+                else
+                    return null;
             }
         }
 
@@ -105,12 +114,25 @@ namespace NaturalGroundingPlayer {
             if (DisableLoadData)
                 return;
 
+            // Searching automatically opens details view.
+            //if (!string.IsNullOrEmpty(Settings.Search) && !IsDetailView) {
+            //    CategoriesList.SelectedIndex = 0; // All
+            //}
+
             // Make sure UserControl_Loaded is completed.
             while (!isFormLoaded) {
                 await Task.Delay(50);
             }
 
             IsLoading = true;
+            if (IsDetailView)
+                await LoadDetailsAsync();
+            else
+                await LoadCategoriesAsync();
+            IsLoading = false;
+        }
+
+        public async Task LoadDetailsAsync() {
             if (lastHeaderClicked == StatusColumn)
                 Settings.OrderBy = "Artist";
             else if (lastHeaderClicked.DisplayMemberBinding != null)
@@ -119,10 +141,36 @@ namespace NaturalGroundingPlayer {
                 Settings.OrderBy = lastHeaderClicked.HeaderStringFormat;
             Settings.OrderByDirection = lastDirection;
             await business.LoadPlaylistAsync(Settings, true);
-            if (DataLoaded != null)
-                DataLoaded(this, null);
+            DataLoaded?.Invoke(this, null);
             DisplayData();
-            IsLoading = false;
+        }
+
+        public async Task ManualLoadPlaylist() {
+            await business.LoadPlaylistAsync(Settings, true);
+        }
+
+        public async Task LoadCategoriesAsync() {
+            int CurrentSelection = CategoriesList.SelectedIndex;
+            CategoriesList.ItemsSource = await business.LoadCategoriesAsync(Settings, SearchGroupType);
+
+            // Find separator position.
+            int Pos = 0;
+            foreach (SearchCategoryItem item in CategoriesList.ItemsSource) {
+                if (item.FilterType == SearchFilterEnum.None)
+                    break;
+                else
+                    Pos++;
+            }
+            // First category item is right after separator.
+            Pos++;
+
+            // Maintain selection.
+            if (CurrentSelection < Pos)
+                CategoriesList.SelectedIndex = (CategoriesList.Items.Count > Pos) ? Pos : 0;
+            else if (CurrentSelection < CategoriesList.Items.Count)
+                CategoriesList.SelectedIndex = CurrentSelection;
+            else
+                CategoriesList.SelectedIndex = CategoriesList.Items.Count - 1;
         }
 
         public void Clear() {
@@ -135,6 +183,17 @@ namespace NaturalGroundingPlayer {
         }
 
         private void DisplayData() {
+            // Display custom column header when custom rating is selected.
+            bool HasCustom = !string.IsNullOrEmpty(Settings.CustomColumn); // && business.Playlist.Where(v => v.Custom != null).Any());
+            CustomColumn.Header = HasCustom ? business.GetRatingInitials(Settings.CustomColumn) : "";
+            CustomColumn.Width = HasCustom ? 35 : 0;
+
+            // Auto-adjust title column width.
+            double ColWidth = ListGridView.Columns.Where(c => c != TitleColumn).Sum(c => c.ActualWidth);
+            // The last part is to adjust so that it fits with either 100% or 150% zoom
+            TitleColumn.Width = VideosView.ActualWidth - ColWidth - 28;
+            // TitleColumn.Width = (VideosView.ActualWidth / Business.Settings.Zoom) - ColWidth - 28 * Math.Pow(Business.Settings.Zoom, 1.5);
+
             int CurrentSelection = VideosView.SelectedIndex;
             // Sort after loading for Status column.
             List<VideoListItem> SortList = business.Playlist;
@@ -145,12 +204,6 @@ namespace NaturalGroundingPlayer {
                     SortList = SortList.OrderByDescending(v => v.StatusText).ToList();
             }
             VideosView.ItemsSource = SortList;
-
-            // Display custom column header when custom rating is selected.
-            if (string.IsNullOrEmpty(Settings.RatingCategory) || business.Playlist.Where(v => v.Custom != null).Any() == false)
-                CustomColumn.Header = "";
-            else
-                CustomColumn.Header = business.GetRatingInitials(Settings.RatingCategory);
 
             // Maintain selection.
             if (!AllowMultiSelect) {
@@ -241,11 +294,26 @@ namespace NaturalGroundingPlayer {
         }
 
         private void SearchTextControl_PreviewKeyDown(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Down && VideosView.SelectedIndex < VideosView.Items.Count)
-                VideosView.SelectedIndex += 1;
-            if (e.Key == Key.Up && VideosView.SelectedIndex > 0)
-                VideosView.SelectedIndex -= 1;
-            VideosView.ScrollIntoView(VideosView.SelectedItem);
+            ListBox Obj = IsDetailView ? VideosView : CategoriesList;
+            if (e.Key == Key.Down && Obj.SelectedIndex < Obj.Items.Count)
+                Obj.SelectedIndex += 1;
+            if (e.Key == Key.Up && Obj.SelectedIndex > 0)
+                Obj.SelectedIndex -= 1;
+            Obj.ScrollIntoView(Obj.SelectedItem);
+        }
+
+        /// <summary>
+        /// Show details when pressing Enter, close when pressing Escape.
+        /// </summary>
+        private async void Window_PreviewKeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter && !IsDetailView) {
+                e.Handled = true;
+                await ShowDetailsAsync();
+            }
+            if (e.Key == Key.Escape && IsDetailView && !IsLoading) {
+                e.Handled = true;
+                await CloseDetailsAsync();
+            }
         }
 
         public int PlayListCount {
@@ -255,6 +323,105 @@ namespace NaturalGroundingPlayer {
                 else
                     return 0;
             }
+        }
+
+        private async void CategoriesList_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            await ShowDetailsAsync();
+        }
+
+        /// <summary>
+        /// Shows the details view.
+        /// </summary>
+        public async Task ShowDetailsAsync() {
+            if (CategoriesList.SelectedIndex < 0)
+                return;
+
+            SearchCategoryItem Item = CategoriesList.SelectedItem as SearchCategoryItem;
+            if (Item.FilterType == SearchFilterEnum.None)
+                return;
+
+            if (Item.FilterValue == null && (Item.FilterType == SearchFilterEnum.Artist || Item.FilterType == SearchFilterEnum.Category || Item.FilterType == SearchFilterEnum.Element)) {
+                // Change category group type.
+                SearchGroupType = Item.FilterType;
+                await LoadCategoriesAsync();
+            } else {
+                // Open details view.
+                IsDetailView = true;
+                Settings.IsInDatabase = (Item.FilterType != SearchFilterEnum.Files);
+
+                bool HasArtistColumn = (Item.FilterType != SearchFilterEnum.Artist || Item.FilterValue == "") && Item.FilterType != SearchFilterEnum.Files;
+                ArtistColumn.Width = HasArtistColumn ? 100 : 0;
+                Settings.FilterType = Item.FilterType;
+                Settings.FilterValue = Item.FilterValue;
+                Settings.DisplayCustomRating = (Item.FilterType == SearchFilterEnum.Element) ? Item.FilterValue : null;
+
+                if (VideosView.HasItems) {
+                    VideosView.SelectedIndex = 0;
+                    VideosView.ScrollIntoView(VideosView.Items[0]);
+                }
+                await LoadDataAsync();
+                StoryboardOpenDetail.Seek(this, TimeSpan.Zero, TimeSeekOrigin.BeginTime);
+                StoryboardOpenDetail.Begin();
+                ShowCategoryLabel();
+            }
+        }
+
+        private void ShowCategoryLabel() {
+            // Get selected item rectangle.
+            ListBoxItem SelectedItem = CategoriesList.ItemContainerGenerator.ContainerFromIndex(CategoriesList.SelectedIndex) as ListBoxItem;
+            if (SelectedItem == null || !IsItemVisible(SelectedItem, CategoriesList)) {
+                int VisibleItemIndex = (int)CategoriesList.FindVisualChildren<VirtualizingStackPanel>().FirstOrDefault().VerticalOffset;
+                SelectedItem = CategoriesList.ItemContainerGenerator.ContainerFromIndex(VisibleItemIndex) as ListBoxItem;
+            }
+
+            Point transform = SelectedItem.TransformToVisual(GridCategories).Transform(new Point());
+            System.Windows.Rect SelectedItemBounds = VisualTreeHelper.GetDescendantBounds(SelectedItem);
+            SelectedItemBounds.Offset(transform.X, transform.Y);
+
+            // Prepare box for display.
+            SelectedCategoryLabel.Content = ((SearchCategoryItem)CategoriesList.SelectedItem).Text;
+            SelectedCategoryLabel.Margin = new Thickness(SelectedItemBounds.Left, SelectedItemBounds.Top, 0, 0);
+            SelectedCategoryLabel.Height = SelectedItemBounds.Bottom - SelectedItemBounds.Top;
+            SelectedCategoryLabel.Width = SelectedItemBounds.Right - SelectedItemBounds.Left;
+        }
+
+        private bool IsItemVisible(FrameworkElement element, FrameworkElement container) {
+            if (!element.IsVisible)
+                return false;
+
+            System.Windows.Rect bounds =
+                element.TransformToAncestor(container).TransformBounds(new System.Windows.Rect(0.0, 0.0, element.ActualWidth, element.ActualHeight));
+            var rect = new System.Windows.Rect(0.0, 0.0, container.ActualWidth, container.ActualHeight);
+            return rect.Contains(bounds.TopLeft) || rect.Contains(bounds.BottomRight);
+        }
+
+        /// <summary>
+        /// Closes the details view.
+        /// </summary>
+        public async Task CloseDetailsAsync() {
+            Settings.Search = "";
+            await LoadCategoriesAsync();
+            IsDetailView = false;
+
+            StoryboardCloseDetail.Seek(this, TimeSpan.Zero, TimeSeekOrigin.BeginTime);
+            StoryboardCloseDetail.Begin();
+            CategoriesList.Focus();
+
+            SelectedCategoryLabel.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// Close details view when clicking on grayed list.
+        /// </summary>
+        private async void CategoriesList_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            if (IsDetailView && !IsLoading) {
+                e.Handled = true;
+                await CloseDetailsAsync();
+            }
+        }
+
+        private void Storyboard_Completed(object sender, EventArgs e) {
+            FocusControl?.Focus();
         }
     }
 }

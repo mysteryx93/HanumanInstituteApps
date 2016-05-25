@@ -28,9 +28,8 @@ namespace NaturalGroundingPlayer {
 
         protected Action callback;
         private WindowHelper helper;
-        private WmpPlayerWindow playerOriginal = new WmpPlayerWindow();
-        private WmpPlayerWindow playerChanges = new WmpPlayerWindow();
-        private MpcPlayerBusiness playerMpc = new MpcPlayerBusiness();
+        private WmpPlayerWindow playerOriginal;
+        private WmpPlayerWindow playerChanges;
         private MediaEncoderSettings encodeSettings = new MediaEncoderSettings();
         private MediaEncoderBusiness business = new MediaEncoderBusiness();
         private bool isBinding = false;
@@ -43,12 +42,18 @@ namespace NaturalGroundingPlayer {
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
             this.DataContext = encodeSettings;
             SettingsTab.Items.CurrentChanging += new CurrentChangingEventHandler(Items_CurrentChanging);
-            playerOriginal.Title = "Original";
-            playerOriginal.WindowState = WindowState.Maximized;
-            playerChanges.Title = "Preview Changes";
-            playerChanges.WindowState = WindowState.Maximized;
-            playerChanges.Player.Player.PositionChanged += Player_PositionChanged;
-            playerMpc.SetPath();
+            if (MediaPlayer.WindowsMediaPlayer.IsWmpInstalled) {
+                playerOriginal = new WmpPlayerWindow();
+                playerOriginal.Title = "Original";
+                playerOriginal.WindowState = WindowState.Maximized;
+                playerChanges = new WmpPlayerWindow();
+                playerChanges.Title = "Preview Changes";
+                playerChanges.WindowState = WindowState.Maximized;
+                playerChanges.Player.Player.PositionChanged += Player_PositionChanged;
+            } else {
+                PreviewOriginalButton.Visibility = Visibility.Hidden;
+                PreviewChangesButton.Visibility = Visibility.Hidden;
+            }
             if (Settings.SavedFile.MediaPlayerApp != MediaPlayerApplication.Mpc)
                 PreviewMpcButton.Visibility = Visibility.Hidden;
             business.EncodingCompleted += business_EncodingCompleted;
@@ -88,7 +93,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Window_Activated(object sender, EventArgs e) {
-            if (playerChanges.Player.Position > 0)
+            if (playerChanges?.Player.Position > 0)
                 encodeSettings.Position = playerChanges.Player.Position;
         }
 
@@ -99,7 +104,7 @@ namespace NaturalGroundingPlayer {
                 ConditionValue = BoolConditionEnum.Yes,
                 RatingCategory = "Height",
                 RatingOperator = OperatorConditionEnum.Smaller
-            }, false);
+            });
             if (Result != null && Result.FileName != null) {
                 ClosePreview();
                 encodeSettings.AutoCalculateSize = false;
@@ -131,11 +136,10 @@ namespace NaturalGroundingPlayer {
         }
 
         public void ClosePreview() {
-            if (playerOriginal.Visibility == Visibility.Visible)
+            if (playerOriginal?.Visibility == Visibility.Visible)
                 playerOriginal.Close();
-            if (playerChanges.Visibility == Visibility.Visible)
+            if (playerChanges?.Visibility == Visibility.Visible)
                 playerChanges.Close();
-            playerMpc.Close();
         }
 
         private async void PreviewOriginalButton_Click(object sender, RoutedEventArgs e) {
@@ -151,8 +155,9 @@ namespace NaturalGroundingPlayer {
 
         private void PreviewMpcButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
-                business.GenerateScript(encodeSettings, false, true);
-                // await playerMpc.PlayVideoAsync(Settings.TempFilesPath + "Preview.avs");
+                // Show cropping borders if WMP isn't available.
+                bool Preview = !MediaPlayer.WindowsMediaPlayer.IsWmpInstalled;
+                business.GenerateScript(encodeSettings, Preview, false);
                 MpcConfigBusiness.StartMpc(Settings.TempFilesPath + "Preview.avs");
             }
         }
@@ -271,12 +276,12 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Codec264Option_Click(object sender, RoutedEventArgs e) {
-            encodeSettings.EncodeQuality = 24;
+            encodeSettings.EncodeQuality = 23;
             encodeSettings.EncodePreset = EncodePresets.veryslow;
         }
 
         private void Codec265Option_Click(object sender, RoutedEventArgs e) {
-            encodeSettings.EncodeQuality = 23;
+            encodeSettings.EncodeQuality = 22;
             encodeSettings.EncodePreset = EncodePresets.medium;
         }
     }

@@ -1,0 +1,7 @@
+1.3.2:
+- Fixed another issue with the YouTube downloader
+- MediaEncoder: Fixed an issue where SuperRes double-pass wasn't applied when upscaling with NNEDI3
+- When playing videos with 432hz auto-tuning, start and end positions are now taking the slowdown into consideration
+- Removed the cap of 10 on ratings as energies can be higher
+- Updated all video ratings of 10 with often values above 10
+- Added many videos to the database

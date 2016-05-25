@@ -61,12 +61,13 @@ namespace NaturalGroundingPlayer {
 
         private async void OkButton_Click(object sender, RoutedEventArgs e) {
             try {
+                OkButton.IsEnabled = false;
                 player.Close();
                 MediaEncoderBusiness business = new MediaEncoderBusiness();
                 if (ReplaceOption.IsChecked.Value) {
-                    await business.FinalizeReplaceAsync(jobInfo);
+                    await Task.Run(() => business.FinalizeReplace(jobInfo));
                 } else if (KeepOption.IsChecked.Value) {
-                    business.FinalizeKeep(jobInfo);
+                    await Task.Run(() => business.FinalizeKeep(jobInfo));
                 }
                 if (ReencodeCheckbox.IsChecked.Value) {
                     MediaEncoderWindow ActiveWindow = SessionCore.Instance.Windows.Current as MediaEncoderWindow;
@@ -90,6 +91,7 @@ namespace NaturalGroundingPlayer {
                 this.Close();
             }
             catch (Exception ex) {
+                OkButton.IsEnabled = true;
                 MessageBox.Show(this, ex.Message, "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

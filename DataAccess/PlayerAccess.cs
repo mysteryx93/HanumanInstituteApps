@@ -41,23 +41,25 @@ namespace DataAccess {
         /// <param name="settings">An object containing various search settings.</param>
         /// <returns>True if video matches conditions, otherwise false.</returns>
         public static bool VideoMatchesConditions(Media video, SearchSettings settings) {
-            using (Entities context = new Entities()) {
-                Media Result = SelectVideo(context.Media.Where(v => v.MediaId == video.MediaId), settings);
-                return (Result != null);
-            }
+            return false;
+            //using (Entities context = new Entities()) {
+            //    Media Result = SelectVideo(context.Media.Where(v => v.MediaId == video.MediaId), settings);
+            //    return (Result != null);
+            //}
         }
 
         /// <summary>
         /// Return a random video from the database matching specified conditions.
         /// </summary>
         /// <param name="playedVideos">The list of videos already played.</param>
-        /// <param name="count">Returns the number of results matching specified conditions.</param>
         /// <param name="settings">An object containing various search settings.</param>
+        /// <param name="count">The quantity of results to return.</param>
+        /// <param name="maintainCurrent">If specified, the currently selected video will be kept.</param>
         /// <returns>The randomly selected video, or null if no matches are found.</returns>
-        public static Media SelectVideo(SearchSettings settings) {
+        public static List<Media> SelectVideo(SearchSettings settings, int count, Media maintainCurrent) {
             using (Entities context = new Entities()) {
                 // context.Database.Log = Console.Write;
-                return SelectVideo(context.Media.Include("MediaRatings.RatingCategory"), settings);
+                return SelectVideo(context.Media.Include("MediaRatings.RatingCategory"), settings, count, maintainCurrent);
             }
         }
 
@@ -66,12 +68,21 @@ namespace DataAccess {
         /// </summary>
         /// <param name="data">The list of videos in which to search; generally Entities.Media.</param>
         /// <param name="settings">An object containing various search settings.</param>
+        /// <param name="count">The quantity of results to return.</param>
+        /// <param name="maintainCurrent">If specified, the currently selected video will be kept.</param>
         /// <returns>The randomly selected video, or null if no matches are found.</returns>
-        public static Media SelectVideo(IQueryable<Media> data, SearchSettings settings) {
+        public static List<Media> SelectVideo(IQueryable<Media> data, SearchSettings settings, int count, Media maintainCurrent) {
             if (settings == null)
                 settings = new SearchSettings();
             if (settings.ExcludeVideos == null)
                 settings.ExcludeVideos = new List<Guid>();
+
+            // Exclude currently selected video so that it doesn't get randomly re-reselected.
+            if (maintainCurrent != null) {
+                settings.ExcludeVideos = new List<Guid>(settings.ExcludeVideos);
+                settings.ExcludeVideos.Add(maintainCurrent.MediaId);
+                count--;
+            }
 
             var Query = (from v in data
                          where (settings.AllowDownloading || v.FileName != null) &&
@@ -85,31 +96,37 @@ namespace DataAccess {
 
             // Return random result
             int TotalFound = 0;
-            Guid? ResultId = SelectRandomId(Query, out TotalFound);
+            List<Guid> ResultId = SelectRandomId(Query, count, out TotalFound);
+            List<Media> Result = new List<Media>();
+            if (maintainCurrent != null)
+                Result.Add(maintainCurrent);
             settings.TotalFound = TotalFound;
-            if (TotalFound == 0 || ResultId == null)
-                return null;
-            else if (TotalFound == 1)
-                return Query.FirstOrDefault();
-            else 
-                return data.Where(v => v.MediaId == ResultId).FirstOrDefault();
+            if (TotalFound > 0 && ResultId.Count() > 0) {
+                if (TotalFound <= count)
+                    Result.AddRange(Query.Take(count).ToList());
+                else
+                    Result.AddRange(data.Where(v => ResultId.Contains(v.MediaId)).ToList());
+            }
+            return Result;
         }
 
         /// <summary>
-        /// Selects a random video from query result while giving higher priority to videos with higher preference.
+        /// Selects random videos from query result while giving higher priority to videos with higher preference.
         /// </summary>
         /// <param name="query">The query returning the list of videos to chose from.</param>
-        /// <returns>A random video ID.</returns>
-        public static Guid? SelectRandomId(IQueryable<Media> query, out int totalFound) {
-            Guid? Result = null;
+        /// <param name="count">The amount of videos to select.</param>
+        /// <param name="totalFound">The total amount of videos matching the query.</param>
+        /// <returns>A list of random videos.</returns>
+        public static List<Guid> SelectRandomId(IQueryable<Media> query, int count, out int totalFound) {
+            List<Guid> Result = new List<Guid>();
 
             // Pull list of ID and Preference from database.
             var IdList = query.Select(v => new { ID = v.MediaId, Preference = v.Preference }).ToList();
             totalFound = IdList.Count();
             if (totalFound == 0)
-                return null;
-            else if (totalFound == 1)
-                return IdList[0].ID;
+                return Result;
+            else if (totalFound <= count)
+                return IdList.Select(v => v.ID).ToList();
 
             // Calculate preferences average and total.
             int PreferenceCount = IdList.Where(v => v.Preference.HasValue).Count();
@@ -122,29 +139,33 @@ namespace DataAccess {
 
 
             // Get a random number between zero and the sum of all the preferences
-            Random rand = new Random();
-            int number = rand.Next(0, PreferenceTotal);
+            for (int i = 0; i < count; i++) {
+                Random rand = new Random();
+                int number = rand.Next(0, PreferenceTotal);
+                int rollingSumOfPreferences = 0;
 
-            int rollingSumOfPreferences = 0;
+                // Select an index from the video list, but weighted by preference
+                foreach (var item in IdList) {
+                    // Add the current item's preference to the rolling sum
+                    if (item.Preference.HasValue)
+                        rollingSumOfPreferences += PreferenceToInt(item.Preference.Value);
+                    else
+                        rollingSumOfPreferences += PreferenceAvg;
 
-            // Set default value in case a value doesn't get assigned by the loop.
-            if (totalFound > 0)
-                Result = IdList[0].ID;
-
-            // Select an index from the video list, but weighted by preference
-            foreach (var item in IdList) {
-                // Add the current item's preference to the rolling sum
-                if (item.Preference.HasValue)
-                    rollingSumOfPreferences += PreferenceToInt(item.Preference.Value);
-                else
-                    rollingSumOfPreferences += PreferenceAvg;
-
-                // If we've hit or passed the random number, select this item
-                if (rollingSumOfPreferences >= number) {
-                    Result = item.ID;
-                    break;
+                    // If we've hit or passed the random number, select this item
+                    if (rollingSumOfPreferences >= number) {
+                        if (!Result.Contains(item.ID))
+                            Result.Add(item.ID);
+                        else // if item is already selected, try again.
+                            i--; 
+                        break;
+                    }
                 }
             }
+
+            // Set default value in case a value doesn't get assigned by the loop.
+            //if (totalFound > 0)
+            //    Result = IdList.Select(v => v.ID).Take(count).ToList();
 
             return Result;
         }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using DataAccess;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Business {
     public class PlayerBusiness {
@@ -39,6 +41,10 @@ namespace Business {
         /// Gets or sets whether to loop current video.
         /// </summary>
         public bool Loop { get; set; }
+        /// <summary>
+        /// Gets or sets the options of next videos to choose from.
+        /// </summary>
+        public ObservableCollection<Media> NextVideoOptions { get; set; } = new ObservableCollection<Media>();
 
         /// <summary>
         /// Occurs before selecting a new video to get search conditions.
@@ -116,8 +122,7 @@ namespace Business {
             get { return playMode; }
             private set {
                 playMode = value;
-                if (PlaylistChanged != null)
-                    PlaylistChanged(this, new EventArgs());
+                Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
             }
         }
 
@@ -143,26 +148,28 @@ namespace Business {
                 DownloadItem VideoDownload = GetNextVideoDownloading();
                 if (VideoDownload == null) {
                     if (playMode == PlayerMode.Manual && nextVideo == null) {
-                        if (player.CurrentVideo != null && player.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
-                            await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0);
+                        if (player.CurrentVideo != null && (player.StartPos.HasValue || player.EndPos.HasValue) && !player.IgnorePos) // Enforce end position without moving to next video.
+                            await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0).ConfigureAwait(false);
+                        else
+                            player.Position = 0;
                     } else {
                         // Play next video if it is not downloading.
                         if (PlayMode == PlayerMode.Normal) {
-                            if (IncreaseConditions != null)
-                                IncreaseConditions(this, new EventArgs());
+                            Application.Current.Dispatcher.Invoke(() => IncreaseConditions?.Invoke(this, new EventArgs()));
                         }
-                        await PlayNextVideoAsync();
+                        await PlayNextVideoAsync().ConfigureAwait(false);
                     }
                 } else {
                     // If next video still downloading, restart current video.
                     // This method will be called again once download is completed.
                     if (player.CurrentVideo != null && player.StartPos.HasValue && !player.IgnorePos)
-                        await player.SetPositionAsync(player.StartPos.Value);
-                    if (PlaylistChanged != null)
-                        PlaylistChanged(this, new EventArgs());
+                        await player.SetPositionAsync(player.StartPos.Value).ConfigureAwait(false);
+                    Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
                 }
-            } else if (player.CurrentVideo != null && player.EndPos.HasValue && !player.IgnorePos) // Enforce end position without moving to next video.
-                await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0);
+            } else if (player.CurrentVideo != null && (player.StartPos.HasValue || player.EndPos.HasValue) && !player.IgnorePos) // Enforce end position without moving to next video.
+                await player.SetPositionAsync(player.StartPos.HasValue ? player.StartPos.Value : 0).ConfigureAwait(false);
+            else
+                player.Position = 0;
         }
 
         /// <summary>
@@ -170,8 +177,7 @@ namespace Business {
         /// </summary>
         private void player_NowPlaying(object sender, EventArgs e) {
             timerSession.Start();
-            if (NowPlaying != null)
-                NowPlaying(this, new NowPlayingEventArgs());
+            Application.Current.Dispatcher.Invoke(() => NowPlaying?.Invoke(this, new NowPlayingEventArgs()));
         }
 
         /// <summary>
@@ -179,8 +185,7 @@ namespace Business {
         /// </summary>
         void player_Pause(object sender, EventArgs e) {
             timerSession.Stop();
-            if (DisplayPlayTime != null)
-                DisplayPlayTime(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -188,8 +193,7 @@ namespace Business {
         /// </summary>
         void player_Resume(object sender, EventArgs e) {
             timerSession.Start();
-            if (DisplayPlayTime != null)
-                DisplayPlayTime(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -197,8 +201,7 @@ namespace Business {
         /// </summary>
         void sessionTimer_Tick(object sender, EventArgs e) {
             sessionTotalSeconds++;
-            if (DisplayPlayTime != null)
-                DisplayPlayTime(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -207,11 +210,11 @@ namespace Business {
         private async void timerChangeConditions_Tick(object sender, EventArgs e) {
             timerChangeConditions.Stop();
             if (PlayMode == PlayerMode.Water && !IsMinimumIntensity)
-                await SetWaterVideosAsync(false);
+                await SetWaterVideosAsync(false).ConfigureAwait(false);
             else if (IsMinimumIntensity && !IsSpecialMode())
-                await SetWaterVideosAsync(true);
+                await SetWaterVideosAsync(true).ConfigureAwait(false);
             else
-                await EnsureNextVideoMatchesConditionsAsync(false);
+                await SelectNextVideoAsync(1, true).ConfigureAwait(false);
         }
 
         public bool IsSpecialMode() {
@@ -231,12 +234,12 @@ namespace Business {
             IsStarted = true;
             bool IsDownloaded = false;
             if (fileName != null)
-                await SetNextVideoFileAsync(PlayerMode.Manual, fileName);
+                await SetNextVideoFileAsync(PlayerMode.Manual, fileName).ConfigureAwait(false);
             else
-                IsDownloaded = await SelectNextVideoAsync(0);
+                IsDownloaded = await SelectNextVideoAsync(0, false).ConfigureAwait(false);
             if (!IsDownloaded) {
-                await Task.Delay(1000);
-                await PlayNextVideoAsync();
+                await Task.Delay(1000).ConfigureAwait(false);
+                await PlayNextVideoAsync().ConfigureAwait(false);
             }
         }
 
@@ -268,7 +271,7 @@ namespace Business {
         public async Task SetNextVideoIdAsync(PlayerMode mode, Guid videoId) {
             Media Result = PlayerAccess.GetVideoById(videoId);
             if (Result != null)
-                await SetNextVideoAsync(mode, Result);
+                await SetNextVideoAsync(mode, Result).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -276,7 +279,7 @@ namespace Business {
         /// </summary>
         /// <param name="fileName">The name of the file to play.</param>
         public async Task SetNextVideoFileAsync(PlayerMode mode, string fileName) {
-            await SetNextVideoAsync(mode, GetMediaObject(fileName));
+            await SetNextVideoAsync(mode, GetMediaObject(fileName)).ConfigureAwait(false);
         }
 
         public Media GetMediaObject(string fileName) {
@@ -289,11 +292,27 @@ namespace Business {
         private async Task SetNextVideoAsync(PlayerMode mode, Media video) {
             if (nextVideo != null)
                 CancelNextDownload(nextVideo);
+            if (NextVideoOptions.Any()) {
+                NextVideoOptions[0] = video;
+                //NextVideoOptions.RemoveAt(0);
+                //NextVideoOptions.Insert(0, video);
+            }
             nextVideo = video;
             this.PlayMode = mode;
-            await PrepareNextVideoAsync(1, 0);
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            await PrepareNextVideoAsync(1, 0).ConfigureAwait(false);
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
+        }
+
+        public async Task SetNextVideoOptionAsync(Media video) {
+            // Don't reset if it's the same value.
+            if (NextVideo != null && video.MediaId == NextVideo.MediaId)
+                return;
+            // Cancel next download.
+            if (nextVideo != null)
+                CancelNextDownload(nextVideo);
+            // Set and prepare next video.
+            nextVideo = video;
+            await PrepareNextVideoAsync(1, 0).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -316,11 +335,10 @@ namespace Business {
         /// <param name="enabled">True to enable this mode, false to restore normal session.</param>
         public async Task SetFunPauseAsync(bool enabled) {
             PlayMode = (enabled ? PlayerMode.WarmPause : PlayerMode.Normal);
-            await SelectNextVideoAsync(0);
+            await SelectNextVideoAsync(0, false).ConfigureAwait(false);
             // PlayNextVideo();
 
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -344,10 +362,9 @@ namespace Business {
                 playMode = PlayerMode.Normal;
             }
 
-            await SelectNextVideoAsync(0);
+            await SelectNextVideoAsync(0, false).ConfigureAwait(false);
 
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -356,10 +373,9 @@ namespace Business {
         /// <param name="enabled">True to enable this mode, false to restore normal session.</param>
         public async Task SetWaterVideosAsync(bool enabled) {
             PlayMode = (enabled ? PlayerMode.Water : PlayerMode.Normal);
-            await SelectNextVideoAsync(1);
+            await SelectNextVideoAsync(1, false).ConfigureAwait(false);
 
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -383,7 +399,7 @@ namespace Business {
             // Auto-pitch to 432hz
             bool EnableAutoPitch = AutoPitchBusiness.AppyAutoPitch(nextVideo);
 
-            await player.PlayVideoAsync(nextVideo, EnableAutoPitch);
+            await player.PlayVideoAsync(nextVideo, EnableAutoPitch).ConfigureAwait(false);
             playedVideos.Add(nextVideo.MediaId);
             nextVideo = null;
 
@@ -391,31 +407,32 @@ namespace Business {
                 PlayMode = PlayerMode.Normal;
 
             if (playMode != PlayerMode.Manual)
-                await SelectNextVideoAsync(1);
+                await SelectNextVideoAsync(1, false).ConfigureAwait(false);
 
             if (PlayMode == PlayerMode.Fire)
                 PlayMode = PlayerMode.SpecialRequest;
 
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
         /// Selects which video will be played next.
         /// </summary>
         /// <param name="queuePos">The video position to select. 0 for current, 1 for next.</param>
+        /// <param name="maintainCurrent">True to keep the next video and only select alternate options, false to change next video.</param>
         /// <returns>Whether the file is downloading.</returns>
-        public async Task<bool> SelectNextVideoAsync(int queuePos) {
-            return await SelectNextVideoAsync(queuePos, 0);
+        public async Task<bool> SelectNextVideoAsync(int queuePos, bool maintainCurrent) {
+            return await SelectNextVideoAsync(queuePos, maintainCurrent, 0).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Selects which video will be played next.
         /// </summary>
         /// <param name="queuePos">The video position to select. 0 for current, 1 for next.</param>
+        /// <param name="maintainCurrent">True to keep the next video and only select alternate options, false to change next video.</param>
         /// <param name="attempts">The number of attemps already made, to avoid infinite loop.</param>
         /// <returns>Whether the file is downloading.</returns>
-        private async Task<bool> SelectNextVideoAsync(int queuePos, int attempts) {
+        private async Task<bool> SelectNextVideoAsync(int queuePos, bool maintainCurrent, int attempts) {
             bool IsDownloading = false;
             if (attempts > 3) {
                 nextVideo = null;
@@ -427,33 +444,31 @@ namespace Business {
             // Get video conditions
             GetConditionsEventArgs e = new GetConditionsEventArgs(FilterSettings);
             e.QueuePos = queuePos;
-            if (GetConditions != null)
-                GetConditions(this, e);
+            Application.Current.Dispatcher.Invoke(() => GetConditions?.Invoke(this, e));
 
             // Select random video matching conditions.
-            Media Result = PlayerAccess.SelectVideo(FilterSettings.Update(playedVideos, Settings.SavedFile.AutoDownload));
+            List<Media> Result = PlayerAccess.SelectVideo(FilterSettings.Update(playedVideos, Settings.SavedFile.AutoDownload), 3, maintainCurrent ? nextVideo : null);
             lastSearchResultCount = FilterSettings.TotalFound;
 
             // If no video is found, try again while increasing tolerance
             if (Result == null) {
                 e = new GetConditionsEventArgs(FilterSettings);
                 e.IncreaseTolerance = true;
-                if (GetConditions != null)
-                    GetConditions(this, e);
-                Result = PlayerAccess.SelectVideo(FilterSettings.Update(null, Settings.SavedFile.AutoDownload));
+                Application.Current.Dispatcher.Invoke(() => GetConditions?.Invoke(this, e));
+                Result = PlayerAccess.SelectVideo(FilterSettings.Update(null, Settings.SavedFile.AutoDownload), 3, maintainCurrent ? nextVideo : null);
                 FilterSettings.TotalFound = lastSearchResultCount;
             }
 
             if (Result != null) {
                 if (nextVideo != null)
                     CancelNextDownload(nextVideo);
-                nextVideo = Result;
-                IsDownloading = await PrepareNextVideoAsync(queuePos, attempts);
+                NextVideoOptions = new ObservableCollection<Media>(Result);
+                nextVideo = Result.FirstOrDefault();
+                IsDownloading = await PrepareNextVideoAsync(queuePos, attempts).ConfigureAwait(false);
             }
 
             timerChangeConditions.Stop();
-            if (PlaylistChanged != null)
-                PlaylistChanged(this, new EventArgs());
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
 
             return IsDownloading;
         }
@@ -472,12 +487,11 @@ namespace Business {
             if (!FileExists) {
                 // If file doesn't exist and can't be downloaded, select another one.
                 if (!Settings.SavedFile.AutoDownload || nextVideo == null || nextVideo.DownloadUrl.Length == 0)
-                    await SelectNextVideoAsync(queuePos, attempts + 1);
+                    await SelectNextVideoAsync(queuePos, false, attempts + 1).ConfigureAwait(false);
                 // If file doesn't exist and can be downloaded, download it.
                 else if (nextVideo != null && nextVideo.DownloadUrl.Length > 0) {
-                    if (PlaylistChanged != null)
-                        PlaylistChanged(this, new EventArgs());
-                    await downloadManager.DownloadVideoAsync(nextVideo, queuePos, Download_Complete);
+                    Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
+                    await downloadManager.DownloadVideoAsync(nextVideo, queuePos, Download_Complete).ConfigureAwait(false);
                     return true;
                 }
             }
@@ -493,7 +507,7 @@ namespace Business {
                 player_PlayNext(null, null);
             } else if (args.DownloadInfo.IsCanceled && args.DownloadInfo.QueuePos > -1 && playMode != PlayerMode.Manual) {
                 nextVideo = null;
-                await SelectNextVideoAsync(args.DownloadInfo.QueuePos);
+                await SelectNextVideoAsync(args.DownloadInfo.QueuePos, false).ConfigureAwait(false);
             }
         }
 
@@ -510,8 +524,8 @@ namespace Business {
 
             if (playedVideos.Count > 0)
                 playedVideos.RemoveAt(playedVideos.Count - 1);
-            await EnsureNextVideoMatchesConditionsAsync(true);
-            await PlayNextVideoAsync();
+            // await EnsureNextVideoMatchesConditionsAsync(true);
+            await PlayNextVideoAsync().ConfigureAwait(false);
         }
 
         public async Task ReplayLastAsync() {
@@ -532,9 +546,8 @@ namespace Business {
                     // Auto-pitch to 432hz
                     bool EnableAutoPitch = AutoPitchBusiness.AppyAutoPitch(LastVideo);
 
-                    await player.PlayVideoAsync(LastVideo, EnableAutoPitch);
-                    if (PlaylistChanged != null)
-                        PlaylistChanged(this, new EventArgs());
+                    await player.PlayVideoAsync(LastVideo, EnableAutoPitch).ConfigureAwait(false);
+                    Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
                 }
             }
         }
@@ -551,43 +564,53 @@ namespace Business {
             }
         }
 
-        public async Task EnsureNextVideoMatchesConditionsAsync(bool skipping) {
-            int QueuePos = skipping ? 0 : 1;
-            if (nextVideo != null && PlayMode == PlayerMode.Normal) {
-                // Get new conditions
-                GetConditionsEventArgs Args = new GetConditionsEventArgs(FilterSettings);
-                Args.QueuePos = QueuePos;
-                if (GetConditions != null)
-                    GetConditions(this, Args);
+        //public async Task EnsureNextVideoMatchesConditionsAsync(bool skipping) {
+        //    int QueuePos = skipping ? 0 : 1;
+        //    if (nextVideo != null && PlayMode == PlayerMode.Normal) {
+        //        // Get new conditions
+        //        GetConditionsEventArgs Args = new GetConditionsEventArgs(FilterSettings);
+        //        Args.QueuePos = QueuePos;
+        //        if (GetConditions != null)
+        //            GetConditions(this, Args);
 
-                // Run the conditions on the next video in the playlist
-                if (!PlayerAccess.VideoMatchesConditions(nextVideo, FilterSettings.Update(playedVideos, Settings.SavedFile.AutoDownload))) {
-                    // If next video doesn't match conditions, select another one
-                    await SelectNextVideoAsync(QueuePos);
-                }
-            } else if (nextVideo == null)
-                await SelectNextVideoAsync(QueuePos);
-        }
+        //        // Run the conditions on the next video in the playlist
+        //        if (!PlayerAccess.VideoMatchesConditions(nextVideo, FilterSettings.Update(playedVideos, Settings.SavedFile.AutoDownload))) {
+        //            // If next video doesn't match conditions, select another one
+        //            await SelectNextVideoAsync(QueuePos);
+        //        }
+        //    } else if (nextVideo == null)
+        //        await SelectNextVideoAsync(QueuePos);
+        //}
 
         public void ReloadVideoInfo() {
             if (player.CurrentVideo != null) {
                 player.CurrentVideo = PlayerAccess.GetVideoById(player.CurrentVideo.MediaId);
-                if (NowPlaying != null)
-                    NowPlaying(this, new NowPlayingEventArgs(true));
+                Application.Current.Dispatcher.Invoke(() => NowPlaying?.Invoke(this, new NowPlayingEventArgs(true)));
             }
         }
 
         /// <summary>
-        /// Loads the list of rating categories for the Focus combobox.
+        /// Loads the list of rating categories for the Elements combobox.
         /// </summary>
         /// <returns>A list of RatingCategory objects.</returns>
-        public async Task<List<RatingCategory>> GetFocusCategoriesAsync() {
+        public List<RatingCategory> GetFocusCategories() {
             List<RatingCategory> Result = new List<RatingCategory>();
-            List<RatingCategory> DbResult = await Task.Run(() => SearchVideoAccess.GetCustomRatingCategories());
+            Result.Add(new RatingCategory() { Name = "" });
             Result.Add(new RatingCategory() { Name = "Intensity" });
             Result.Add(new RatingCategory() { Name = "Physical" });
             Result.Add(new RatingCategory() { Name = "Emotional" });
             Result.Add(new RatingCategory() { Name = "Spiritual" });
+            return Result;
+        }
+
+        /// <summary>
+        /// Loads the list of rating categories for the Elements combobox.
+        /// </summary>
+        /// <returns>A list of RatingCategory objects.</returns>
+        public async Task<List<RatingCategory>> GetElementCategoriesAsync() {
+            List<RatingCategory> Result = new List<RatingCategory>();
+            List<RatingCategory> DbResult = await Task.Run(() => SearchVideoAccess.GetCustomRatingCategories());
+            Result.Add(new RatingCategory() { Name = "" });
             Result.Add(new RatingCategory() { Name = "Egoless" });
             Result.Add(new RatingCategory() { Name = "Love" });
             Result.AddRange(DbResult);
@@ -631,15 +654,6 @@ namespace Business {
 
             if (player.CurrentVideo != null)
                 player.PlayVideoAsync(player.CurrentVideo, false);
-        }
-
-        public string GetVideoDisplayTitle(Media video) {
-            if (video == null)
-                return "None";
-            else if (video.Artist.Length == 0)
-                return video.Title;
-            else
-                return string.Format("{0} - {1}", video.Artist, video.Title);
         }
 
         public void ResetPlayerMode() {

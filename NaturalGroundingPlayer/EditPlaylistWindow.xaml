@@ -6,7 +6,7 @@
         xmlns:DataAccess="clr-namespace:DataAccess;assembly=DataAccess"
         xmlns:local="clr-namespace:NaturalGroundingPlayer"
         x:Class="NaturalGroundingPlayer.EditPlaylistWindow"
-        Title="Edit Playlist" Height="503" Width="618" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" Closing="Window_Closing"
+        Title="Edit Playlist" Height="483" Width="578" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" Closing="Window_Closing"
     MinHeight="300" MinWidth="500">
     <Window.Resources>
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
@@ -50,7 +50,6 @@
         <TextBlock HorizontalAlignment="Left" Margin="428,58,0,0" Text="Depth" VerticalAlignment="Top" FontSize="10"/>
         <ComboBox x:Name="FilterCombo" HorizontalAlignment="Left" Margin="309,81,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="Settings_Changed" SelectedIndex="{Binding ConditionField, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="8">
             <ComboBoxItem Content="" IsSelected="True" />
-            <ComboBoxItem Content="Is in database" />
             <ComboBoxItem Content="File exists" />
             <ComboBoxItem Content="Has download URL" />
             <ComboBoxItem Content="Has buy or download URL" />

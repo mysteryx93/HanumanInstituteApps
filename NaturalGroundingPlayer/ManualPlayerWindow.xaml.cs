@@ -56,11 +56,9 @@ namespace NaturalGroundingPlayer {
             // Keep main window's settings and it will be set back when closing manual mode.
             mainSettings = SessionCore.Instance.Business.FilterSettings;
             MediaList.Settings.RatingRatio = mainSettings.RatingRatio;
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, true);
             SessionCore.Instance.Business.FilterSettings = MediaList.Settings;
             this.DataContext = MediaList.Settings;
 
-            RatingCategoryCombo.ItemsSource = await MediaList.business.GetRatingCategoriesAsync(false);
             await MediaList.LoadDataAsync();
             isLoaded = true;
         }
@@ -99,7 +97,7 @@ namespace NaturalGroundingPlayer {
                 SessionCore.Instance.Business.ResetPlayerMode();
                 mainSettings.RatingRatio = MediaList.Settings.RatingRatio;
                 SessionCore.Instance.Business.FilterSettings = mainSettings;
-                await SessionCore.Instance.Business.SelectNextVideoAsync(1);
+                await SessionCore.Instance.Business.SelectNextVideoAsync(1, false).ConfigureAwait(false);
                 // mainForm.business_PlaylistChanged(null, null);
             } else
                 Application.Current.Shutdown();
@@ -109,29 +107,13 @@ namespace NaturalGroundingPlayer {
             timerChangeFilters.Stop();
             timerChangeFilters.Start();
         }
-
-        private void MediaList_SelectionChanged(object sender, EventArgs e) {
-            if (MediaList.SelectedItem != null)
-                PlayButton.Content = (MediaList.SelectedItem.FileExists ? "_Play" : "_Download");
-        }
-
+        
         private void MediaList_ItemDoubleClick(object sender, EventArgs e) {
             PlayButton_Click(this, null);
         }
 
-        private async void ShowAllFiles_Click(object sender, RoutedEventArgs e) {
-            MediaList.Settings.ConditionValue = ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes;
-            if (IsLoaded && !MediaList.IsLoading) {
-                await MediaList.LoadDataAsync();
-                SearchText.Focus();
-            }
-        }
-
         private async void timerChangeFilters_Tick(object sender, EventArgs e) {
             if (!MediaList.IsLoading) {
-                if (RatingValueText.IsFocused)
-                    RatingValueText.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-
                 timerChangeFilters.Stop();
                 await MediaList.LoadDataAsync();
             }
@@ -220,20 +202,20 @@ namespace NaturalGroundingPlayer {
 
         private async void PlayButton_Click(object sender, RoutedEventArgs e) {
             VideoListItem VideoInfo = MediaList.SelectedItem;
-            if (VideoInfo != null) {
+            if (MediaList.IsDetailView && VideoInfo != null) {
                 if (VideoInfo.FileName != null) {
                     // File exists, play.
                     if (SessionCore.Instance.Business.IsStarted) {
                         if (SessionCore.Instance.Business.IsPaused)
                             SessionCore.Instance.Menu.ResumeSession();
-                        await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.Manual, VideoInfo.FileName);
-                        if (PlayNextCheck.IsChecked == false)
-                            await SessionCore.Instance.Business.SkipVideoAsync();
+                        await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.Manual, VideoInfo.FileName).ConfigureAwait(false);
+                        if (PlayButton.Content != MenuPlayNext.Header)
+                            await SessionCore.Instance.Business.SkipVideoAsync().ConfigureAwait(false);
                     } else
-                        await SessionCore.Instance.Menu.CommandBinding_StartSessionAsync(VideoInfo.FileName);
+                        await SessionCore.Instance.Menu.CommandBinding_StartSessionAsync(VideoInfo.FileName).ConfigureAwait(false);
                 } else if (VideoInfo.HasDownloadUrl) {
                     // File doesn't exist, download.
-                    await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(PlayerAccess.GetVideoById(VideoInfo.MediaId.Value), -1, DownloadBusiness_DownloadCompleted);
+                    await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(PlayerAccess.GetVideoById(VideoInfo.MediaId.Value), -1, DownloadBusiness_DownloadCompleted).ConfigureAwait(false);
                 }
             }
         }
@@ -247,7 +229,7 @@ namespace NaturalGroundingPlayer {
 
         private void business_NowPlaying(object sender, NowPlayingEventArgs e) {
             Media VideoInfo = SessionCore.Instance.Business.CurrentVideo;
-            txtCurrentVideo.Text = SessionCore.Instance.Business.GetVideoDisplayTitle(VideoInfo);
+            txtCurrentVideo.Text = VideoInfo?.DisplayTitle;
             bool IsPrefEdit = SessionCore.Instance.RatingViewer.UpdatePreference();
             if (e.ReloadInfo)
                 MediaList.EditForm_Closed(VideoInfo);
@@ -267,6 +249,25 @@ namespace NaturalGroundingPlayer {
                 Height += height * Settings.Zoom;
                 LayersRow.Height = new GridLength(LayersRow.Height.Value + height);
             }
+        }
+
+        private void MenuPlay_Click(object sender, RoutedEventArgs e) {
+            PlayButton.IsOpen = false;
+            PlayButton.Content = ((MenuItem)sender).Header;
+            PlayButton_Click(sender, e);
+        }
+
+        private void window_PreviewKeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter && MediaList.IsDetailView)
+                PlayButton_Click(sender, e);
+        }
+
+        private void CommandBinding_Play(object sender, ExecutedRoutedEventArgs e) {
+            MenuPlay_Click(MenuPlay, e);
+        }
+
+        private void CommandBinding_PlayNext(object sender, ExecutedRoutedEventArgs e) {
+            MenuPlay_Click(MenuPlayNext, e);
         }
     }
 }

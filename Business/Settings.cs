@@ -65,6 +65,7 @@ namespace Business {
         public static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\NaturalGroundingVideos.db");
         public static readonly string InitialDatabasePath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "InitialDatabase.db");
         public static readonly string AviSynthPluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Encoder\");
+        public static readonly AviSynthVersion EncoderAviSynthVersion = AviSynthVersion.AviSynthPlus;
 
         public static string[] GetMediaTypeExtensions(MediaType mediaType) {
             if (mediaType == MediaType.Video)

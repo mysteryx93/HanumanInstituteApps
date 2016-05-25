@@ -298,9 +298,10 @@ namespace NaturalGroundingPlayer {
                 SearchSettings settings = new SearchSettings() {
                     MediaType = (MediaType)video.MediaTypeId,
                     ConditionField = FieldConditionEnum.FileExists,
-                    ConditionValue = BoolConditionEnum.No
+                    ConditionValue = BoolConditionEnum.No,
+                    ListIsInDatabase = true
                 };
-                VideoListItem Result = SearchVideoWindow.Instance(settings, false);
+                VideoListItem Result = SearchVideoWindow.Instance(settings);
                 if (Result != null) {
                     // Close and re-open selected entry.
                     Close();

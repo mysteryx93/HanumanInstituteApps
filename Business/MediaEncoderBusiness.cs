@@ -11,12 +11,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using DataAccess;
+using System.Xml;
 
 namespace Business {
     public class MediaEncoderBusiness {
         private static int JobIndex = 0;
         private static Task<EncodingCompletedEventArgs> EncoderTask = null;
         public static ObservableCollection<string> ProcessingQueue = new ObservableCollection<string>();
+        private static SupportedOpenClVersion gpuSupportsOpenCL12;
+
         public event EventHandler<EncodingCompletedEventArgs> EncodingCompleted;
         static public string PreviewScriptFile {
             get { return Settings.TempFilesPath + "Preview.avs"; }
@@ -35,7 +38,8 @@ namespace Business {
             else if (preview) {
                 Script.RemoveMT();
                 Script.AppendLine(@"ConvertToRGB32(matrix=""Rec709"")");
-            }
+            } else if (!multiThreaded)
+                Script.RemoveMT();
             Script.WriteToFile(PreviewScriptFile);
             SaveSettingsFile(settings, PreviewSettingsFile);
         }
@@ -199,7 +203,7 @@ namespace Business {
             int CPU = Environment.ProcessorCount;
             if (CPU <= 1)
                 multiThreaded = false;
-            bool AviSynthPlus = false;
+            bool AviSynthPlus = (Settings.EncoderAviSynthVersion == AviSynthVersion.AviSynthPlus);
             // multiThreaded = true;
 
             settings.CalculateSize();
@@ -212,19 +216,20 @@ namespace Business {
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             bool IsYV24 = false;
             Script.AppendLine(); // After clean-up, this adds a line after LoadPlugin commands.
+            Script.AddPluginPath();
             if (multiThreaded) {
                 // Script.AppendLine("Setmemorymax(1500)");
                 if (AviSynthPlus) {
-                    Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
-                    Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
-                    Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-                    if (settings.Denoise1)
-                        Script.AppendLine(@"SetFilterMTMode(""KNLMeansCL"",5)");
+                    Script.LoadPluginAvsi("AviSynthMT.avsi");
+                    //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
+                    //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
+                    //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
+                    //if (settings.Denoise1)
+                    //    Script.AppendLine(@"SetFilterMTMode(""KNLMeansCL"",3)");
                 } else {
                     Script.AppendLine("SetMTMode(3,{0})", CPU);
                 }
             }
-            Script.AddPluginPath();
             if (settings.ConvertToAvi || inputFile.ToLower().EndsWith(".avi"))
                 Script.OpenAvi(inputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
             else
@@ -240,15 +245,18 @@ namespace Business {
                 Script.AppendLine("Crop({0}, {1}, -{2}, -{3})", settings.CropSource.Left, settings.CropSource.Top, settings.CropSource.Right, settings.CropSource.Bottom);
             }
             if (settings.Denoise1) {
-                if (settings.Denoise1Compatibility)
-                    Script.LoadPluginDll("KNLMeansCL-6.11.dll");
-                else
+                if (GpuSupport == SupportedOpenClVersion.v12)
                     Script.LoadPluginDll("KNLMeansCL.dll");
+                else
+                    Script.LoadPluginDll("KNLMeansCL-6.11.dll");
                 Script.AppendLine("ConvertToYV24()");
                 IsYV24 = true;
                 if (multiThreaded && !AviSynthPlus)
                     Script.AppendLine("SetMTMode(5)");
-                Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D=1, A=2, h={0}, cmode=true, device_type=""GPU"", device_id={1})", ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture), Settings.SavedFile.GraphicDeviceId);
+                Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D=1, A=2, h={0}, cmode=true, device_type=""{1}""{2})", 
+                    ((double)settings.Denoise1Strength / 10).ToString(CultureInfo.InvariantCulture), 
+                    GpuSupport != SupportedOpenClVersion.None ? "GPU" : "CPU",
+                    GpuSupport != SupportedOpenClVersion.None ? ", device_id=" + Settings.SavedFile.GraphicDeviceId.ToString() : "");
             }
             if (multiThreaded && !AviSynthPlus)
                 Script.AppendLine("SetMTMode(2)");
@@ -256,7 +264,8 @@ namespace Business {
                 Script.LoadPluginDll("Shaders\\Shader.dll");
                 Script.LoadPluginAvsi("Shaders\\Shader.avsi");
             }
-            if (settings.SourceColorMatrix == ColorMatrix.Rec601 && !preview && settings.FrameDouble == 0) {
+            bool HasNoShader = (!settings.SuperRes && settings.UpscaleMethod == UpscaleMethods.NNedi3 && settings.DownscaleMethod == DownscaleMethods.Bicubic);
+            if (settings.SourceColorMatrix == ColorMatrix.Rec601 && settings.FrameDouble == 0 || HasNoShader) {
                 Script.AppendLine("ColorMatrixShader(MatrixIn=\"601\")");
             }
             if (settings.Denoise2) {
@@ -267,45 +276,62 @@ namespace Business {
             }
 
             if (settings.FrameDouble > 0) {
-                string FinalResize = string.Format("fWidth={0}, fHeight={1}", settings.OutputWidth + settings.CropAfter.Left + settings.CropAfter.Right, settings.OutputHeight + settings.CropAfter.Top + settings.CropAfter.Bottom);
-                int Passes = settings.SuperResDoublePass ? 2 : 1;
-                float Strength = settings.SuperResStrength / 100f / Passes;
-                if (Strength > 1)
-                    Strength = 1;
+                string FinalSize = string.Format("fWidth={0}, fHeight={1}",
+                    settings.OutputWidth + settings.CropAfter.Left + settings.CropAfter.Right,
+                    settings.OutputHeight + settings.CropAfter.Top + settings.CropAfter.Bottom);
+                string FinalResize = FinalSize;
+                if (settings.DownscaleMethod == DownscaleMethods.SSim)
+                    FinalResize += string.Format(@", fKernel=""SSim"", fB={0}{1}",
+                        settings.SSimStrength / 100, settings.SSimSoft ? ", fC=1" : "");
+                else // DownscaleMethod == Bicubic
+                    FinalResize += string.Format(@", fKernel=""Bicubic"", fB=0, fC=.75");
 
+                bool IsLastDouble = false;
                 if (settings.UpscaleMethod == UpscaleMethods.NNedi3) {
                     if (IsYV24) {
                         Script.AppendLine("ConvertToYV12()");
                         IsYV24 = false;
                     }
                     Script.LoadPluginDll("nnedi3.dll");
-                    Script.LoadPluginDll("FTurn.dll");
+                    //Script.LoadPluginDll("FTurn.dll");
                     Script.LoadPluginAvsi("edi_rpow2.avsi");
 
                     for (int i = 0; i < settings.FrameDouble; i++) {
+                        IsLastDouble = i == settings.FrameDouble - 1;
                         string DoubleScript = string.Format("edi_rpow2(2, nns=4, {0}, Threads=2)",
-                            i < settings.FrameDouble - 1 ? @"cshift=""Spline16Resize""" : @"cshift=""Bicubic"", a1=0, a2=.75, " + FinalResize);
+                            IsLastDouble && settings.DownscaleMethod == DownscaleMethods.Bicubic ? @"cshift=""Bicubic"", a1=0, a2=.75, " + FinalSize : @"cshift=""Spline16Resize""");
                         if (settings.SuperRes) {
-                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4})", 
-                                Passes, Strength, settings.SuperResSoftness / 100f, DoubleScript,
-                                i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "");                                
-                        } else
+                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4}{5})",
+                                settings.SuperRes3Passes ? (i == 0 && settings.FrameDouble > 1 ? 5 : 3) : 2, 
+                                settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f, DoubleScript,
+                                i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "",
+                                IsLastDouble && settings.DownscaleMethod == DownscaleMethods.SSim ? ", " + FinalResize : "");
+                        } else {
                             Script.AppendLine(DoubleScript);
+                            if (IsLastDouble && settings.DownscaleMethod == DownscaleMethods.SSim) {
+                                Script.AppendLine("SSimDownscaler({0}{1})", 
+                                    FinalResize.Replace(" f", " ").Replace("fW", "W"), // Use same string as FinalResize but remove 'f' parameter sufix.
+                                    settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "");
+                            }
+                        }
                         if (i == 0 && settings.IncreaseFrameRate)
                             ApplyInterFrame(Script, settings, CPU);
                     }
-                } else {
+                } else { // UpscaleMethod == SuperXBR
                     for (int i = 0; i < settings.FrameDouble; i++) {
+                        IsLastDouble = i == settings.FrameDouble - 1;
                         if (settings.SuperRes) {
                             Script.AppendLine(CultureInfo.InvariantCulture, @"SuperResXBR({0}, {1}, {2}, XbrStr={3}, XbrSharp={4}{5}{6})",
-                                Passes, Strength, settings.SuperResSoftness / 100f,
+                                settings.SuperRes3Passes ? (i == 0 && settings.FrameDouble > 1 ? 5 : 3) : 2,
+                                settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f,
                                 settings.SuperXbrStrength / 10f, settings.SuperXbrSharpness / 10f,
                                 i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "",
-                                i == settings.FrameDouble - 1 ? ", " + FinalResize : "");
+                                IsLastDouble ? ", " + FinalResize : "");
                         } else {
-                            Script.AppendLine("SuperXBR(Str={0}, Sharp={1}{2})",
+                            Script.AppendLine("SuperXBR(Str={0}, Sharp={1}{2}{3})",
                                 settings.SuperXbrStrength / 10f, settings.SuperXbrSharpness / 10f,
-                                i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "");
+                                i == 0 && settings.SourceColorMatrix == ColorMatrix.Rec601 ? ", MatrixIn=\"601\"" : "",
+                                IsLastDouble ? ", " + FinalResize : "");
                         }
                         if (i == 0 && settings.IncreaseFrameRate) {
                             if (IsYV24) {
@@ -326,7 +352,7 @@ namespace Business {
 
             Script.LoadPluginAvsi("ResizeX.avsi");
             if (settings.CropAfter.HasValue || settings.FrameDouble == 0) {
-                bool ApplyResize = settings.FrameDouble == 0 || !(settings.UpscaleMethod == UpscaleMethods.SuperXbr && settings.SuperRes);
+                bool ApplyResize = settings.FrameDouble == 0 || HasNoShader;
                 string CropFormat = "ResizeX";
                 CropFormat += settings.CropAfter.HasValue ? "({0}, {1}, {2}, {3}, -{4}, -{5}{6})" : "({0}, {1}{6})";
                 Script.AppendLine(CropFormat, settings.OutputWidth, settings.OutputHeight,
@@ -444,10 +470,6 @@ namespace Business {
                 settings.Position = (InfoReader.Length ?? 0) / 2;
                 settings.CalculateSize();
             }
-        }
-
-        public async Task FinalizeReplaceAsync(EncodingCompletedEventArgs jobInfo) {
-            await Task.Run(() => FinalizeReplace(jobInfo));
         }
 
         public void FinalizeReplace(EncodingCompletedEventArgs jobInfo) {
@@ -636,10 +658,15 @@ namespace Business {
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
 
             using (var writer = new StreamWriter(fileName)) {
+
                 var serializer = new XmlSerializer(typeof(MediaEncoderSettings));
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
-                serializer.Serialize(writer, settings, ns);
+                XmlWriterSettings ws = new XmlWriterSettings();
+                ws.NewLineHandling = NewLineHandling.Entitize;
+                using (XmlWriter wr = XmlWriter.Create(writer, ws)) {
+                    serializer.Serialize(wr, settings, ns);
+                }
                 writer.Flush();
             }
         }
@@ -690,6 +717,19 @@ namespace Business {
                     catch {
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// The first time the media encoder window is shown, it will test whether OpenCL 1.2 is support to use the latest version 
+        /// of KNLMeans. If not, an older version of the library will be used.
+        /// </summary>
+        public SupportedOpenClVersion GpuSupport {
+            get {
+                if (gpuSupportsOpenCL12 == SupportedOpenClVersion.NotTested) {
+                    gpuSupportsOpenCL12 = FfmpegBusiness.TestSupportedOpenClVersion();
+                }
+                return gpuSupportsOpenCL12;
             }
         }
 

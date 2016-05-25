@@ -44,9 +44,10 @@ namespace NaturalGroundingPlayer {
 
         public async Task InitializationCompleted() {
             settings = SessionCore.Instance.Business.FilterSettings;
-            PolarityFocus.ItemsSource = await SessionCore.Instance.Business.GetFocusCategoriesAsync();
+            PolarityFocus.ItemsSource = SessionCore.Instance.Business.GetFocusCategories();
+            ElementList.ItemsSource = await SessionCore.Instance.Business.GetElementCategoriesAsync();
             this.DataContext = settings;
-            PolarityFocus.SelectedIndex = 0;
+            PolarityFocus.SelectedIndex = 1;
             Settings_Changed(null, null);
         }
 
@@ -89,6 +90,7 @@ namespace NaturalGroundingPlayer {
                     GrowthSlider.Value = 0;
                 if (IntensitySlider.Value == IntensitySlider.Minimum && GrowthSlider.Value < 0)
                     GrowthSlider.Value = 0;
+                ElementRangeSlider.IsEnabled = ElementList.SelectedIndex > 0;
 
                 SessionCore.Instance.Business.IsMinimumIntensity = (IntensitySlider.Value == IntensitySlider.Minimum);
 
@@ -124,31 +126,42 @@ namespace NaturalGroundingPlayer {
                     if (MaxCond > IntensitySlider.Maximum)
                         MaxCond = IntensitySlider.Maximum;
                     if (MaxCond > IntensitySlider.Minimum) {
-                        // Exclude videos with Water >= 6
-                        Filters.AddRange(FilterPresets.PresetWater(true));
-                        // Exclude videos with Fire >= 8.5 && Intensity >= 9.5 unless we're at maximum heat.
-                        if (MaxCond < IntensitySlider.Maximum)
-                            Filters.AddRange(FilterPresets.PresetFire(true));
+                        if (PolarityFocus.Text != "") {
 
-                        if (PolarityFocus.Text == "Intensity")
-                            MaxCond -= 1;
-                        // Min/Max Values.
-                        SearchRatingSetting MinFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.GreaterOrEqual, Math.Round(MaxCond - ToleranceSlider.Value, 1));
-                        SearchRatingSetting MaxFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.Smaller, Math.Round(MaxCond, 1));
-                        if (PolarityFocus.Text == "Intensity" && MaxCond == IntensitySlider.Maximum - 1)
-                            MaxFilter.Value = IntensitySlider.Maximum;
-                        if (e.IncreaseTolerance) {
-                            MinFilter.Value -= .5f;
-                            MaxFilter.Value += .5f;
+                            // Exclude videos with Water >= 6
+                            Filters.AddRange(FilterPresets.PresetWater(true));
+                            // Exclude videos with Fire >= 8.5 && Intensity >= 9.5 unless we're at maximum heat.
+                            if (MaxCond < IntensitySlider.Maximum)
+                                Filters.AddRange(FilterPresets.PresetFire(true));
+
+                            if (PolarityFocus.Text == "Intensity")
+                                MaxCond -= 1;
+                            // Min/Max Values.
+                            SearchRatingSetting MinFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.GreaterOrEqual, Math.Round(MaxCond - ToleranceSlider.Value, 1));
+                            SearchRatingSetting MaxFilter = new SearchRatingSetting(PolarityFocus.Text, OperatorConditionEnum.Smaller, Math.Round(MaxCond, 1));
+                            if (PolarityFocus.Text == "Intensity" && MaxCond == IntensitySlider.Maximum - 1)
+                                MaxFilter.Value = IntensitySlider.Maximum;
+                            if (e.IncreaseTolerance) {
+                                MinFilter.Value -= .5f;
+                                MaxFilter.Value += .5f;
+                            }
+                            Filters.Add(MinFilter);
+                            if (MaxFilter.Value < IntensitySlider.Maximum) // When at max heat, don't limit greater values
+                                Filters.Add(MaxFilter);
+                            if (PolarityFocus.Text == "Physical" || PolarityFocus.Text == "Emotional" || PolarityFocus.Text == "Spiritual") {
+                                // Don't get videos that are more than .5 stronger on other values.
+                                Filters.Add(new SearchRatingSetting("!" + PolarityFocus.Text, OperatorConditionEnum.Smaller, MaxFilter.Value + .5f));
+                            } else if (PolarityFocus.Text == "Intensity") {
+                                Filters.Add(new SearchRatingSetting("!Intensity", OperatorConditionEnum.Smaller, MaxFilter.Value + 2f));
+                            }
                         }
-                        Filters.Add(MinFilter);
-                        if (MaxFilter.Value < IntensitySlider.Maximum) // When at max heat, don't limit greater values
-                            Filters.Add(MaxFilter);
-                        if (PolarityFocus.Text == "Physical" || PolarityFocus.Text == "Emotional" || PolarityFocus.Text == "Spiritual") {
-                            // Don't get videos that are more than .5 stronger on other values.
-                            Filters.Add(new SearchRatingSetting("!" + PolarityFocus.Text, OperatorConditionEnum.Smaller, MaxFilter.Value + .5f));
-                        } else if (PolarityFocus.Text == "Intensity") {
-                            Filters.Add(new SearchRatingSetting("!Intensity", OperatorConditionEnum.Smaller, MaxFilter.Value + 2f));
+
+                        // Secondary filter by element
+                        if (ElementList.SelectedIndex > 0) {
+                            Filters.Add(new SearchRatingSetting(ElementList.Text, OperatorConditionEnum.GreaterOrEqual, Math.Round(ElementRangeSlider.LowerValue, 0)));
+                            double ElementMax = Math.Round(ElementRangeSlider.HigherValue, 0);
+                            if (ElementMax < ElementRangeSlider.Maximum)
+                                Filters.Add(new SearchRatingSetting(ElementList.Text, OperatorConditionEnum.Smaller, ElementMax + .1));
                         }
                     } else { // Water
                         IntensitySlider.Value = IntensitySlider.Minimum;
@@ -181,8 +194,10 @@ namespace NaturalGroundingPlayer {
 
         public void business_PlaylistChanged(object sender, EventArgs e) {
             txtVideosFound.Text = SessionCore.Instance.Business.LastSearchResultCount.ToString() + (SessionCore.Instance.Business.LastSearchResultCount > 1 ? " videos found" : " video found");
-            txtNextVideo.Text = SessionCore.Instance.Business.GetVideoDisplayTitle(SessionCore.Instance.Business.NextVideo);
-            txtCurrentVideo.Text = SessionCore.Instance.Business.GetVideoDisplayTitle(SessionCore.Instance.Business.CurrentVideo);
+            NextVideosCombo.ItemsSource = SessionCore.Instance.Business.NextVideoOptions;
+            if (NextVideosCombo.Items.Count > 0)
+                NextVideosCombo.SelectedIndex = 0;
+            txtCurrentVideo.Text = SessionCore.Instance.Business.CurrentVideo?.DisplayTitle;
             DisplayConditionsText();
         }
 
@@ -200,6 +215,7 @@ namespace NaturalGroundingPlayer {
         /// Updates the conditions text.
         /// </summary>
         private void DisplayConditionsText() {
+            string SelectedPolarity = ((RatingCategory)PolarityFocus.SelectedItem).Name;
             if (SessionCore.Instance.Business.IsMinimumIntensity && !SessionCore.Instance.Business.IsSpecialMode())
                 IntensitySliderValue.Text = "Water...";
             else {
@@ -209,9 +225,12 @@ namespace NaturalGroundingPlayer {
                     case PlayerMode.Water:
                         double MaxCond = IntensitySlider.Value;
                         bool IsMaxIntensity = (MaxCond == IntensitySlider.Maximum);
-                        if (((RatingCategory)PolarityFocus.SelectedItem).Name == "Intensity")
+                        if (SelectedPolarity == "Intensity")
                             MaxCond -= 1;
-                        IntensitySliderValue.Text = string.Format("{0:0.0} - {1:0.0}{2}", MaxCond - ToleranceSlider.Value, IsMaxIntensity ? IntensitySlider.Maximum : MaxCond, IsMaxIntensity ? "+" : "");
+                        IntensitySliderValue.Text = SelectedPolarity != "" ? string.Format("{0:0.0} - {1:0.0}{2}", MaxCond - ToleranceSlider.Value, IsMaxIntensity ? IntensitySlider.Maximum : MaxCond, IsMaxIntensity ? "+" : "") : "";
+                        IntensitySlider.IsEnabled = SelectedPolarity != "";
+                        GrowthSlider.IsEnabled = SelectedPolarity != "";
+                        ToleranceSlider.IsEnabled = SelectedPolarity != "";
                         break;
                     case PlayerMode.WarmPause:
                         IntensitySliderValue.Text = "Warm Pause";
@@ -268,9 +287,25 @@ namespace NaturalGroundingPlayer {
             MediaEncoderBusiness.ClearTempFolder();
         }
 
+        private async void SkipVideo_Click(object sender, RoutedEventArgs e) {
+            if (SessionCore.Instance.Business.IsStarted)
+                await SessionCore.Instance.Business.SkipVideoAsync().ConfigureAwait(false);
+        }
+
         private async void SkipNextVideo_Click(object sender, RoutedEventArgs e) {
             if (SessionCore.Instance.Business.IsStarted)
-                await SessionCore.Instance.Business.SelectNextVideoAsync(1);
+                await SessionCore.Instance.Business.SelectNextVideoAsync(1, false).ConfigureAwait(false);
+        }
+
+        private void ElementRangeSlider_ValueChanged(object sender, RoutedEventArgs e) {
+            ElementRangeText.Text = string.Format("{0:0} - {1:0}", ElementRangeSlider.LowerValue, ElementRangeSlider.HigherValue);
+            Settings_Changed(sender, e);
+        }
+
+        private async void NextVideosCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            Media Item = NextVideosCombo.SelectedItem as Media;
+            if (Item != null)
+                await SessionCore.Instance.Business.SetNextVideoOptionAsync(Item).ConfigureAwait(false);
         }
     }
 }

@@ -24,4 +24,11 @@ namespace Business {
         AviSynth26,
         AviSynthPlus
     }
+
+    public enum SupportedOpenClVersion {
+        NotTested,
+        None,
+        v11,
+        v12
+    }
 }

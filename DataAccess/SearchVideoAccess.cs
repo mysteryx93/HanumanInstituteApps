@@ -18,6 +18,65 @@ namespace DataAccess {
             }
         }
 
+        /// <summary>
+        /// Returns the list of artists that have more than one song.
+        /// </summary>
+        /// <returns>A list of SearchCategoryItem objects.</returns>
+        public static List<SearchCategoryItem> GetCategoryArtists(SearchSettings settings) {
+            using (Entities context = new Entities()) {
+                var Query = (from v in context.Media
+                             where v.MediaTypeId == (int)settings.MediaType
+                             group v by v.Artist into a
+                             where a.Key != "" && 
+                                a.Count() > 1 && 
+                                (settings.Search == "" || a.Key.Contains(settings.Search))
+                             orderby a.Key
+                             select new SearchCategoryItem() {
+                                 FilterType = SearchFilterEnum.Artist,
+                                 FilterValue = a.Key,
+                                 Text = a.Key + " (" + a.Count() + ")"
+                             });
+                return Query.ToList();
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of categories.
+        /// </summary>
+        /// <returns>A list of SearchCategoryItem objects.</returns>
+        public static List<SearchCategoryItem> GetCategoryCategories(SearchSettings settings) {
+            using (Entities context = new Entities()) {
+                var Query = (from c in context.MediaCategories
+                             where c.MediaTypeId == (int)settings.MediaType &&
+                                (settings.Search == "" || c.Name.Contains(settings.Search))
+                             orderby c.Name
+                             select new SearchCategoryItem() {
+                                 FilterType = SearchFilterEnum.Category,
+                                 FilterValue = c.Name,
+                                 Text = c.Name
+                             });
+                return Query.ToList();
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of elements.
+        /// </summary>
+        /// <returns>A list of SearchCategoryItem objects.</returns>
+        public static List<SearchCategoryItem> GetCategoryElements(SearchSettings settings) {
+            using (Entities context = new Entities()) {
+                var Query = (from c in context.RatingCategories
+                             where (settings.Search == "" || c.Name.Contains(settings.Search))
+                             orderby c.Name
+                             select new SearchCategoryItem() {
+                                 FilterType = SearchFilterEnum.Element,
+                                 FilterValue = c.Name,
+                                 Text = c.Name
+                             });
+                return Query.ToList();
+            }
+        }
+
         public static List<VideoListItem> GetList(SearchSettings settings) {
             using (Entities context = new Entities()) {
                 var Query = (from v in context.Media select v);
@@ -71,6 +130,29 @@ namespace DataAccess {
             // Media type
             if (settings.MediaType != MediaType.None)
                 Query = Query.Where(v => v.MediaTypeId == (int)settings.MediaType);
+
+            // Apply FilterKey.
+            if (settings.FilterType == SearchFilterEnum.All)
+                settings.IsInDatabase = true;
+            else if (settings.FilterValue != null) {
+                if (settings.FilterType == SearchFilterEnum.Artist)
+                    Query = Query.Where(v => v.Artist == settings.FilterValue);
+                else if (settings.FilterType == SearchFilterEnum.Category) {
+                    if (settings.FilterValue != "")
+                        Query = Query.Where(v => v.MediaCategory.Name == settings.FilterValue);
+                    else
+                        Query = Query.Where(v => v.MediaCategoryId == null);
+                } else if (settings.FilterType == SearchFilterEnum.Element) {
+                    Query = Query.Where(v => v.MediaRatings.Where(r => r.RatingCategory.Name == settings.FilterValue).Any());
+                }
+            } else if (settings.FilterType == SearchFilterEnum.Files)
+                settings.IsInDatabase = false;
+            else if (settings.FilterType == SearchFilterEnum.ArtistSingles)
+                Query = Query.Where(v => (from s in context.Media
+                                          group s by s.Artist into a
+                                          where a.Count() == 1
+                                          select a.Key).Contains(v.Artist));
+
             // Search string
             if (!string.IsNullOrEmpty(settings.Search))
                 Query = Query.Where(v => v.Artist.Contains(settings.Search) || v.Title.Contains(settings.Search) || v.FileName.Contains(settings.Search) || v.MediaCategory.Name.Contains(settings.Search));
@@ -239,9 +321,9 @@ namespace DataAccess {
                               //Egoless = (from r in v.MediaRatings
                               //           where r.RatingCategory.Name == "Egoless"
                               //           select r.DbGetValue(r.Height, r.Depth, settings.RatingRatio)).FirstOrDefault(),
-                              Custom = string.IsNullOrEmpty(settings.RatingCategory) ? null :
+                              Custom = string.IsNullOrEmpty(settings.CustomColumn) ? null :
                                       (from r in v.MediaRatings
-                                       where r.RatingCategory.Name == settings.RatingCategory // && r.RatingCategory.Custom
+                                       where r.RatingCategory.Name == settings.CustomColumn // && r.RatingCategory.Custom
                                        select r.DbGetValue(r.Height, r.Depth, settings.RatingRatio)).FirstOrDefault(),
                               IsInDatabase = true
                           });

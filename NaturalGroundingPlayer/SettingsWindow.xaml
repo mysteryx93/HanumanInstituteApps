@@ -20,7 +20,7 @@
         <TextBlock HorizontalAlignment="Left" Margin="18,163,0,0" TextWrapping="Wrap" Text="Zoom" VerticalAlignment="Top"/>
         <ComboBox x:Name="MediaPlayerCombo" HorizontalAlignment="Left" Margin="190,106,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="{Binding MediaPlayerApp, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay}" TabIndex="8" LostKeyboardFocus="MediaPlayerCombo_LostKeyboardFocus">
             <ComboBoxItem Content="MPC-HC" />
-            <ComboBoxItem Content="Internal" />
+            <ComboBoxItem Content="WMP" />
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" Margin="18,109,0,0" TextWrapping="Wrap" Text="Media Player" VerticalAlignment="Top"/>
         <CheckBox x:Name="EnableSvpCheckbox" Content="Enable SVP (play @ 60 fps)" HorizontalAlignment="Left" Margin="308,109,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableSvp, Mode=TwoWay}" TabIndex="20" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />

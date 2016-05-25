@@ -97,7 +97,7 @@ namespace Business {
         /// </summary>
         public void RemoveMT() {
             string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "SetMTMode", "Prefetch" };
+            string[] CommandsToComment = new string[] { "SetMTMode", "SetFilterMTMode", "Prefetch", @"Import(P+""AviSynthMT.avsi"")" };
             string[] NewLines = Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))).ToArray();
             script = new StringBuilder(string.Join(Environment.NewLine, NewLines));
         }

@@ -16,10 +16,9 @@ namespace NaturalGroundingPlayer {
     /// Interaction logic for FindVideoWindow.xaml
     /// </summary>
     public partial class SearchVideoWindow : Window {
-        public static VideoListItem Instance(SearchSettings settings, bool showAllFilesVisible) {
+        public static VideoListItem Instance(SearchSettings settings) {
             SearchVideoWindow NewForm = new SearchVideoWindow();
             NewForm.settings = settings;
-            NewForm.showAllFilesVisible = showAllFilesVisible;
             SessionCore.Instance.Windows.ShowDialog(NewForm);
             return NewForm.selection;
         }
@@ -42,11 +41,6 @@ namespace NaturalGroundingPlayer {
             timerChangeFilters.Tick += timerChangeFilters_Tick;
 
             MediaList.Settings = settings;
-
-            if (showAllFilesVisible)
-                settings.ConditionFilters.Add(new SearchConditionSetting()); // This will be associated with ShowAllFiles option.
-            else
-                ShowAllFiles.Visibility = Visibility.Hidden;
 
             if (settings.ConditionField == FieldConditionEnum.None)
                 settings.SetCondition(FieldConditionEnum.FileExists, true);
@@ -88,9 +82,12 @@ namespace NaturalGroundingPlayer {
             timerChangeFilters.Start();
         }
 
-        private void SelectButton_Click(object sender, RoutedEventArgs e) {
+        private async void SelectButton_Click(object sender, RoutedEventArgs e) {
             selection = MediaList.SelectedItem;
-            this.Close();
+            if (selection != null)
+                this.Close();
+            else
+                await MediaList.ShowDetailsAsync();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e) {
@@ -99,14 +96,6 @@ namespace NaturalGroundingPlayer {
 
         private void VideosView_ItemDoubleClick(object sender, MouseButtonEventArgs e) {
             SelectButton_Click(null, null);
-        }
-
-        private async void ShowAllFiles_Click(object sender, RoutedEventArgs e) {
-            MediaList.Settings.ConditionValue = ShowAllFiles.IsChecked.Value ? BoolConditionEnum.None : BoolConditionEnum.Yes;
-            if (IsLoaded && !MediaList.IsLoading) {
-                await MediaList.LoadDataAsync();
-                SearchText.Focus();
-            }
         }
 
         private void RatingCategoryCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {

@@ -19,7 +19,6 @@ namespace Business {
             this.AllowClose = true;
             timerKillIfFrozen = new Timer(2000);
             timerKillIfFrozen.Elapsed += timerKillIfFrozen_Elapsed;
-            // timerKillIfFrozen.Start();
         }
 
         public void Start() {

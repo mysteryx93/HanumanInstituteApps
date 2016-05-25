@@ -20,9 +20,18 @@ namespace DataAccess {
         Incomplete = 3
     }
 
+    public enum SearchFilterEnum {
+        None,
+        All,
+        Artist,
+        Category,
+        Element,
+        Files,
+        ArtistSingles
+    }
+
     public enum FieldConditionEnum {
         None,
-        IsInDatabase,
         FileExists,
         HasDownloadUrl,
         HasBuyOrDownloadUrl,

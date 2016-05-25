@@ -160,20 +160,18 @@ namespace NaturalGroundingPlayer {
             if (!menuReplayLast.IsEnabled)
                 return;
 
-            await SessionCore.Instance.Business.ReplayLastAsync();
+            await SessionCore.Instance.Business.ReplayLastAsync().ConfigureAwait(false);
         }
 
         private async void CommandBinding_SpecialRequest(object sender, ExecutedRoutedEventArgs e) {
             if (!menuSpecialRequest.IsEnabled)
                 return;
 
-            SearchSettings SearchSettings = new SearchSettings() { 
-                MediaType = MediaType.Video, 
-                RatingRatio = SessionCore.Instance.Main.RatioSlider.Value,
-                ConditionField = FieldConditionEnum.IsInDatabase,
-                ConditionValue = BoolConditionEnum.Yes
+            SearchSettings SearchSettings = new SearchSettings() {
+                MediaType = MediaType.Video,
+                RatingRatio = SessionCore.Instance.Main.RatioSlider.Value
             };
-            VideoListItem Result = SearchVideoWindow.Instance(SearchSettings, true);
+            VideoListItem Result = SearchVideoWindow.Instance(SearchSettings);
             if (Result != null)
                 await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, Result.FileName).ConfigureAwait(false);
         }
@@ -234,7 +232,7 @@ namespace NaturalGroundingPlayer {
                 Value = 12
             });
 
-            VideoListItem Result = SearchVideoWindow.Instance(settings, false);
+            VideoListItem Result = SearchVideoWindow.Instance(settings);
             if (Result != null)
                 await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.Fire, Result.FileName);
         }
@@ -268,7 +266,7 @@ namespace NaturalGroundingPlayer {
             if (!menuAddAudio.IsEnabled)
                 return;
 
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Audio }, true);
+            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Audio });
             if (Result != null) {
                 LayerAudioControl Layer = new LayerAudioControl();
                 await Layer.OpenMediaAsync(SessionCore.Instance.Business.GetMediaObject(Result.FileName));
@@ -280,7 +278,7 @@ namespace NaturalGroundingPlayer {
             if (!menuAddImage.IsEnabled)
                 return;
 
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Image }, true);
+            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Image });
             if (Result != null) {
                 LayerImageControl Layer = new LayerImageControl();
                 Layer.OpenMedia(SessionCore.Instance.Business.GetMediaObject(Result.FileName));
@@ -292,7 +290,7 @@ namespace NaturalGroundingPlayer {
             if (!menuAddVideo.IsEnabled)
                 return;
 
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Video }, true);
+            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Video });
             if (Result != null) {
                 LayerVideoControl Layer = new LayerVideoControl();
                 await Layer.OpenMediaAsync(SessionCore.Instance.Business.GetMediaObject(Result.FileName));
@@ -304,7 +302,7 @@ namespace NaturalGroundingPlayer {
             if (!menuAddLucidVideo.IsEnabled)
                 return;
 
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Video }, true);
+            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() { MediaType = MediaType.Video });
             if (Result != null) {
                 LayerLucidVideoControl Layer = new LayerLucidVideoControl();
                 Layer.OpenMedia(SessionCore.Instance.Business.GetMediaObject(Result.FileName));

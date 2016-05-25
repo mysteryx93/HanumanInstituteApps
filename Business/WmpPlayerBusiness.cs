@@ -23,7 +23,7 @@ namespace Business {
         public bool IsVisible;
         private double position;
         private DateTime lastStartTime;
-        private int restorePosition;
+        private double restorePosition;
         private bool isPlaying;
         private bool timerGetPositionEnabled = false; // GetPosition is always being sent, but sets whether to listen to the response.
         private bool allowClose = false;
@@ -155,6 +155,7 @@ namespace Business {
 
         public double Position {
             get { return position; }
+            set { position = value; }
         }
 
         public Task SetPositionAsync(double pos) {
@@ -238,11 +239,17 @@ namespace Business {
         /// <summary>
         /// Returns the current video's start position, taking into account the slowdown when playing at 432hz.
         /// </summary>
-        public short? StartPos {
+        public double? StartPos {
             get {
-                if (CurrentVideo != null && CurrentVideo.StartPos != null)
-                    return (short)((double)CurrentVideo.StartPos.Value * 440 / 432);
-                else
+                if (CurrentVideo != null && CurrentVideo.StartPos != null) {
+                    if (Settings.SavedFile.ChangeAudioPitch) {
+                        if (MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynth26)
+                            return (double)CurrentVideo.StartPos.Value * 440 / 432 + .5; // Video slowed down
+                        else
+                            return CurrentVideo.StartPos.Value + .5; // Added half-second to fill buffer
+                    } else
+                        return CurrentVideo.StartPos.Value;
+                } else
                     return null;
             }
         }
@@ -250,11 +257,18 @@ namespace Business {
         /// <summary>
         /// Returns the current video's end position, taking into account the slowdown when playing at 432hz.
         /// </summary>
-        public short? EndPos {
+        public double? EndPos {
             get {
-                if (CurrentVideo != null && CurrentVideo.EndPos != null)
-                    return (short)((double)CurrentVideo.EndPos.Value * 440 / 432);
-                else
+                if (CurrentVideo != null && CurrentVideo.EndPos != null) {
+                    if (Settings.SavedFile.ChangeAudioPitch) {
+                        if (MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynth26)
+                            return (double)CurrentVideo.EndPos.Value * 440 / 432 + .5; // Video slowed down
+                        else
+                            return CurrentVideo.EndPos.Value + .5; // Added half-second to fill buffer
+                    } else
+                        return CurrentVideo.EndPos.Value;
+
+                } else
                     return null;
             }
         }

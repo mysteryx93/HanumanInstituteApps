@@ -64,7 +64,6 @@ namespace Business {
         }
         public bool Denoise1 { get; set; }
         public int Denoise1Strength { get; set; }
-        public bool Denoise1Compatibility { get; set; }
         public bool Denoise2 { get; set; }
         public int Denoise2Strength { get; set; }
         public int Denoise2Sharpen { get; set; }
@@ -72,12 +71,15 @@ namespace Business {
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
         public bool IncreaseFrameRateSmooth { get; set; }
         public UpscaleMethods UpscaleMethod { get; set; }
+        public DownscaleMethods DownscaleMethod { get; set; }
         public int SuperXbrStrength { get; set; }
         public int SuperXbrSharpness { get; set; }
         public bool SuperRes { get; set; }
-        public bool SuperResDoublePass { get; set; }
+        public bool SuperRes3Passes { get; set; }
         public int SuperResStrength { get; set; }
         public int SuperResSoftness { get; set; }
+        public float SSimStrength { get; set; }
+        public bool SSimSoft { get; set; }
         private bool crop;
         public bool Crop {
             get { return crop; }
@@ -185,15 +187,19 @@ namespace Business {
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             IncreaseFrameRateSmooth = true;
             UpscaleMethod = UpscaleMethods.SuperXbr;
-            SuperXbrStrength = 20;
-            SuperXbrSharpness = 12;
+            DownscaleMethod = DownscaleMethods.Bicubic;
+            SuperXbrStrength = 27;
+            SuperXbrSharpness = 13;
             SuperRes = true;
-            SuperResDoublePass = true;
-            SuperResStrength = 120;
+            SuperRes3Passes = true;
+            SuperResStrength = 100;
+            SuperResSoftness = 15;
+            SSimStrength = 80;
+            SSimSoft = false;
             TrimStart = 0;
             ChangeSpeedValue = 100;
             VideoCodec = VideoCodecs.x265;
-            EncodeQuality = 23;
+            EncodeQuality = 22;
             EncodePreset = EncodePresets.medium;
             AudioQuality = 50;
             ChangeAudioPitch = false;
@@ -367,6 +373,11 @@ namespace Business {
     public enum UpscaleMethods {
         SuperXbr,
         NNedi3
+    }
+
+    public enum DownscaleMethods {
+        SSim,
+        Bicubic
     }
 
     public enum VideoCodecs {

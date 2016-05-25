@@ -67,6 +67,16 @@ namespace DataAccess {
                     return "";
             }
         }
+
+        public string DisplayTitle {
+            get {
+                if (Artist.Length == 0)
+                    return Title;
+                else
+                    return string.Format("{0} - {1}", Artist, Title);
+
+            }
+        }
     }
 
     [PropertyChanged.ImplementPropertyChanged]

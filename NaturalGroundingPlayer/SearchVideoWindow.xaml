@@ -15,7 +15,6 @@
     <Grid>
         <Button x:Name="SelectButton" Content="_Select" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="SelectButton_Click" IsDefault="True" TabIndex="9"/>
         <Button x:Name="CancelButton" Content="_Cancel" Margin="0,0,90,10" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="CancelButton_Click" IsCancel="True" TabIndex="8"/>
-        <CheckBox x:Name="ShowAllFiles" Content="Show _All Files" HorizontalAlignment="Left" Margin="10,0,0,13" VerticalAlignment="Bottom" RenderTransformOrigin="0.235,-0.25" TabIndex="7" Click="ShowAllFiles_Click"/>
         <TextBox x:Name="SearchText" Width="136" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="60,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,17,0,0" HorizontalAlignment="Left"/>
         <ComboBox x:Name="RatingCategoryCombo" HorizontalAlignment="Left" Margin="285,16,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="RatingCategoryCombo_SelectionChanged" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />

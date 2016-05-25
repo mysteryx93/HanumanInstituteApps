@@ -34,34 +34,35 @@ namespace Business {
         /// <param name="infoReader">An object to read media information.</param>
         public static void CreateScript(string inputFile, MediaInfoReader infoReader) {
             bool AviSynthPlus = MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynthPlus;
-            int CPU = Environment.ProcessorCount / 2;
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            Script.LoadPluginDll("TimeStretch.dll");
-            Script.LoadPluginAvsi("UUSize4.avsi");
             if (AviSynthPlus) {
-                Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
-                Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
-                Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-            } else {
-                Script.AppendLine("SetMTMode(3,{0})", CPU);
-            }
-            Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), 2);
-            if (!AviSynthPlus)
-                Script.AppendLine("SetMTMode(2)");
-            Script.AppendLine("UUSize4(mod=4)");
-            if (AviSynthPlus) {
+                //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
+                //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
+                //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
+                Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), 0);
+                Script.AppendLine("Preroll(int(FrameRate*3))");
                 // This causes a slight audio delay in AviSynth 2.6
+                Script.LoadPluginDll("TimeStretch.dll");
                 Script.AppendLine("ResampleAudio(48000)");
                 Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
-                Script.AppendLine("Prefetch({0})", CPU);
+                //Script.AppendLine("Prefetch({0})", CPU);
             } else {
+                int CPU = Environment.ProcessorCount / 2;
+                Script.AppendLine("SetMTMode(3,{0})", CPU);
+                Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), CPU);
+                Script.AppendLine("SetMTMode(2)");
+                Script.AppendLine("Preroll(int(FrameRate*3))");
+                //Script.AppendLine("Loop(int(FrameRate/2), 0, 0)");
+                //Script.LoadPluginAvsi("UUSize4.avsi");
+                //Script.AppendLine("UUSize4(mod=4)");
                 // This slightly slows down playback speed but audio stays in sync
                 Script.AppendLine("V = AssumeFPS(432.0 / 440.0 * FrameRate)");
                 Script.AppendLine("A = AssumeSampleRate(int(432.0 / 440.0 * AudioRate))");
                 Script.AppendLine("AudioDub(V, A)");
             }
 
+            Script.Cleanup();
             Script.WriteToFile(Settings.AutoPitchFile);
             File.Delete(Settings.AutoPitchCache);
         }

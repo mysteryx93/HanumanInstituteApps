@@ -30,7 +30,7 @@ namespace NaturalGroundingPlayer {
             MpcConfigBusiness.IsSvpEnabled = true;
             MpcConfigBusiness.IsMadvrEnabled = true;
 
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, true);
+            MediaList.Settings.IsInDatabase = true;
             await Task.Delay(100);
             ComboBox_SelectionChanged(null, null);
         }

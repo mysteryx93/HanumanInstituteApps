@@ -10,6 +10,7 @@ namespace DataAccess {
     /// Contains settings to search videos.
     /// </summary>
     [Serializable()]
+    [PropertyChanged.ImplementPropertyChanged]
     public class SearchSettings {
         public SearchSettings() {
             // Add first row that is found to standard properties.
@@ -26,7 +27,7 @@ namespace DataAccess {
         /// <param name="excludeVideos">A list of videos to exclude from the search.</param>
         /// <param name="allowDownloading">False to allow downloading from the Internet, True to search only local files.</param>
         /// <param name="ratingRatio">A number between -1 and 1 representing the rating Heigth/Depth priority ratio.</param>
-        public SearchSettings(MediaType mediaType, List<Guid> excludeVideos, bool allowDownloading, double ratingRatio):this() {
+        public SearchSettings(MediaType mediaType, List<Guid> excludeVideos, bool allowDownloading, double ratingRatio) : this() {
             this.MediaType = mediaType;
             this.ExcludeVideos = excludeVideos;
             this.AllowDownloading = allowDownloading;
@@ -34,9 +35,17 @@ namespace DataAccess {
         }
 
         /// <summary>
+        /// Sets a type of filter to apply.
+        /// </summary>
+        public SearchFilterEnum FilterType { get; set; }
+        /// <summary>
+        /// When set, the Artist, Category or Element must match this value.
+        /// </summary>
+        public string FilterValue { get; set; }
+        /// <summary>
         /// A value to search within artist, title, folder and category.
         /// </summary>
-        public string Search { get; set; }
+        public string Search { get; set; } = "";
         /// <summary>
         /// The type of media to return.
         /// </summary>
@@ -53,11 +62,18 @@ namespace DataAccess {
         public List<SearchRatingSetting> RatingFilters { get; set; }
         public List<SearchConditionSetting> ConditionFilters { get; set; }
 
+        public bool? ListIsInDatabase { get; set; } // For categories list
+        public bool? IsInDatabase { get; set; } // For details view
         public HasRatingEnum HasRating { get; set; }
         public List<string> BuyUrlDomains { get; set; }
         public bool BuyUrlDomainsNegated { get; set; }
         public string OrderBy { get; set; }
         public ListSortDirection OrderByDirection { get; set; }
+        public string DisplayCustomRating { get; set; }
+
+        public string CustomColumn {
+            get { return !string.IsNullOrEmpty(DisplayCustomRating) ? DisplayCustomRating : RatingCategory; }
+        }
 
         /// <summary>
         /// Gets or sets the Height/Depth rating priority ratio as a number between -1 and 1.

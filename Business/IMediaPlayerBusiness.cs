@@ -9,13 +9,13 @@ namespace Business {
         bool IsPlaying { get; }
         bool IsAvailable { get; }
         bool IgnorePos { get; set; }
-        short? StartPos { get; }
-        short? EndPos { get; }
+        double? StartPos { get; }
+        double? EndPos { get; }
         event EventHandler NowPlaying;
         event EventHandler Pause;
         event EventHandler PlayNext;
         Task PlayVideoAsync(DataAccess.Media video, bool enableAutoPitch);
-        double Position { get; }
+        double Position { get; set; }
         Task SetPositionAsync(double pos);
         event EventHandler PositionChanged;
         event EventHandler Resume;

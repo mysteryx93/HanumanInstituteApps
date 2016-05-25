@@ -25,15 +25,6 @@ namespace Business {
                 Media VideoData = PlayerAccess.GetVideoById(item.MediaId.Value);
 
                 if (VideoData != null) {
-                    // Test MediaInfo not releasing file.
-                    string TestFile = Settings.TempFilesPath + Path.GetFileName(VideoData.FileName);
-                    File.Delete(TestFile);
-                    File.Copy(Settings.NaturalGroundingFolder + VideoData.FileName, TestFile);
-                    MediaInfoReader MediaReader = new MediaInfoReader();
-                    MediaReader.LoadInfo(TestFile);
-                    string VFormat = MediaReader.VideoFormat;
-                    File.Delete(TestFile);
-
                     try {
                         // Query the server for media info.
                         SetStatus(item, VideoListItemStatusEnum.DownloadingInfo);

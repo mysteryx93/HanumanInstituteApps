@@ -133,5 +133,26 @@ namespace MediaPlayer {
             if (PositionChanged != null)
                 PositionChanged(this, new EventArgs());
         }
+
+
+        private static bool? isWmpInstalled;
+
+        /// <summary>
+        /// Returns whether Windows Media Player is installed.
+        /// </summary>
+        public static bool IsWmpInstalled {
+            get {
+                if (!isWmpInstalled.HasValue) {
+                    try {
+                        MediaPlayer.WindowsMediaPlayer a = new MediaPlayer.WindowsMediaPlayer();
+                        isWmpInstalled = true;
+                    }
+                    catch {
+                        isWmpInstalled = false;
+                    }
+                }
+                return isWmpInstalled.Value;
+            }
+        }
     }
 }

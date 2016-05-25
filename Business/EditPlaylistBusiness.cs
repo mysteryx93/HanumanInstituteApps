@@ -27,6 +27,41 @@ namespace Business {
         }
 
         /// <summary>
+        /// Loads the list of artists.
+        /// </summary>
+        /// <param name="settings">The filters to apply to the data.</param>
+        public async Task<List<SearchCategoryItem>> LoadCategoriesAsync(SearchSettings settings, SearchFilterEnum groupType) {
+            List<SearchCategoryItem> Result = new List<SearchCategoryItem>();
+            if (settings.ListIsInDatabase != false) {
+                Result.Add(new SearchCategoryItem(SearchFilterEnum.All, null, "All"));
+                if (groupType != SearchFilterEnum.Artist)
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.Artist, null, "By Artist"));
+                if (groupType != SearchFilterEnum.Category)
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.Category, null, "By Category"));
+                if (groupType != SearchFilterEnum.Element)
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.Element, null, "By Element"));
+            }
+            if (settings.ListIsInDatabase != true)
+                Result.Add(new SearchCategoryItem(SearchFilterEnum.Files, null, "Other Files"));
+            Result.Add(new SearchCategoryItem(SearchFilterEnum.None, null, "---"));
+
+            if (groupType == SearchFilterEnum.Artist) {
+                if (string.IsNullOrEmpty(settings.Search)) {
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.Artist, "", "No Artist"));
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.ArtistSingles, null, "Singles"));
+                }
+                Result.AddRange(await Task.Run(() => SearchVideoAccess.GetCategoryArtists(settings)));
+            } else if (groupType == SearchFilterEnum.Category) {
+                if (string.IsNullOrEmpty(settings.Search))
+                    Result.Add(new SearchCategoryItem(SearchFilterEnum.Category, "", "No Category"));
+                Result.AddRange(await Task.Run(() => SearchVideoAccess.GetCategoryCategories(settings)));
+            } else if (groupType == SearchFilterEnum.Element)
+                Result.AddRange(await Task.Run(() => SearchVideoAccess.GetCategoryElements(settings)));
+
+            return Result;
+        }
+
+        /// <summary>
         /// Loads the playlist from the database with specified filter conditions.
         /// </summary>
         /// <param name="settings">The filters to apply to the data.</param>
@@ -42,7 +77,7 @@ namespace Business {
         /// <param name="forceScanFolder">Whether to scan files in folder to set FileExists.</param>
         /// <returns>A Task object for asynchronous processing.</returns>
         public async Task LoadPlaylistAsync(SearchSettings settings, bool forceScanFolder) {
-            bool LoadFilesRequired = !(settings.ConditionField == FieldConditionEnum.IsInDatabase && settings.ConditionValue == BoolConditionEnum.Yes);
+            bool LoadFilesRequired = !(settings.IsInDatabase == true);
 
             // Load database.
             var DbTask = Task.Run(() => SearchVideoAccess.GetList(settings));
@@ -118,7 +153,7 @@ namespace Business {
             if (Cond != null)
                 playlist.RemoveAll(v => v.FileExists == (Cond.Value == BoolConditionEnum.No));
             // Apply IsInDatabase search filter.
-            if (settings.ConditionFilters.Any(f => f.Field == FieldConditionEnum.IsInDatabase && f.Value == BoolConditionEnum.No))
+            if (settings.IsInDatabase == false)
                 playlist.RemoveAll(v => v.IsInDatabase);
         }
 
@@ -127,10 +162,11 @@ namespace Business {
             Result = (settings.MediaType == MediaType.None || mediaType == settings.MediaType) &&
                         (string.IsNullOrEmpty(settings.Search) || (fileName != null && fileName.IndexOf(settings.Search, StringComparison.OrdinalIgnoreCase) != -1)) &&
                         (string.IsNullOrEmpty(settings.RatingCategory) || !settings.RatingValue.HasValue) &&
+                        (settings.IsInDatabase != true) &&
                         (settings.HasRating == HasRatingEnum.All || settings.HasRating == HasRatingEnum.Without);
             foreach (SearchConditionSetting item in settings.ConditionFilters) {
                 if (!(item.Field == FieldConditionEnum.None || item.Value == BoolConditionEnum.None ||
-                    (item.Field == FieldConditionEnum.IsInDatabase && item.Value == BoolConditionEnum.No) ||
+                    // (item.Field == FieldConditionEnum.IsInDatabase && item.Value == BoolConditionEnum.No) ||
                     (item.Field == FieldConditionEnum.FileExists && item.Value == BoolConditionEnum.Yes) ||
                     (item.Field == FieldConditionEnum.HasDownloadUrl && item.Value == BoolConditionEnum.No)))
                     Result = false;
@@ -241,8 +277,7 @@ namespace Business {
         public async Task LoadBuyListAsync(SearchSettings settings, BuyProductType productType, bool showAllFiles) {
             settings.MediaType = MediaType.None;
             if (showAllFiles) {
-                settings.ConditionField = FieldConditionEnum.IsInDatabase;
-                settings.ConditionValue = BoolConditionEnum.Yes;
+                settings.IsInDatabase = true;
             } else {
                 settings.ConditionField = FieldConditionEnum.FileExists;
                 settings.ConditionValue = BoolConditionEnum.No;
@@ -350,7 +385,7 @@ namespace Business {
             // Auto-bind files
             EditPlaylistBusiness BindBusiness = new EditPlaylistBusiness();
             SearchSettings BindSettings = new SearchSettings();
-            BindSettings.SetCondition(FieldConditionEnum.IsInDatabase, true);
+            BindSettings.IsInDatabase = true;
             await BindBusiness.LoadPlaylistAsync(BindSettings);
             await BindBusiness.LoadMediaInfoAsync(null);
         }

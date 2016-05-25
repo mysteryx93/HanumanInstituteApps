@@ -391,10 +391,71 @@ namespace Business {
 
             return Result;
         }
-    }
 
-    public class ClipInfo {
-        public float FrameRate;
-        public int FrameCount;
+        /// <summary>
+        /// Returns which version of OpenCL the GPU supports.
+        /// </summary>
+        /// <returns>The version of OpenCL supported by the GPU.</returns>
+        public static SupportedOpenClVersion TestSupportedOpenClVersion() {
+            if (GpuSupportsOpenCL(true))
+                return SupportedOpenClVersion.v12;
+            else if (GpuSupportsOpenCL(false))
+                return SupportedOpenClVersion.v11;
+            else
+                return SupportedOpenClVersion.None;
+        }
+
+        /// <summary>
+        /// Returns whether the GPU supports the latest version of KNLMeans with OpenCL 1.2
+        /// </summary>
+        /// <param name="supports11">If true, it will instead test whether the GPU supports OpenCL 1.1</param>
+        /// <returns>True if OpenCL is supported.</returns>
+        private static bool GpuSupportsOpenCL(bool version12) {
+            string TempScript = Settings.TempFilesPath + "Temp.avs";
+            string TempResult = Settings.TempFilesPath + "Temp.txt";
+            string TempOut = Settings.TempFilesPath + "Temp.y4m";
+
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
+            Script.AddPluginPath();
+            Script.LoadPluginDll(string.Format("KNLMeansCL{0}.dll", version12 ? "" : "-6.11"));
+            Script.AppendLine(@"colorbars(pixel_type = ""yv12"").killaudio().trim(1, 1)");
+            Script.AppendLine("Result = true");
+            Script.AppendLine("try {");
+            Script.AppendLine(@"KNLMeansCL(device_type=""GPU"")");
+            Script.AppendLine("} catch(error_msg) {");
+            Script.AppendLine("Result = false");
+            Script.AppendLine("}");
+            Script.AppendLine(@"WriteFileStart(""{0}"", string(Result))", TempResult);
+            Script.WriteToFile(TempScript);
+
+            // Run script.
+            FfmpegBusiness.Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o {1}", TempScript, TempOut), true);
+
+            // Read frame count
+            bool Result = false;
+            if (File.Exists(TempResult)) {
+                string FileString = File.ReadAllText(TempResult);
+                try {
+                    Result = bool.Parse(FileString.TrimEnd());
+                }
+                catch {
+                    Result = false;
+                }
+            }
+
+            // Delete temp files.
+            File.Delete(TempScript);
+            File.Delete(TempResult);
+            File.Delete(TempOut); // Dummy file that received avs2yuv output.
+
+            return Result;
+        }
+
+
+        public class ClipInfo {
+            public float FrameRate;
+            public int FrameCount;
+        }
+
     }
 }

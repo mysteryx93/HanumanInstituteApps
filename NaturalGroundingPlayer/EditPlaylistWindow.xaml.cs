@@ -43,7 +43,10 @@ namespace NaturalGroundingPlayer {
             this.DataContext = MediaList.Settings;
 
             RatingCategoryCombo.ItemsSource = await MediaList.business.GetRatingCategoriesAsync(true);
+            // Load categories list.
             await MediaList.LoadDataAsync();
+            // Auto-attach files.
+            await MediaList.ManualLoadPlaylist();
             await LoadMediaInfoAsync();
             isLoaded = true;
         }
@@ -67,9 +70,9 @@ namespace NaturalGroundingPlayer {
             bool HasChanges = await MediaList.business.LoadMediaInfoAsync(progress);
             isLoadingMediaInfo = false;
             DisplayVideoCount();
-            if (HasChanges) {
-                await MediaList.LoadDataAsync();
-            }
+            //if (HasChanges) {
+            //    await MediaList.LoadDataAsync();
+            //}
         }
 
         private void Settings_Changed(object sender, RoutedEventArgs e) {
@@ -110,8 +113,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Window_Closing(object sender, CancelEventArgs e) {
-            if (callback != null)
-                callback();
+            callback?.Invoke();
         }
 
         private void RatingCategoryCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {

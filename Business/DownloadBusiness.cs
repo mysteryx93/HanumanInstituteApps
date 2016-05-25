@@ -55,7 +55,7 @@ namespace Business {
 
             // Add DownloadItem right away before doing any async work.
             DownloadItem DownloadInfo = new DownloadItem(video, Destination, DownloadDesc, queuePos, upgradeAudio, callback);
-            System.Windows.Application.Current.Dispatcher.Invoke(() => downloadsList.Insert(0, DownloadInfo));
+            Application.Current.Dispatcher.Invoke(() => downloadsList.Insert(0, DownloadInfo));
 
             // Notify UI of new download to show window.
             if (DownloadAdded != null)

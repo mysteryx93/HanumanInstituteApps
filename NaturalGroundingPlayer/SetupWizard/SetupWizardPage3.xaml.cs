@@ -32,7 +32,7 @@ namespace NaturalGroundingPlayer {
             MpcConfigBusiness.IsMadvrEnabled = false;
             MpcConfigBusiness.IsWidescreenEnabled = false;
 
-            MediaList.Settings.SetCondition(FieldConditionEnum.IsInDatabase, true);
+            MediaList.Settings.IsInDatabase = true;
             await Task.Delay(100);
             ComboBox_SelectionChanged(null, null);
         }
