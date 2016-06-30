@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
-    public class MediaEncoderSettings : ICloneable {
+    public class MediaEncoderSettings {
         public string FileName { get; set; }
         public bool ConvertToAvi { get; set; }
         [DefaultValue(null)]
@@ -62,11 +62,16 @@ namespace Business {
                 CalculateSize(false);
             }
         }
-        public bool Denoise1 { get; set; }
-        public int Denoise1Strength { get; set; }
-        public bool Denoise2 { get; set; }
-        public int Denoise2Strength { get; set; }
-        public int Denoise2Sharpen { get; set; }
+        public bool Denoise { get; set; }
+        public int DenoiseStrength { get; set; }
+        public int DenoiseD { get; set; }
+        public int DenoiseA { get; set; }
+        public bool Dering { get; set; }
+        public bool Deblock { get; set; }
+        public int DeblockStrength { get; set; }
+        public bool DeblockSharp { get; set; }
+        public bool DeblockHD { get; set; }
+        public bool Deshaker { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
         public bool IncreaseFrameRateSmooth { get; set; }
@@ -137,18 +142,15 @@ namespace Business {
             get { return audioAction; }
             set {
                 audioAction = value;
-                if (audioAction == AudioActions.Copy) {
-                    Trim = false;
-                    ChangeSpeed = false;
-                    if (!IsAudioMp4)
-                        EncodeFormat = VideoFormats.Mkv;
-                }
+                if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction == AudioActions.EncodeOpus)
+                    EncodeFormat = VideoFormats.Mkv;
             }
         }
         public int AudioQuality { get; set; }
         [DefaultValue(null)]
         public float? AudioGain { get; set; }
         public bool ChangeAudioPitch { get; set; }
+        public MediaEncoderDeshakerSettings DeshakerSettings { get; set; }
 
         private bool autoCalculateSize;
         [XmlIgnore()]
@@ -170,6 +172,14 @@ namespace Business {
         public Rect CropAfter { get; set; }
         [XmlIgnore()]
         public int FrameDouble { get; set; }
+        [XmlIgnore()]
+        public int ScaleFactor { get; set; }
+        [XmlIgnore()]
+        public bool IsUpscaling { get; set; }
+        [XmlIgnore()]
+        public bool IsDownscaling { get; set; }
+        [XmlIgnore()]
+        public bool IsSameSize { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
@@ -179,10 +189,13 @@ namespace Business {
             SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
             OutputHeight = 768;
-            Denoise1 = true;
-            Denoise1Strength = 21;
-            Denoise2Strength = 30;
-            Denoise2Sharpen = 10;
+            Denoise = true;
+            DenoiseStrength = 20;
+            DenoiseD = 2;
+            DenoiseA = 2;
+            DeblockStrength = 20;
+            DeblockSharp = true;
+            DeblockHD = true;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             IncreaseFrameRateSmooth = true;
@@ -193,7 +206,7 @@ namespace Business {
             SuperRes = true;
             SuperRes3Passes = true;
             SuperResStrength = 100;
-            SuperResSoftness = 15;
+            SuperResSoftness = 0;
             SSimStrength = 80;
             SSimSoft = false;
             TrimStart = 0;
@@ -201,7 +214,7 @@ namespace Business {
             VideoCodec = VideoCodecs.x265;
             EncodeQuality = 22;
             EncodePreset = EncodePresets.medium;
-            AudioQuality = 50;
+            AudioQuality = 256;
             ChangeAudioPitch = false;
         }
 
@@ -237,37 +250,53 @@ namespace Business {
                 CropSource = new Rect();
 
             FrameDouble = 0;
-            int ScaleFactor = 1;
+            ScaleFactor = 1;
             int FrameDoubleX = 0, FrameDoubleY = 0;
             int ScaleFactorX = 1, ScaleFactorY = 1;
+            CalcOutputWidth(1);
             // Calculate scale factor based on height
-            while ((SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactorY < OutputHeight) {
+            while ((SourceHeight - CropSource.Top - CropSource.Bottom) * ScaleFactorY - CropAfter.Top - CropAfter.Bottom < OutputHeight) {
                 FrameDoubleY += 1;
                 ScaleFactorY *= 2;
             }
-            // Calculate scale factor based on width
-            while ((SourceWidth - CropSource.Left - CropSource.Right) * ScaleFactorX * SourceAspectRatio < OutputWidth) {
-                FrameDoubleX += 1;
-                ScaleFactorX *= 2;
+            if (SourceAspectRatio != 1) {
+                // Calculate scale factor based on width
+                while ((int)Math.Round(((double)(SourceWidth - CropSource.Left - CropSource.Right) * ScaleFactorX - CropAfter.Left - CropAfter.Right) / 4) * 4 < OutputWidth) {
+                    FrameDoubleX += 1;
+                    ScaleFactorX *= 2;
+                }
             }
             // Take highest ratio
             FrameDouble = FrameDoubleX > FrameDoubleY ? FrameDoubleX : FrameDoubleY;
             ScaleFactor = ScaleFactorX > ScaleFactorY ? ScaleFactorX : ScaleFactorY;
 
+            CalcOutputWidth(ScaleFactor);
+
+            IsUpscaling = FrameDouble > 0;
+            IsDownscaling = !IsUpscaling && OutputHeight < SourceHeight - (Crop ? CropTop + CropBottom : 0);
+            IsSameSize = !IsUpscaling && !IsDownscaling;
+            DownscaleMethod = IsDownscaling ? DownscaleMethods.SSim : DownscaleMethods.Bicubic;
+        }
+
+        // This must be calculated twice; once to get the Width, and again to calculate accurate cropping values.
+        public void CalcOutputWidth(int ScaleFactor) {
             if (Crop) {
                 CropAfter = new Rect(
                     (CropLeft - CropSource.Left) * ScaleFactor,
                     (CropTop - CropSource.Top) * ScaleFactor,
                     (CropRight - CropSource.Right) * ScaleFactor,
                     (CropBottom - CropSource.Bottom) * ScaleFactor);
+                // Make sure Height is Mod 2
+                if (ScaleFactor == 1) {
+                    if (CropAfter.Top + CropAfter.Bottom % 2 == 1)
+                        CropAfter.Bottom++;
+                    if (CropAfter.Left + CropAfter.Right % 2 == 1)
+                        CropAfter.Right++;
+                }
             } else
                 CropAfter = new Rect();
-            int CropHeight = ((SourceHeight.Value - CropSource.Top - CropSource.Bottom) * ScaleFactor);
-            int CropWidth = ((SourceWidth.Value - CropSource.Left - CropSource.Right) * ScaleFactor);
-            if (CropAfter.HasValue) {
-                CropHeight = CropHeight - CropAfter.Top - CropAfter.Bottom;
-                CropWidth = CropWidth - CropAfter.Left - CropAfter.Right;
-            }
+            int CropHeight = ((SourceHeight.Value - CropSource.Top - CropSource.Bottom) * ScaleFactor) - CropAfter.Top - CropAfter.Bottom;
+            int CropWidth = ((SourceWidth.Value - CropSource.Left - CropSource.Right) * ScaleFactor) - CropAfter.Left - CropAfter.Right;
             // Make width divisible by 4 without distorting pixels
             float TotalWidth = (float)CropWidth * SourceAspectRatio / CropHeight * OutputHeight;
             OutputWidth = (int)Math.Round(TotalWidth / 4) * 4;
@@ -284,9 +313,15 @@ namespace Business {
             }
         }
 
+        public bool IsAudioEncode {
+            get {
+                return AudioAction == AudioActions.EncodeAac || AudioAction == AudioActions.EncodeOpus;
+            }
+        }
+
         public bool CanEncodeMp4 {
             get {
-                return IsAudioMp4 || AudioAction != AudioActions.Copy;
+                return IsAudioMp4 || AudioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac;
             }
         }
 
@@ -304,7 +339,7 @@ namespace Business {
 
         public bool CanAlterAudio {
             get {
-                return audioAction == AudioActions.Ignore || audioAction == AudioActions.Encode;
+                return audioAction != AudioActions.Copy;
             }
         }
 
@@ -347,6 +382,10 @@ namespace Business {
             get { return Settings.TempFilesPath + string.Format("Job{0}_Output.aac", JobIndex); }
         }
 
+        public string AudioFileOpus {
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.opus", JobIndex); }
+        }
+
         public string FinalFile {
             get { return Settings.TempFilesPath + string.Format("Job{0}_Final.{1}", JobIndex, EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv"); }
         }
@@ -360,14 +399,34 @@ namespace Business {
             }
         }
 
-        public object Clone() {
+        public string DeshakerScript {
+            get {
+                if (JobIndex >= 0)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Deshaker.avs", JobIndex);
+                else
+                    return Settings.TempFilesPath + "Preview_Deshaker.avs";
+            }
+        }
+
+        public string DeshakerLog {
+            get {
+                if (JobIndex >= 0)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Deshaker.log", JobIndex);
+                else
+                    return Settings.TempFilesPath + "Preview_Deshaker.log";
+            }
+        }
+
+        public MediaEncoderSettings Clone() {
             return (MediaEncoderSettings)DataHelper.DeepClone(this);
         }
     }
 
     public enum ColorMatrix {
         Rec601,
-        Rec709
+        Rec709,
+        Pc601,
+        Pc709
     }
 
     public enum UpscaleMethods {
@@ -394,7 +453,8 @@ namespace Business {
     public enum AudioActions {
         Copy,
         Ignore,
-        Encode
+        EncodeAac,
+        EncodeOpus
     }
 
     public enum EncodePresets {

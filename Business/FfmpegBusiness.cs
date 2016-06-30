@@ -15,9 +15,10 @@ namespace Business {
         /// <param name="videoFile">The video file with missing audio.</param>
         /// <param name="audioFile">The video file containing the audio.</param>
         /// <param name="destination">The output file.</param>
+        /// <param name="fixAac">FFMPEG-encoded AAC streams are invalid and require an extra flag to join.</param>
         /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
         /// <returns>Whether the operation was completed.</returns>
-        public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool silent) {
+        public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool fixAac, bool silent) {
             bool Result = true;
             File.Delete(destination);
 
@@ -25,13 +26,13 @@ namespace Business {
             string OriginalVideoFile = videoFile;
             if ((videoFile.EndsWith(".264") || videoFile.EndsWith(".265")) && destination.EndsWith(".mkv")) {
                 videoFile = videoFile.Substring(0, videoFile.Length - 4) + ".mp4";
-                Result = JoinAudioVideo(OriginalVideoFile, null, videoFile, silent);
+                Result = JoinAudioVideo(OriginalVideoFile, null, videoFile, false, silent);
             }
 
             if (Result) {
                 // Join audio and video files.
                 if (!string.IsNullOrEmpty(audioFile)) {
-                    Result = RunFfmpeg(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a ""{2}""", videoFile, audioFile, destination), silent);
+                    Result = RunFfmpeg(string.Format(@"-i ""{0}"" -i ""{1}"" -acodec copy -vcodec copy -map 0:v -map 1:a{2} ""{3}""", videoFile, audioFile, fixAac ? " -bsf:a aac_adtstoasc" : "", destination), silent);
                 } else
                     Result = RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
             }
@@ -168,14 +169,25 @@ namespace Business {
             //} else {
             // Ffmpeg contains x264 with 8-bit encoding.
             if (settings.VideoCodec == VideoCodecs.x264) {
-                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {1} -crf {2} ""{3}""",
-                    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
+                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {2} -crf {3} ""{4}""",
+                    Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             } else {
-                PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe ""{0}"" -o - | Encoder\ffmpeg.exe -y -i - -an -c:v libx265 -preset {1} -crf {2} ""{3}""",
-                    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
+                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx265 -preset {2} -crf {3} ""{4}""",
+                    Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             }
             //}
             return Run("cmd", PipeArgs, false);
+        }
+
+        public static bool RunDeshakerPass(MediaEncoderSettings settings) {
+            string TempOut = settings.TempFile + ".avi";
+            string Args = string.Format(@"""{0}"" -o -", settings.DeshakerScript);
+
+            string PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an ""{2}""",
+                Settings.AviSynthPluginsPath, settings.DeshakerScript, TempOut);
+            bool Result = Run("cmd", PipeArgs, false);
+            File.Delete(TempOut);
+            return Result;
         }
 
         /// <summary>
@@ -197,7 +209,7 @@ namespace Business {
                 if (settings.ConvertToAvi || settings.InputFile.ToLower().EndsWith(".avi"))
                     Script.OpenAvi(settings.InputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
                 else
-                    Script.OpenDirect(settings.InputFile, null, !string.IsNullOrEmpty(settings.SourceAudioFormat), 1);
+                    Script.OpenDirect(settings.InputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
                 Script.AppendLine("KillVideo()");
             }
             Script.AppendLine();
@@ -208,7 +220,7 @@ namespace Business {
             if (settings.ChangeAudioPitch) {
                 // Change pitch to 432hz.
                 Script.LoadPluginDll("TimeStretch.dll");
-                Script.AppendLine("ResampleAudio(48000)"); // This line causes audio out distortion
+                Script.AppendLine("ResampleAudio(48000)");
                 Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
             }
             // Add TWriteWAV.
@@ -226,8 +238,14 @@ namespace Business {
         }
 
         public static bool EncodeAudio(MediaEncoderSettings settings, bool silent) {
-            string Args = string.Format(@"-q {0} -if ""{1}"" -of ""{2}""", settings.AudioQuality / 100f, settings.AudioFileWav, settings.AudioFileAac);
-            return Run("Encoder\\NeroAacEnc.exe", Args, true);
+            // string Args = string.Format(@"-q {0} -if ""{1}"" -of ""{2}""", settings.AudioQuality / 100f, settings.AudioFileWav, settings.AudioFileAac);
+            // return Run("Encoder\\NeroAacEnc.exe", Args, true);
+            string Args = string.Format(@"-i {2}{0} -b:a {1}k {3}",
+                settings.AudioAction == AudioActions.EncodeOpus ? " -c:a libopus" : "",
+                settings.AudioQuality,
+                settings.AudioFileWav,
+                settings.AudioAction == AudioActions.EncodeOpus ? settings.AudioFileOpus : settings.AudioFileAac);
+            return Run("Encoder\\ffmpeg.exe", Args, true);
         }
 
         public static float? GetPixelAspectRatio(MediaEncoderSettings settings) {
@@ -293,7 +311,7 @@ namespace Business {
             // Create script to get auto-crop coordinates
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            Script.OpenDirect(Settings.NaturalGroundingFolder + settings.FileName, null, false, 0);
+            Script.OpenDirect(Settings.NaturalGroundingFolder + settings.FileName, false);
             Script.LoadPluginDll("RoboCrop26.dll");
             Script.AppendLine(@"RoboCrop(LogFn=""{0}"")", Script.GetAsciiPath(TempResult));
             Script.AppendLine("Trim(0,-1)");

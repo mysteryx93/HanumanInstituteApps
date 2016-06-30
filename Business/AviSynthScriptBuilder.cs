@@ -27,6 +27,10 @@ namespace Business {
             set { script = new StringBuilder(value); }
         }
 
+        public override string ToString() {
+            return Script;
+        }
+
         /// <summary>
         /// Returns whether the script is empty.
         /// </summary>
@@ -76,10 +80,26 @@ namespace Business {
         }
 
         /// <summary>
+        /// Returns whether the script contains any line beginning with the specified values. The search is case-invariant.
+        /// </summary>
+        /// <param name="values">The list of values to search for.</param>
+        /// <returns>True if any of the value was found, otherwise false.</returns>
+        public bool ContainsAny(string[] values) {
+            string StrScript = script.ToString();
+            foreach (string item in values) {
+                if (StrScript.IndexOf(Environment.NewLine + item, StringComparison.InvariantCultureIgnoreCase) > -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Adds a line containing the plugin path. Must be called before loading any other plugin.
         /// </summary>
         public void AddPluginPath() {
             AppendLine(@"P=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath));
+            AppendLine(@"AddAutoloadDir(P, true)");
         }
 
         /// <summary>
@@ -87,7 +107,7 @@ namespace Business {
         /// </summary>
         public void Cleanup() {
             string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "P=", "LoadPlugin", "Import" };
+            string[] CommandsToComment = new string[] { "AddAutoloadDir", "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin" };
             var NewScriptLines = Lines.Where(l => CommandsToComment.Any(c => l.StartsWith(c))).Concat(Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))));
             script = new StringBuilder(string.Join(Environment.NewLine, NewScriptLines));
         }
@@ -96,6 +116,7 @@ namespace Business {
         /// Removes MultiThreading commands from script.
         /// </summary>
         public void RemoveMT() {
+            script = script.Replace(string.Format("Cores={0},", Environment.ProcessorCount), "Cores=1,");
             string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             string[] CommandsToComment = new string[] { "SetMTMode", "SetFilterMTMode", "Prefetch", @"Import(P+""AviSynthMT.avsi"")" };
             string[] NewLines = Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))).ToArray();
@@ -120,11 +141,11 @@ namespace Business {
         //}
 
         public void LoadPluginDll(string fileName) {
-            AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
+            //AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
         }
 
         public void LoadPluginAvsi(string fileName) {
-            AppendLine(@"Import(P+""{0}"")", fileName);
+            //AppendLine(@"Import(P+""{0}"")", fileName);
         }
 
         public void OpenAvi(string fileName, bool audio) {
@@ -132,20 +153,14 @@ namespace Business {
             AppendLine(@"AviSource(file, audio={0}, pixel_type=""YV12"")", audio);
         }
 
-        public void OpenDirect(string fileName, string cacheFile, bool audio, int threads) {
-            //LoadPluginDll("ffms2.dll");
-            //AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
-            //AppendLine("FFVideoSource(file{0}{1})",
-            //    string.IsNullOrEmpty(cacheFile) ? ", cache=false" : string.Format(@", cachefile=""{0}""", cacheFile),
-            //    multiThreaded ? ", threads=1" : "");
-            //if (audio)
-            //    AppendLine("AudioDub(FFAudioSource(file, cache=false))");
-
+        public void OpenDirect(string fileName, bool audio) {
+            // Create cache file when file size is over 500MB
+            bool Cache = new FileInfo(fileName).Length >= 500 * 1024 * 1024;
             LoadPluginDll("LSMASHSource.dll");
             AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
-            AppendLine("LWLibavVideoSource(file, cache=false{0})", threads > 0 ? ", threads=" + threads.ToString() : "");
+            AppendLine("LWLibavVideoSource(file, cache={0})", Cache);
             if (audio)
-                AppendLine("AudioDub(LWLibavAudioSource(file, cache=false))");
+                AppendLine("AudioDub(LWLibavAudioSource(file, cache={0}))", Cache);
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]

@@ -221,6 +221,21 @@ namespace Business {
         }
     }
 
+    public class BooleanAndConverter : IMultiValueConverter {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+            foreach (object value in values) {
+                if ((value is bool) && (bool)value == false) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture) {
+            throw new NotSupportedException("BooleanAndConverter is a OneWay converter.");
+        }
+    }
+
+
     [ValueConversion(typeof(bool), typeof(System.Windows.Visibility))]
     public class VisibilityConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -238,6 +253,7 @@ namespace Business {
     public class NumericRangeRule : ValidationRule {
         public double? Min { get; set; }
         public double? Max { get; set; }
+        public int? Mod { get; set; }
         public bool AllowNull { get; set; }
 
         public NumericRangeRule() {
@@ -259,6 +275,8 @@ namespace Business {
 
             if ((Min.HasValue && NumValue < Min) || (Max.HasValue && NumValue > Max))
                 return new ValidationResult(false, "Please enter a value in the range: " + Min + " - " + Max);
+            else if (Mod.HasValue && NumValue % Mod != 0)
+                return new ValidationResult(false, "Value must be a multiple of " + Mod);
             else
                 return new ValidationResult(true, null);
         }

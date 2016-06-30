@@ -261,10 +261,6 @@ namespace NaturalGroundingPlayer {
             e.Handled = true;
         }
 
-        private void AudioQuality_TextChanged(object sender, TextChangedEventArgs e) {
-            AudioBitrateLabel.Content = string.Format("~{0} kbps", business.ConvertAudioQualityToBitrate(encodeSettings.AudioQuality));
-        }
-
         private async void CalculateAudioGain_Click(object sender, RoutedEventArgs e) {
             CalculateAudioGain.IsEnabled = false;
             CalculateAudioGain.Content = "Wait";
@@ -283,6 +279,13 @@ namespace NaturalGroundingPlayer {
         private void Codec265Option_Click(object sender, RoutedEventArgs e) {
             encodeSettings.EncodeQuality = 22;
             encodeSettings.EncodePreset = EncodePresets.medium;
+        }
+
+        private void DeshakerGenerateButton_Click(object sender, RoutedEventArgs e) {
+            MediaEncoderDeshakerWindow.Instance(business, encodeSettings);
+            //DeshakerGenerateButton.IsEnabled = false;
+            //await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings));
+            //DeshakerGenerateButton.IsEnabled = true;
         }
     }
 }

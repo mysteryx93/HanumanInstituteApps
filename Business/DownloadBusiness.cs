@@ -354,7 +354,7 @@ namespace Business {
                 File.Delete(Destination + DestinationExt);
 
                 // Merge audio and video files.
-                await Task.Run(() => FfmpegBusiness.JoinAudioVideo(Destination + File1Ext, Destination + File2Ext, Destination + DestinationExt, true));
+                await Task.Run(() => FfmpegBusiness.JoinAudioVideo(Destination + File1Ext, Destination + File2Ext, Destination + DestinationExt, false, true));
 
                 // Delete source files
                 File.Delete(Destination + File1Ext);
@@ -376,7 +376,7 @@ namespace Business {
                 await Task.Run(() => {
                     FfmpegBusiness.ExtractVideo(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName, VideoDest, true);
                     if (FileHasContent(VideoDest))
-                        FfmpegBusiness.JoinAudioVideo(VideoDest, Destination + AudioExt, Destination + DestinationExt, true);
+                        FfmpegBusiness.JoinAudioVideo(VideoDest, Destination + AudioExt, Destination + DestinationExt, false, true);
                 });
 
                 // Delete source files

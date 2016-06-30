@@ -40,7 +40,7 @@ namespace Business {
                 //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-                Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), 0);
+                Script.OpenDirect(inputFile, !string.IsNullOrEmpty(infoReader.AudioFormat));
                 Script.AppendLine("Preroll(int(FrameRate*3))");
                 // This causes a slight audio delay in AviSynth 2.6
                 Script.LoadPluginDll("TimeStretch.dll");
@@ -50,7 +50,7 @@ namespace Business {
             } else {
                 int CPU = Environment.ProcessorCount / 2;
                 Script.AppendLine("SetMTMode(3,{0})", CPU);
-                Script.OpenDirect(inputFile, Settings.AutoPitchCache, !string.IsNullOrEmpty(infoReader.AudioFormat), CPU);
+                Script.OpenDirect(inputFile, !string.IsNullOrEmpty(infoReader.AudioFormat));
                 Script.AppendLine("SetMTMode(2)");
                 Script.AppendLine("Preroll(int(FrameRate*3))");
                 //Script.AppendLine("Loop(int(FrameRate/2), 0, 0)");
@@ -64,7 +64,6 @@ namespace Business {
 
             Script.Cleanup();
             Script.WriteToFile(Settings.AutoPitchFile);
-            File.Delete(Settings.AutoPitchCache);
         }
     }
 }

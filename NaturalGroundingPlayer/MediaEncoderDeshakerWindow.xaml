@@ -1,0 +1,163 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NaturalGroundingPlayer"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Name="window" x:Class="NaturalGroundingPlayer.MediaEncoderDeshakerWindow"
+        mc:Ignorable="d"
+        Title="Deshaker Settings" Height="509.045" Width="374.872" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
+    <Window.Resources>
+        <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <Business:BooleanAndConverter x:Key="BooleanAndConverter"/>
+        <ControlTemplate x:Key="validationTemplate">
+            <DockPanel>
+                <AdornedElementPlaceholder/>
+                <TextBlock FontSize="20" FontWeight="Bold" Foreground="Red"><Run Text="!"/></TextBlock>
+            </DockPanel>
+        </ControlTemplate>
+        <Style x:Key="textBoxInError" TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={x:Static RelativeSource.Self}}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" Margin="0,0,14,14" VerticalAlignment="Bottom" Width="75" IsDefault="True" Click="OkButton_Click"/>
+        <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Right" Margin="0,0,94,14" VerticalAlignment="Bottom" Width="75" IsCancel="True" Click="CancelButton_Click"/>
+
+        <CheckBox x:Name="RollingShutterCheckbox" VerticalAlignment="Top" TabIndex="18" Margin="10,33,0,0" IsChecked="{Binding RollingShutter}" HorizontalAlignment="Left" Content="Camera has rolling shutter (0-100)"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="230,30,0,0" VerticalAlignment="Top" Width="50" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=RollingShutterCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="RollingShutterAmount" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" Max="100" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <CheckBox Content="Detect rotation" HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" IsChecked="{Binding DetectRotation}"/>
+        <CheckBox Content="Detect zoom" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top" IsChecked="{Binding DetectZoom}"/>
+        <CheckBox x:Name="DetectScenesCheckbox" Content="Detect scenes Treshold (0-1000)" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" IsChecked="{Binding DetectScenes}"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="230,112,0,0" VerticalAlignment="Top" Width="50" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=DetectScenesCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="DetectScenesTreshold" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" Max="1000" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="129,50,0,0" VerticalAlignment="Top" Width="40" TabIndex="19" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=RollingShutterCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="DeepAnalysis" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" Max="100" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="11,13,0,0" VerticalAlignment="Top" FontWeight="Bold"><Run Text="Pass 1 - changing these settings requires "/><Run Text="rescanning"/></TextBlock>
+        <TextBlock x:Name="HelpLink" HorizontalAlignment="Right" Margin="0,13,14,0" VerticalAlignment="Top"><Hyperlink NavigateUri="http://www.guthspot.se/video/deshaker.htm" RequestNavigate="HelpLink_RequestNavigate">Help</Hyperlink></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Pass 2 - can be changed without rescanning"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Text="Edge Compensation"/>
+        <ComboBox x:Name="EdgeCompensationCombo" HorizontalAlignment="Left" Margin="131,161,0,0" VerticalAlignment="Top" Width="182"  SelectedValue="{Binding EdgeCompensation}" SelectedValuePath="Key" DisplayMemberPath="Value" />
+        <CheckBox x:Name="UsePreviousFrameCheckbox" Content="Fill borders with previous frames" HorizontalAlignment="Left" Margin="11,188,0,0" VerticalAlignment="Top" IsChecked="{Binding FillBordersWithPreviousFrames}"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="220,185,0,0" VerticalAlignment="Top" Width="50" TabIndex="26" IsEnabled="{Binding IsChecked, ElementName=UsePreviousFrameCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="FillBordersWithPreviousFramesCount" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <CheckBox x:Name="SoftBordersCheckbox" Content="Soft borders. Edge transition width" HorizontalAlignment="Left" Margin="11,236,0,0" VerticalAlignment="Top" IsEnabled="{Binding FillBordersWithPreviousOrFutureFrames}" IsChecked="{Binding SoftBorders}"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="220,233,0,0" VerticalAlignment="Top" Width="50" TabIndex="26" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <TextBox.IsEnabled>
+                <MultiBinding Converter="{StaticResource BooleanAndConverter}">
+                    <Binding ElementName="SoftBordersCheckbox" Path="IsChecked" />
+                    <Binding Path="FillBordersWithPreviousOrFutureFrames" />
+                </MultiBinding>
+            </TextBox.IsEnabled>
+            <Binding Path="SoftBorderEdgeTransitionWidth" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="275,238,0,0" Text="pixels" VerticalAlignment="Top"/>
+        <CheckBox x:Name="UseFutureFrameCheckbox" Content="Fill borders with future frames" HorizontalAlignment="Left" Margin="11,212,0,0" VerticalAlignment="Top" IsChecked="{Binding FillBordersWithFutureFrames}"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="220,209,0,0" VerticalAlignment="Top" Width="50" TabIndex="26" IsEnabled="{Binding IsChecked, ElementName=UseFutureFrameCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="FillBordersWithFutureFramesCount" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <Label Padding="0" Content="Deep analysis if &lt;               % of all blocks are OK" HorizontalAlignment="Left" Margin="30,53,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=RollingShutterCheckbox}" />
+        <TextBlock HorizontalAlignment="Left" Margin="31,281,0,0" VerticalAlignment="Top" FontWeight="Bold"><Run Text="Motion Smoothness"/></TextBlock>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="143,299,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MotionSmoothPanX" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="31,302,0,0" Text="Horizontal panning" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="143,323,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MotionSmoothPanY" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="31,326,0,0" VerticalAlignment="Top"><Run Text="Vertical"/><Run Text=" panning"/></TextBlock>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="279,299,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MotionSmoothRotation" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="225,302,0,0" Text="Rotation" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="279,323,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MotionSmoothZoom" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="225,326,0,0" VerticalAlignment="Top" Text="Zoom"/>
+        <TextBlock HorizontalAlignment="Left" Margin="31,350,0,0" VerticalAlignment="Top"><Run FontWeight="Bold" Text="Max Correction Limit"/><Run Text=" (in percent and degrees)"/></TextBlock>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="143,368,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MaxPanX" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="31,371,0,0" Text="Horizontal panning" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="143,392,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MaxPanY" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="31,395,0,0" VerticalAlignment="Top"><Run Text="Vertical"/><Run Text=" panning"/></TextBlock>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="279,368,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MaxRotation" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="225,371,0,0" Text="Rotation" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="279,392,0,0" VerticalAlignment="Top" Width="60" TabIndex="27" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+            <Binding Path="MaxZoom" UpdateSourceTrigger="PropertyChanged">
+                <Binding.ValidationRules>
+                    <Business:NumericRangeRule Min="0" />
+                </Binding.ValidationRules>
+            </Binding>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="225,395,0,0" VerticalAlignment="Top" Text="Zoom"/>
+        <CheckBox Content="Extrapolate colors into border" HorizontalAlignment="Left" Margin="11,258,0,0" VerticalAlignment="Top" IsChecked="{Binding ExtrapolateColorsIntoBorder}"/>
+
+    </Grid>
+</Window>

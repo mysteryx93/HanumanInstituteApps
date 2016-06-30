@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.MediaEncoderWindow" 
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="Media Encoder" Height="550" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated">
+        Title="Media Encoder" Height="568" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated">
     <Window.Resources>
+        <Business:VisibilityConverter x:Key="VisibilityConverter"/>
         <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <sys:Boolean x:Key="True">True</sys:Boolean>
         <sys:Boolean x:Key="False">False</sys:Boolean>
@@ -43,98 +44,77 @@
         <TabControl x:Name="SettingsTab" Margin="10,35,0,12" Background="Transparent" HorizontalAlignment="Left" Width="376" TabIndex="5" KeyboardNavigation.TabNavigation="Local" IsSynchronizedWithCurrentItem="True">
             <TabItem x:Name="TabTransform" Header="Transform" TabIndex="6">
                 <Grid Background="Transparent">
-                    <CheckBox x:Name="IncreaseFrameRateCheckbox" Content="Increase Frame Rate" HorizontalAlignment="Left" Margin="7,158,0,0" VerticalAlignment="Top" IsChecked="{Binding IncreaseFrameRate}" TabIndex="24"/>
-                    <CheckBox x:Name="CropCheckbox" Content="Crop" HorizontalAlignment="Left" Margin="7,182,0,0" VerticalAlignment="Top" IsChecked="{Binding Crop}" TabIndex="27" />
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="84,179,0,0" VerticalAlignment="Top" Width="40" TabIndex="28" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <CheckBox x:Name="IncreaseFrameRateCheckbox" Content="Increase Frame Rate" HorizontalAlignment="Left" Margin="7,201,0,0" VerticalAlignment="Top" IsChecked="{Binding IncreaseFrameRate}" TabIndex="21"/>
+                    <CheckBox x:Name="CropCheckbox" Content="Crop" HorizontalAlignment="Left" Margin="7,225,0,0" VerticalAlignment="Top" IsChecked="{Binding Crop}" TabIndex="24" />
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="84,222,0,0" VerticalAlignment="Top" Width="40" TabIndex="25" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="CropLeft" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="60,182,0,0" Text="Left" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="155,179,0,0" VerticalAlignment="Top" Width="40" TabIndex="29" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <TextBlock HorizontalAlignment="Left" Margin="60,225,0,0" Text="Left" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="155,222,0,0" VerticalAlignment="Top" Width="40" TabIndex="26" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="CropTop" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="130,182,0,0" Text="Top" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="234,179,0,0" VerticalAlignment="Top" Width="40" TabIndex="30" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <TextBlock HorizontalAlignment="Left" Margin="130,225,0,0" Text="Top" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="234,222,0,0" VerticalAlignment="Top" Width="40" TabIndex="27" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="CropRight" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="202,182,0,0" Text="Right" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="323,179,0,0" VerticalAlignment="Top" Width="40" TabIndex="31" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <TextBlock HorizontalAlignment="Left" Margin="202,225,0,0" Text="Right" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="323,222,0,0" VerticalAlignment="Top" Width="40" TabIndex="28" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="CropBottom" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="280,182,0,0" Text="Bottom" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="97,333,0,0" VerticalAlignment="Top" Width="68" TabIndex="39" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <TextBlock HorizontalAlignment="Left" Margin="280,225,0,0" Text="Bottom" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="97,248,0,0" VerticalAlignment="Top" Width="68" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="OutputHeight" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="1" Max="10000" />
+                                <Business:NumericRangeRule Min="1" Max="10000" Mod="4"/>
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <CheckBox x:Name="Denoise2Checkbox" Content="Alternative Denoise Str / Sharp (1-50)" HorizontalAlignment="Left" Margin="7,133,0,0" VerticalAlignment="Top" IsChecked="{Binding Denoise2}" TabIndex="21"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="7,362,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio cannot be copied with the following option"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="234,130,0,0" VerticalAlignment="Top" Width="50" TabIndex="22" IsEnabled="{Binding IsChecked, ElementName=Denoise2Checkbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="Denoise2Strength" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="50" />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox>
-                    <CheckBox x:Name="TrimCheckbox" Content="Trim" HorizontalAlignment="Left" Margin="7,386,0,0" VerticalAlignment="Top" IsChecked="{Binding Trim}" TabIndex="40" IsEnabled="{Binding CanAlterAudio}"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="115,383,0,0" VerticalAlignment="Top" Width="60" TabIndex="41" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimStart, Converter={StaticResource MediaTimeConverter}}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="84,386,0,0" Text="Start" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="220,383,0,0" VerticalAlignment="Top" Width="60" TabIndex="42" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimEnd, Converter={StaticResource MediaTimeConverter}}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="193,386,0,0" Text="End" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="ChangeSpeedCheckbox" Content="Change Speed (1-200 %)" HorizontalAlignment="Left" Margin="7,411,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeSpeed}" TabIndex="43" IsEnabled="{Binding CanAlterAudio}"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="170,408,0,0" VerticalAlignment="Top" Width="40" TabIndex="44" IsEnabled="{Binding IsChecked, ElementName=ChangeSpeedCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                    <CheckBox x:Name="DeringCheckbox" Content="Dering" HorizontalAlignment="Left" Margin="7,107,0,0" VerticalAlignment="Top" IsChecked="{Binding Dering}" TabIndex="20"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="7,373,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio cannot be copied with the following option"/>
+                    <CheckBox x:Name="TrimCheckbox" Content="Trim" HorizontalAlignment="Left" Margin="7,397,0,0" VerticalAlignment="Top" IsChecked="{Binding Trim}" TabIndex="40" IsEnabled="{Binding CanAlterAudio}"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="115,394,0,0" VerticalAlignment="Top" Width="60" TabIndex="41" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimStart, Converter={StaticResource MediaTimeConverter}}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="84,397,0,0" Text="Start" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="220,394,0,0" VerticalAlignment="Top" Width="60" TabIndex="42" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimEnd, Converter={StaticResource MediaTimeConverter}}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="193,397,0,0" Text="End" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="ChangeSpeedCheckbox" Content="Change Speed (1-200 %)" HorizontalAlignment="Left" Margin="7,422,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeSpeed}" TabIndex="43" IsEnabled="{Binding CanAlterAudio}"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="170,419,0,0" VerticalAlignment="Top" Width="40" TabIndex="44" IsEnabled="{Binding IsChecked, ElementName=ChangeSpeedCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="ChangeSpeedValue">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="200" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <ComboBox HorizontalAlignment="Left" Margin="147,155,0,0" VerticalAlignment="Top" Width="70" TabIndex="25" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" SelectedValue="" SelectedIndex="{Binding IncreaseFrameRateValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox HorizontalAlignment="Left" Margin="147,198,0,0" VerticalAlignment="Top" Width="70" TabIndex="22" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" SelectedValue="" SelectedIndex="{Binding IncreaseFrameRateValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem Content="Double" IsSelected="True" />
                         <ComboBoxItem Content="30 fps" />
                         <ComboBoxItem Content="60 fps" />
                         <ComboBoxItem Content="120 fps" />
                     </ComboBox>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="289,130,0,0" VerticalAlignment="Top" Width="50" TabIndex="23" IsEnabled="{Binding IsChecked, ElementName=Denoise2Checkbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="Denoise2Sharpen" UpdateSourceTrigger="PropertyChanged">
+                    <CheckBox x:Name="DenoiseCheckbox" Content="Denoise Str (1-50)" HorizontalAlignment="Left" Margin="7,129,0,0" VerticalAlignment="Top" IsChecked="{Binding Denoise}" TabIndex="18"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="137,126,0,0" VerticalAlignment="Top" Width="50" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <Binding Path="DenoiseStrength" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="50" />
+                                <Business:NumericRangeRule Min="1" Max="50" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <CheckBox x:Name="Denoise1Checkbox" Content="Denoise Str (1-100)" HorizontalAlignment="Left" Margin="7,110,0,0" VerticalAlignment="Top" IsChecked="{Binding Denoise1}" TabIndex="18"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="147,107,0,0" VerticalAlignment="Top" Width="70" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=Denoise1Checkbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="Denoise1Strength" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="100" />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="143,263,0,0" VerticalAlignment="Top" Width="50" TabIndex="37" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="SuperResStrength" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="1" Max="200" />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,336,0,0" Text="Output Height" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,251,0,0" Text="Output Height" VerticalAlignment="Top"/>
                     <TextBox HorizontalAlignment="Left" Height="23" Margin="91,7,0,0" VerticalAlignment="Top" Width="75" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="10">
                         <Binding Path="SourceWidth" TargetNullValue="">
                             <Binding.ValidationRules>
@@ -171,51 +151,92 @@
                     <TextBox HorizontalAlignment="Left" Height="23" Margin="91,57,0,0" VerticalAlignment="Top" Width="75" TabIndex="12" IsReadOnly="True" Text="{Binding SourceAudioFormat}" />
                     <TextBlock Margin="200,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="Bitrate"/></TextBlock>
                     <TextBox HorizontalAlignment="Left" Height="23" Margin="281,57,0,0" VerticalAlignment="Top" Width="75" TabIndex="15" IsReadOnly="True" Text="{Binding SourceAudioBitrate}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top" Text="Color Matrix"/>
-                    <RadioButton Content="Rec.601 (SD)" HorizontalAlignment="Left" Margin="91,85,0,0" VerticalAlignment="Top" GroupName="ColorMatrix" IsChecked="{Binding SourceColorMatrix, ConverterParameter={x:Static Business:ColorMatrix.Rec601}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="16"/>
-                    <RadioButton Content="Rec.709 (HD)" HorizontalAlignment="Left" Margin="193,85,0,0" VerticalAlignment="Top" GroupName="ColorMatrix" IsChecked="{Binding SourceColorMatrix, ConverterParameter={x:Static Business:ColorMatrix.Rec709}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="17"/>
-                    <CheckBox Content="Smooth" HorizontalAlignment="Left" Margin="234,158,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" ToolTip="May cause more artifacts" IsChecked="{Binding IncreaseFrameRateSmooth}" TabIndex="26" />
-                    <TextBlock HorizontalAlignment="Left" Margin="181,335,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding OutputWidth}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="170,336,0,0" TextWrapping="Wrap" Text="x" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="143,223,0,0" VerticalAlignment="Top" Width="50" TabIndex="33" IsEnabled="{Binding IsChecked, ElementName=UpscaleOptionSuperXBR}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="SuperXbrStrength" UpdateSourceTrigger="PropertyChanged">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Text="Color Matrix"/>
+                    <CheckBox Content="Smooth" HorizontalAlignment="Left" Margin="229,201,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" ToolTip="May cause more artifacts" IsChecked="{Binding IncreaseFrameRateSmooth}" TabIndex="23" />
+                    <TextBlock HorizontalAlignment="Left" Margin="185,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding OutputWidth}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="174,251,0,0" TextWrapping="Wrap" Text="x" VerticalAlignment="Top"/>
+                    <Grid Margin="7,278,0,0" x:Name="GridUpscale" Visibility="{Binding IsUpscaling, Converter={StaticResource VisibilityConverter}}" Height="90" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="136,58,0,0" VerticalAlignment="Top" Width="50" TabIndex="35" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                            <Binding Path="SuperResStrength" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <Business:NumericRangeRule Min="1" Max="200" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="136,18,0,0" VerticalAlignment="Top" Width="50" TabIndex="31" IsEnabled="{Binding IsChecked, ElementName=UpscaleOptionSuperXBR}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                            <Binding Path="SuperXbrStrength" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <Business:NumericRangeRule Min="0" Max="50" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="262,18,0,0" VerticalAlignment="Top" Width="50" TabIndex="32" IsEnabled="{Binding IsChecked, ElementName=UpscaleOptionSuperXBR}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                            <Binding Path="SuperXbrSharpness" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <Business:NumericRangeRule Min="0" Max="15" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox>
+                        <TextBlock HorizontalAlignment="Left" Margin="190,21,0,0" VerticalAlignment="Top"><Run Text="Sharp (0-"/><Run Text="15"/><Run Text=")"/><Run Text=" "/></TextBlock>
+                        <TextBlock HorizontalAlignment="Left" Margin="3,0,0,0" VerticalAlignment="Top"><Run Text="Upscale Settings ("/><Run Text="{Binding ScaleFactor}"/><Run Text="x)"/></TextBlock>
+                        <RadioButton x:Name="UpscaleOptionSuperXBR" Content="Super-xBR Str (0-50)" HorizontalAlignment="Left" Margin="0,22,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod" IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.SuperXbr}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="30" />
+                        <RadioButton x:Name="UpscaleOptionNNEDI3" Content="NNEDI3" HorizontalAlignment="Left" Margin="0,42,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod"  IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.NNedi3}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="33" />
+                        <CheckBox x:Name="SuperResCheckbox" Content="SuperRes Str (0-100)" HorizontalAlignment="Left" Margin="0,62,0,0" VerticalAlignment="Top" IsChecked="{Binding SuperRes}" TabIndex="34"/>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="262,58,0,0" VerticalAlignment="Top" Width="50" TabIndex="36" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                            <Binding Path="SuperResSoftness" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <Business:NumericRangeRule Min="0" Max="100" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox>
+                        <TextBlock HorizontalAlignment="Left" Margin="190,61,0,0" VerticalAlignment="Top"><Run Text="Soft (0-"/><Run Text="1"/><Run Text="00"/><Run Text=")"/><Run Text=" "/></TextBlock>
+                        <CheckBox Content="SuperRes Multi-Passes" HorizontalAlignment="Left" Margin="187,42,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" IsChecked="{Binding SuperRes3Passes}" TabIndex="37" />
+                    </Grid>
+                    <Grid Margin="7,278,0,0" x:Name="GridDownscale" Visibility="{Binding IsDownscaling, Converter={StaticResource VisibilityConverter}}" Height="81" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
+                        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3,0,0,0"><Run Text="Downscale"/><Run Text=" Settings"/></TextBlock>
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="136,18,0,0" VerticalAlignment="Top" Width="50" TabIndex="38" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                            <Binding Path="SSimStrength" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <Business:NumericRangeRule Min="0" Max="100" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox>
+                        <CheckBox Content="Soft" HorizontalAlignment="Left" Margin="197,22,0,0" VerticalAlignment="Top" IsChecked="{Binding SSimSoft}" TabIndex="39" />
+                        <TextBlock HorizontalAlignment="Left" Margin="19,21,0,0" VerticalAlignment="Top"><Run Text="Sharp"/><Run Text="ness"/><Run Text=" (0-100)"/></TextBlock>
+                    </Grid>
+                    <CheckBox x:Name="DeblockCheckbox" Content="Deblock Str (1-50)" HorizontalAlignment="Left" Margin="7,154,0,0" VerticalAlignment="Top" IsChecked="{Binding Deblock}" TabIndex="18"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="137,151,0,0" VerticalAlignment="Top" Width="50" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=DeblockCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <Binding Path="DeblockStrength" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="50" />
+                                <Business:NumericRangeRule Min="1" Max="50" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="269,223,0,0" VerticalAlignment="Top" Width="50" TabIndex="34" IsEnabled="{Binding IsChecked, ElementName=UpscaleOptionSuperXBR}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="SuperXbrSharpness" UpdateSourceTrigger="PropertyChanged">
+                    <CheckBox Content="Sharp" HorizontalAlignment="Left" Margin="199,154,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=DeblockCheckbox}" IsChecked="{Binding DeblockSharp}" TabIndex="23" />
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="295,125,0,0" VerticalAlignment="Top" Width="25" TabIndex="27" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <Binding Path="DenoiseD" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="15" />
+                                <Business:NumericRangeRule Min="0" Max="3" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="197,226,0,0" VerticalAlignment="Top"><Run Text="Sharp (0-"/><Run Text="15"/><Run Text=")"/><Run Text=" "/></TextBlock>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,205,0,0" VerticalAlignment="Top"><Run Text="Upscale"/><Run Text=" (double size)"/></TextBlock>
-                    <RadioButton x:Name="UpscaleOptionSuperXBR" Content="Super-xBR Str (0-50)" HorizontalAlignment="Left" Margin="7,227,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod" IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.SuperXbr}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="32" />
-                    <RadioButton x:Name="UpscaleOptionNNEDI3" Content="NNEDI3" HorizontalAlignment="Left" Margin="7,247,0,0" VerticalAlignment="Top" GroupName="UpscaleMethod"  IsChecked="{Binding UpscaleMethod, ConverterParameter={x:Static Business:UpscaleMethods.NNedi3}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="35" />
-                    <CheckBox x:Name="SuperResCheckbox" Content="SuperRes Str (0-100)" HorizontalAlignment="Left" Margin="7,267,0,0" VerticalAlignment="Top" IsChecked="{Binding SuperRes}" TabIndex="36"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="269,263,0,0" VerticalAlignment="Top" Width="50" TabIndex="34" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="SuperResSoftness" UpdateSourceTrigger="PropertyChanged">
+                    <TextBlock HorizontalAlignment="Left" Margin="199,128,0,0" Text="Temp/Spac (0-3)" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="325,125,0,0" VerticalAlignment="Top" Width="25" TabIndex="27" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <Binding Path="DenoiseA" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="100" />
+                                <Business:NumericRangeRule Min="1" Max="3" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="197,266,0,0" VerticalAlignment="Top"><Run Text="Soft (0-"/><Run Text="1"/><Run Text="00"/><Run Text=")"/><Run Text=" "/></TextBlock>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,291,0,0" VerticalAlignment="Top" Text="Downscale"/>
-                    <RadioButton x:Name="DownscaleOptionSSim" Content="SSim Str (0-100)" HorizontalAlignment="Left" Margin="76,312,0,0" VerticalAlignment="Top" GroupName="DownscaleMethod" IsChecked="{Binding DownscaleMethod, ConverterParameter={x:Static Business:DownscaleMethods.SSim}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="35" />
-                    <RadioButton x:Name="DownscaleOptionBicubic" Content="Bicubic" HorizontalAlignment="Left" Margin="76,292,0,0" VerticalAlignment="Top" GroupName="DownscaleMethod" IsChecked="{Binding DownscaleMethod, ConverterParameter={x:Static Business:DownscaleMethods.Bicubic}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="35" />
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="190,308,0,0" VerticalAlignment="Top" Width="50" TabIndex="33" IsEnabled="{Binding IsChecked, ElementName=DownscaleOptionSSim}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                        <Binding Path="SSimStrength" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" Max="100" />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox>
-                    <CheckBox Content="Soft" HorizontalAlignment="Left" Margin="245,312,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=DownscaleOptionSSim}" IsChecked="{Binding SSimSoft}" TabIndex="26" />
-                    <CheckBox Content="SuperRes Multi-Passes" HorizontalAlignment="Left" Margin="194,247,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" IsChecked="{Binding SuperRes3Passes}" TabIndex="26" />
+                    <ComboBox HorizontalAlignment="Left" Margin="91,82,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="{Binding SourceColorMatrix, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="Rec.601 (SD)" IsSelected="True" />
+                        <ComboBoxItem Content="Rec.709 (HD)" />
+                        <ComboBoxItem Content="PC.601" />
+                        <ComboBoxItem Content="PC.709" />
+                    </ComboBox>
+                    <CheckBox Content="HD" HorizontalAlignment="Left" Margin="261,154,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=DeblockCheckbox}" IsChecked="{Binding DeblockHD}" TabIndex="23" />
+                    <CheckBox x:Name="DeshakerCheckbox" Content="Deshaker" HorizontalAlignment="Left" Margin="7,178,0,0" VerticalAlignment="Top" IsChecked="{Binding Deshaker}" TabIndex="20"/>
+                    <Button x:Name="DeshakerGenerateButton" Content="Settings" HorizontalAlignment="Left" Margin="94,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerGenerateButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabEncoding" Header="Encoding" TabIndex="6">
@@ -227,27 +248,26 @@
                     <TextBlock HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio Settings"/>
                     <RadioButton Content="Copy (no quality loss)" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" IsEnabled="{Binding CanCopyAudio}" TabIndex="57"/>
                     <RadioButton Content="Ignore" HorizontalAlignment="Left" Margin="10,213,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Ignore}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="58"/>
-                    <RadioButton x:Name="AudioEncodeOption" Content="Encode" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Encode}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="59"/>
-                    <Grid HorizontalAlignment="Left" Height="86" Margin="28,250,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding IsChecked, ElementName=AudioEncodeOption}">
-                        <TextBlock HorizontalAlignment="Left" Margin="1,6,0,0" VerticalAlignment="Top" Text="Quality (1-100)"/>
+                    <RadioButton x:Name="AudioEncodeAacOption" Content="Encode AAC" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeAac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="59"/>
+                    <Grid HorizontalAlignment="Left" Height="86" Margin="28,264,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding IsAudioEncode}">
+                        <TextBlock HorizontalAlignment="Left" Margin="1,6,0,0" VerticalAlignment="Top"><Run Text="Quality (kbps)"/></TextBlock>
                         <TextBlock Margin="1,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="Gain"/></TextBlock>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="86,27,0,0" VerticalAlignment="Top" Width="84" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="61">
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="86,27,0,0" VerticalAlignment="Top" Width="84" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="62">
                             <Binding Path="AudioGain" TargetNullValue="">
                                 <Binding.ValidationRules>
                                     <Business:NumericRangeRule Min="-50" Max="50" AllowNull="True" />
                                 </Binding.ValidationRules>
                             </Binding>
                         </TextBox>
-                        <TextBox HorizontalAlignment="Left" Height="23" Margin="86,3,0,0" VerticalAlignment="Top" Width="84" TabIndex="60" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TextChanged="AudioQuality_TextChanged">
+                        <TextBox HorizontalAlignment="Left" Height="23" Margin="86,3,0,0" VerticalAlignment="Top" Width="84" TabIndex="61" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                             <Binding Path="AudioQuality" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
-                                    <Business:NumericRangeRule Min="1" Max="100" />
+                                    <Business:NumericRangeRule Min="64" Max="384" />
                                 </Binding.ValidationRules>
                             </Binding>
                         </TextBox>
-                        <Label x:Name="AudioBitrateLabel" Content="" HorizontalAlignment="Left" Margin="175,1,0,0" VerticalAlignment="Top"/>
-                        <CheckBox Content="Convert 440hz Pitch to 432hz" HorizontalAlignment="Left" Margin="1,55,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeAudioPitch}" TabIndex="63" />
-                        <Button x:Name="CalculateAudioGain" Content="Auto" HorizontalAlignment="Left" Margin="175,28,0,0" VerticalAlignment="Top" Width="35" TabIndex="62" Click="CalculateAudioGain_Click"/>
+                        <CheckBox Content="Convert 440hz Pitch to 432hz" HorizontalAlignment="Left" Margin="1,55,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeAudioPitch}" TabIndex="64" />
+                        <Button x:Name="CalculateAudioGain" Content="Auto" HorizontalAlignment="Left" Margin="175,28,0,0" VerticalAlignment="Top" Width="35" TabIndex="63" Click="CalculateAudioGain_Click"/>
                     </Grid>
                     <RadioButton x:Name="VideoCopyOption" Content="Copy" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="50"/>
                     <RadioButton x:Name="Codec264Option" Content="x264" HorizontalAlignment="Left" Margin="77,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x264}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="51" Click="Codec264Option_Click"/>
@@ -272,11 +292,12 @@
                         </ComboBox>
                         <TextBlock HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top" ><Run Text="Preset"/><Run Text=" (slower = "/><Run Text="smaller "/><Run Text="file"/><Run Text=")"/></TextBlock>
                     </Grid>
+                    <RadioButton x:Name="AudioEncodeOpusOption" Content="Encode Opus" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeOpus}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="60"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabScript" Header="AviSynth Script" TabIndex="7">
                 <Grid Background="Transparent">
-                    <TextBox x:Name="ScriptText" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TabIndex="58">
+                    <TextBox x:Name="ScriptText" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TabIndex="80">
                         <TextBox.Background>
                             <SolidColorBrush Color="Transparent"/>
                         </TextBox.Background>

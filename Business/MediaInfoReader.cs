@@ -93,6 +93,18 @@ namespace Business {
             }
         }
 
+        public string ColorRange {
+            get {
+                return lastMedia.Get(StreamKind.Video, 0, "colour_range");
+            }
+        }
+
+        public string ColorMatrix {
+            get {
+                return lastMedia.Get(StreamKind.Video, 0, "matrix_coefficients");
+            }
+        }
+
         public float? PixelAspectRatio {
             get {
                 string StrValue = lastMedia.Get(StreamKind.Video, 0, "PixelAspectRatio");
