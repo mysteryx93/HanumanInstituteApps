@@ -15,6 +15,7 @@ namespace MediaPlayer {
         public event EventHandler MediaOpened;
         public event EventHandler MediaResume;
         public event EventHandler MediaPause;
+        public event EventHandler MediaStop;
         public event EventHandler PositionChanged;
 
         public WindowsMediaPlayer() {
@@ -69,19 +70,19 @@ namespace MediaPlayer {
 
         public double Duration {
             get {
-                return Player.currentMedia.duration;
+                return Player?.currentMedia?.duration ?? 0;
             }
         }
 
         public int VideoWidth {
             get {
-                return Player.currentMedia.imageSourceWidth;
+                return Player?.currentMedia?.imageSourceWidth ?? 0;
             }
         }
 
         public int VideoHeight {
             get {
-                return Player.currentMedia.imageSourceHeight;
+                return Player?.currentMedia?.imageSourceHeight ?? 0;
             }
         }
 
@@ -120,13 +121,12 @@ namespace MediaPlayer {
         }
 
         private void Player_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e) {
-            if (e.newState == (int)WMPLib.WMPPlayState.wmppsPlaying) {
-                if (MediaResume != null)
-                    MediaResume(this, new EventArgs());
-            } else if (e.newState == (int)WMPLib.WMPPlayState.wmppsPaused || e.newState == (int)WMPLib.WMPPlayState.wmppsStopped) {
-                if (MediaPause != null)
-                    MediaPause(this, new EventArgs());
-            }
+            if (e.newState == (int)WMPLib.WMPPlayState.wmppsPlaying)
+                MediaResume?.Invoke(this, new EventArgs());
+            else if (e.newState == (int)WMPLib.WMPPlayState.wmppsPaused)
+                MediaPause?.Invoke(this, new EventArgs());
+            else if (e.newState == (int)WMPLib.WMPPlayState.wmppsStopped)
+                MediaStop?.Invoke(this, new EventArgs());
         }
 
         private void Player_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {

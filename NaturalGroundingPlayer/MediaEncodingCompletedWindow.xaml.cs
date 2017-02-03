@@ -88,6 +88,7 @@ namespace NaturalGroundingPlayer {
                     }
                 }
                 business.DeleteJobFiles(jobInfo.Settings);
+                jobInfo.Settings.JobIndex = -1;
                 this.Close();
             }
             catch (Exception ex) {

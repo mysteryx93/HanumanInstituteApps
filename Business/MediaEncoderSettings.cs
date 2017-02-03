@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
 using System.Xml.Serialization;
+using System.IO;
+using System.Xml;
+using System.Collections.ObjectModel;
 
 namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
@@ -53,6 +56,7 @@ namespace Business {
         [DefaultValue(null)]
         public string SourceVideoFormat { get; set; }
         public ColorMatrix SourceColorMatrix { get; set; }
+        public ChromaPlacement SourceChromaPlacement { get; set; }
         public int? SourceBitDepth { get; set; }
         private int outputHeight;
         public int OutputHeight {
@@ -67,10 +71,10 @@ namespace Business {
         public int DenoiseD { get; set; }
         public int DenoiseA { get; set; }
         public bool Dering { get; set; }
-        public bool Deblock { get; set; }
-        public int DeblockStrength { get; set; }
-        public bool DeblockSharp { get; set; }
-        public bool DeblockHD { get; set; }
+        public bool Degrain { get; set; }
+        public int DegrainStrength { get; set; }
+        public bool DegrainSharp { get; set; }
+        public DegrainPrefilters DegrainPrefilter { get; set; }
         public bool Deshaker { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
@@ -188,14 +192,15 @@ namespace Business {
             JobIndex = -1;
             SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
+            SourceChromaPlacement = ChromaPlacement.MPEG2;
             OutputHeight = 768;
             Denoise = true;
-            DenoiseStrength = 20;
+            DenoiseStrength = 10;
             DenoiseD = 2;
             DenoiseA = 2;
-            DeblockStrength = 20;
-            DeblockSharp = true;
-            DeblockHD = true;
+            Degrain = true;
+            DegrainStrength = 10;
+            DegrainSharp = true;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
             IncreaseFrameRateSmooth = true;
@@ -216,6 +221,7 @@ namespace Business {
             EncodePreset = EncodePresets.medium;
             AudioQuality = 256;
             ChangeAudioPitch = false;
+            DeshakerSettings = new MediaEncoderDeshakerSettings();
         }
 
         /// <summary>
@@ -354,24 +360,42 @@ namespace Business {
         }
 
         public string ScriptFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Script.avs", JobIndex); }
+            get {
+                if (JobIndex >= 0)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Script.avs", JobIndex);
+                else
+                    return MediaEncoderBusiness.PreviewScriptFile;
+            }
         }
 
         public string SettingsFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Settings.xml", JobIndex); }
+            get {
+                if (JobIndex >= 0)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Settings.xml", JobIndex);
+                else
+                    return MediaEncoderBusiness.PreviewSettingsFile;
+            }
         }
 
         public string InputFile {
             get {
-                if (ConvertToAvi)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
-                else
+                if (ConvertToAvi) {
+                    if (JobIndex >= 0)
+                        return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
+                    else
+                        return MediaEncoderBusiness.PreviewSourceFile;
+                } else
                     return Settings.NaturalGroundingFolder + FileName;
             }
         }
 
         public string OutputFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.mkv", JobIndex, VideoCodec == VideoCodecs.x265 ? "265" : "264"); }
+            get {
+                if (VideoCodec == VideoCodecs.Avi)
+                    return Settings.TempFilesPath + string.Format("Job{0}_Output.avi", JobIndex);
+                else
+                    return Settings.TempFilesPath + string.Format("Job{0}_Output.mkv", JobIndex);
+            }
         }
 
         public string AudioFileWav {
@@ -420,6 +444,43 @@ namespace Business {
         public MediaEncoderSettings Clone() {
             return (MediaEncoderSettings)DataHelper.DeepClone(this);
         }
+
+
+        public void Save(string fileName) {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            // Don't serialize DeshakerSesttings unless Deshaker is enabled, but preserve settings within class.
+            MediaEncoderDeshakerSettings S = DeshakerSettings;
+            if (!Deshaker)
+                DeshakerSettings = null;
+
+            using (var writer = new StreamWriter(fileName)) {
+                var serializer = new XmlSerializer(typeof(MediaEncoderSettings));
+                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                ns.Add("", "");
+                XmlWriterSettings ws = new XmlWriterSettings();
+                // ws.NewLineHandling = NewLineHandling.Entitize;
+                using (XmlWriter wr = XmlWriter.Create(writer, ws)) {
+                    serializer.Serialize(wr, this, ns);
+                }
+                writer.Flush();
+            }
+
+            if (!Deshaker)
+                DeshakerSettings = S;
+        }
+
+        public static MediaEncoderSettings Load(string fileName) {
+            using (var stream = File.OpenRead(fileName)) {
+                var serializer = new XmlSerializer(typeof(MediaEncoderSettings));
+                MediaEncoderSettings Result = serializer.Deserialize(stream) as MediaEncoderSettings;
+                if (Result.DeshakerSettings == null)
+                    Result.DeshakerSettings = new MediaEncoderDeshakerSettings();
+                // Serialization changes new lines; restore them.
+                if (Result.CustomScript != null)
+                    Result.CustomScript = Result.CustomScript.Replace("\n", "\r\n");
+                return Result;
+            }
+        }
     }
 
     public enum ColorMatrix {
@@ -427,6 +488,18 @@ namespace Business {
         Rec709,
         Pc601,
         Pc709
+    }
+
+    public enum ChromaPlacement {
+        MPEG1,
+        MPEG2,
+        DV
+    }
+
+    public enum DegrainPrefilters {
+        SD,
+        HD,
+        KNLMeans
     }
 
     public enum UpscaleMethods {
@@ -442,7 +515,8 @@ namespace Business {
     public enum VideoCodecs {
         Copy,
         x264,
-        x265
+        x265,
+        Avi
     }
 
     public enum VideoFormats {

@@ -22,10 +22,12 @@ namespace NaturalGroundingPlayer {
             window.UseLayoutRounding = true;
 
             // Set vertical content align for all textboxes
-            foreach (TextBox item in FindVisualChildren<TextBox>(window)) {
-                if (item.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
-                    item.VerticalContentAlignment = VerticalAlignment.Center;
-            }
+            window.Loaded += delegate (object sender, RoutedEventArgs e) {
+                foreach (TextBox item in window.FindVisualChildren<TextBox>()) {
+                    if (item.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
+                        item.VerticalContentAlignment = VerticalAlignment.Center;
+                }
+            };
 
             // Set the focus to the first control.
             window.SourceInitialized += (sender, e) => {
@@ -50,29 +52,12 @@ namespace NaturalGroundingPlayer {
                 SetScale(TopControl);
 
                 // Set the zoom for ContextMenu objects.
-                foreach (var item in FindVisualChildren<Button>(window)) {
+                foreach (var item in window.FindVisualChildren<Button>()) {
                     if (item.ContextMenu != null)
                         SetScale(item.ContextMenu);
                 }
 
                 currentZoom = Settings.Zoom;
-            }
-        }
-
-        /// <summary>
-        /// Returns the list of child objects of specified type.
-        /// </summary>
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject {
-            if (depObj != null) {
-                foreach (var child in LogicalTreeHelper.GetChildren(depObj)) {
-                    if (child != null && child is T) {
-                        yield return (T)child;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child as DependencyObject)) {
-                        yield return childOfChild;
-                    }
-                }
             }
         }
 

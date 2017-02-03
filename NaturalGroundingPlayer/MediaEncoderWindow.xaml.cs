@@ -118,7 +118,7 @@ namespace NaturalGroundingPlayer {
                 encodeSettings.CropTop = 0;
 
                 try {
-                    await business.PreparePreviewFile(encodeSettings, true);
+                    await business.PreparePreviewFile(encodeSettings, true, true);
                 } catch (Exception ex) {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
                     encodeSettings.FileName = "";
@@ -196,7 +196,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private bool Validate() {
-            bool Error = !IsValid(this) ||
+            bool Error = !this.IsValid() ||
                 string.IsNullOrEmpty(encodeSettings.FileName) ||
                 !encodeSettings.SourceHeight.HasValue ||
                 !encodeSettings.SourceWidth.HasValue ||
@@ -206,21 +206,11 @@ namespace NaturalGroundingPlayer {
             return !Error;
         }
 
-        private bool IsValid(DependencyObject obj) {
-            // The dependency object is valid if it has no errors and all
-            // of its children (that are dependency objects) are error-free.
-            return !Validation.GetHasError(obj) &&
-                LogicalTreeHelper.GetChildren(obj)
-                .OfType<DependencyObject>()
-                .All(IsValid);
-        }
-
-
         private async void ConvertToAviCheckbox_Click(object sender, RoutedEventArgs e) {
             if (isBinding)
                 return;
             ConvertToAviCheckbox.IsEnabled = false;
-            await business.PreparePreviewFile(encodeSettings, false);
+            await business.PreparePreviewFile(encodeSettings, false, false);
             ConvertToAviCheckbox.IsEnabled = true;
         }
 

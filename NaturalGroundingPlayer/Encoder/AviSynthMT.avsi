@@ -15,7 +15,7 @@
 # Official avs+ filters. Newer versions will register themself so you should never force any of these modes
 ############################################
 #rgtools
-#SetFilterMTMode("DEFAULT_MT_MODE",     MT_MULTI_INSTANCE)
+SetFilterMTMode("DEFAULT_MT_MODE",     MT_MULTI_INSTANCE)
 
 SetFilterMTMode("removegrain",         MT_NICE_FILTER)
 SetFilterMTMode("repair",              MT_NICE_FILTER)
@@ -189,10 +189,7 @@ SetFilterMTMode("MRecalculate",        MT_MULTI_INSTANCE)
 #Filters from EEDI2 v0.9.2 (from http://forum.doom9.org/showthread.php?t=173238 ) Tested On 2016/03/06
 SetFilterMTMode("EEDI2",               MT_MULTI_INSTANCE)
 
-#SetFilterMTMode("ConvertToShader",     MT_NICE_FILTER)
-#SetFilterMTMode("ConvertFromShader",   MT_NICE_FILTER)
-#SetFilterMTMode("Shader",              MT_NICE_FILTER)
-#SetFilterMTMode("ExecuteShader",       MT_MULTI_INSTANCE)
+SetFilterMTMode("KNLMeansCL",          MT_SERIALIZED)
 
 #keep it the last line please
 if (FunctionExists("avstp_set_threads")) {

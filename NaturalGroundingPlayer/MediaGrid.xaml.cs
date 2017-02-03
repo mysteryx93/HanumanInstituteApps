@@ -127,7 +127,13 @@ namespace NaturalGroundingPlayer {
             IsLoading = true;
             if (IsDetailView)
                 await LoadDetailsAsync();
-            else
+            else if (Settings.Search != "") {
+                // Open search details on 'All'
+                CategoriesList.SelectedIndex = 0;
+                Settings.FilterValue = null;
+                await LoadDetailsAsync();
+                await ShowDetailsAsync();
+            } else 
                 await LoadCategoriesAsync();
             IsLoading = false;
         }
@@ -349,7 +355,7 @@ namespace NaturalGroundingPlayer {
                 IsDetailView = true;
                 Settings.IsInDatabase = (Item.FilterType != SearchFilterEnum.Files);
 
-                bool HasArtistColumn = (Item.FilterType != SearchFilterEnum.Artist || Item.FilterValue == "") && Item.FilterType != SearchFilterEnum.Files;
+                bool HasArtistColumn = (Item.FilterType != SearchFilterEnum.Artist || Item.FilterValue != "") && Item.FilterType != SearchFilterEnum.Files;
                 ArtistColumn.Width = HasArtistColumn ? 100 : 0;
                 Settings.FilterType = Item.FilterType;
                 Settings.FilterValue = Item.FilterValue;

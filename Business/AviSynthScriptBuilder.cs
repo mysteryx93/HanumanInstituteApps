@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,6 +12,9 @@ namespace Business {
     /// </summary>
     public class AviSynthScriptBuilder {
         private StringBuilder script = new StringBuilder();
+        // Store the list of loaded plugins to avoid adding duplicate.
+        private List<string> loadedPluginsDll = new List<string>();
+        private List<string> loadedPluginsAvsi = new List<string>();
 
         public AviSynthScriptBuilder() {
         }
@@ -71,6 +75,16 @@ namespace Business {
         }
 
         /// <summary>
+        /// Appends specified lines to the script.
+        /// </summary>
+        /// <param name="lines">The lines to append.</param>
+        public void AppendLine(IEnumerable<string> lines) {
+            foreach (string item in lines) {
+                script.AppendLine(item);
+            }
+        }
+
+        /// <summary>
         /// Replaces all instances of oldValue with newValue.
         /// </summary>
         /// <param name="oldValue">The string to be replaced.</param>
@@ -99,7 +113,8 @@ namespace Business {
         /// </summary>
         public void AddPluginPath() {
             AppendLine(@"P=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath));
-            AppendLine(@"AddAutoloadDir(P, true)");
+            //AppendLine(@"AddAutoloadDir(P, true)");
+            //AppendLine(@"AddAutoloadDir(P+""Shaders\"", true)");
         }
 
         /// <summary>
@@ -107,9 +122,60 @@ namespace Business {
         /// </summary>
         public void Cleanup() {
             string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            string[] CommandsToComment = new string[] { "AddAutoloadDir", "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin" };
-            var NewScriptLines = Lines.Where(l => CommandsToComment.Any(c => l.StartsWith(c))).Concat(Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))));
+            string[] CommandsToMove = new string[] { "AddAutoloadDir", "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin" };
+            var NewScriptLines = Lines.Where(l => CommandsToMove.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase))).Concat(Lines.Where(l => !CommandsToMove.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase))));
             script = new StringBuilder(string.Join(Environment.NewLine, NewScriptLines));
+        }
+
+        /// <summary>
+        /// Rewrites the script to run through MP_Pipeline.
+        /// </summary>
+        public void ConvertToMultiProcesses(double sourceFrameRate) {
+            string[] Lines = script.ToString().TrimEnd('\r','\n').Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            script = new StringBuilder();
+            AddPluginPath();
+            LoadPluginDll("MP_Pipeline.dll");
+            AppendLine("SetMemoryMax(1)");
+            AppendLine();
+            AppendLine("MP_Pipeline(\"\"\"");
+            string[] CommandsToMove = new string[] { "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin" };
+            string[] CommandsToIgnore = new string[] { "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin", "file=", "AudioDub(" };
+            var LoadPluginLines = Lines.Where(l => CommandsToMove.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase)));
+            string FileNameLine = Lines.Where(l => l.StartsWith("file=", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            string AudioDubLine = Lines.Where(l => l.StartsWith("AudioDub(", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            string AviSourceLine = Lines.Where(l => l.StartsWith("AviSource(", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            string TrimLine = Lines.Where(l => l.StartsWith("Trim(", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            string AssumeFpsLine = Lines.Where(l => l.StartsWith("AssumeFps(", StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            var OtherLines = Lines.Where(l => !CommandsToIgnore.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase)));
+            AppendLine("### inherit start ###");
+            AppendLine(LoadPluginLines);
+            AppendLine(FileNameLine);
+            AppendLine("### inherit end ###");
+            AppendLine(OtherLines);
+            if (OtherLines.Last() != "### ###") {
+                AppendLine("### prefetch: 3, 3"); // Keep 3 frames before and after for temporal filters.
+                AppendLine("### ###");
+            }
+            AppendLine("\"\"\")");
+            AppendLine();
+            if (!string.IsNullOrEmpty(AudioDubLine) && string.IsNullOrEmpty(TrimLine) && string.IsNullOrEmpty(AssumeFpsLine)) {
+                AppendLine(AudioDubLine);
+            } else {
+                if (string.IsNullOrEmpty(AudioDubLine))
+                    AppendLine("A=" + AviSourceLine);
+                else {
+                    // We must create a clip with the original frame count and frame rate so that Trim and AssumeFps functions perform what they are meant to.
+                    AppendLine("SourceFps=" + sourceFrameRate.ToString(CultureInfo.InvariantCulture));
+                    AppendLine("A=BlankClip(1,1,1)." + AudioDubLine);
+                    AppendLine(@"Blank=BlankClip(int(A.AudioDuration*SourceFps), 4, 4, ""YV12"", SourceFps)");
+                    AppendLine("A=AudioDub(Blank, A)");
+                }
+                if (!string.IsNullOrEmpty(TrimLine))
+                    AppendLine("A=A." + TrimLine);
+                if (!string.IsNullOrEmpty(AssumeFpsLine))
+                    AppendLine("A=A." + AssumeFpsLine);
+                AppendLine("AudioDub(last, A)");
+            }
         }
 
         /// <summary>
@@ -141,11 +207,17 @@ namespace Business {
         //}
 
         public void LoadPluginDll(string fileName) {
-            //AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
+            if (!loadedPluginsDll.Contains(fileName)) {
+                AppendLine(@"LoadPlugin(P+""{0}"")", fileName);
+                loadedPluginsDll.Add(fileName);
+            }
         }
 
         public void LoadPluginAvsi(string fileName) {
-            //AppendLine(@"Import(P+""{0}"")", fileName);
+            if (!loadedPluginsAvsi.Contains(fileName)) {
+                AppendLine(@"Import(P+""{0}"")", fileName);
+                loadedPluginsAvsi.Add(fileName);
+            }
         }
 
         public void OpenAvi(string fileName, bool audio) {
@@ -154,13 +226,23 @@ namespace Business {
         }
 
         public void OpenDirect(string fileName, bool audio) {
+            OpenDirect(fileName, audio, true);
+        }
+
+        public void OpenDirect(string fileName, bool audio, bool video) {
             // Create cache file when file size is over 500MB
             bool Cache = new FileInfo(fileName).Length >= 500 * 1024 * 1024;
             LoadPluginDll("LSMASHSource.dll");
             AppendLine(@"file=""{0}""", GetAsciiPath(fileName));
-            AppendLine("LWLibavVideoSource(file, cache={0})", Cache);
-            if (audio)
-                AppendLine("AudioDub(LWLibavAudioSource(file, cache={0}))", Cache);
+            if (video)
+                AppendLine("LWLibavVideoSource(file, cache={0})", Cache);
+            if (audio) {
+                string AudioScript = string.Format("LWLibavAudioSource(file, cache={0})", Cache);
+                if (video)
+                    AppendLine("AudioDub({0})", AudioScript);
+                else
+                    AppendLine(AudioScript);
+            }                
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]

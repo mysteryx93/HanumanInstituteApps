@@ -192,6 +192,12 @@
     <Compile Include="ManualPlayerWindow.xaml.cs">
       <DependentUpon>ManualPlayerWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MediaEncoderDeshakerPassWindow.xaml.cs">
+      <DependentUpon>MediaEncoderDeshakerPassWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MediaEncoderDeshakerAdvancedWindow.xaml.cs">
+      <DependentUpon>MediaEncoderDeshakerAdvancedWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MediaEncoderDeshakerWindow.xaml.cs">
       <DependentUpon>MediaEncoderDeshakerWindow.xaml</DependentUpon>
     </Compile>
@@ -294,6 +300,14 @@
     <Page Include="ManualPlayerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MediaEncoderDeshakerPassWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MediaEncoderDeshakerAdvancedWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MediaEncoderDeshakerWindow.xaml">
       <SubType>Designer</SubType>
@@ -478,6 +492,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.manifest" />
+    <None Include="Encoder\AviSynthMT.avsi" />
     <None Include="Encoder\edi_rpow2.avsi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -487,96 +502,7 @@
     <None Include="Encoder\ResizeX.avsi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Encoder\Shaders\Bicubic.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\GammaToLinear.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\GammaToYuv.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\GammaToYuv601.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\Shader.avsi">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimCalc.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimCalcR.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimDownscaledVarI.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimDownscaledVarII.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimDownscalerX.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimDownscalerY.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimSinglePassConvolver.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimSoftDownscalerX.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SSimSoftDownscalerY.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperRes.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResDownscaleAndDiff.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResDownscaleAndDiff601.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResDownscaleAndDiff709.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResDownscaler.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResFinal.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResFinal601.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResFinal709.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperResSkipSoftening.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperXBR-pass0.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperXBR-pass1.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\SuperXBR-pass2.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\Yuv601ToGamma.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\Yuv601ToLinear.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\YuvToGamma.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Encoder\Shaders\YuvToLinear.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Encoder\Shader.avsi" />
     <None Include="Encoder\UUSize4.avsi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -672,11 +598,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Encoder\Shaders\Shader.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Encoder\LSMASHSource.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -693,6 +614,9 @@
     <None Include="License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Encoder\Shader.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

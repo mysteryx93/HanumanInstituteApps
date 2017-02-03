@@ -258,6 +258,9 @@ namespace NaturalGroundingPlayer {
                         break;
                 }
             }
+
+            // Sometimes the intensity slider doesn't get redrawn properly; force it.
+            InvalidateVisual();
         }
 
         public void AdjustHeight(double height) {

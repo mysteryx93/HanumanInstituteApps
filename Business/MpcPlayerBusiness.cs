@@ -93,6 +93,7 @@ namespace Business {
             if (!string.IsNullOrEmpty(FileInfo[3]) && nowPlayingPath != FileInfo[3]) {
                 nowPlayingPath = FileInfo[3];
                 position = 0;
+                restorePosition = 0;
                 timerPlayTimeout.Stop();
 
                 if (NowPlaying != null)
@@ -183,6 +184,7 @@ namespace Business {
             customFileName = null;
             TimerGetPositionEnabled = false;
             position = 0;
+            restorePosition = 0;
             nowPlayingPath = null;
             lastStartTime = DateTime.Now;
             watcher.EnsureRunning();
@@ -202,6 +204,7 @@ namespace Business {
             customFileName = fileName;
             TimerGetPositionEnabled = false;
             position = 0;
+            restorePosition = 0;
             nowPlayingPath = null;
             lastStartTime = DateTime.Now;
             watcher.EnsureRunning();

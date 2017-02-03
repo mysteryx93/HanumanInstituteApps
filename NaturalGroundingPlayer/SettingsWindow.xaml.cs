@@ -102,30 +102,22 @@ namespace NaturalGroundingPlayer {
                 App.Current.Shutdown();
         }
 
+        private void BrowseFolder_Click(object sender, RoutedEventArgs e) {
+            string Result = FileFolderDialog.ShowFolderDialog(settings.NaturalGroundingFolder);
+            if (Result != null)
+                settings.NaturalGroundingFolder = Result;
+        }
+
         private void BrowseMpc_Click(object sender, RoutedEventArgs e) {
-            string Result = ShowFileDialog(settings.MpcPath);
+            string Result = FileFolderDialog.ShowFileDialog(settings.MpcPath, "Executable File|*.exe");
             if (Result != null)
                 settings.MpcPath = Result;
         }
 
         private void BrowseSvp_Click(object sender, RoutedEventArgs e) {
-            string Result = ShowFileDialog(settings.SvpPath);
+            string Result = FileFolderDialog.ShowFileDialog(settings.SvpPath, "Executable File|*.exe");
             if (Result != null)
                 settings.SvpPath = Result;
-        }
-
-        private string ShowFileDialog(string defaultPath) {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            try {
-                if (!string.IsNullOrEmpty(defaultPath))
-                    dlg.InitialDirectory = Path.GetDirectoryName(defaultPath);
-            }
-            catch { }
-            dlg.Filter = "Executable File|*.exe";
-            if (dlg.ShowDialog(IsLoaded ? this : Owner).Value == true) {
-                return dlg.FileName;
-            } else
-                return null;
         }
 
         /// <summary>

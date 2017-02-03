@@ -210,5 +210,4 @@ namespace Business {
             return avisynthVersionCache;
         }
     }
-
 }

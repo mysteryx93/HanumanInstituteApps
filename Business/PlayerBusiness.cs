@@ -185,7 +185,7 @@ namespace Business {
         /// </summary>
         void player_Pause(object sender, EventArgs e) {
             timerSession.Stop();
-            Application.Current.Dispatcher.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
+            Application.Current.Dispatcher?.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>

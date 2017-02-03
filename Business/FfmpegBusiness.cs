@@ -94,10 +94,10 @@ namespace Business {
         }
 
         private static bool Run(string command, string arguments, bool silent) {
-            return Run(command, arguments, silent, ProcessPriorityClass.Normal);
+            return Run(command, arguments, silent, ProcessPriorityClass.Normal, null);
         }
 
-        private static bool Run(string command, string arguments, bool silent, ProcessPriorityClass priority) {
+        private static bool Run(string command, string arguments, bool silent, ProcessPriorityClass priority, ExecutingProcessHandler callback) {
             Process P = new Process();
             if (silent) {
                 P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -113,6 +113,8 @@ namespace Business {
                     P.PriorityClass = priority;
             }
             catch { }
+            // Give a change for the caller to track the process.
+            callback?.Invoke(null, new ExecutingProcessEventArgs(P));
             P.WaitForExit();
             // ExitCode is 0 for normal exit. Different value when closing the console.
             return P.ExitCode == 0;
@@ -146,46 +148,27 @@ namespace Business {
         /// </summary>
         /// <param name="settings">An object containing the encoding settings.</param>
         /// <returns>Whether the operation was completed.</returns>
-        public static bool EncodeH264(MediaEncoderSettings settings) {
+        public static bool EncodeVideo(MediaEncoderSettings settings) {
             File.Delete(settings.OutputFile);
             string PipeArgs;
-            //if (settings.Encode10bit) {
-            //    // x264-10b provides 10-bit encoding.
-            //    settings.CalculateSize();
-            //    ClipInfo Clip = GetClipInfo(settings, true);
-            //    if (Clip == null) // Sometimes it fails; try again
-            //        Clip = GetClipInfo(settings, true);
-            //    //PipeArgs = string.Format(@"/c Encoder\avs4x26x --x26x-binary ""Encoder\x264-10bit.exe"" --depth 16 ""{0}"" --preset {1} --crf {2} --psy-rd 1:0.05 --output ""{3}"" --frames {4} -",
-            //    //    settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
-            //    if (settings.VideoCodec == VideoCodecs.x264) {
-            //        PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe -raw ""{0}"" -o - | Encoder\x264-10bit.exe --demuxer raw --input-depth 16 --input-res {1}x{2} --fps {3} --preset {4} --crf {5} --psy-rd 1:0.05 --output ""{6}"" --frames {7} -",
-            //            settings.ScriptFile, settings.OutputWidth, settings.OutputHeight, Clip.FrameRate,
-            //            settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
-            //    } else {
-            //        PipeArgs = string.Format(@"/c Encoder\avs2yuv.exe -raw ""{0}"" -o - | Encoder\x265-10bit.exe --input-depth 16 --input-res {1}x{2} --fps {3} --preset {4} --crf {5} --output ""{6}"" --frames {7} -",
-            //            settings.ScriptFile, settings.OutputWidth, settings.OutputHeight, Clip.FrameRate,
-            //            settings.EncodePreset, settings.EncodeQuality, settings.OutputFile, Clip.FrameCount);
-            //    }
-            //} else {
-            // Ffmpeg contains x264 with 8-bit encoding.
             if (settings.VideoCodec == VideoCodecs.x264) {
                 PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {2} -crf {3} ""{4}""",
                     Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
-            } else {
+            } else if (settings.VideoCodec == VideoCodecs.x265) {
                 PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx265 -preset {2} -crf {3} ""{4}""",
+                    Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
+            } else { // AVI
+                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v utvideo ""{4}""",
                     Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             }
             //}
             return Run("cmd", PipeArgs, false);
         }
 
-        public static bool RunDeshakerPass(MediaEncoderSettings settings) {
-            string TempOut = settings.TempFile + ".avi";
-            string Args = string.Format(@"""{0}"" -o -", settings.DeshakerScript);
-
-            string PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an ""{2}""",
-                Settings.AviSynthPluginsPath, settings.DeshakerScript, TempOut);
-            bool Result = Run("cmd", PipeArgs, false);
+        public static bool RunDeshakerPass(MediaEncoderSettings settings, ExecutingProcessHandler callback) {
+            string TempOut = settings.DeshakerLog + ".y4m";
+            string Args = string.Format(@"""{0}"" -o - ""{1}""", settings.DeshakerScript, TempOut);
+            bool Result = Run(@"Encoder\avs2yuv.exe", Args, true, ProcessPriorityClass.Normal, callback);
             File.Delete(TempOut);
             return Result;
         }
@@ -367,13 +350,14 @@ namespace Business {
         /// <param name="source">The AviSynth script to get information for.</param>
         /// <param name="silent">If true, the x264 window will be hidden.</param>
         /// <returns>The clip information.</returns>
-        public static ClipInfo GetClipInfo(MediaEncoderSettings settings, bool silent) {
+        public static ClipInfo GetClipInfo(MediaEncoderSettings settings, string scriptFile, bool silent) {
             string TempScript = settings.TempFile + ".avs";
             string TempResult = settings.TempFile + ".txt";
             string TempOut = settings.TempFile + ".y4m";
 
-            // Read source script and remove MT.
-            string FileContent = File.ReadAllText(settings.ScriptFile);
+            // Read source script and remove MT. Also remove Deshaker if present.
+            string FileContent = File.ReadAllText(scriptFile);
+            FileContent.Replace(Environment.NewLine + "Deshaker", Environment.NewLine + "#Deshaker");
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder(FileContent);
             Script.RemoveMT();
             //Script.DitherOut(false);
@@ -474,6 +458,14 @@ namespace Business {
             public float FrameRate;
             public int FrameCount;
         }
+    }
 
+    public delegate void ExecutingProcessHandler(object sender, ExecutingProcessEventArgs e);
+    public class ExecutingProcessEventArgs : EventArgs {
+        public Process Process { get; private set; }
+
+        public ExecutingProcessEventArgs(Process process) {
+            this.Process = process;
+        }
     }
 }

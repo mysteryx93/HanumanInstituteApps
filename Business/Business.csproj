@@ -116,6 +116,8 @@
   <ItemGroup>
     <Compile Include="AutoPitchBusiness.cs" />
     <Compile Include="AviSynthScriptBuilder.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FileFolderDialog.cs" />
     <Compile Include="MediaEncoderDeshakerSettings.cs" />
     <Compile Include="FileOperationAPIWrapper.cs" />
     <Compile Include="DatabaseHandler.cs" />
@@ -131,7 +133,7 @@
     <Compile Include="Enumerations.cs" />
     <Compile Include="FfmpegBusiness.cs" />
     <Compile Include="FilterPresets.cs" />
-    <Compile Include="Helper.cs" />
+    <Compile Include="FormatHelper.cs" />
     <Compile Include="IMediaPlayerBusiness.cs" />
     <Compile Include="IMediaPlayerControl.cs" />
     <Compile Include="LayerItem.cs" />
