@@ -14,6 +14,9 @@ namespace Player432hz {
     public class ConfigFile {
         [XmlElement("Playlist")]
         public ObservableCollection<PlaylistItem> Playlists = new ObservableCollection<PlaylistItem>();
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public int Volume { get; set; }
 
         /// <summary>
         /// Loads settings from the XML file

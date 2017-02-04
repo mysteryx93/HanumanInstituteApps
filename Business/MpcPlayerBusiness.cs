@@ -93,7 +93,7 @@ namespace Business {
             if (!string.IsNullOrEmpty(FileInfo[3]) && nowPlayingPath != FileInfo[3]) {
                 nowPlayingPath = FileInfo[3];
                 position = 0;
-                restorePosition = 0;
+                // restorePosition = 0;
                 timerPlayTimeout.Stop();
 
                 if (NowPlaying != null)

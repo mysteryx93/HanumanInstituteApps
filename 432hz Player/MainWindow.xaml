@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Player432hz"
         xmlns:Player432hz="clr-namespace:Player432hz" xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="Player432hz.MainWindow"
         mc:Ignorable="d"
-        Title="432hz Player" Height="423.6" Width="625" Icon="App.ico" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="432hz Player" Height="390.6" Width="583" Icon="App.ico" Closing="Window_Closing" Loaded="Window_Loaded">
     <Window.Resources>
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
     </Window.Resources>

@@ -356,7 +356,7 @@ namespace NaturalGroundingPlayer {
                 Settings.IsInDatabase = (Item.FilterType != SearchFilterEnum.Files);
 
                 bool HasArtistColumn = (Item.FilterType != SearchFilterEnum.Artist || Item.FilterValue != "") && Item.FilterType != SearchFilterEnum.Files;
-                ArtistColumn.Width = HasArtistColumn ? 100 : 0;
+                ArtistColumn.Width = HasArtistColumn ? 80 : 0;
                 Settings.FilterType = Item.FilterType;
                 Settings.FilterValue = Item.FilterValue;
                 Settings.DisplayCustomRating = (Item.FilterType == SearchFilterEnum.Element) ? Item.FilterValue : null;

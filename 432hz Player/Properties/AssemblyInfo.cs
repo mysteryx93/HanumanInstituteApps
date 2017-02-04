@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("432hz Player")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("432hz Player")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Emergence Guardian")]
+[assembly: AssemblyProduct("Natural Grounding Player")]
+[assembly: AssemblyCopyright("Copyright Emergence Guardian ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

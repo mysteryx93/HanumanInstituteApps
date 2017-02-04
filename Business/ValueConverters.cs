@@ -66,6 +66,9 @@ namespace Business {
             double? DecValue = value as double?;
             if (DecValue == null)
                 return "";
+            else if (MaxValue < 0 && DecValue > 9999)
+                // Display max 9999
+                return "9999";
             else
                 // Display the digit for up to 10 for Height and Depth, and up to 100 for Power.
                 return DecValue.Value.ToString(DecValue < (MaxValue == 10 ? 10 : 100) ? "0.0" : "0");

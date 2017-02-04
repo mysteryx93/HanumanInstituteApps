@@ -6,6 +6,7 @@ using Business;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 namespace Player432hz {
     /// <summary>
@@ -34,6 +35,12 @@ namespace Player432hz {
             posTimer.Interval = new TimeSpan(0, 0, 1);
 
             config = ConfigFile.Load();
+            if (config.Width > 0)
+                this.Width = config.Width;
+            if (config.Height > 0)
+                this.Height = config.Height;
+            if (config.Volume > 0 && config.Volume <= 100)
+                AudioPlayer.Player.Volume = config.Volume;
             PlaylistsList.DataContext = config.Playlists;
             if (config.Playlists.Count == 0) {
                 AddPlaylistButton_Click(null, null);
@@ -44,6 +51,13 @@ namespace Player432hz {
             PlaylistsList.SelectedIndex = 0;
             PlaylistsList.Focus();
             ((ListBoxItem)PlaylistsList.ItemContainerGenerator.ContainerFromIndex(0)).Focus();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            config.Width = this.Width;
+            config.Height = this.Height;
+            config.Volume = AudioPlayer.Player.Volume;
+            config.Save();
         }
 
         private void AddPlaylistButton_Click(object sender, RoutedEventArgs e) {
@@ -112,7 +126,8 @@ namespace Player432hz {
         }
 
         private void FilesList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            if (e.LeftButton == MouseButtonState.Pressed && (e.OriginalSource is TextBlock || e.OriginalSource is Border)) {
+            var dataContext = ((FrameworkElement)e.OriginalSource).DataContext;
+            if (dataContext is string && e.LeftButton == MouseButtonState.Pressed) {
                 PlayButton_Click(null, null);
             }
         }
@@ -145,10 +160,6 @@ namespace Player432hz {
         private void PosTimer_Tick(object sender, EventArgs e) {
             displayInfo.Position = AudioPlayer.Position;
             displayInfo.Duration = AudioPlayer.Duration;
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            config.Save();
         }
     }
 }
