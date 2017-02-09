@@ -15,6 +15,7 @@ namespace Business {
         event EventHandler Pause;
         event EventHandler PlayNext;
         Task PlayVideoAsync(DataAccess.Media video, bool enableAutoPitch);
+        Task PlayVideoAsync(string filePath);
         double Position { get; set; }
         Task SetPositionAsync(double pos);
         event EventHandler PositionChanged;

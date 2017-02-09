@@ -1,32 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
 using Business;
-using DataAccess;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Navigation;
+using NaturalGroundingPlayer;
+using DataAccess;
+using System.Windows.Controls;
 
-namespace NaturalGroundingPlayer {
+namespace YinMediaEncoder {
     /// <summary>
-    /// Interaction logic for MediaEncoderWindow.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MediaEncoderWindow : Window {
-        public static void Instance(Action callback) {
-            MediaEncoderWindow NewForm = new MediaEncoderWindow();
-            NewForm.callback = callback;
-            SessionCore.Instance.Windows.Show(NewForm);
-        }
-
-        protected Action callback;
+    public partial class MainWindow : Window {
         private WindowHelper helper;
         private WmpPlayerWindow playerOriginal;
         private WmpPlayerWindow playerChanges;
@@ -34,8 +22,9 @@ namespace NaturalGroundingPlayer {
         private MediaEncoderBusiness business = new MediaEncoderBusiness();
         private bool isBinding = false;
 
-        public MediaEncoderWindow() {
+        public MainWindow() {
             InitializeComponent();
+            SessionCore.Instance.Start(this);
             helper = new WindowHelper(this);
         }
 
@@ -82,14 +71,13 @@ namespace NaturalGroundingPlayer {
         }
 
         private void business_EncodingCompleted(object sender, EncodingCompletedEventArgs e) {
-            MediaEncodingCompletedWindow.Instance(e);
+            CompletedWindow.Instance(e);
         }
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            ClosePreview();
+            playerOriginal?.Close();
+            playerChanges?.Close();
             await business.DeletePreviewFilesAsync();
-            if (callback != null)
-                callback();
         }
 
         private void Window_Activated(object sender, EventArgs e) {
@@ -98,20 +86,33 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void SelectVideoButton_Click(object sender, RoutedEventArgs e) {
-            VideoListItem Result = SearchVideoWindow.Instance(new SearchSettings() {
-                MediaType = MediaType.Video,
-                ConditionField = FieldConditionEnum.FileExists,
-                ConditionValue = BoolConditionEnum.Yes,
-                RatingCategory = "Height",
-                RatingOperator = OperatorConditionEnum.Smaller
-            });
-            if (Result != null && Result.FileName != null) {
-                ClosePreview();
+            string SelectedFile = null;
+            string DisplayName = null;
+            if (SelectVideoButton.Content == MenuSelectFromPlaylist.Header) {
+                VideoListItem PlaylistItem = SearchVideoWindow.Instance(new SearchSettings() {
+                    MediaType = MediaType.Video,
+                    ConditionField = FieldConditionEnum.FileExists,
+                    ConditionValue = BoolConditionEnum.Yes,
+                    RatingCategory = "Height",
+                    RatingOperator = OperatorConditionEnum.Smaller
+                });
+                if (PlaylistItem != null) {
+                    SelectedFile = Settings.NaturalGroundingFolder + PlaylistItem.FileName;
+                    DisplayName = PlaylistItem.FileName;
+                }
+            } else {
+                string ExtFilter = string.Format("Video Files|*{0})", string.Join(";*", Settings.VideoExtensions));
+                SelectedFile = FileFolderDialog.ShowFileDialog(Settings.NaturalGroundingFolder, ExtFilter);
+                DisplayName = SelectedFile;
+            }
+            if (!string.IsNullOrEmpty(SelectedFile)) {
+                HidePreview();
                 encodeSettings.AutoCalculateSize = false;
-                encodeSettings.FileName = null;
+                encodeSettings.FilePath = null;
                 encodeSettings.CustomScript = null;
                 SettingsTab.SelectedIndex = 0;
-                encodeSettings.FileName = Result.FileName;
+                encodeSettings.FilePath = SelectedFile;
+                encodeSettings.DisplayName = DisplayName;
                 encodeSettings.CropBottom = 0;
                 encodeSettings.CropLeft = 0;
                 encodeSettings.CropRight = 0;
@@ -121,10 +122,16 @@ namespace NaturalGroundingPlayer {
                     await business.PreparePreviewFile(encodeSettings, true, true);
                 } catch (Exception ex) {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
-                    encodeSettings.FileName = "";
+                    encodeSettings.FilePath = "";
                 }
                 encodeSettings.AutoCalculateSize = true;
             }
+        }
+
+        private void MenuSelect_Click(object sender, RoutedEventArgs e) {
+            SelectVideoButton.IsOpen = false;
+            SelectVideoButton.Content = ((MenuItem)sender).Header;
+            SelectVideoButton_Click(sender, e);
         }
 
         public void SetEncodeSettings(MediaEncoderSettings value) {
@@ -135,15 +142,15 @@ namespace NaturalGroundingPlayer {
             isBinding = false;
         }
 
-        public void ClosePreview() {
+        public void HidePreview() {
             if (playerOriginal?.Visibility == Visibility.Visible)
-                playerOriginal.Close();
+                playerOriginal.Visibility = Visibility.Hidden;
             if (playerChanges?.Visibility == Visibility.Visible)
-                playerChanges.Close();
+                playerChanges.Visibility = Visibility.Hidden;
         }
 
         private async void PreviewOriginalButton_Click(object sender, RoutedEventArgs e) {
-            await PlayVideoAsync(playerOriginal, Settings.NaturalGroundingFolder + encodeSettings.FileName);
+            await PlayVideoAsync(playerOriginal, encodeSettings.FilePath);
         }
 
         private async void PreviewChangesButton_Click(object sender, RoutedEventArgs e) {
@@ -179,9 +186,9 @@ namespace NaturalGroundingPlayer {
 
             MediaEncoderSettings EncodeSettings = encodeSettings;
             try {
-                ClosePreview();
+                HidePreview();
                 SetEncodeSettings((MediaEncoderSettings)encodeSettings.Clone());
-                encodeSettings.FileName = "";
+                encodeSettings.FilePath = "";
                 await Task.Delay(100); // Wait for media player file to be released.
                 await business.EncodeFileAsync(EncodeSettings);
             } catch (Exception ex) {
@@ -197,7 +204,7 @@ namespace NaturalGroundingPlayer {
 
         private bool Validate() {
             bool Error = !this.IsValid() ||
-                string.IsNullOrEmpty(encodeSettings.FileName) ||
+                string.IsNullOrEmpty(encodeSettings.FilePath) ||
                 !encodeSettings.SourceHeight.HasValue ||
                 !encodeSettings.SourceWidth.HasValue ||
                 !encodeSettings.SourceFrameRate.HasValue;
@@ -218,7 +225,7 @@ namespace NaturalGroundingPlayer {
         /// Generates script when going to Script tab, and prevents returning to Transform tab without a confirmation to lose changes.
         /// </summary>
         private void Items_CurrentChanging(object sender, CurrentChangingEventArgs e) {
-            if (string.IsNullOrEmpty(encodeSettings.FileName))
+            if (string.IsNullOrEmpty(encodeSettings.FilePath))
                 return;
 
             SettingsTab.Focus();
@@ -272,7 +279,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void DeshakerGenerateButton_Click(object sender, RoutedEventArgs e) {
-            MediaEncoderDeshakerWindow.Instance(business, encodeSettings);
+            DeshakerWindow.Instance(business, encodeSettings);
             //DeshakerGenerateButton.IsEnabled = false;
             //await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings));
             //DeshakerGenerateButton.IsEnabled = true;

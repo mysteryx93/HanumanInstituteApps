@@ -10,13 +10,13 @@ using System.Windows.Forms;
 using WMPLib;
 
 namespace MediaPlayer {
-    public partial class WindowsMediaPlayer : UserControl {
-        
+    public partial class WindowsMediaPlayer : UserControl {        
         public event EventHandler MediaOpened;
         public event EventHandler MediaResume;
         public event EventHandler MediaPause;
         public event EventHandler MediaStop;
         public event EventHandler PositionChanged;
+        public new event EventHandler LostFocus;
 
         public WindowsMediaPlayer() {
             InitializeComponent();
@@ -26,6 +26,10 @@ namespace MediaPlayer {
             Player.uiMode = "full";
             Player.enableContextMenu = false;
             Player.stretchToFit = true;
+            // LostFocus only gets triggered by the COM component.
+            Player.LostFocus += (sender, e) => {
+                LostFocus?.Invoke(sender, e);
+            };
         }
 
         public string Source {
@@ -101,6 +105,15 @@ namespace MediaPlayer {
             }
             set {
                 Player.settings.volume = value;
+            }
+        }
+
+        public double Rate {
+            get {
+                return Player.settings.rate;
+            }
+            set {
+                Player.settings.rate = value;
             }
         }
 

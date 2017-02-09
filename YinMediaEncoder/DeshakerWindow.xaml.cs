@@ -9,14 +9,15 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Business;
 using System.Collections.ObjectModel;
+using NaturalGroundingPlayer;
 
-namespace NaturalGroundingPlayer {
+namespace YinMediaEncoder {
     /// <summary>
-    /// Interaction logic for MediaEncoderDeshakerWindow.xaml
+    /// Interaction logic for DeshakerWindow.xaml
     /// </summary>
-    public partial class MediaEncoderDeshakerWindow : Window {
+    public partial class DeshakerWindow : Window {
         public static void Instance(MediaEncoderBusiness business, MediaEncoderSettings settings) {
-            MediaEncoderDeshakerWindow NewForm = new MediaEncoderDeshakerWindow();
+            DeshakerWindow NewForm = new DeshakerWindow();
             NewForm.business = business;
             NewForm.encodeSettings = settings;
             SessionCore.Instance.Windows.ShowDialog(NewForm);
@@ -29,7 +30,7 @@ namespace NaturalGroundingPlayer {
         private MediaEncoderDeshakerSegmentSettings bindingSegmentSettings;
         public int StartFrameTextBoxValue { get; set; } = 0;
 
-        public MediaEncoderDeshakerWindow() {
+        public DeshakerWindow() {
             InitializeComponent();
             helper = new WindowHelper(this);
         }
@@ -86,11 +87,11 @@ namespace NaturalGroundingPlayer {
         /// This gets called when the Deshaker process has started. Show the status window.
         /// </summary>
         private void ExecutingDeshakePass(object sender, ExecutingProcessEventArgs e) {
-            Application.Current.Dispatcher.Invoke(() => MediaEncoderDeshakerPassWindow.Instance(business, encodeSettings, e.Process));
+            Application.Current.Dispatcher.Invoke(() => DeshakerPassWindow.Instance(business, encodeSettings, e.Process));
         }
 
         private void AdvancedSettingsButton_Click(object sender, RoutedEventArgs e) {
-            MediaEncoderDeshakerAdvancedWindow.Instance(business, bindingSegmentSettings);
+            DeshakerAdvancedWindow.Instance(business, bindingSegmentSettings);
         }
 
         private void StartFrameChangeButton_Click(object sender, RoutedEventArgs e) {

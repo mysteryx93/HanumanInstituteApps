@@ -181,8 +181,6 @@ namespace Business {
             //viewer.Dispose();
         }
 
-
-
         private MediaInfo ReadMediaFile(string fileName) {
             //Initilaizing MediaInfo
             MediaInfo MI = new MediaInfo();

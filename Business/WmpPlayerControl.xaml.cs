@@ -12,9 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Business;
 
-namespace NaturalGroundingPlayer {
+namespace Business {
     /// <summary>
     /// Interaction logic for MediaPlayerControl.xaml
     /// </summary>
@@ -22,6 +23,8 @@ namespace NaturalGroundingPlayer {
         public bool AllowClose { get; set; }
         public bool IsWindow { get; set; }
         private bool forceClose;
+        private DispatcherTimer reloadTimer { get; set; } // Adds a delay after changing settings before reloading video
+        private double newRate;
         public event EventHandler MediaOpened;
         public event EventHandler MediaResume;
         public event EventHandler MediaPause;
@@ -34,6 +37,11 @@ namespace NaturalGroundingPlayer {
             Player.MediaOpened += Player_MediaOpened;
             Player.MediaResume += Player_MediaResume;
             Player.MediaPause += Player_MediaPause;
+            Player.LostFocus += Player_LostFocus;
+
+            reloadTimer = new DispatcherTimer();
+            reloadTimer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+            reloadTimer.Tick += ReloadTimer_Tick;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e) {
@@ -127,6 +135,75 @@ namespace NaturalGroundingPlayer {
             set {
                 Player.Loop = value;
             }
+        }
+
+        public static readonly DependencyProperty VolumeProperty =
+            DependencyProperty.Register("Volume", typeof(double),
+            typeof(WmpPlayerControl), new PropertyMetadata(100.0, OnVolumeChanged));
+
+        public double Volume {
+            get {
+                return (double)GetValue(VolumeProperty);
+            }
+            set {
+                SetValue(VolumeProperty, value);
+            }
+        }
+
+        private static void OnVolumeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            ((WmpPlayerControl)d).Player.Volume = (int)(double)e.NewValue;
+        }
+
+        private void Player_LostFocus(object sender, EventArgs e) {
+            if ((double)Player.Volume != Volume)
+                SetValue(VolumeProperty, (double)Player.Volume);
+        }
+
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source", typeof(string),
+            typeof(WmpPlayerControl), new PropertyMetadata("", OnSourceChanged));
+
+        public string Source {
+            get {
+                return (string)GetValue(SourceProperty);
+            }
+            set {
+                SetValue(SourceProperty, value);
+            }
+        }
+
+        private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            ((WmpPlayerControl)d).Player.Source = (string)e.NewValue;
+        }
+
+        public static readonly DependencyProperty RateProperty =
+            DependencyProperty.Register("Rate", typeof(double),
+            typeof(WmpPlayerControl), new PropertyMetadata(1.0, OnRateChanged));
+
+        public double Rate {
+            get {
+                return (double)GetValue(RateProperty);
+            }
+            set {
+                SetValue(RateProperty, value);
+            }
+        }
+
+        private static void OnRateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var P = ((WmpPlayerControl)d);
+            P.newRate = (double)e.NewValue;
+            P.reloadTimer.Stop();
+            P.reloadTimer.Start();
+        }
+
+        private void ReloadTimer_Tick(object sender, EventArgs e) {
+            reloadTimer.Stop();
+            string Src = Player.Source;
+            double Pos = Player.Position;
+            Player.Source = "";
+            Player.Rate = newRate;
+            Player.Source = Src;
+            Player.Position = Pos;
         }
     }
 }

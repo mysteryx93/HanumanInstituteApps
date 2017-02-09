@@ -6,6 +6,6 @@
         Title="Media Player" Height="600" Width="800" WindowStartupLocation="CenterScreen"
         UseLayoutRounding="True" Icon="/NaturalGroundingPlayer;component/Icons/App.ico">
     <Grid>
-        <NaturalGroundingPlayer:WmpPlayerControl x:Name="Player" IsWindow="True" />
+        <Business:WmpPlayerControl x:Name="Player" IsWindow="True" x:FieldModifier="public" />
     </Grid>
 </Window>

@@ -17,7 +17,8 @@ namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
     public class MediaEncoderSettings {
-        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public string DisplayName { get; set; }
         public bool ConvertToAvi { get; set; }
         [DefaultValue(null)]
         public double? Position { get; set; }
@@ -148,6 +149,8 @@ namespace Business {
                 audioAction = value;
                 if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction == AudioActions.EncodeOpus)
                     EncodeFormat = VideoFormats.Mkv;
+                else if (audioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac)
+                    EncodeFormat = VideoFormats.Mp4;
             }
         }
         public int AudioQuality { get; set; }
@@ -355,8 +358,8 @@ namespace Business {
             }
         }
 
-        public bool HasFileName {
-            get { return !string.IsNullOrEmpty(FileName); }
+        public bool HasFilePath {
+            get { return !string.IsNullOrEmpty(FilePath); }
         }
 
         public string ScriptFile {
@@ -385,7 +388,7 @@ namespace Business {
                     else
                         return MediaEncoderBusiness.PreviewSourceFile;
                 } else
-                    return Settings.NaturalGroundingFolder + FileName;
+                    return FilePath;
             }
         }
 
@@ -446,14 +449,14 @@ namespace Business {
         }
 
 
-        public void Save(string fileName) {
-            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+        public void Save(string filePath) {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             // Don't serialize DeshakerSesttings unless Deshaker is enabled, but preserve settings within class.
             MediaEncoderDeshakerSettings S = DeshakerSettings;
             if (!Deshaker)
                 DeshakerSettings = null;
 
-            using (var writer = new StreamWriter(fileName)) {
+            using (var writer = new StreamWriter(filePath)) {
                 var serializer = new XmlSerializer(typeof(MediaEncoderSettings));
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
@@ -469,8 +472,8 @@ namespace Business {
                 DeshakerSettings = S;
         }
 
-        public static MediaEncoderSettings Load(string fileName) {
-            using (var stream = File.OpenRead(fileName)) {
+        public static MediaEncoderSettings Load(string filePath) {
+            using (var stream = File.OpenRead(filePath)) {
                 var serializer = new XmlSerializer(typeof(MediaEncoderSettings));
                 MediaEncoderSettings Result = serializer.Deserialize(stream) as MediaEncoderSettings;
                 if (Result.DeshakerSettings == null)

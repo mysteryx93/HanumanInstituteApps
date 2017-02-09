@@ -169,7 +169,7 @@ namespace NaturalGroundingPlayer {
 
             SearchSettings SearchSettings = new SearchSettings() {
                 MediaType = MediaType.Video,
-                RatingRatio = SessionCore.Instance.Main.RatioSlider.Value
+                RatingRatio = SessionCore.Instance.NgMain.RatioSlider.Value
             };
             VideoListItem Result = SearchVideoWindow.Instance(SearchSettings);
             if (Result != null)
@@ -222,7 +222,7 @@ namespace NaturalGroundingPlayer {
 
             SearchSettings settings = new SearchSettings();
             settings.MediaType = MediaType.Video;
-            settings.RatingRatio = SessionCore.Instance.Main.RatioSlider.Value;
+            settings.RatingRatio = SessionCore.Instance.NgMain.RatioSlider.Value;
             settings.RatingCategory = "Fire";
             settings.RatingOperator = OperatorConditionEnum.GreaterOrEqual;
             settings.RatingValue = 7.5f;
@@ -342,7 +342,7 @@ namespace NaturalGroundingPlayer {
                 return;
 
             PauseSession();
-            MediaEncoderWindow.Instance(null);
+            //MediaEncoderWindow.Instance(null);
         }
 
         public void CommandBinding_Settings(object sender, ExecutedRoutedEventArgs e) {

@@ -232,7 +232,7 @@ namespace Business {
         }
 
         public static float? GetPixelAspectRatio(MediaEncoderSettings settings) {
-            string ConsoleOut = RunToString("Encoder\\ffmpeg.exe", string.Format(@"-i ""{0}""", Settings.NaturalGroundingFolder + settings.FileName));
+            string ConsoleOut = RunToString("Encoder\\ffmpeg.exe", string.Format(@"-i ""{0}""", settings.FilePath));
             int PosStart = ConsoleOut.IndexOf("[SAR ") + 5;
             int PosEnd = ConsoleOut.IndexOf(" DAR ", PosStart);
             if (PosStart < 0 || PosEnd < 0)
@@ -258,7 +258,7 @@ namespace Business {
         public static float? GetAudioGain(MediaEncoderSettings settings) {
             string TempResult = settings.TempFile + ".txt";
             string Args = string.Format(@"/c Encoder\\ffmpeg.exe -i ""{0}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1",
-                Settings.NaturalGroundingFolder + settings.FileName, TempResult);
+                settings.FilePath, TempResult);
             Run("cmd", Args, true);
             float? Result = null;
             if (File.Exists(TempResult)) {
@@ -294,7 +294,7 @@ namespace Business {
             // Create script to get auto-crop coordinates
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
-            Script.OpenDirect(Settings.NaturalGroundingFolder + settings.FileName, false);
+            Script.OpenDirect(settings.FilePath, false);
             Script.LoadPluginDll("RoboCrop26.dll");
             Script.AppendLine(@"RoboCrop(LogFn=""{0}"")", Script.GetAsciiPath(TempResult));
             Script.AppendLine("Trim(0,-1)");

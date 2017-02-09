@@ -1,9 +1,9 @@
-﻿<Window x:Class="NaturalGroundingPlayer.MediaEncoderDeshakerPassWindow"
+﻿<Window x:Class="YinMediaEncoder.DeshakerPassWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NaturalGroundingPlayer"
+        xmlns:local="clr-namespace:YinMediaEncoder"
         mc:Ignorable="d"
         Title="Deshaker" Height="166.24" Width="325.782" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" Closing="Window_Closing" WindowStyle="None" Loaded="Window_Loaded">
     <Border BorderThickness="1" BorderBrush="Black">

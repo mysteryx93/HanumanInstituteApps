@@ -271,11 +271,11 @@ namespace NaturalGroundingPlayer {
                 Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
                 dlg.InitialDirectory = Settings.NaturalGroundingFolder;
                 if (video.MediaType == MediaType.Video)
-                    string.Format("Video Files|*{0})", string.Join(";*", Settings.VideoExtensions));
+                    dlg.Filter = string.Format("Video Files|*{0})", string.Join(";*", Settings.VideoExtensions));
                 else if (video.MediaType == MediaType.Audio)
-                    string.Format("Audio Files|*{0})", string.Join(";*", Settings.AudioExtensions));
+                    dlg.Filter = string.Format("Audio Files|*{0})", string.Join(";*", Settings.AudioExtensions));
                 else if (video.MediaType == MediaType.Image)
-                    string.Format("Image Files|*{0})", string.Join(";*", Settings.ImageExtensions));
+                    dlg.Filter = string.Format("Image Files|*{0})", string.Join(";*", Settings.ImageExtensions));
                 if (dlg.ShowDialog(IsLoaded ? this : Owner).Value == true) {
                     if (!dlg.FileName.StartsWith(Settings.NaturalGroundingFolder))
                         MessageBox.Show("You must select a file within your Natural Grounding folder.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);

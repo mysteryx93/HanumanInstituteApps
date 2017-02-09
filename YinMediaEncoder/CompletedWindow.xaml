@@ -1,7 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.MediaEncodingCompletedWindow"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="YinMediaEncoder.CompletedWindow"
         Title="Encoding Completed" Height="308.534" Width="492.857" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
         <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>

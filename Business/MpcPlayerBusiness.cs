@@ -197,18 +197,18 @@ namespace Business {
         /// <summary>
         /// Plays specified video file. To use only when playing files outside the Natural Grounding folder.
         /// </summary>
-        /// <param name="fileName">The path of the file to play.</param>
-        public async Task PlayVideoAsync(string fileName) {
+        /// <param name="filePath">The absolute path of the file to play.</param>
+        public async Task PlayVideoAsync(string filePath) {
             CurrentVideo = new Media() { };
             IsAutoPitchEnabled = false;
-            customFileName = fileName;
+            customFileName = filePath;
             TimerGetPositionEnabled = false;
             position = 0;
             restorePosition = 0;
             nowPlayingPath = null;
             lastStartTime = DateTime.Now;
             watcher.EnsureRunning();
-            await apiAccess.OpenFileAsync(fileName);
+            await apiAccess.OpenFileAsync(filePath);
             // If video doesn't load after 5 seconds, send the play command again.
             timerPlayTimeout.Stop();
             timerPlayTimeout.Start();

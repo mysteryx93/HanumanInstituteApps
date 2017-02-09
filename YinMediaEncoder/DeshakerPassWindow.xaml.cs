@@ -8,14 +8,15 @@ using System.Windows;
 using System.Windows.Threading;
 using Business;
 using System.Diagnostics;
+using NaturalGroundingPlayer;
 
-namespace NaturalGroundingPlayer {
+namespace YinMediaEncoder {
     /// <summary>
-    /// Interaction logic for MediaEncoderDeshakerPassWindow.xaml
+    /// Interaction logic for DeshakerPassWindow.xaml
     /// </summary>
-    public partial class MediaEncoderDeshakerPassWindow : Window {
+    public partial class DeshakerPassWindow : Window {
         public static void Instance(MediaEncoderBusiness business, MediaEncoderSettings settings, Process process) {
-            MediaEncoderDeshakerPassWindow NewForm = new MediaEncoderDeshakerPassWindow();
+            DeshakerPassWindow NewForm = new DeshakerPassWindow();
             NewForm.business = business;
             NewForm.settings = settings;
             NewForm.process = process;
@@ -29,9 +30,9 @@ namespace NaturalGroundingPlayer {
         private DispatcherTimer progressTimer = new DispatcherTimer();
         private FfmpegBusiness.ClipInfo clipInfo;
 
-        public MediaEncoderDeshakerPassWindow() {
+        public DeshakerPassWindow() {
             InitializeComponent();
-            helper = new NaturalGroundingPlayer.WindowHelper(this);
+            helper = new WindowHelper(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {

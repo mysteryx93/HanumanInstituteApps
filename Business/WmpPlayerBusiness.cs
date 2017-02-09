@@ -20,6 +20,7 @@ namespace Business {
         public IMediaPlayerControl player;
         public Media CurrentVideo { get; set; }
         public bool IsAutoPitchEnabled { get; set; }
+        private string customFileName;
         public bool IsVisible;
         private double position;
         private DateTime lastStartTime;
@@ -136,6 +137,7 @@ namespace Business {
             this.IsAutoPitchEnabled = enableAutoPitch;
             timerGetPositionEnabled = false;
             position = 0;
+            restorePosition = 0;
             lastStartTime = DateTime.Now;
             if (player == null)
                 Show();
@@ -146,10 +148,27 @@ namespace Business {
             timerPlayTimeout.Start();
         }
 
+        /// <summary>
+        /// Plays specified video file. To use only when playing files outside the Natural Grounding folder.
+        /// </summary>
+        /// <param name="filePath">The absolute path of the file to play.</param>
+        public async Task PlayVideoAsync(string filePath) {
+            CurrentVideo = new Media() { };
+            IsAutoPitchEnabled = false;
+            customFileName = filePath;
+            timerGetPositionEnabled = false;
+            position = 0;
+            restorePosition = 0;
+            lastStartTime = DateTime.Now;
+            await player.OpenFileAsync(filePath);
+            // If video doesn't load after 5 seconds, send the play command again.
+            timerPlayTimeout.Stop();
+            timerPlayTimeout.Start();
+        }
+
         private string MediaFileName {
             get {
-                // customFileName != null ? customFileName : 
-                return IsAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+                return customFileName != null ? customFileName : IsAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
             }
         }
 

@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using NaturalGroundingPlayer;
 using Business;
 
-namespace NaturalGroundingPlayer {
+namespace YinMediaEncoder {
     /// <summary>
-    /// Interaction logic for MediaEncoderDeshakerWindow.xaml
+    /// Interaction logic for DeshakerWindow.xaml
     /// </summary>
-    public partial class MediaEncoderDeshakerAdvancedWindow : Window {
+    public partial class DeshakerAdvancedWindow : Window {
         public static void Instance(MediaEncoderBusiness business, MediaEncoderDeshakerSegmentSettings settings) {
-            MediaEncoderDeshakerAdvancedWindow NewForm = new MediaEncoderDeshakerAdvancedWindow();
+            DeshakerAdvancedWindow NewForm = new DeshakerAdvancedWindow();
             NewForm.business = business;
             NewForm.encodeSettings = settings;
             SessionCore.Instance.Windows.ShowDialog(NewForm);
@@ -26,7 +27,7 @@ namespace NaturalGroundingPlayer {
         MediaEncoderDeshakerSegmentSettings encodeSettings;
         MediaEncoderDeshakerSegmentSettings bindingSettings;
 
-        public MediaEncoderDeshakerAdvancedWindow() {
+        public DeshakerAdvancedWindow() {
             InitializeComponent();
             helper = new WindowHelper(this);
         }

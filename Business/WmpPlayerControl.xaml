@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="NaturalGroundingPlayer.WmpPlayerControl"
+﻿<UserControl x:Class="Business.WmpPlayerControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded">
     <Grid>
         <WindowsFormsHost Name="formsHost" Panel.ZIndex="200">
-            <ax:WindowsMediaPlayer x:Name="Player"/>
+            <ax:WindowsMediaPlayer x:Name="Player" x:FieldModifier="public"/>
         </WindowsFormsHost>
     </Grid>
 </UserControl>

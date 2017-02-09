@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using NaturalGroundingPlayer;
 using Business;
 using DataAccess;
-using System.Threading.Tasks;
 
-namespace NaturalGroundingPlayer {
+namespace YinMediaEncoder {
     /// <summary>
-    /// Interaction logic for MediaEncodingCompletedWindow.xaml
+    /// Interaction logic for CompletedWindow.xaml
     /// </summary>
-    public partial class MediaEncodingCompletedWindow : Window {
+    public partial class CompletedWindow : Window {
         public static void Instance(EncodingCompletedEventArgs jobInfo) {
-            MediaEncodingCompletedWindow NewForm = new MediaEncodingCompletedWindow();
+            CompletedWindow NewForm = new CompletedWindow();
             NewForm.jobInfo = jobInfo;
             NewForm.Show();
         }
@@ -25,7 +26,7 @@ namespace NaturalGroundingPlayer {
         private WindowHelper helper;
         IMediaPlayerBusiness player = SessionCore.Instance.GetNewPlayer();
 
-        public MediaEncodingCompletedWindow() {
+        public CompletedWindow() {
             InitializeComponent();
             helper = new WindowHelper(this);
         }
@@ -52,11 +53,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async Task PlayVideoAsync(string fileName) {
-            if (SessionCore.Instance.Business.IsStarted && (SessionCore.Instance.Windows.Current.GetType() == typeof(MainWindow) || SessionCore.Instance.Windows.Current.GetType() == typeof(ManualPlayerWindow))) {
-                await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, fileName);
-                await SessionCore.Instance.Business.SkipVideoAsync();
-            } else
-                await player.PlayVideoAsync(new Media() { FileName = fileName }, false);
+            await player.PlayVideoAsync(fileName);
         }
 
         private async void OkButton_Click(object sender, RoutedEventArgs e) {
@@ -70,12 +67,12 @@ namespace NaturalGroundingPlayer {
                     await Task.Run(() => business.FinalizeKeep(jobInfo));
                 }
                 if (ReencodeCheckbox.IsChecked.Value) {
-                    MediaEncoderWindow ActiveWindow = SessionCore.Instance.Windows.Current as MediaEncoderWindow;
+                    MainWindow ActiveWindow = SessionCore.Instance.Windows.Current as MainWindow;
                     
                     // If Media Encoder is open, close preview windows and replace preview files.
                     // Otherwise, open Media Encoder and pre-load preview files.
                     if (ActiveWindow != null)
-                        ActiveWindow.ClosePreview();
+                        ActiveWindow.HidePreview();
                     await business.MovePreviewFilesAsync(jobInfo.Settings);
 
                     if (ActiveWindow != null) {

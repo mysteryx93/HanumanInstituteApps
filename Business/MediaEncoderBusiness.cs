@@ -62,7 +62,7 @@ namespace Business {
             if (settings.ConvertToAvi)
                 return PreviewSourceFile;
             else
-                return Settings.NaturalGroundingFolder + settings.FileName;
+                return settings.FilePath;
         }
 
         public async Task DeletePreviewFilesAsync() {
@@ -110,7 +110,7 @@ namespace Business {
         }
 
         private async Task StartEncodeFileAsync(MediaEncoderSettings settings) {
-            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FileName));
+            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FilePath));
 
             EncodingCompletedEventArgs EncodingResult;
             if (EncoderTask == null)
@@ -125,7 +125,7 @@ namespace Business {
         }
 
         private async Task WaitEncodeProcessAsync(MediaEncoderSettings settings, Process jobProcess) {
-            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FileName));
+            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FilePath));
 
             EncodingCompletedEventArgs EncodingResult;
             if (EncoderTask == null)
@@ -176,7 +176,7 @@ namespace Business {
             string FinalFile = GetNextAvailableFileName(settings.FinalFile);
             string VideoFile = null;
             if (settings.VideoCodec == VideoCodecs.Copy)
-                VideoFile = Settings.NaturalGroundingFolder + settings.FileName;
+                VideoFile = settings.FilePath;
             else
                 VideoFile = settings.OutputFile;
 
@@ -186,7 +186,7 @@ namespace Business {
                 // Muxe video with audio.
                 string AudioFile = null;
                 if (settings.AudioAction == AudioActions.Copy)
-                    AudioFile = Settings.NaturalGroundingFolder + settings.FileName;
+                    AudioFile = settings.FilePath;
                 else if (settings.AudioAction == AudioActions.EncodeAac)
                     AudioFile = settings.AudioFileAac;
                 else if (settings.AudioAction == AudioActions.EncodeOpus)
@@ -203,13 +203,13 @@ namespace Business {
             EncodingCompletedEventArgs Result = null;
             if (File.Exists(finalFile)) {
                 Result = new EncodingCompletedEventArgs();
-                Result.OldFileName = settings.FileName;
-                Result.NewFileName = settings.FinalFile.Substring(Settings.NaturalGroundingFolder.Length);
+                Result.OldFileName = settings.FilePath;
+                Result.NewFileName = settings.FinalFile;
                 if (startTime.HasValue)
                     Result.EncodingTime = DateTime.Now - startTime.Value;
                 FileInfo FinalFileInfo = new FileInfo(finalFile);
                 Result.NewFileSize = FinalFileInfo.Length;
-                FinalFileInfo = new FileInfo(Settings.NaturalGroundingFolder + settings.FileName);
+                FinalFileInfo = new FileInfo(settings.FilePath);
                 Result.OldFileSize = FinalFileInfo.Length;
                 Result.Settings = settings;
             }
@@ -606,17 +606,17 @@ namespace Business {
         }
 
         public async Task PreparePreviewFile(MediaEncoderSettings settings, bool overwrite, bool calcAutoCrop) {
-            if (string.IsNullOrEmpty(settings.FileName))
+            if (string.IsNullOrEmpty(settings.FilePath))
                 return;
 
             if (overwrite) {
                 File.Delete(PreviewSourceFile);
                 // Select default open method.
-                if (settings.FileName.ToLower().EndsWith(".avi"))
+                if (settings.FilePath.ToLower().EndsWith(".avi"))
                     settings.ConvertToAvi = false;
                 else {
                     using (MediaInfoReader InfoReader = new MediaInfoReader()) {
-                        InfoReader.LoadInfo(Settings.NaturalGroundingFolder + settings.FileName);
+                        InfoReader.LoadInfo(settings.FilePath);
                         if (settings.ConvertToAvi && InfoReader.Height.HasValue && InfoReader.Height >= 720)
                             settings.ConvertToAvi = false;
                     }
@@ -625,13 +625,13 @@ namespace Business {
 
             bool AviFileReady = File.Exists(PreviewSourceFile);
             if (!AviFileReady && settings.ConvertToAvi)
-                AviFileReady = await Task.Run(() => FfmpegBusiness.ConvertToAVI(Settings.NaturalGroundingFolder + settings.FileName, PreviewSourceFile, false));
+                AviFileReady = await Task.Run(() => FfmpegBusiness.ConvertToAVI(settings.FilePath, PreviewSourceFile, false));
 
             if (AviFileReady && settings.ConvertToAvi)
                 await GetMediaInfo(PreviewSourceFile, settings);
             else {
                 settings.ConvertToAvi = false;
-                await GetMediaInfo(Settings.NaturalGroundingFolder + settings.FileName, settings);
+                await GetMediaInfo(settings.FilePath, settings);
             }
 
             // Auto-calculate crop settings.
@@ -669,7 +669,7 @@ namespace Business {
                     settings.SourceAspectRatio = 1.092f;
                 settings.SourceFrameRate = InfoReader.FrameRate;
                 if (settings.ConvertToAvi)
-                    await InfoReader.LoadInfoAsync(Settings.NaturalGroundingFolder + settings.FileName);
+                    await InfoReader.LoadInfoAsync(settings.FilePath);
                 settings.SourceAudioFormat = InfoReader.AudioFormat;
                 settings.SourceVideoFormat = InfoReader.VideoFormat;
                 bool IsTvRange = InfoReader.ColorRange.ToLower() != "full";
@@ -697,14 +697,15 @@ namespace Business {
 
         public void FinalizeReplace(EncodingCompletedEventArgs jobInfo) {
             EditVideoBusiness EditBusiness = new EditVideoBusiness();
-            Media EditVideo = EditBusiness.GetVideoByFileName(jobInfo.OldFileName);
+            string RelativePath = jobInfo.OldFileName.StartsWith(Settings.NaturalGroundingFolder) ? jobInfo.OldFileName.Substring(Settings.NaturalGroundingFolder.Length) : jobInfo.OldFileName;
+            Media EditVideo = EditBusiness.GetVideoByFileName(RelativePath);
             System.Threading.Thread.Sleep(200); // Give MPC time to release the file.
-            string OriginalPath = Path.Combine(Path.GetDirectoryName(Settings.NaturalGroundingFolder + jobInfo.OldFileName), "Original", Path.GetFileName(jobInfo.OldFileName));
-            string NewPath = Path.Combine(Path.GetDirectoryName(Settings.NaturalGroundingFolder + jobInfo.OldFileName), Path.GetFileNameWithoutExtension(jobInfo.OldFileName) + Path.GetExtension(jobInfo.Settings.FinalFile));
+            string OriginalPath = Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName), "Original", Path.GetFileName(jobInfo.OldFileName));
+            string NewPath = Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName), Path.GetFileNameWithoutExtension(jobInfo.OldFileName) + Path.GetExtension(jobInfo.Settings.FinalFile));
             Directory.CreateDirectory(Path.GetDirectoryName(OriginalPath));
-            SafeMove(Settings.NaturalGroundingFolder + jobInfo.OldFileName, OriginalPath);
+            SafeMove(jobInfo.OldFileName, OriginalPath);
             SafeMove(jobInfo.Settings.FinalFile, NewPath);
-            jobInfo.Settings.FileName = OriginalPath.Substring(Settings.NaturalGroundingFolder.Length);
+            jobInfo.Settings.FilePath = OriginalPath.Substring(Settings.NaturalGroundingFolder.Length);
 
             if (EditVideo != null) {
                 EditVideo.FileName = NewPath.Substring(Settings.NaturalGroundingFolder.Length);
@@ -715,10 +716,10 @@ namespace Business {
 
         public void FinalizeKeep(EncodingCompletedEventArgs jobInfo) {
             string FinalFile = String.Format("{0} - Encoded.{1}",
-                Path.Combine(Path.GetDirectoryName(Settings.NaturalGroundingFolder + jobInfo.OldFileName),
+                Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName),
                     Path.GetFileNameWithoutExtension(jobInfo.OldFileName)),
                     jobInfo.Settings.FileExtension);
-            SafeMove(Settings.NaturalGroundingFolder + jobInfo.NewFileName, FinalFile);
+            SafeMove(jobInfo.NewFileName, FinalFile);
         }
 
         public void DeleteJobFiles(MediaEncoderSettings settings) {
@@ -782,7 +783,7 @@ namespace Business {
         public async Task<MediaEncoderSettings> AutoLoadPreviewFileAsync() {
             if (File.Exists(PreviewSettingsFile)) {
                 MediaEncoderSettings settings = MediaEncoderSettings.Load(PreviewSettingsFile);
-                if (!File.Exists(PreviewSourceFile) && File.Exists(Settings.NaturalGroundingFolder + settings.FileName)) {
+                if (!File.Exists(PreviewSourceFile) && File.Exists(settings.FilePath)) {
                     double? SourceFps = settings.SourceFrameRate; // Keep FPS in case it cannot be read from the file.
                     await PreparePreviewFile(settings, false, false);
                     if (!settings.SourceFrameRate.HasValue)
@@ -825,7 +826,7 @@ namespace Business {
                     if (Index > JobIndex)
                         JobIndex = Index;
 
-                    if (settings != null && File.Exists(settings.InputFile) && File.Exists(settings.ScriptFile) && File.Exists(settings.SettingsFile) && File.Exists(Settings.NaturalGroundingFolder + settings.FileName)) {
+                    if (settings != null && File.Exists(settings.InputFile) && File.Exists(settings.ScriptFile) && File.Exists(settings.SettingsFile) && File.Exists(settings.FilePath)) {
                         if (File.Exists(settings.FinalFile)) {
                             // Merging was completed.
                             EncodingCompletedEventArgs EncodeResult = GetEncodingResults(settings, settings.FinalFile, null);

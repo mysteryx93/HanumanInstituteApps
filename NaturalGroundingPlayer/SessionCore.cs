@@ -22,20 +22,29 @@ namespace NaturalGroundingPlayer {
         public RatingViewerControl RatingViewer { get; private set; }
         public ViewDownloadsWindow Downloads { get; private set; }
         public ImageSource Icon { get; private set; }
-        public MainWindow Main { get; private set; }
+        public Window Main { get; private set; }
+        public MainWindow NgMain {
+            get {
+                return Main as MainWindow;
+            }
+        }
         public WindowManager Windows { get; private set; }
 
         static SessionCore() {
             Instance = new SessionCore();
         }
 
-        public void Start(MainWindow main) {
+        public void Start(Window main) {
             // Make sure to initialize Settings static constructor to initialize database path.
             var a = Settings.SavedFile;
 
-            Menu = (MenuControl)main.MainMenuContainer.Content;
-            Layers = (LayersControl)main.LayersContainer.Content;
-            RatingViewer = (RatingViewerControl)main.RatingViewerContainer.Content;
+            NaturalGroundingPlayer.MainWindow NgMain = main as NaturalGroundingPlayer.MainWindow;
+            if (NgMain != null) {
+                Menu = (MenuControl)NgMain.MainMenuContainer.Content;
+                Layers = (LayersControl)NgMain.LayersContainer.Content;
+                RatingViewer = (RatingViewerControl)NgMain.RatingViewerContainer.Content;
+                Business = new PlayerBusiness(GetNewPlayer());
+            }
             Icon = main.Icon;
             Main = main;
 
@@ -46,7 +55,6 @@ namespace NaturalGroundingPlayer {
             main.Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             System.Windows.Forms.Application.ThreadException += Application_ThreadException; // MPC-HC API calls are done through WinForms.
 
-            Business = new PlayerBusiness(GetNewPlayer());
             Windows = new WindowManager(main);
         }
 
@@ -60,9 +68,11 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Main_Loaded(object sender, EventArgs e) {
-            Downloads = new ViewDownloadsWindow();
-            Downloads.Owner = Main;
-            Downloads.DownloadsView.ItemsSource = Business.DownloadManager.DownloadsList;
+            if (NgMain != null) {
+                Downloads = new ViewDownloadsWindow();
+                Downloads.Owner = Main;
+                Downloads.DownloadsView.ItemsSource = Business.DownloadManager.DownloadsList;
+            }
 
             InitializingWindow InitWin = new InitializingWindow();
             InitWin.Owner = Main;
@@ -81,7 +91,8 @@ namespace NaturalGroundingPlayer {
                 SettingsWindow.Instance();
             }
 
-            await Main.InitializationCompleted();
+            if (NgMain != null)
+                await NgMain.InitializationCompleted();
 
             InitWin.Close();
             await InitWinTask;
