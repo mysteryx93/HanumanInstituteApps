@@ -19,7 +19,7 @@ namespace Player432hz {
         DispatcherTimer posTimer = new DispatcherTimer();
         internal PlayingInfo displayInfo = new PlayingInfo();
 
-        PlayerManager playManager = new PlayerManager();
+        AudioPlayerManager playManager = new AudioPlayerManager();
 
         public MainWindow() {
             InitializeComponent();
@@ -112,12 +112,13 @@ namespace Player432hz {
         private void RefreshFiles() {
             files.Clear();
             foreach (string item in currentPlaylist.Folders) {
-                foreach (string file in PlayerManager.GetFiles(item, new string[] { "*.mp3", "*.flac" }, SearchOption.AllDirectories)) {
+                foreach (string file in AudioPlayerManager.GetAudioFiles(item)) {
                     files.Add(file);
                 }
             }
         }
 
+        // Play selected file and then the playlist.
         private void PlayButton_Click(object sender, RoutedEventArgs e) {
             if (FilesList.SelectedIndex > -1) {
                 string CurrentFile = files[FilesList.SelectedIndex];
@@ -129,6 +130,16 @@ namespace Player432hz {
             var dataContext = ((FrameworkElement)e.OriginalSource).DataContext;
             if (dataContext is string && e.LeftButton == MouseButtonState.Pressed) {
                 PlayButton_Click(null, null);
+            }
+        }
+
+        // Start playing the playlist.
+        private void PlaylistsList_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            var dataContext = ((FrameworkElement)e.OriginalSource).DataContext;
+            if (dataContext is PlaylistItem && e.LeftButton == MouseButtonState.Pressed) {
+                if (PlaylistsList.SelectedIndex > -1) {
+                    playManager.Play(files, null);
+                }
             }
         }
 

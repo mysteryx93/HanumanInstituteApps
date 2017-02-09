@@ -11,6 +11,7 @@ using Business;
 namespace Player432hz {
     [Serializable]
     [XmlRoot("Player432hz")]
+    [PropertyChanged.ImplementPropertyChanged]
     public class ConfigFile {
         [XmlElement("Playlist")]
         public ObservableCollection<PlaylistItem> Playlists = new ObservableCollection<PlaylistItem>();
