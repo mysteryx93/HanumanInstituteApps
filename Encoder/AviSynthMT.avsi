@@ -127,7 +127,7 @@ SetFilterMTMode("flash3kyuu_deband",   MT_MULTI_INSTANCE) #flash3kyuu_deband v1.
 # flash3kyuu_deband 2.0pre2 2012/12/03 - Crashes with mode 1 even with mt=False
 #########################################
 # Filters from Dither 1.25.0. Tested by Firesledge (not extensively though)
-SetFilterMTMode("DitherPost",          MT_NICE_FILTER)
+SetFilterMTMode("DitherPost",          MT_SERIALIZED)
 SetFilterMTMode("SmoothGrad",          MT_NICE_FILTER)
 SetFilterMTMode("Dither_box_filter16", MT_NICE_FILTER)
 SetFilterMTMode("Dither_bilateral16",  MT_NICE_FILTER)
