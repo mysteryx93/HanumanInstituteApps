@@ -337,14 +337,6 @@ namespace NaturalGroundingPlayer {
                 MessageBox.Show("To use this wizard, you must first set MPC-HC as your media player under Options.", "MPC-HC Setup Wizard");
         }
 
-        public void CommandBinding_MediaEncoder(object sender, ExecutedRoutedEventArgs e) {
-            if (!menuMoveFiles.IsEnabled)
-                return;
-
-            PauseSession();
-            //MediaEncoderWindow.Instance(null);
-        }
-
         public void CommandBinding_Settings(object sender, ExecutedRoutedEventArgs e) {
             if (!menuSettings.IsEnabled)
                 return;

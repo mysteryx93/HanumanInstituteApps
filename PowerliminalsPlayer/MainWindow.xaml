@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PowerliminalsPlayer"
         mc:Ignorable="d"
-        Title="Powerliminals Player" Height="409" Width="721" MinWidth="640" MinHeight="183" Icon="App.ico" Closing="Window_Closing">
+        Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183" Icon="App.ico" Closing="Window_Closing">
     <Grid>
+        <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,420,0" Text="Volume" VerticalAlignment="Top" Visibility="Visible"/>
+        <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1" TickFrequency="10" HorizontalAlignment="Right" Width="99" Visibility="Visible" Height="18" VerticalAlignment="Top" Value="{Binding MasterVolume}"/>
         <ScrollViewer HorizontalAlignment="Right" Width="302">
             <ItemsControl x:Name="NowPlayingList" ItemsSource="{Binding}">
                 <ItemsControl.ItemTemplate>
@@ -16,9 +18,9 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <Button x:Name="AddFolderButton" Content="_Add" Margin="106,3,0,0" VerticalAlignment="Top" Click="AddFolderButton_Click" TabIndex="6" HorizontalAlignment="Left" Width="75"/>
+        <Button x:Name="AddFolderButton" Content="_Add" Margin="106,3,0,0" VerticalAlignment="Top" Click="AddFolderButton_Click" TabIndex="6" HorizontalAlignment="Left" Width="70"/>
         <ListBox x:Name="FoldersList" Margin="10,26,312,0" ItemsSource="{Binding}" Height="81" VerticalAlignment="Top" TabIndex="5" />
-        <Button x:Name="RemoveFolderButton" Content="_Remove" VerticalAlignment="Top" Click="RemoveFolderButton_Click" TabIndex="7" Margin="186,3,0,0" HorizontalAlignment="Left" Width="75"/>
+        <Button x:Name="RemoveFolderButton" Content="_Remove" VerticalAlignment="Top" Click="RemoveFolderButton_Click" TabIndex="7" Margin="181,3,0,0" HorizontalAlignment="Left" Width="70"/>
         <Grid x:Name="FilesGrid" Margin="10,111,312,35">
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
             <ListBox x:Name="FilesList" Margin="0,23,0,0" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" />
@@ -28,8 +30,6 @@
         <Expander x:Name="FoldersExpander" Header="Folders" HorizontalAlignment="Left" Margin="10,1,0,0" VerticalAlignment="Top" FontWeight="Bold" Collapsed="FoldersExpander_Collapsed" Expanded="FoldersExpander_Expanded" IsExpanded="{Binding FoldersExpanded}">
             <Grid Background="#FFE5E5E5"/>
         </Expander>
-        <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,420,0" Text="Volume" VerticalAlignment="Top" Visibility="Visible"/>
-        <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1" TickFrequency="10" HorizontalAlignment="Right" Width="99" Visibility="Visible" Height="18" VerticalAlignment="Top" Value="{Binding MasterVolume}"/>
         <Button x:Name="LoadPresetButton" Content="_Load Preset" HorizontalAlignment="Right" Margin="0,0,402,10" VerticalAlignment="Bottom" Width="85" TabIndex="6" Click="LoadPresetButton_Click"/>
         <Button x:Name="SavePresetButton" Content="_Save As" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="85" TabIndex="6" Margin="0,0,312,10" Click="SavePresetButton_Click"/>
         <Button x:Name="PauseButton" Content="Pause All" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="85" TabIndex="6" Click="PauseButton_Click"/>

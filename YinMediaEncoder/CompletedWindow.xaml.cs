@@ -78,10 +78,6 @@ namespace YinMediaEncoder {
                     if (ActiveWindow != null) {
                         // Media Encoder is already open.
                         ActiveWindow.SetEncodeSettings(jobInfo.Settings);
-                    } else {
-                        // Media Encoder is not open, open it.
-                        SessionCore.Instance.Windows.CloseToMain();
-                        SessionCore.Instance.Menu.CommandBinding_MediaEncoder(null, null);
                     }
                 }
                 business.DeleteJobFiles(jobInfo.Settings);

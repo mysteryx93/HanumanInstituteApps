@@ -53,6 +53,7 @@
         <CommandBinding Command="{StaticResource AddImage}" Executed="CommandBinding_AddImage" />
         <CommandBinding Command="{StaticResource AddVideo}" Executed="CommandBinding_AddVideo" />
         <CommandBinding Command="{StaticResource AddLucidVideo}" Executed="CommandBinding_AddLucidVideo" />
+        <CommandBinding Command="{StaticResource BuyResources}" Executed="CommandBinding_BuyResources" />
         <CommandBinding Command="{StaticResource EditVideo}" Executed="CommandBinding_EditVideo" />
         <CommandBinding Command="{StaticResource EditPlaylist}" Executed="CommandBinding_EditPlaylist" />
         <CommandBinding Command="{StaticResource DownloadPlaylist}" Executed="CommandBinding_DownloadPlaylist" />
@@ -64,14 +65,11 @@
         <CommandBinding Command="{StaticResource DownloadVideo}" Executed="CommandBinding_DownloadVideo" />
         <CommandBinding Command="{StaticResource ViewDownloads}" Executed="CommandBinding_ViewDownloads" />
         <CommandBinding Command="{StaticResource SetupWizard}" Executed="CommandBinding_SetupWizard" />
-        <CommandBinding Command="{StaticResource MediaEncoder}" Executed="CommandBinding_MediaEncoder" />
         <CommandBinding Command="{StaticResource Settings}" Executed="CommandBinding_Settings" />
         <CommandBinding Command="{StaticResource ForceOfLife}" Executed="CommandBinding_ForceOfLife" />
-        <CommandBinding Command="{StaticResource BuyResources}" Executed="CommandBinding_BuyResources" />
         <CommandBinding Command="{StaticResource EnergyTuneUp}" Executed="CommandBinding_EnergyTuneUp" />
         <CommandBinding Command="{StaticResource OfficialResources}" Executed="CommandBinding_OfficialResources" />
         <CommandBinding Command="{StaticResource AboutUs}" Executed="CommandBinding_AboutUs" />
-
     </Control.CommandBindings>
     <Control.InputBindings>
         <KeyBinding Key="F5" Command="{StaticResource StartSession}" />
@@ -101,6 +99,7 @@
     <Grid>
         <Menu Name="MainMenu" DockPanel.Dock="Top">
             <MenuItem x:Name="menuPlaylist" Header="_Playlist" KeyboardNavigation.TabNavigation="None">
+                <MenuItem x:Name="menuBuyResources" Header="_Buy Resources..." Command="{StaticResource BuyResources}" InputGestureText="F10"/>
                 <MenuItem x:Name="menuEditVideo" Header="_Edit Video..." IsEnabled="False" Command="{StaticResource EditVideo}" InputGestureText="E"/>
                 <MenuItem x:Name="menuEditPlaylist" Header="Edit _Playlist..." Command="{StaticResource EditPlaylist}"  InputGestureText="F6"/>
                 <MenuItem x:Name="menuDownloadPlaylist" Header="_Download Playlist..." Command="{StaticResource DownloadPlaylist}"  InputGestureText="F7"/>
@@ -137,12 +136,10 @@
                 <MenuItem x:Name="menuViewDownloads" Header="_View Downloads" Command="{StaticResource ViewDownloads}" InputGestureText="F11" />
                 <Separator />
                 <MenuItem x:Name="menuSetupWizard" Header="SVP Setup _Wizard..." Command="{StaticResource SetupWizard}" />
-                <MenuItem x:Name="menuMediaEncoder" Header="Media Encoder..." Command="{StaticResource MediaEncoder}" />
                 <MenuItem x:Name="menuSettings" Header="_Settings..." Command="{StaticResource Settings}" InputGestureText="S" />
             </MenuItem>
             <MenuItem x:Name="menuRessources" Header="_Resources" KeyboardNavigation.TabNavigation="None">
                 <MenuItem x:Name="menuForceOfLife" Header="_Force of Life Training (free)..." Command="{StaticResource ForceOfLife}"/>
-                <MenuItem x:Name="menuBuyResources" Header="_Buy Resources..." Command="{StaticResource BuyResources}" InputGestureText="F10"/>
                 <MenuItem x:Name="menuEnergyTuneUp" Header="_Get Your Energy Reading..." Command="{StaticResource EnergyTuneUp}"/>
                 <MenuItem x:Name="menuOfficialRessources" Header="Official Resources List..." Command="{StaticResource OfficialResources}"/>
                 <Separator />

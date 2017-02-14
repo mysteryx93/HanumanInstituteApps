@@ -260,7 +260,7 @@ namespace NaturalGroundingPlayer {
             }
 
             // Sometimes the intensity slider doesn't get redrawn properly; force it.
-            InvalidateVisual();
+            IntensitySlider.InvalidateVisual();
         }
 
         public void AdjustHeight(double height) {

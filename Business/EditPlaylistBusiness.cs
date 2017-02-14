@@ -278,9 +278,9 @@ namespace Business {
             settings.MediaType = MediaType.None;
             if (showAllFiles) {
                 settings.IsInDatabase = true;
+                settings.ConditionField = FieldConditionEnum.None;
             } else {
-                settings.ConditionField = FieldConditionEnum.FileExists;
-                settings.ConditionValue = BoolConditionEnum.No;
+                settings.SetCondition(FieldConditionEnum.FileExists, false);
             }
             settings.BuyUrlDomainsNegated = false;
             if (productType == BuyProductType.PremiumProduct)
