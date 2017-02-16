@@ -139,8 +139,13 @@ namespace Business {
         public float ChangeSpeedValue { get; set; }
 
         public VideoCodecs VideoCodec { get; set; }
-        public float EncodeQuality { get; set; }
+        public int EncodeQuality { get; set; }
         public EncodePresets EncodePreset { get; set; }
+        [XmlIgnore()]
+        public int EncodePresetInt {
+            get { return (int)EncodePreset; }
+            set { EncodePreset = (EncodePresets)value; }
+        }
         public VideoFormats EncodeFormat { get; set; }
         private AudioActions audioAction;
         public AudioActions AudioAction {
@@ -201,7 +206,7 @@ namespace Business {
             DenoiseStrength = 10;
             DenoiseD = 2;
             DenoiseA = 2;
-            Degrain = true;
+            Degrain = false;
             DegrainStrength = 10;
             DegrainSharp = true;
             IncreaseFrameRate = true;
@@ -535,12 +540,12 @@ namespace Business {
     }
 
     public enum EncodePresets {
-        faster,
-        fast,
-        medium,
-        slow,
-        slower,
-        veryslow,
-        placebo
+        faster = 0,
+        fast = 1,
+        medium = 2,
+        slow = 3,
+        slower = 4,
+        veryslow = 5,
+        placebo = 6
     }
 }

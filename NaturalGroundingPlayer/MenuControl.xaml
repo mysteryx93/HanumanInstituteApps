@@ -100,6 +100,7 @@
         <Menu Name="MainMenu" DockPanel.Dock="Top">
             <MenuItem x:Name="menuPlaylist" Header="_Playlist" KeyboardNavigation.TabNavigation="None">
                 <MenuItem x:Name="menuBuyResources" Header="_Buy Resources..." Command="{StaticResource BuyResources}" InputGestureText="F10"/>
+                <Separator />
                 <MenuItem x:Name="menuEditVideo" Header="_Edit Video..." IsEnabled="False" Command="{StaticResource EditVideo}" InputGestureText="E"/>
                 <MenuItem x:Name="menuEditPlaylist" Header="Edit _Playlist..." Command="{StaticResource EditPlaylist}"  InputGestureText="F6"/>
                 <MenuItem x:Name="menuDownloadPlaylist" Header="_Download Playlist..." Command="{StaticResource DownloadPlaylist}"  InputGestureText="F7"/>

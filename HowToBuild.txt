@@ -1,0 +1,34 @@
+How to build Natural Grounding Player
+
+Requirements:
+
+Visual Studio 2015
+
+System.Data.SQLite, look for the only version that supports Visual Studio 2015
+sqlite-netFx46-setup-bundle-x86-2015-1.0.104.0.exe
+https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki
+
+
+Instructions:
+
+Download the source code to a folder such as 
+C:\GitHub\NaturalGrounding Player\
+
+Download the source code of this custom branch of YoutubeExtractor
+https://github.com/mysteryx93/YoutubeExtractor
+Extract to
+C:\GitHub\YoutubeExtractor\
+
+Natural Grounding Player, 432hz Player and Powerliminals Player all require the 
+Encoder folder to be in their runtime folder. The easiest method is to create a
+junction into each runtime folder pointing to the same folder.
+
+Open an command prompt and enter these commands:
+mklink /J C:\GitHub\NaturalGroundingPlayer\NaturalGroundingPlayer\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\NaturalGroundingPlayer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\Player432hz\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\Player432hz\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\PowerliminalsPlayer\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\PowerliminalsPlayer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+
+Compile, and run.

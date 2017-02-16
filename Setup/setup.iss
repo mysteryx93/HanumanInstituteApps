@@ -43,10 +43,10 @@
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © Spiritual Self Transformation 2008-2016
+AppCopyright=Copyright © Emergence Guardian 2008-2017
 VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany=Spiritual Self Transformation
-AppPublisher=Spiritual Self Transformation
+VersionInfoCompany=Emergence Guardian
+AppPublisher=Emergence Guardian
 AppPublisherURL=https://www.spiritualselftransformation.com
 ;AppSupportURL=http://...
 ;AppUpdatesURL=http://...
@@ -100,65 +100,46 @@ Source: "..\NaturalGroundingPlayer\bin\Release\Newtonsoft.Json.dll"; DestDir: "{
 Source: "..\NaturalGroundingPlayer\bin\Release\System.Linq.Dynamic.dll"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\bin\Release\Xceed.Wpf.Toolkit.dll"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\bin\Release\YoutubeExtractor.dll"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\Player432hz\bin\Release\432hzPlayer.exe"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\Player432hz\bin\Release\432hzPlayer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\InitialDatabase.db"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\AviSynth.dll"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\AviSynth.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\AviSynthMT.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\avs2yuv.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
+Source: "..\NaturalGroundingPlayer\Encoder\dfttest.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\dither.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\dither.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\edi_rpow2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\ffmpeg.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: IsWin64; Flags: replacesameversion ignoreversion
 Source: "..\NaturalGroundingPlayer\Encoder\ffmpeg-x86.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: not IsWin64; Flags: replacesameversion ignoreversion
-Source: "..\NaturalGroundingPlayer\Encoder\FFT3DFilter.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\fturn.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\HQDeringmod.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\InterFrame2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\KNLMeansCL.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\KNLMeansCL-6.11.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\libfftw3f-3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\LSMASHSource.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\masktools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\MedianBlur2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\mvtools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\NeroAacEnc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
 Source: "..\NaturalGroundingPlayer\Encoder\nnedi3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\ResizeX.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\RgTools.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\RoboCrop26.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\Shader.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\Shader.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\smdegrain.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\NaturalGroundingPlayer\Encoder\SmoothAdjust.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\svpflow1.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\svpflow2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\TimeStretch.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\TWriteAVI.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\UUSize4.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\fftw3.dll"; DestDir: "{syswow64}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\Encoder\DevIL.dll"; DestDir: "{syswow64}";
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\Shader.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\Shader.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\Bicubic.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\GammaToLinear.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\GammaToYuv.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\GammaToYuv601.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\LinearToGamma.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\LinearToYuv.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\LinearToYuv601.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimCalc.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimCalcR.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimDownscaledVarI.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimDownscaledVarII.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimDownscalerX.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimDownscalerY.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimSinglePassConvolver.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimSoftDownscalerX.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SSimSoftDownscalerY.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperRes.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResDownscaleAndDiff.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResDownscaleAndDiff601.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResDownscaleAndDiff709.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResDownscaler.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResFinal.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResFinal601.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResFinal709.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperResSkipSoftening.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperXBR-pass0.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperXBR-pass1.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\SuperXBR-pass2.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\Yuv601ToGamma.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\Yuv601ToLinear.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\YuvToGamma.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shaders\YuvToLinear.cso"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+
 Source: "Dependencies\utvideo.exe"; DestDir: "{app}"; Flags: dontcopy
 
 [Icons]

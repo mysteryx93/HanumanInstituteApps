@@ -227,7 +227,7 @@
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="199,128,0,0" Text="Temp/Spac (0-3)" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="199,128,0,0" VerticalAlignment="Top" Text="Time/Space (0-3)"/>
                     <TextBox HorizontalAlignment="Left" Height="21" Margin="325,127,0,0" VerticalAlignment="Top" Width="25" TabIndex="27" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="DenoiseA" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
@@ -288,25 +288,13 @@
                     <RadioButton x:Name="VideoCopyOption" Content="Copy" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="50"/>
                     <RadioButton x:Name="Codec264Option" Content="x264" HorizontalAlignment="Left" Margin="77,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x264}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="51" Click="Codec264Option_Click"/>
                     <RadioButton x:Name="Codec265Option" Content="x265" HorizontalAlignment="Left" Margin="143,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x265}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="52" Click="Codec265Option_Click"/>
-                    <Grid HorizontalAlignment="Left" Height="57" Margin="29,49,0,0" VerticalAlignment="Top" Width="268" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=VideoCopyOption}">
-                        <TextBox HorizontalAlignment="Left" Height="21" Margin="165,5,0,0" VerticalAlignment="Top" Width="75" TabIndex="53" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
-                            <Binding Path="EncodeQuality" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <Business:NumericRangeRule Min="16" Max="30" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox>
+                    <Grid HorizontalAlignment="Left" Height="52" Margin="29,49,0,0" VerticalAlignment="Top" Width="341" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=VideoCopyOption}">
                         <TextBlock HorizontalAlignment="Left" Margin="0,6,0,0" VerticalAlignment="Top"><Run Text="Quality"/><Run Text=" "/><Run Text="(30="/><Run Text="Low"/><Run Text=", "/><Run Text="1"/><Run Text="6"/><Run Text="="/><Run Text="High)"/></TextBlock>
-                        <ComboBox HorizontalAlignment="Left" Margin="165,28,0,0" VerticalAlignment="Top" Width="75" Text="{Binding EncodePreset}" TabIndex="54">
-                            <ComboBoxItem Content="faster"/>
-                            <ComboBoxItem Content="fast"/>
-                            <ComboBoxItem Content="medium"/>
-                            <ComboBoxItem Content="slow"/>
-                            <ComboBoxItem Content="slower"/>
-                            <ComboBoxItem Content="veryslow"/>
-                            <ComboBoxItem Content="placebo"/>
-                        </ComboBox>
                         <TextBlock HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top" ><Run Text="Preset"/><Run Text=" (slower = "/><Run Text="smaller "/><Run Text="file"/><Run Text=")"/></TextBlock>
+                        <Slider x:Name="slider" HorizontalAlignment="Left" Margin="167,28,0,0" VerticalAlignment="Top" Width="104" Minimum="0" Maximum="6" SmallChange="1" TickPlacement="BottomRight" Value="{Binding EncodePresetInt}" Foreground="#FFA0A0A0" TabIndex="54" />
+                        <TextBlock x:Name="EncodePresetText" HorizontalAlignment="Left" Margin="278,28,0,0" Text="{Binding EncodePreset}" VerticalAlignment="Top"/>
+                        <Slider x:Name="slider_Copy" HorizontalAlignment="Left" Margin="167,3,0,0" VerticalAlignment="Top" Width="104" Minimum="16" Maximum="30" SmallChange="1" TickPlacement="BottomRight" Value="{Binding EncodeQuality}" Foreground="#FFA0A0A0" TabIndex="53" IsDirectionReversed="True" />
+                        <TextBlock x:Name="EncodeQualityText" HorizontalAlignment="Left" Margin="278,3,0,0" Text="{Binding EncodeQuality}" VerticalAlignment="Top"/>
                     </Grid>
                     <RadioButton x:Name="AudioEncodeOpusOption" Content="Encode Opus" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeOpus}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="60"/>
                     <RadioButton x:Name="CodecAviOption" Content="AVI (lossless)" HorizontalAlignment="Left" Margin="212,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Avi}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="52" />

@@ -75,8 +75,8 @@ namespace YinMediaEncoder {
         }
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            playerOriginal?.Close();
-            playerChanges?.Close();
+            playerOriginal?.Player?.Close();
+            playerChanges?.Player?.Close();
             await business.DeletePreviewFilesAsync();
         }
 

@@ -290,7 +290,7 @@ namespace Business {
                 Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D={0}, A={1}, h={2}{3}, device_type=""{4}""{5}{6})",
                     settings.DenoiseD, settings.DenoiseA,
                     ((double)settings.DenoiseStrength / 10).ToString(CultureInfo.InvariantCulture),
-                    settings.FrameDouble > 0 ? ", cmode=true" : "",
+                    settings.FrameDouble > 0 ? (GpuSupport == SupportedOpenClVersion.v12 ? ", channels=\"YUV\"" : ", cmode=true") : "",
                     GpuSupport != SupportedOpenClVersion.None ? "GPU" : "CPU",
                     GpuSupport != SupportedOpenClVersion.None ? ", device_id=" + Settings.SavedFile.GraphicDeviceId.ToString() : "",
                     IsLsb ? ", lsb_inout=true" : "");
