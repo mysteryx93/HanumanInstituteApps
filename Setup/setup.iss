@@ -104,46 +104,51 @@ Source: "..\Player432hz\bin\Release\432hzPlayer.exe"; DestDir: "{app}"; Flags: r
 Source: "..\Player432hz\bin\Release\432hzPlayer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\YinMediaEncoder\bin\Release\YinMediaEncoder.exe"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\YinMediaEncoder\bin\Release\YinMediaEncoder.exe.config"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\InitialDatabase.db"; DestDir: "{app}"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\AviSynth.dll"; DestDir: "{app}"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\AviSynth.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\AviSynthMT.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\avs2yuv.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
-Source: "..\NaturalGroundingPlayer\Encoder\dfttest.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\dither.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\dither.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\edi_rpow2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\ffmpeg.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: IsWin64; Flags: replacesameversion ignoreversion
-Source: "..\NaturalGroundingPlayer\Encoder\ffmpeg-x86.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: not IsWin64; Flags: replacesameversion ignoreversion
-Source: "..\NaturalGroundingPlayer\Encoder\HQDeringmod.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\InterFrame2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\KNLMeansCL.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\KNLMeansCL-6.11.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\libfftw3f-3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\LSMASHSource.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\masktools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\MedianBlur2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\mvtools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\NeroAacEnc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
-Source: "..\NaturalGroundingPlayer\Encoder\nnedi3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\ResizeX.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\RgTools.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\RoboCrop26.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shader.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\Shader.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\smdegrain.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\SmoothAdjust.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\svpflow1.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\svpflow2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\TimeStretch.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\TWriteAVI.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\UUSize4.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\NaturalGroundingPlayer\Encoder\DevIL.dll"; DestDir: "{syswow64}";
+Source: "..\Encoder\AviSynth.dll"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\Encoder\AviSynth.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\AviSynthMT.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\avs2yuv.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
+Source: "..\Encoder\dfttest.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\dither.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\dither.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\edi_rpow2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\ffmpeg.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: IsWin64; Flags: replacesameversion ignoreversion
+Source: "..\Encoder\ffmpeg-x86.exe"; DestDir: "{app}\Encoder"; DestName: "ffmpeg.exe"; Check: not IsWin64; Flags: replacesameversion ignoreversion
+Source: "..\Encoder\HQDeringmod.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\InterFrame2.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\KNLMeansCL.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\KNLMeansCL-6.11.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\libfftw3f-3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\LSMASHSource.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\masktools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\MedianBlur2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\mvtools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\NeroAacEnc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
+Source: "..\Encoder\nnedi3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\ResizeX.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\RgTools.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\RoboCrop26.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\Shader.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\Encoder\Shader.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\Encoder\smdegrain.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\Encoder\SmoothAdjust.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\Encoder\svpflow1.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\svpflow2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\TimeStretch.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\TWriteAVI.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\UUSize4.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\DevIL.dll"; DestDir: "{syswow64}";
 
 Source: "Dependencies\utvideo.exe"; DestDir: "{app}"; Flags: dontcopy
 
 [Icons]
 Name: "{group}\Natural Grounding Player"; Filename: "{app}\NaturalGroundingPlayer.exe"; IconFilename: "{app}\NaturalGroundingPlayer.exe"
+Name: "{group}\432hz Player"; Filename: "{app}\432hzPlayer.exe"; IconFilename: "{app}\432hzPlayer.exe"
+Name: "{group}\Powerliminals Player"; Filename: "{app}\PowerliminalsPlayer.exe"; IconFilename: "{app}\PowerliminalsPlayer.exe"
+Name: "{group}\Yin Media Encoder"; Filename: "{app}\YinMediaEncoder.exe"; IconFilename: "{app}\YinMediaEncoder.exe"
 ;Name: "{group}\{cm:UninstallProgram,MyProgram}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\Natural Grounding Player"; Filename: "{app}\NaturalGroundingPlayer.exe"; IconFilename: "{app}\NaturalGroundingPlayer.exe"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\MyProgram"; Filename: "{app}\NaturalGroundingPlayer.exe"; IconFilename: "{app}\NaturalGroundingPlayer.exe"; Tasks: quicklaunchicon
