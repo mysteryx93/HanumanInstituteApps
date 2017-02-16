@@ -10,7 +10,7 @@ namespace Business {
     public static class Settings {
         static Settings() {
             // Change ConnectionString's DataDirectory before initiating any database connection.
-            AppDomain.CurrentDomain.SetData("DataDirectory", Environment.GetFolderPath(Environment.SpecialFolder.Personal));
+            AppDomain.CurrentDomain.SetData("DataDirectory", Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
 
             // Load settings file if present.
             try {
@@ -55,14 +55,14 @@ namespace Business {
         public static readonly string[] AudioExtensions = new string[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a" };
         public static readonly string[] ImageExtensions = new string[] { ".gif", ".jpg", ".png", ".bmp", ".tiff" };
 
-        public static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\Settings.xml");
-        public static readonly string UnhandledExceptionLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\Log.txt");
-        public static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\NaturalGroundingVideos.db");
+        public static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\Settings.xml");
+        public static readonly string UnhandledExceptionLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\Log.txt");
+        public static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\NaturalGroundingVideos.db");
         public static readonly string InitialDatabasePath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "InitialDatabase.db");
         public static readonly string AviSynthPluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Encoder\");
-        public static readonly string Player432hzScriptFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\432hzPlaying.avs");
-        public static readonly string Player432hzConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\432hzConfig.xml");
-        public static readonly string PowerliminalsPlayerConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"Natural Grounding Player\PowerliminalsConfig.xml");
+        public static readonly string Player432hzScriptFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\432hzPlaying.avs");
+        public static readonly string Player432hzConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\432hzConfig.xml");
+        public static readonly string PowerliminalsPlayerConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\PowerliminalsConfig.xml");
 
         public static string[] GetMediaTypeExtensions(MediaType mediaType) {
             if (mediaType == MediaType.Video)
