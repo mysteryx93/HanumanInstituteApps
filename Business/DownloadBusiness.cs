@@ -279,7 +279,8 @@ namespace Business {
             // Decrypt all URLs at the same time without waiting.
             List<Task> DecryptTasks = new List<Task>();
             foreach (var item in downloadInfo.Files) {
-                DecryptTasks.Add(Task.Run(() => DownloadUrlResolver.DecryptDownloadUrl(item.Source)));
+                if (item.Source.RequiresDecryption)
+                    DecryptTasks.Add(Task.Run(() => DownloadUrlResolver.DecryptDownloadUrl(item.Source)));
             }
             await Task.WhenAll(DecryptTasks.ToArray()).ConfigureAwait(false);
 
