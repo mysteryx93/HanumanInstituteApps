@@ -334,14 +334,18 @@ namespace Business {
         }
 
         public static bool EncodeAudio(MediaEncoderSettings settings, bool silent) {
-            // string Args = string.Format(@"-q {0} -if ""{1}"" -of ""{2}""", settings.AudioQuality / 100f, settings.AudioFileWav, settings.AudioFileAac);
-            // return Run("Encoder\\NeroAacEnc.exe", Args, true);
-            string Args = string.Format(@"-i {2}{0} -b:a {1}k {3}",
-                settings.AudioAction == AudioActions.EncodeOpus ? " -c:a libopus" : "",
-                settings.AudioQuality,
-                settings.AudioFileWav,
-                settings.AudioAction == AudioActions.EncodeOpus ? settings.AudioFileOpus : settings.AudioFileAac);
-            return Run("Encoder\\ffmpeg.exe", Args, true);
+            if (settings.AudioAction == AudioActions.EncodeOpus) {
+                string Args = string.Format(@"--bitrate {0} ""{1}"" ""{2}""", settings.AudioQuality, settings.AudioFileWav, settings.AudioFileOpus);
+                return Run("Encoder\\opusenc.exe", Args, true);
+            } else if (settings.AudioAction == AudioActions.EncodeAac || settings.AudioAction == AudioActions.EncodeFlac) {
+                string Args = string.Format(@"-i {2}{0} -b:a {1}k {3}",
+                    settings.AudioAction == AudioActions.EncodeFlac ? " -c:a flac" : "",
+                    settings.AudioQuality,
+                    settings.AudioFileWav,
+                    settings.AudioAction == AudioActions.EncodeFlac ? settings.AudioFileFlac : settings.AudioFileAac);
+                return Run("Encoder\\ffmpeg.exe", Args, true);
+            } else
+                return true;
         }
 
         public static float? GetPixelAspectRatio(MediaEncoderSettings settings) {

@@ -187,6 +187,10 @@ namespace Business {
                 string AudioFile = null;
                 if (settings.AudioAction == AudioActions.Copy)
                     AudioFile = settings.FilePath;
+                else if (settings.AudioAction == AudioActions.EncodeWav)
+                    AudioFile = settings.AudioFileWav;
+                else if (settings.AudioAction == AudioActions.EncodeFlac)
+                    AudioFile = settings.AudioFileFlac;
                 else if (settings.AudioAction == AudioActions.EncodeAac)
                     AudioFile = settings.AudioFileAac;
                 else if (settings.AudioAction == AudioActions.EncodeOpus)
@@ -729,6 +733,7 @@ namespace Business {
             File.Delete(settings.AudioFileWav);
             File.Delete(settings.AudioFileAac);
             File.Delete(settings.AudioFileOpus);
+            File.Delete(settings.AudioFileFlac);
             File.Delete(settings.FinalFile);
             File.Delete(settings.ScriptFile);
             File.Delete(settings.SettingsFile);

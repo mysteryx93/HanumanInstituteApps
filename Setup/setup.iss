@@ -106,6 +106,8 @@ Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe"; DestDir: "
 Source: "..\PowerliminalsPlayer\bin\Release\PowerliminalsPlayer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\YinMediaEncoder\bin\Release\YinMediaEncoder.exe"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\YinMediaEncoder\bin\Release\YinMediaEncoder.exe.config"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\AudioVideoMuxer\bin\Release\AudioVideoMuxer.exe"; DestDir: "{app}"; Flags: replacesameversion
+Source: "..\AudioVideoMuxer\bin\Release\AudioVideoMuxer.exe.config"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\NaturalGroundingPlayer\InitialDatabase.db"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\Encoder\AviSynth.dll"; DestDir: "{app}"; Flags: replacesameversion
 Source: "..\Encoder\AviSynth.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
@@ -149,9 +151,10 @@ Name: "{group}\Natural Grounding Player"; Filename: "{app}\NaturalGroundingPlaye
 Name: "{group}\432hz Player"; Filename: "{app}\432hzPlayer.exe"; IconFilename: "{app}\432hzPlayer.exe"
 Name: "{group}\Powerliminals Player"; Filename: "{app}\PowerliminalsPlayer.exe"; IconFilename: "{app}\PowerliminalsPlayer.exe"
 Name: "{group}\Yin Media Encoder"; Filename: "{app}\YinMediaEncoder.exe"; IconFilename: "{app}\YinMediaEncoder.exe"
-;Name: "{group}\{cm:UninstallProgram,MyProgram}"; Filename: "{uninstallexe}"
+Name: "{group}\Audio Video Muxer"; Filename: "{app}\AudioVideoMuxer.exe"; IconFilename: "{app}\AudioVideoMuxer.exe"
 Name: "{commondesktop}\Natural Grounding Player"; Filename: "{app}\NaturalGroundingPlayer.exe"; IconFilename: "{app}\NaturalGroundingPlayer.exe"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\MyProgram"; Filename: "{app}\NaturalGroundingPlayer.exe"; IconFilename: "{app}\NaturalGroundingPlayer.exe"; Tasks: quicklaunchicon
+;Name: "{group}\{cm:UninstallProgram,MyProgram}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\NaturalGroundingPlayer.exe"; Description: "{cm:LaunchProgram,Natural Grounding Player}"; Flags: nowait postinstall skipifsilent

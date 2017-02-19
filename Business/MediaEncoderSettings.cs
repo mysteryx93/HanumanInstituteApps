@@ -152,10 +152,10 @@ namespace Business {
             get { return audioAction; }
             set {
                 audioAction = value;
-                if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction == AudioActions.EncodeOpus)
-                    EncodeFormat = VideoFormats.Mkv;
-                else if (audioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac)
+                if (audioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac || (audioAction == AudioActions.Copy && IsAudioMp4))
                     EncodeFormat = VideoFormats.Mp4;
+                else if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction != AudioActions.Copy)
+                    EncodeFormat = VideoFormats.Mkv;
             }
         }
         public int AudioQuality { get; set; }
@@ -329,6 +329,12 @@ namespace Business {
 
         public bool IsAudioEncode {
             get {
+                return AudioAction == AudioActions.EncodeAac || AudioAction == AudioActions.EncodeOpus || AudioAction == AudioActions.EncodeFlac || AudioAction == AudioActions.EncodeWav;
+            }
+        }
+
+        public bool IsAudioCompress {
+            get {
                 return AudioAction == AudioActions.EncodeAac || AudioAction == AudioActions.EncodeOpus;
             }
         }
@@ -416,6 +422,10 @@ namespace Business {
 
         public string AudioFileOpus {
             get { return Settings.TempFilesPath + string.Format("Job{0}_Output.opus", JobIndex); }
+        }
+
+        public string AudioFileFlac {
+            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.flac", JobIndex); }
         }
 
         public string FinalFile {
@@ -535,6 +545,8 @@ namespace Business {
     public enum AudioActions {
         Copy,
         Ignore,
+        EncodeWav,
+        EncodeFlac,
         EncodeAac,
         EncodeOpus
     }

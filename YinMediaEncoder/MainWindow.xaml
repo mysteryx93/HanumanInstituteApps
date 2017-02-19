@@ -262,32 +262,30 @@
                     <RadioButton Content="MP4 (more compatible, requires AAC, AC3 or MP3 audio)" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" IsChecked="{Binding EncodeFormat, ConverterParameter={x:Static Business:VideoFormats.Mp4}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="55" IsEnabled="{Binding CanEncodeMp4}" GroupName="ContainerFormat"/>
                     <TextBlock HorizontalAlignment="Left" Margin="11,13,0,0" VerticalAlignment="Top" FontWeight="Bold"><Run Text="Video Setti"/><Run Text="n"/><Run Text="gs"/></TextBlock>
                     <TextBlock HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio Settings"/>
-                    <RadioButton Content="Copy (no quality loss)" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" IsEnabled="{Binding CanCopyAudio}" TabIndex="57"/>
-                    <RadioButton Content="Ignore" HorizontalAlignment="Left" Margin="10,213,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Ignore}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="58"/>
-                    <RadioButton x:Name="AudioEncodeAacOption" Content="Encode AAC" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeAac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="59"/>
-                    <Grid HorizontalAlignment="Left" Height="86" Margin="28,264,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding IsAudioEncode}">
+                    <Grid HorizontalAlignment="Left" Height="86" Margin="28,298,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding IsAudioEncode}">
                         <TextBlock HorizontalAlignment="Left" Margin="1,6,0,0" VerticalAlignment="Top"><Run Text="Quality (kbps)"/></TextBlock>
                         <TextBlock Margin="1,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="Gain"/></TextBlock>
-                        <TextBox HorizontalAlignment="Left" Height="21" Margin="86,29,0,0" VerticalAlignment="Top" Width="84" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="62">
+                        <TextBox HorizontalAlignment="Left" Height="21" Margin="86,29,0,0" VerticalAlignment="Top" Width="84" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" TabIndex="64">
                             <Binding Path="AudioGain" TargetNullValue="">
                                 <Binding.ValidationRules>
                                     <Business:NumericRangeRule Min="-50" Max="50" AllowNull="True" />
                                 </Binding.ValidationRules>
                             </Binding>
                         </TextBox>
-                        <TextBox HorizontalAlignment="Left" Height="21" Margin="86,5,0,0" VerticalAlignment="Top" Width="84" TabIndex="61" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
+                        <TextBox HorizontalAlignment="Left" Height="21" Margin="86,5,0,0" VerticalAlignment="Top" Width="84" TabIndex="63" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}" IsEnabled="{Binding IsAudioCompress}">
                             <Binding Path="AudioQuality" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
                                     <Business:NumericRangeRule Min="64" Max="384" />
                                 </Binding.ValidationRules>
                             </Binding>
                         </TextBox>
-                        <CheckBox Content="Convert 440hz Pitch to 432hz" HorizontalAlignment="Left" Margin="1,55,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeAudioPitch}" TabIndex="64" />
-                        <Button x:Name="CalculateAudioGain" Content="Auto" HorizontalAlignment="Left" Margin="175,28,0,0" VerticalAlignment="Top" Width="35" TabIndex="63" Click="CalculateAudioGain_Click"/>
+                        <CheckBox Content="Convert 440hz Pitch to 432hz" HorizontalAlignment="Left" Margin="1,55,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeAudioPitch}" TabIndex="66" />
+                        <Button x:Name="CalculateAudioGain" Content="Auto" HorizontalAlignment="Left" Margin="175,28,0,0" VerticalAlignment="Top" Width="35" TabIndex="65" Click="CalculateAudioGain_Click"/>
                     </Grid>
                     <RadioButton x:Name="VideoCopyOption" Content="Copy" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="50"/>
                     <RadioButton x:Name="Codec264Option" Content="x264" HorizontalAlignment="Left" Margin="77,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x264}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="51" Click="Codec264Option_Click"/>
                     <RadioButton x:Name="Codec265Option" Content="x265" HorizontalAlignment="Left" Margin="143,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x265}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="52" Click="Codec265Option_Click"/>
+                    <RadioButton x:Name="CodecAviOption" Content="AVI (lossless)" HorizontalAlignment="Left" Margin="212,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Avi}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="52" />
                     <Grid HorizontalAlignment="Left" Height="52" Margin="29,49,0,0" VerticalAlignment="Top" Width="341" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=VideoCopyOption}">
                         <TextBlock HorizontalAlignment="Left" Margin="0,6,0,0" VerticalAlignment="Top"><Run Text="Quality"/><Run Text=" "/><Run Text="(30="/><Run Text="Low"/><Run Text=", "/><Run Text="1"/><Run Text="6"/><Run Text="="/><Run Text="High)"/></TextBlock>
                         <TextBlock HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top" ><Run Text="Preset"/><Run Text=" (slower = "/><Run Text="smaller "/><Run Text="file"/><Run Text=")"/></TextBlock>
@@ -296,8 +294,12 @@
                         <Slider x:Name="slider_Copy" HorizontalAlignment="Left" Margin="167,3,0,0" VerticalAlignment="Top" Width="104" Minimum="16" Maximum="30" SmallChange="1" TickPlacement="BottomRight" Value="{Binding EncodeQuality}" Foreground="#FFA0A0A0" TabIndex="53" IsDirectionReversed="True" />
                         <TextBlock x:Name="EncodeQualityText" HorizontalAlignment="Left" Margin="278,3,0,0" Text="{Binding EncodeQuality}" VerticalAlignment="Top"/>
                     </Grid>
-                    <RadioButton x:Name="AudioEncodeOpusOption" Content="Encode Opus" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeOpus}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="60"/>
-                    <RadioButton x:Name="CodecAviOption" Content="AVI (lossless)" HorizontalAlignment="Left" Margin="212,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Avi}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="52" />
+                    <RadioButton Content="Copy (lossless)" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="57"/>
+                    <RadioButton Content="Ignore" HorizontalAlignment="Left" Margin="10,213,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Ignore}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="58"/>
+                    <RadioButton x:Name="AudioEncodeWavOption" Content="Encode WAV (lossless)" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeWav}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="59"/>
+                    <RadioButton x:Name="AudioEncodeFlacOption" Content="Encode FLAC (lossless)" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeFlac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="60"/>
+                    <RadioButton x:Name="AudioEncodeAacOption" Content="Encode AAC (best compatibility)" HorizontalAlignment="Left" Margin="10,264,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeAac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="61"/>
+                    <RadioButton x:Name="AudioEncodeOpusOption" Content="Encode Opus (best compression)" HorizontalAlignment="Left" Margin="10,281,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeOpus}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="62"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabScript" Header="AviSynth Script" TabIndex="7">
