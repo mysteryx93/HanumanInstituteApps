@@ -19,8 +19,7 @@ https://github.com/mysteryx93/YoutubeExtractor
 Extract to
 C:\GitHub\YoutubeExtractor\
 
-Natural Grounding Player, 432hz Player and Powerliminals Player all require the 
-Encoder folder to be in their runtime folder. The easiest method is to create a
+Several projects require the Encoder folder to be in their runtime folder. The easiest method is to create a
 junction into each runtime folder pointing to the same folder.
 
 Open an command prompt and enter these commands:
@@ -30,5 +29,7 @@ mklink /J C:\GitHub\NaturalGroundingPlayer\Player432hz\bin\Debug\Encoder\ C:\Git
 mklink /J C:\GitHub\NaturalGroundingPlayer\Player432hz\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 mklink /J C:\GitHub\NaturalGroundingPlayer\PowerliminalsPlayer\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 mklink /J C:\GitHub\NaturalGroundingPlayer\PowerliminalsPlayer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 
 Compile, and run.

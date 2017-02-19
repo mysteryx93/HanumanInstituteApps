@@ -33,6 +33,12 @@ namespace PowerliminalsPlayer {
             FoldersExpander_Collapsed(null, null);
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            SplashWindow F = SplashWindow.Instance(this, Properties.Resources.AppIcon);
+            F.CanClose();
+            F.ShowDialog();
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             config.Width = this.Width;
             config.Height = this.Height;

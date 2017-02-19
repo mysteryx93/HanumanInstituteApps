@@ -16,10 +16,10 @@ namespace NaturalGroundingPlayer {
     /// <summary>
     /// Interaction logic for InitializingWindow.xaml
     /// </summary>
-    public partial class InitializingWindow : Window {
+    public partial class InitializingWindow2 : Window {
         private WindowHelper helper;
 
-        public InitializingWindow() {
+        public InitializingWindow2() {
             InitializeComponent();
             helper = new WindowHelper(this);
         }

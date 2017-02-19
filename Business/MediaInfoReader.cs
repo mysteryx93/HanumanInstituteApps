@@ -146,10 +146,18 @@ namespace Business {
             }
         }
 
+        public string GetVideoFormat(int index) {
+            return lastMedia.Get(StreamKind.Video, index, "Format");
+        }
+
         public string AudioFormat {
             get {
                 return lastMedia.Get(StreamKind.Audio, 0, "Format");
             }
+        }
+
+        public string GetAudioFormat(int index) {
+            return lastMedia.Get(StreamKind.Audio, index, "Format");
         }
 
         public int? AudioBitRate {

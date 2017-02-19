@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Business;
@@ -28,7 +26,7 @@ namespace NaturalGroundingPlayer {
         public MainWindow() {
             InitializeComponent();
             DefaultHeight = this.Height;
-            SessionCore.Instance.Start(this);
+            SessionCore.Instance.Start(this, Properties.Resources.AppIcon);
             helper = new WindowHelper(this);
         }
 
@@ -40,6 +38,7 @@ namespace NaturalGroundingPlayer {
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             this.Title += " " + SessionCore.GetVersionText();
             AttachBusinessEvents(SessionCore.Instance.Business);
+            SplashWindow.Instance(this, Properties.Resources.AppIcon);
         }
 
         public async Task InitializationCompleted() {

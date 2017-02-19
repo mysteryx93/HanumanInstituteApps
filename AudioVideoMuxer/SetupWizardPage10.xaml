@@ -1,0 +1,24 @@
+﻿<Page x:Class="AudioVideoMuxer.SetupWizardPage10"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d"
+	Title="Page1" Loaded="Page_Loaded" Height="270" Width="470">
+
+    <Grid>
+        <TextBlock Margin="10,10,10,0" TextWrapping="Wrap" Text="Select the files you want to muxe." FontWeight="Bold" VerticalAlignment="Top" />
+        <ListBox x:Name="FilesList" HorizontalAlignment="Left" Margin="10,122,0,0" Width="152" ItemsSource="{Binding}" DisplayMemberPath="Display" SelectedValuePath="Path" Height="138" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,101,0,0" Text="Source Files" VerticalAlignment="Top"/>
+        <ListBox x:Name="StreamsList" Margin="177,122,0,0" ItemsSource="{Binding}" Height="138" VerticalAlignment="Top" HorizontalAlignment="Left" Width="282">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Display}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock HorizontalAlignment="Left" Margin="177,101,0,0" Text="Audio/Video Streams" VerticalAlignment="Top"/>
+        <Button x:Name="AddButton" Content="Add Files" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" Width="152" Click="AddButton_Click"/>
+
+    </Grid>
+</Page>

@@ -24,7 +24,7 @@ namespace YinMediaEncoder {
 
         public MainWindow() {
             InitializeComponent();
-            SessionCore.Instance.Start(this);
+            SessionCore.Instance.Start(this, Properties.Resources.AppIcon);
             helper = new WindowHelper(this);
         }
 

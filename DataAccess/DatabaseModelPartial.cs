@@ -13,12 +13,25 @@ using System.Threading.Tasks;
 namespace DataAccess {
     public partial class Entities {
         public Entities() : base("name=Entities") {
+            Environment.SetEnvironmentVariable("AppendManifestToken_SQLiteProviderManifest", ";BinaryGUID=True;");
             SQLiteConnection Conn = (SQLiteConnection)Database.Connection;
             Conn.Open();
             Conn.BindFunction(new DbGetRatingValueClass());
             Conn.BindFunction(new DbCompareValuesClass());
 
-            // Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+
+            //SQLiteCommand cm = new SQLiteCommand("SELECT RatingId FROM MediaRatings", Conn);
+            //SQLiteDataReader dr = cm.ExecuteReader();
+            //while (dr.Read()) {
+            //    string GuidString = dr.GetString(0);
+            //    Guid GuidValue = new Guid(GuidString);
+            //    SQLiteCommand Writer = new SQLiteCommand("UPDATE MediaRatings SET RatingId = @IdGuid WHERE RatingId = @IdString", Conn);
+            //    Writer.Parameters.Add("@IdGuid", System.Data.DbType.Guid).Value = GuidValue;
+            //    Writer.Parameters.Add("@IdString", System.Data.DbType.String).Value = GuidString;
+            //    Writer.ExecuteNonQuery();
+            //}
+            //throw new ApplicationException("Done");
         }
 
         public override int SaveChanges() {

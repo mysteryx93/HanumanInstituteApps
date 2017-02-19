@@ -43,6 +43,74 @@ namespace Business {
             return Result;
         }
 
+        public static bool JoinAudioVideoMuxer(IEnumerable<FfmpegStream> fileStreams, string destination, bool fixAac, bool silent) {
+            bool Result = true;
+            List<string> TempFiles = new List<string>();
+            File.Delete(destination);
+
+            // FFMPEG fails to muxe H264 into MKV container. Converting to MP4 and then muxing with the audio, however, works.
+            foreach (FfmpegStream item in fileStreams) {
+                if (item.Type == FfmpegStreamType.Video && (item.Path.EndsWith(".264") || item.Path.EndsWith(".265")) && destination.EndsWith(".mkv")) {
+                    string NewFile = item.Path.Substring(0, item.Path.Length - 4) + ".mp4";
+                    Result = JoinAudioVideoMuxer(new FfmpegStream[] { item }, NewFile, false, true);
+                    TempFiles.Add(NewFile);
+                    if (!Result)
+                        break;
+                }
+            }
+
+            if (Result) {
+                // Join audio and video files.
+                StringBuilder Query = new StringBuilder();
+                StringBuilder Map = new StringBuilder();
+                int StreamIndex = 0;
+                bool HasVideo = false, HasAudio = false, HasPcmDvdAudio = false;
+                foreach (FfmpegStream item in fileStreams.OrderBy(f => f.Type)) {
+                    if (item.Type == FfmpegStreamType.Video)
+                        HasVideo = true;
+                    if (item.Type == FfmpegStreamType.Audio) {
+                        HasAudio = true;
+                        if (item.Format == "pcm_dvd")
+                            HasPcmDvdAudio = true;
+                    }
+                    Query.Append("-i \"");
+                    Query.Append(item.Path);
+                    Query.Append("\" ");
+                    Map.Append("-map ");
+                    Map.Append(StreamIndex++);
+                    Map.Append(":");
+                    Map.Append(item.Index);
+                    Map.Append(" ");
+                }
+                if (HasVideo)
+                    Query.Append("-vcodec copy ");
+                if (HasAudio)
+                    Query.Append(HasPcmDvdAudio ? "-acodec pcm_s16le " : "-acodec copy ");
+                Query.Append(Map);
+                if (fixAac)
+                    Query.Append("-bsf:a aac_adtstoasc ");
+                Query.Append("\"");
+                Query.Append(destination);
+                Query.Append("\"");
+                if (silent) {
+                    string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+                    Result = RunFfmpeg(Query.ToString(), LogFile);
+                    if (Result)
+                        File.Delete(LogFile);
+                    else
+                        Run("notepad.exe", LogFile, false);
+                } else {
+                    Result = RunFfmpeg(Query.ToString(), silent);
+                }
+            }
+
+            // Delete temp file.
+            foreach (string item in TempFiles) {
+                File.Delete(item);
+            }
+            return Result;
+        }
+
         //public static bool JoinAudioVideo(string videoFile, string audioFile, string destination, bool silent) {
         //    File.Delete(destination);
         //    if (!string.IsNullOrEmpty(audioFile))
@@ -50,6 +118,40 @@ namespace Business {
         //    else
         //        return RunFfmpeg(string.Format(@"-i ""{0}"" -vcodec copy ""{1}""", videoFile, destination), silent);
         //}
+
+        /// <summary>
+        /// Concatenates (merges) all specified files.
+        /// </summary>
+        /// <param name="files">The files to merge.</param>
+        /// <param name="output">The output media file.</param>
+        /// <param name="silent">If true, the FFMPEG window will be hidden.</param>
+        /// <returns>Whether the operation was successful.</returns>
+        public static bool ConcatenateFiles(IEnumerable<string> files, string output, bool silent) {
+            bool Result = false;
+            // Write temp file.
+            string TempFile = Path.Combine(Settings.TempFilesPath, "MergeList.txt");
+            StringBuilder TempContent = new StringBuilder();
+            foreach (string item in files) {
+                TempContent.AppendFormat("file '{0}'", item).AppendLine();
+            }
+            File.WriteAllText(TempFile, TempContent.ToString());
+
+            string Query = string.Format(@"-f concat -safe 0 -i ""{0}"" -c copy ""{1}""", TempFile, output);
+
+            if (silent) {
+                string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+                Result = RunFfmpeg(Query.ToString(), LogFile);
+                if (Result)
+                    File.Delete(LogFile);
+                else
+                    Run("notepad.exe", LogFile, false);
+            } else {
+                Result = RunFfmpeg(Query.ToString(), silent);
+            }
+
+            File.Delete(TempFile);
+            return true;
+        }
 
 
 
@@ -141,6 +243,17 @@ namespace Business {
         /// <returns>Whether the operation was completed.</returns>
         private static bool RunFfmpeg(string arguments, bool silent) {
             return Run(@"Encoder\ffmpeg.exe", arguments, silent);
+        }
+
+        /// <summary>
+        /// Runs FFMPEG with specified arguments.
+        /// </summary>
+        /// <param name="arguments">FFMPEG startup arguments.</param>
+        /// <param name="log">A file to write the log.</param>
+        /// <returns>Whether the operation was completed.</returns>
+        private static bool RunFfmpeg(string arguments, string log) {
+            string PipeArgs = string.Format("/c {0}ffmpeg.exe {1} 2> {2}", Settings.AviSynthPluginsPath, arguments, log);
+            return Run("cmd", PipeArgs, true);
         }
 
         /// <summary>
@@ -248,6 +361,42 @@ namespace Business {
             catch {
                 return null;
             }
+        }
+
+        public static List<FfmpegStream> GetStreamList(string file) {
+            List<FfmpegStream> Result = new List<FfmpegStream>();
+            string FileName = System.IO.Path.GetFileName(file);
+            string ConsoleOut = RunToString("Encoder\\ffmpeg.exe", string.Format(@"-i ""{0}""", file));
+            string[] OutLines = ConsoleOut.Split('\n');
+            List<string> OutStreams = OutLines.Where(l => l.StartsWith("    Stream #0:")).ToList();
+            int PosStart;
+            int PosEnd;
+            int StreamIndex;
+            string StreamType;
+            string StreamFormat;
+            foreach (string item in OutStreams) {
+                PosStart = 14;
+                PosEnd = -1;
+                for (int i=PosStart; i<item.Length; i++) {
+                    if (!char.IsDigit(item[i])) {
+                        PosEnd = i;
+                        break;
+                    }
+                }
+                if (PosEnd < 0 || !int.TryParse(item.Substring(PosStart, PosEnd - PosStart), out StreamIndex))
+                    return Result;
+                PosStart = item.IndexOf(": ", PosStart) + 2;
+                PosEnd = item.IndexOf(": ", PosStart);
+                if (PosStart < 0 || PosEnd < 0)
+                    return Result;
+                StreamType = item.Substring(PosStart, PosEnd - PosStart);
+                PosStart = PosEnd + 2;
+                PosEnd = item.IndexOfAny(new char[] { ' ', ',' }, PosStart);
+                StreamFormat = PosEnd >= 0 ? item.Substring(PosStart, PosEnd - PosStart) : "";
+                if (StreamType == "Video" || StreamType == "Audio") 
+                    Result.Add(new FfmpegStream(file, FileName, StreamType == "Video" ? FfmpegStreamType.Video : FfmpegStreamType.Audio, StreamIndex, StreamFormat));
+            }
+            return Result;
         }
 
         /// <summary>
@@ -467,5 +616,42 @@ namespace Business {
         public ExecutingProcessEventArgs(Process process) {
             this.Process = process;
         }
+    }
+
+    public class FfmpegStream {
+        public bool IsChecked { get; set; } = false;
+        public string Path { get; set; }
+        public string File { get; set; }
+        public FfmpegStreamType Type { get; set; }
+        public int Index { get; set; }
+        public string Format { get; set; }
+
+        public FfmpegStream() {
+        }
+
+        public FfmpegStream(string path, string file, FfmpegStreamType type, int index, string format) {
+            Path = path;
+            File = file;
+            Type = type;
+            Index = index;
+            Format = format;
+        }
+
+        public string Display {
+            get {
+                return string.Format("{0}[{1}]:{2} - {3}", Type.ToString(), Index, Format, Path);
+            }
+        }
+
+        public string DisplayShort {
+            get {
+                return string.Format("{0}[{1}]:{2}", Type.ToString(), Index, Format);
+            }
+        }
+    }
+
+    public enum FfmpegStreamType {
+        Video,
+        Audio
     }
 }

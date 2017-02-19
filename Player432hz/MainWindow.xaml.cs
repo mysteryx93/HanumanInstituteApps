@@ -51,6 +51,10 @@ namespace Player432hz {
             PlaylistsList.SelectedIndex = 0;
             PlaylistsList.Focus();
             ((ListBoxItem)PlaylistsList.ItemContainerGenerator.ContainerFromIndex(0)).Focus();
+
+            SplashWindow F = SplashWindow.Instance(this, Properties.Resources.AppIcon);
+            F.CanClose();
+            F.ShowDialog();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432hz", "Player432hz\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YinMediaEncoder", "YinMediaEncoder\YinMediaEncoder.csproj", "{947D138C-22AD-43B6-817F-CD8050A620E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioVideoMuxer", "AudioVideoMuxer\AudioVideoMuxer.csproj", "{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -168,6 +170,22 @@ Global
 		{947D138C-22AD-43B6-817F-CD8050A620E7}.Release|x64.Build.0 = Release|Any CPU
 		{947D138C-22AD-43B6-817F-CD8050A620E7}.Release|x86.ActiveCfg = Release|Any CPU
 		{947D138C-22AD-43B6-817F-CD8050A620E7}.Release|x86.Build.0 = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|x64.Build.0 = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Debug|x86.Build.0 = Debug|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|x64.ActiveCfg = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|x64.Build.0 = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|x86.ActiveCfg = Release|Any CPU
+		{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

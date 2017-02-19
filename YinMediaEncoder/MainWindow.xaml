@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="YinMediaEncoder.MainWindow" 
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="Media Encoder" Height="568" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated" Icon="App.ico">
+        Title="Yin Media Encoder" Height="568" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated" Icon="App.ico">
     <Window.Resources>
         <Business:VisibilityConverter x:Key="VisibilityConverter"/>
         <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>

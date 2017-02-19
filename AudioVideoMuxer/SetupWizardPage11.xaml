@@ -1,0 +1,25 @@
+﻿<Page x:Class="AudioVideoMuxer.SetupWizardPage11"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d"
+	Title="Page1" Loaded="Page_Loaded" Height="270" Width="470">
+
+    <Grid>
+        <TextBlock Margin="10,10,0,0" TextWrapping="Wrap" Text="Selected video streams:" VerticalAlignment="Top" HorizontalAlignment="Left" FontWeight="Bold" />
+        <ItemsControl x:Name="SelectedStreams" ItemsSource="{Binding}" Height="103" VerticalAlignment="Top" Margin="10,31,10,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Margin="10,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Output Container" FontWeight="Bold" />
+        <TextBox x:Name="OutputContainerTextBox" HorizontalAlignment="Left" Height="20" Margin="10,155,0,0" Text="mkv" VerticalAlignment="Top" Width="120" TabIndex="1"/>
+        <TextBlock Margin="11,188,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left" FontWeight="Bold" Text="Output File" />
+        <TextBox x:Name="OutputFileTextBox" HorizontalAlignment="Left" Height="20" Margin="11,209,0,0" VerticalAlignment="Top" Width="282" TabIndex="2"/>
+        <Button x:Name="BrowseFile" Content="..." HorizontalAlignment="Left" Margin="293,209,0,0" VerticalAlignment="Top" Width="22" Height="21" TabIndex="3" Click="BrowseFile_Click" />
+
+    </Grid>
+</Page>

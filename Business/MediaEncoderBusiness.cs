@@ -289,7 +289,7 @@ namespace Business {
                 }
                 Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D={0}, A={1}, h={2}{3}, device_type=""{4}""{5}{6})",
                     settings.DenoiseD, settings.DenoiseA,
-                    ((double)settings.DenoiseStrength / 10).ToString(CultureInfo.InvariantCulture),
+                    ((double)settings.DenoiseStrength / 10 * (GpuSupport == SupportedOpenClVersion.v12 ? 1.732 : 1)).ToString(CultureInfo.InvariantCulture), // v1.0.1 treats h differently, need to multipy by 1.732
                     settings.FrameDouble > 0 ? (GpuSupport == SupportedOpenClVersion.v12 ? ", channels=\"YUV\"" : ", cmode=true") : "",
                     GpuSupport != SupportedOpenClVersion.None ? "GPU" : "CPU",
                     GpuSupport != SupportedOpenClVersion.None ? ", device_id=" + Settings.SavedFile.GraphicDeviceId.ToString() : "",

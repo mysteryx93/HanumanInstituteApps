@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace NaturalGroundingPlayer {
         public ViewDownloadsWindow Downloads { get; private set; }
         public ImageSource Icon { get; private set; }
         public Window Main { get; private set; }
+        public Bitmap SplashImage { get; set; }
         public MainWindow NgMain {
             get {
                 return Main as MainWindow;
@@ -34,7 +36,7 @@ namespace NaturalGroundingPlayer {
             Instance = new SessionCore();
         }
 
-        public void Start(Window main) {
+        public void Start(Window main, System.Drawing.Bitmap splashImage) {
             // Make sure to initialize Settings static constructor to initialize database path.
             var a = Settings.SavedFile;
 
@@ -47,6 +49,7 @@ namespace NaturalGroundingPlayer {
             }
             Icon = main.Icon;
             Main = main;
+            SplashImage = splashImage;
 
             main.Loaded += Main_Loaded;
             main.Closing += Main_Closing;
@@ -74,8 +77,9 @@ namespace NaturalGroundingPlayer {
                 Downloads.DownloadsView.ItemsSource = Business.DownloadManager.DownloadsList;
             }
 
-            InitializingWindow InitWin = new InitializingWindow();
-            InitWin.Owner = Main;
+            SplashWindow InitWin = SplashWindow.Instance(Main, SplashImage);
+            SplashImage = null;
+            // InitWin.Owner = Main;
 
             CancellationToken token = new CancellationToken();
             Task InitWinTask = Task.Factory.StartNew(
@@ -94,7 +98,7 @@ namespace NaturalGroundingPlayer {
             if (NgMain != null)
                 await NgMain.InitializationCompleted();
 
-            InitWin.Close();
+            InitWin.CanClose();
             await InitWinTask;
         }
 

@@ -42,5 +42,35 @@ namespace Business {
             } else
                 return null;
         }
+
+        public static string[] ShowFileDialogMultiple(string defaultPath, string filter) {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            try {
+                if (!string.IsNullOrEmpty(defaultPath))
+                    dlg.InitialDirectory = Path.GetDirectoryName(defaultPath);
+            }
+            catch { }
+            dlg.Filter = filter;
+            dlg.Multiselect = true;
+            if (dlg.ShowDialog().Value == true) {
+                return dlg.FileNames;
+            } else
+                return null;
+        }
+
+        public static string ShowSaveFileDialog(string defaultPath, string filter) {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            try {
+                if (!string.IsNullOrEmpty(defaultPath))
+                    dlg.InitialDirectory = Path.GetDirectoryName(defaultPath);
+            }
+            catch { }
+            dlg.Filter = filter;
+            if (dlg.ShowDialog().Value == true) {
+                return dlg.FileName;
+            } else
+                return null;
+        }
+
     }
 }
