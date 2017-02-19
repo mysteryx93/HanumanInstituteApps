@@ -336,14 +336,14 @@ namespace Business {
         public static bool EncodeAudio(MediaEncoderSettings settings, bool silent) {
             if (settings.AudioAction == AudioActions.EncodeOpus) {
                 string Args = string.Format(@"--bitrate {0} ""{1}"" ""{2}""", settings.AudioQuality, settings.AudioFileWav, settings.AudioFileOpus);
-                return Run("Encoder\\opusenc.exe", Args, true);
+                return Run("Encoder\\opusenc.exe", Args, silent);
             } else if (settings.AudioAction == AudioActions.EncodeAac || settings.AudioAction == AudioActions.EncodeFlac) {
                 string Args = string.Format(@"-i {2}{0} -b:a {1}k {3}",
                     settings.AudioAction == AudioActions.EncodeFlac ? " -c:a flac" : "",
                     settings.AudioQuality,
                     settings.AudioFileWav,
                     settings.AudioAction == AudioActions.EncodeFlac ? settings.AudioFileFlac : settings.AudioFileAac);
-                return Run("Encoder\\ffmpeg.exe", Args, true);
+                return Run("Encoder\\ffmpeg.exe", Args, silent);
             } else
                 return true;
         }

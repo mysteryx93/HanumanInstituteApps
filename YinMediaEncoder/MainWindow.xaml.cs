@@ -101,7 +101,7 @@ namespace YinMediaEncoder {
                     DisplayName = PlaylistItem.FileName;
                 }
             } else {
-                string ExtFilter = string.Format("Video Files|*{0})", string.Join(";*", Settings.VideoExtensions));
+                string ExtFilter = string.Format("Video Files|*{0}", string.Join(";*", Settings.VideoExtensions));
                 SelectedFile = FileFolderDialog.ShowFileDialog(Settings.NaturalGroundingFolder, ExtFilter);
                 DisplayName = SelectedFile;
             }

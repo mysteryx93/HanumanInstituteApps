@@ -167,8 +167,9 @@ namespace Business {
         }
 
         public bool EncodeAudio(MediaEncoderSettings settings) {
-            FfmpegBusiness.SaveAudioToWav(settings, true);
-            return FfmpegBusiness.EncodeAudio(settings, true);
+            bool Silent = settings.VideoCodec != VideoCodecs.Copy;
+            FfmpegBusiness.SaveAudioToWav(settings, Silent);
+            return FfmpegBusiness.EncodeAudio(settings, Silent);
         }
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
