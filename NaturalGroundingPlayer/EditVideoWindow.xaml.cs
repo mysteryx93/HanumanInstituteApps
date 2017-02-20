@@ -23,13 +23,12 @@ namespace NaturalGroundingPlayer {
         /// <summary>
         /// Displays a window to edit specified video.
         /// </summary>
-        public static EditVideoWindow Instance(Guid? videoId, string fileName, IMediaPlayerBusiness player, ClosingCallback callback) {
+        public static EditVideoWindow Instance(Guid? videoId, string fileName, ClosingCallback callback) {
             EditVideoWindow NewForm = new EditVideoWindow();
             if (videoId != null && videoId != Guid.Empty)
                 NewForm.videoId = videoId;
             else
                 NewForm.fileName = fileName;
-            NewForm.player = player;
             NewForm.callback = callback;
             SessionCore.Instance.Windows.Show(NewForm);
             return NewForm;
@@ -38,7 +37,7 @@ namespace NaturalGroundingPlayer {
         /// <summary>
         /// Displays a popup containing the FileBinding menu features.
         /// </summary>
-        public static EditVideoWindow InstancePopup(UIElement target, PlacementMode placement, Guid? videoId, string fileName, IMediaPlayerBusiness player, ClosingCallback callback) {
+        public static EditVideoWindow InstancePopup(UIElement target, PlacementMode placement, Guid? videoId, string fileName, ClosingCallback callback) {
             EditVideoWindow NewForm = new EditVideoWindow();
             NewForm.isPopup = true;
             NewForm.videoId = videoId;
@@ -46,7 +45,6 @@ namespace NaturalGroundingPlayer {
                 NewForm.videoId = videoId;
             else
                 NewForm.fileName = fileName;
-            NewForm.player = player;
             NewForm.callback = callback;
             WindowHelper.SetScale(NewForm.FileBindingButton.ContextMenu);
             NewForm.Window_Loaded(null, null);
@@ -54,7 +52,6 @@ namespace NaturalGroundingPlayer {
             return NewForm;
         }
 
-        protected IMediaPlayerBusiness player;
         protected Guid? videoId;
         protected string fileName;
         protected ClosingCallback callback;
@@ -97,8 +94,6 @@ namespace NaturalGroundingPlayer {
             ratingBusiness = business.GetRatings(video);
             RatingsGrid.DataContext = ratingBusiness;
             EditRating_LostFocus(null, null);
-            if (player == null)
-                PlayButton.Visibility = System.Windows.Visibility.Hidden;
 
             if (video.FileName != null) {
                 if (File.Exists(Settings.NaturalGroundingFolder + video.FileName))
@@ -189,8 +184,10 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void PlayButton_Click(object sender, RoutedEventArgs e) {
-            if (player != null && video.FileName != null)
-                await player.PlayVideoAsync(video, false);
+            if (video.FileName != null) {
+                await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, video.FileName);
+                await SessionCore.Instance.Business.SkipVideoAsync();
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -212,10 +209,7 @@ namespace NaturalGroundingPlayer {
 
         public void ShowFileBindingMenu(UIElement target, PlacementMode placement) {
             // Set context menu items visibility.
-            if (player == null)
-                FileBindingButton.ContextMenu.Items.Remove(menuPlay);
-            else
-                menuPlay.IsEnabled = (!fileNotFound && video.FileName != null);
+            menuPlay.IsEnabled = (!fileNotFound && video.FileName != null);
             if (!isPopup)
                 FileBindingButton.ContextMenu.Items.Remove(menuEdit);
             string DefaultFileName = GetDefaultFileName();
@@ -246,7 +240,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void menuEdit_Click(object sender, RoutedEventArgs e) {
-            EditVideoWindow.Instance(null, video.FileName, player, callback);
+            EditVideoWindow.Instance(null, video.FileName, callback);
         }
 
         private void menuMoveFile_Click(object sender, RoutedEventArgs e) {
@@ -305,7 +299,7 @@ namespace NaturalGroundingPlayer {
                 if (Result != null) {
                     // Close and re-open selected entry.
                     Close();
-                    EditVideoWindow NewForm = Instance(Result.MediaId, null, player, callback);
+                    EditVideoWindow NewForm = Instance(Result.MediaId, null, callback);
                     NewForm.video.FileName = video.FileName;
                     NewForm.video.Length = null;
                     NewForm.video.Height = null;

@@ -79,7 +79,7 @@ namespace NaturalGroundingPlayer {
 
             SessionCore.Instance.RatingViewer.UpdatePreference();
             if (SessionCore.Instance.Business.CurrentVideo != null) {
-                EditVideoWindow.Instance(SessionCore.Instance.Business.CurrentVideo.MediaId, null, null, delegate(Media result) {
+                EditVideoWindow.Instance(SessionCore.Instance.Business.CurrentVideo.MediaId, null, delegate(Media result) {
                     if (result != null)
                         SessionCore.Instance.Business.ReloadVideoInfo();
                 });
@@ -90,7 +90,6 @@ namespace NaturalGroundingPlayer {
             if (!menuEditPlaylist.IsEnabled)
                 return;
 
-            PauseSession();
             EditPlaylistWindow.Instance(null);
         }
 
@@ -99,7 +98,6 @@ namespace NaturalGroundingPlayer {
             if (!menuDownloadPlaylist.IsEnabled)
                 return;
 
-            PauseSession();
             DownloadPlaylistWindow.Instance(null);
         }
 
@@ -107,7 +105,6 @@ namespace NaturalGroundingPlayer {
             if (!menuMoveFiles.IsEnabled)
                 return;
 
-            PauseSession();
             MoveFilesWindow.Instance(null);
         }
 
@@ -115,7 +112,6 @@ namespace NaturalGroundingPlayer {
             if (!menuDistributionGraph.IsEnabled)
                 return;
 
-            PauseSession();
             DistributionGraphWindow.Instance();
         }
 
@@ -123,7 +119,6 @@ namespace NaturalGroundingPlayer {
             if (!menuExport.IsEnabled)
                 return;
 
-            PauseSession();
             ExportWindow.Instance();
         }
 
@@ -131,7 +126,6 @@ namespace NaturalGroundingPlayer {
             if (!menuImport.IsEnabled)
                 return;
 
-            PauseSession();
             ImportWindow.Instance();
         }
 
@@ -352,7 +346,6 @@ namespace NaturalGroundingPlayer {
             if (!menuBuyResources.IsEnabled)
                 return;
 
-            PauseSession();
             BuyResourcesWindow.Instance(null);
         }
 

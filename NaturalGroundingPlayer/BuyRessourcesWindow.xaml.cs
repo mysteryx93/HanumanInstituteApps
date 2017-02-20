@@ -31,7 +31,6 @@ namespace NaturalGroundingPlayer {
         private GridViewColumn lastHeaderClicked;
         private ListSortDirection lastDirection = ListSortDirection.Ascending;
         protected Action callback;
-        private IMediaPlayerBusiness player;
         private WindowHelper helper;
         private bool isLoading = true;
         private DispatcherTimer timerChangeFilters;
@@ -49,10 +48,6 @@ namespace NaturalGroundingPlayer {
             lastHeaderClicked = ((GridView)VideosView.View).Columns[0];
             this.DataContext = settings;
             
-            player = SessionCore.Instance.GetNewPlayer();
-            player.SetPath();
-            player.AllowClose = true;
-
             RatingCategoryCombo.ItemsSource = await business.GetRatingCategoriesAsync(true);
             await LoadDataAsync();
         }
@@ -147,12 +142,12 @@ namespace NaturalGroundingPlayer {
         }
 
         private void ShowEditForm(VideoListItem item) {
-            EditVideoWindow.Instance(item.MediaId, item.FileName, player, EditForm_Closed);
+            EditVideoWindow.Instance(item.MediaId, item.FileName, EditForm_Closed);
         }
 
 
         private void ShowEditFormPopup(VideoListItem item, UIElement target) {
-            EditVideoWindow.InstancePopup(target, PlacementMode.Mouse, item.MediaId, item.FileName, player, EditForm_Closed);
+            EditVideoWindow.InstancePopup(target, PlacementMode.Mouse, item.MediaId, item.FileName, EditForm_Closed);
         }
 
         private async void EditForm_Closed(Media result) {

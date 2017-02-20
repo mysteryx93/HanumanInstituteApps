@@ -3,6 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Audio Video Muxer" Height="350" Width="484" Loaded="Window_Loaded" ResizeMode="NoResize" Closing="Window_Closing" WindowStartupLocation="CenterOwner" Icon="App.ico">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                <GradientStop Color="#FF75C7C1" Offset="1"/>
+                <GradientStop Color="White"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Frame x:Name="ContentFrame" Margin="0,0,4,42" NavigationUIVisibility="Hidden"/>
         <Button x:Name="NextButton" Content="_Next" Margin="0,0,19,16" IsDefault="True" HorizontalAlignment="Right" Width="75" Height="22" VerticalAlignment="Bottom" Click="NextButton_Click"/>
         <Button x:Name="PreviousButton" Content="_Previous" Margin="0,0,99,16" HorizontalAlignment="Right" Width="75" Height="22" VerticalAlignment="Bottom" Click="PreviousButton_Click"/>

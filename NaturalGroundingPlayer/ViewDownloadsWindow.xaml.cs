@@ -79,7 +79,7 @@ namespace NaturalGroundingPlayer {
         private void menuEdit_Click(object sender, RoutedEventArgs e) {
             DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
             if (Item != null)
-                EditVideoWindow.Instance(Item.Request.MediaId, null, null, null);
+                EditVideoWindow.Instance(Item.Request.MediaId, null, null);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

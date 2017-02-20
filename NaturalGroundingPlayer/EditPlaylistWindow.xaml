@@ -64,6 +64,6 @@
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" Margin="309,43,0,0" Text="Priority" VerticalAlignment="Top"/>
         <TextBlock x:Name="StatusText" HorizontalAlignment="Left" Margin="290,0,0,13" Text="" Height="16" VerticalAlignment="Bottom"/>
-        <local:MediaGrid x:Name="MediaList" Margin="10,113,10,37" Width="Auto" Height="Auto" IsolatedPlayer="True" DataLoaded="MediaList_DataLoaded" ItemDoubleClick="MediaList_ItemDoubleClick" />
+        <local:MediaGrid x:Name="MediaList" Margin="10,113,10,37" Width="Auto" Height="Auto" DataLoaded="MediaList_DataLoaded" ItemDoubleClick="MediaList_ItemDoubleClick" />
     </Grid>
 </Window>

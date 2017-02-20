@@ -55,6 +55,6 @@
             <TextBlock HorizontalAlignment="Left" Margin="449,183,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14" Text="11.0"/>
         </Grid>
         <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Left" Margin="409,14,0,0" VerticalAlignment="Top" Width="90" IsCancel="True" Click="CloseButton_Click"/>
-        <local:MediaGrid x:Name="MediaList" Margin="10,261,10,10" Height="Auto" Width="Auto" IsolatedPlayer="True" />
+        <local:MediaGrid x:Name="MediaList" Margin="10,261,10,10" Height="Auto" Width="Auto" />
     </Grid>
 </Window>

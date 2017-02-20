@@ -60,7 +60,7 @@ namespace NaturalGroundingPlayer {
         private void FilesView_ItemDoubleClick(object sender, MouseButtonEventArgs e) {
             if (FilesView.SelectedItem != null) {
                 MoveFileItem Item = (MoveFileItem)FilesView.SelectedItem;
-                EditVideoWindow.Instance(Item.VideoId, null, player, delegate(Media result) {
+                EditVideoWindow.Instance(Item.VideoId, null, delegate(Media result) {
                     if (result != null) {
                         business.Load(result.MediaId);
                         DisplayData();

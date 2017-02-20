@@ -27,10 +27,8 @@ namespace NaturalGroundingPlayer {
         private ListSortDirection lastDirection = ListSortDirection.Ascending;
         private List<VideoListItem> selectionList = new List<VideoListItem>();
         public EditPlaylistBusiness business = new EditPlaylistBusiness();
-        public IMediaPlayerBusiness player;
         public SearchSettings Settings { get; set; }
         public SearchFilterEnum SearchGroupType { get; set; } = SearchFilterEnum.Artist;
-        public bool IsolatedPlayer { get; set; }
         public bool PopupEnabled { get; set; } = true;
         public bool IsPreferenceVisible { get; set; } = true;
         public bool IsIntensityVisible { get; set; } = true;
@@ -74,12 +72,6 @@ namespace NaturalGroundingPlayer {
             lastHeaderClicked = ((GridView)VideosView.View).Columns[0];
             Window.GetWindow(this).Closed += MediaGrid_Closed;
 
-            if (IsolatedPlayer) {
-                player = SessionCore.Instance.GetNewPlayer();
-                player.SetPath();
-                player.AllowClose = true;
-            }
-
             // Bind to parent window
             Window.GetWindow(this).PreviewKeyDown += Window_PreviewKeyDown;
             // Bind to search box.
@@ -97,8 +89,6 @@ namespace NaturalGroundingPlayer {
         }
 
         void MediaGrid_Closed(object sender, EventArgs e) {
-            if (player != null)
-                player.Close();
         }
 
         public VideoListItem SelectedItem {
@@ -260,11 +250,11 @@ namespace NaturalGroundingPlayer {
         }
 
         private void ShowEditForm(VideoListItem item) {
-            EditVideoWindow.Instance(item.MediaId, item.FileName, player, EditForm_Closed);
+            EditVideoWindow.Instance(item.MediaId, item.FileName, EditForm_Closed);
         }
 
         private void ShowEditFormPopup(VideoListItem item, UIElement target) {
-            EditVideoWindow.InstancePopup(target, PlacementMode.Mouse, item.MediaId, item.FileName, player, EditForm_Closed);
+            EditVideoWindow.InstancePopup(target, PlacementMode.Mouse, item.MediaId, item.FileName, EditForm_Closed);
         }
 
         public async void EditForm_Closed(Media result) {
