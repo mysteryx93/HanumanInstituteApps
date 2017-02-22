@@ -92,7 +92,7 @@
         <KeyBinding Key="F8" Command="{StaticResource MoveFiles}" />
         <KeyBinding Key="F9" Command="{StaticResource DistributionGraph}" />
         <KeyBinding Key="F10" Command="{StaticResource BuyResources}" />
-        <KeyBinding Key="D" Command="{StaticResource DownloadVideo}" />
+        <KeyBinding Key="A" Command="{StaticResource DownloadVideo}" />
         <KeyBinding Key="F11" Command="{StaticResource ViewDownloads}" />
         <KeyBinding Key="S" Command="{StaticResource Settings}" />
     </Control.InputBindings>
@@ -101,6 +101,7 @@
             <MenuItem x:Name="menuPlaylist" Header="_Playlist" KeyboardNavigation.TabNavigation="None">
                 <MenuItem x:Name="menuBuyResources" Header="_Buy Resources..." Command="{StaticResource BuyResources}" InputGestureText="F10"/>
                 <Separator />
+                <MenuItem x:Name="menuDownloadVideo" Header="_Add Video..." Command="{StaticResource DownloadVideo}" InputGestureText="A" />
                 <MenuItem x:Name="menuEditVideo" Header="_Edit Video..." IsEnabled="False" Command="{StaticResource EditVideo}" InputGestureText="E"/>
                 <MenuItem x:Name="menuEditPlaylist" Header="Edit _Playlist..." Command="{StaticResource EditPlaylist}"  InputGestureText="F6"/>
                 <MenuItem x:Name="menuDownloadPlaylist" Header="_Download Playlist..." Command="{StaticResource DownloadPlaylist}"  InputGestureText="F7"/>
@@ -133,7 +134,6 @@
                 <MenuItem x:Name="menuAddLucidVideo" Header="Add _Lucid Video" Command="{StaticResource AddLucidVideo}" InputGestureText="CTRL+4" />
             </MenuItem>
             <MenuItem x:Name="menuTools" Header="_Tools" KeyboardNavigation.TabNavigation="None">
-                <MenuItem x:Name="menuDownloadVideo" Header="_Download Video..." Command="{StaticResource DownloadVideo}" InputGestureText="D" />
                 <MenuItem x:Name="menuViewDownloads" Header="_View Downloads" Command="{StaticResource ViewDownloads}" InputGestureText="F11" />
                 <Separator />
                 <MenuItem x:Name="menuSetupWizard" Header="SVP Setup _Wizard..." Command="{StaticResource SetupWizard}" />

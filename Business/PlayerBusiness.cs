@@ -14,7 +14,7 @@ namespace Business {
         #region Declarations / Constructor
 
         private List<Guid> playedVideos = new List<Guid>();
-        private IMediaPlayerBusiness player;
+        private IMediaPlayerBusiness player { get; set; }
         private Media nextVideo;
         private PlayerMode playMode = PlayerMode.Normal;
         private DispatcherTimer timerChangeConditions;
@@ -185,7 +185,7 @@ namespace Business {
         /// </summary>
         void player_Pause(object sender, EventArgs e) {
             timerSession.Stop();
-            Application.Current.Dispatcher?.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
+            Application.Current?.Dispatcher?.Invoke(() => DisplayPlayTime?.Invoke(this, new EventArgs()));
         }
 
         /// <summary>
@@ -265,6 +265,19 @@ namespace Business {
         }
 
         /// <summary>
+        /// When opening an editor window, this allows the player to be closed and be handled differently.
+        /// </summary>
+        /// <param name="value">True when opening the editor, false when closing.</param>
+        public async Task SetEditorModeAsync(bool value) {
+            if (value)
+                player.AllowClose = true;
+            else if (IsStarted && !IsPaused)
+                player.AllowClose = false;
+            if (!value && IsStarted)
+                await SelectNextVideoAsync(1, false);
+        }
+
+        /// <summary>
         /// Manually sets the next video in queue.
         /// </summary>
         /// <param name="videoId">The ID of the video play next.</param>
@@ -282,6 +295,31 @@ namespace Business {
             await SetNextVideoAsync(mode, GetMediaObject(fileName)).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Plays a single video while allowing to close the player, such as from the Edit Video window.
+        /// </summary>
+        /// <param name="fileName">The name of the file to play.</param>
+        public async Task PlaySingleVideoAsync(string fileName) {
+            Media video = GetMediaObject(fileName);
+            if (!player.IsAvailable || video == null)
+                return;
+
+            if (nextVideo != null) {
+                CancelNextDownload(nextVideo);
+                NextVideoOptions.Clear();
+                nextVideo = video;
+            }
+
+            // Enable/Disable SVP if necessary.
+            MpcConfigBusiness.AutoConfigure(video);
+            // Auto-pitch to 432hz
+            bool EnableAutoPitch = AutoPitchBusiness.AppyAutoPitch(video);
+
+            await player.PlayVideoAsync(video, EnableAutoPitch).ConfigureAwait(false);
+
+            Application.Current.Dispatcher.Invoke(() => PlaylistChanged?.Invoke(this, new EventArgs()));
+        }
+
         public Media GetMediaObject(string fileName) {
             Media Result = PlayerAccess.GetVideoByFileName(fileName);
             if (Result == null)
@@ -294,8 +332,6 @@ namespace Business {
                 CancelNextDownload(nextVideo);
             if (NextVideoOptions.Any()) {
                 NextVideoOptions[0] = video;
-                //NextVideoOptions.RemoveAt(0);
-                //NextVideoOptions.Insert(0, video);
             }
             nextVideo = video;
             this.PlayMode = mode;

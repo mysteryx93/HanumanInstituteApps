@@ -5,7 +5,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:NaturalGroundingPlayer" x:Name="window" x:Class="NaturalGroundingPlayer.SearchVideoWindow"
         Title="Search Videos" Height="410" Width="611" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-        MinHeight="300" MinWidth="500">
+        MinHeight="300" MinWidth="500" Closed="window_Closed">
     <Window.Resources>
         <Business:RatingConverter x:Key="RatingConverter"/>
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>

@@ -42,6 +42,8 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(true);
+
             timerChangeFilters = new DispatcherTimer();
             timerChangeFilters.Interval = TimeSpan.FromSeconds(1);
             timerChangeFilters.Tick += timerChangeFilters_Tick;
@@ -53,6 +55,8 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            if (SessionCore.Instance.Business.IsStarted && !SessionCore.Instance.Business.IsPaused)
+                SessionCore.Instance.Business.SetEditorModeAsync(false);
             if (callback != null)
                 callback();
         }

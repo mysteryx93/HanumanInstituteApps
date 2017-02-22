@@ -21,15 +21,20 @@ namespace DataAccess {
 
             //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
 
-            //SQLiteCommand cm = new SQLiteCommand("SELECT RatingId FROM MediaRatings", Conn);
+            //SQLiteCommand cm = new SQLiteCommand("SELECT MediaCategoryId FROM Media", Conn);
             //SQLiteDataReader dr = cm.ExecuteReader();
             //while (dr.Read()) {
-            //    string GuidString = dr.GetString(0);
-            //    Guid GuidValue = new Guid(GuidString);
-            //    SQLiteCommand Writer = new SQLiteCommand("UPDATE MediaRatings SET RatingId = @IdGuid WHERE RatingId = @IdString", Conn);
-            //    Writer.Parameters.Add("@IdGuid", System.Data.DbType.Guid).Value = GuidValue;
-            //    Writer.Parameters.Add("@IdString", System.Data.DbType.String).Value = GuidString;
-            //    Writer.ExecuteNonQuery();
+            //    if (!dr.IsDBNull(0)) {
+            //        try {
+            //            string GuidString = dr.GetString(0);
+            //            Guid GuidValue = new Guid(GuidString);
+            //            SQLiteCommand Writer = new SQLiteCommand("UPDATE Media SET MediaCategoryId = @IdGuid WHERE MediaCategoryId = @IdString", Conn);
+            //            Writer.Parameters.Add("@IdGuid", System.Data.DbType.Guid).Value = GuidValue;
+            //            Writer.Parameters.Add("@IdString", System.Data.DbType.String).Value = GuidString;
+            //            Writer.ExecuteNonQuery();
+            //        }
+            //        catch { }
+            //    }
             //}
             //throw new ApplicationException("Done");
         }

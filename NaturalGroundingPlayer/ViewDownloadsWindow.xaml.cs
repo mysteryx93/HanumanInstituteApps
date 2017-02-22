@@ -41,8 +41,7 @@ namespace NaturalGroundingPlayer {
             DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
             if (Item != null && IsPlayerMode) {
                 if (Item.IsCompleted) {
-                    await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, Item.Request.FileName);
-                    await SessionCore.Instance.Business.SkipVideoAsync();
+                    await SessionCore.Instance.Business.PlaySingleVideoAsync(Item.Request.FileName);
                 } else {
                     menuEdit_Click(null, null);
                 }

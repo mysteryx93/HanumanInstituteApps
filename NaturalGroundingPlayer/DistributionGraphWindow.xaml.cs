@@ -37,12 +37,14 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(true);
             GraphTypeCombo.ItemsSource = await business.GetRatingCategoriesAsync();
             //MediaList.Settings.ConditionField = FieldConditionEnum.IsInDatabase;
             //MediaList.Settings.ConditionValue = BoolConditionEnum.Yes;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(false);
             this.Close();
         }
 

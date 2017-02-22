@@ -54,7 +54,9 @@ namespace MediaPlayer {
         }
 
         public void Stop() {
-            Player.Ctlcontrols.stop();
+            try {
+                Player.Ctlcontrols.stop();
+            } catch { }
         }
 
         public void SetFramePosition(double pos) {

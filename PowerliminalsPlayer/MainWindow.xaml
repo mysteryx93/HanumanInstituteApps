@@ -7,6 +7,13 @@
         mc:Ignorable="d"
         Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183" Icon="App.ico" Closing="Window_Closing" Loaded="Window_Loaded">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                <GradientStop Color="#FF75C7C1" Offset="1"/>
+                <GradientStop Color="White"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
         <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,420,0" Text="Volume" VerticalAlignment="Top" Visibility="Visible"/>
         <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1" TickFrequency="10" HorizontalAlignment="Right" Width="99" Visibility="Visible" Height="18" VerticalAlignment="Top" Value="{Binding MasterVolume}"/>
         <ScrollViewer HorizontalAlignment="Right" Width="302">
@@ -18,21 +25,22 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <Button x:Name="AddFolderButton" Content="_Add" Margin="106,3,0,0" VerticalAlignment="Top" Click="AddFolderButton_Click" TabIndex="6" HorizontalAlignment="Left" Width="70"/>
-        <ListBox x:Name="FoldersList" Margin="10,26,312,0" ItemsSource="{Binding}" Height="81" VerticalAlignment="Top" TabIndex="5" />
-        <Button x:Name="RemoveFolderButton" Content="_Remove" VerticalAlignment="Top" Click="RemoveFolderButton_Click" TabIndex="7" Margin="181,3,0,0" HorizontalAlignment="Left" Width="70"/>
+        <Button x:Name="AddFolderButton" Content="_Add" Margin="106,27,0,0" VerticalAlignment="Top" Click="AddFolderButton_Click" TabIndex="6" HorizontalAlignment="Left" Width="70"/>
+        <ListBox x:Name="FoldersList" Margin="10,50,312,0" ItemsSource="{Binding}" Height="81" VerticalAlignment="Top" TabIndex="5" />
+        <Button x:Name="RemoveFolderButton" Content="_Remove" VerticalAlignment="Top" Click="RemoveFolderButton_Click" TabIndex="7" Margin="181,27,0,0" HorizontalAlignment="Left" Width="70"/>
         <Grid x:Name="FilesGrid" Margin="10,111,312,35">
-            <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
-            <ListBox x:Name="FilesList" Margin="0,23,0,0" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" />
-            <Button x:Name="PlayButton" Content="_Play" Margin="46,0,0,0" VerticalAlignment="Top" Click="PlayButton_Click" TabIndex="9" HorizontalAlignment="Left" Width="75"/>
-            <TextBox x:Name="SearchBox" Height="20" Margin="163,0,0,0" VerticalAlignment="Top" TextChanged="SearchBox_TextChanged" />
+            <TextBlock HorizontalAlignment="Left" Margin="0,28,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
+            <ListBox x:Name="FilesList" Margin="0,47,0,0" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" />
+            <Button x:Name="PlayButton" Content="_Play" Margin="46,24,0,0" VerticalAlignment="Top" Click="PlayButton_Click" TabIndex="9" HorizontalAlignment="Left" Width="75"/>
+            <TextBox x:Name="SearchBox" Height="20" Margin="163,24,0,0" VerticalAlignment="Top" TextChanged="SearchBox_TextChanged" />
         </Grid>
-        <Expander x:Name="FoldersExpander" Header="Folders" HorizontalAlignment="Left" Margin="10,1,0,0" VerticalAlignment="Top" FontWeight="Bold" Collapsed="FoldersExpander_Collapsed" Expanded="FoldersExpander_Expanded" IsExpanded="{Binding FoldersExpanded}">
+        <Expander x:Name="FoldersExpander" Header="Folders" HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" FontWeight="Bold" Collapsed="FoldersExpander_Collapsed" Expanded="FoldersExpander_Expanded" IsExpanded="{Binding FoldersExpanded}">
             <Grid Background="#FFE5E5E5"/>
         </Expander>
         <Button x:Name="LoadPresetButton" Content="_Load Preset" HorizontalAlignment="Right" Margin="0,0,402,10" VerticalAlignment="Bottom" Width="85" TabIndex="6" Click="LoadPresetButton_Click"/>
         <Button x:Name="SavePresetButton" Content="_Save As" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="85" TabIndex="6" Margin="0,0,312,10" Click="SavePresetButton_Click"/>
         <Button x:Name="PauseButton" Content="Pause All" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="85" TabIndex="6" Click="PauseButton_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold"><Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals" RequestNavigate="Hyperlink_RequestNavigate" >Get Powerliminals</Hyperlink></TextBlock>
 
     </Grid>
 </Window>

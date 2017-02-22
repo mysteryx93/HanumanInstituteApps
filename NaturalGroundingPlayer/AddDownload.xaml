@@ -16,7 +16,7 @@
         <Button x:Name="SaveButton" Content="_Download" Margin="268,183,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="90" IsDefault="True" Click="DownloadButton_Click" TabIndex="8"/>
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Left" Margin="173,183,0,0" VerticalAlignment="Top" Width="90" Height="22" IsCancel="True" Click="CancelButton_Click" TabIndex="7"/>
         <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="21,162,0,0" VerticalAlignment="Top" Width="278" Foreground="Red" Height="16"/>
-        <CheckBox x:Name="StartDownloadCheckBox" Content="Start Download" HorizontalAlignment="Left" Margin="21,186,0,0" VerticalAlignment="Top" IsChecked="True" TabIndex="6" />
+        <CheckBox x:Name="StartDownloadCheckBox" Content="Start Download" HorizontalAlignment="Left" Margin="21,186,0,0" VerticalAlignment="Top" IsChecked="True" TabIndex="6" Click="StartDownloadCheckBox_Click" />
 
     </Grid>
 </Window>

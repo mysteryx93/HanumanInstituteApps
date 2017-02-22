@@ -247,6 +247,8 @@ namespace Business {
         public string GetAudioExtension(AudioType audio) {
             if (audio == AudioType.Vorbis)
                 return ".ogg";
+            else if (audio == AudioType.Opus)
+                return ".opus";
             else if (audio == AudioType.Aac)
                 return ".aac";
             else if (audio == AudioType.Mp3)

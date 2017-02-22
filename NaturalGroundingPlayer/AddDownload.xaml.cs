@@ -99,7 +99,7 @@ namespace NaturalGroundingPlayer {
                 return false;
             }
 
-            if (!isUrlValid) {
+            if (!isUrlValid && StartDownloadCheckBox.IsChecked == true) {
                 ErrorText.Text = "Please enter a valid URL";
                 return false;
             }
@@ -126,6 +126,10 @@ namespace NaturalGroundingPlayer {
                 Obj.Text = ObjItem.Name;
             else
                 Obj.Text = "";
+        }
+
+        private void StartDownloadCheckBox_Click(object sender, RoutedEventArgs e) {
+            SaveButton.Content = StartDownloadCheckBox.IsChecked == true ? "_Download" : "_Add";
         }
     }
 }

@@ -36,6 +36,8 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(true);
+
             timerChangeFilters = new DispatcherTimer();
             timerChangeFilters.Interval = TimeSpan.FromSeconds(1);
             timerChangeFilters.Tick += timerChangeFilters_Tick;
@@ -58,6 +60,10 @@ namespace NaturalGroundingPlayer {
             this.DataContext = settings;
             await MediaList.LoadDataAsync();
             isLoaded = true;
+        }
+
+        private void window_Closed(object sender, EventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(false);
         }
 
         private void Settings_Changed(object sender, RoutedEventArgs e) {

@@ -7,6 +7,7 @@ using System.Windows;
 using Business;
 using System.IO;
 using System.Windows.Input;
+using System.Diagnostics;
 
 namespace PowerliminalsPlayer {
     /// <summary>
@@ -90,8 +91,6 @@ namespace PowerliminalsPlayer {
             FoldersList.Visibility = Visibility.Hidden;
             AddFolderButton.Visibility = Visibility.Hidden;
             RemoveFolderButton.Visibility = Visibility.Hidden;
-            //VolumeText.Visibility = Visibility.Visible;
-            //VolumeSlider.Visibility = Visibility.Visible;
             FilesGrid.Margin = new Thickness(FilesGrid.Margin.Left, FilesGrid.Margin.Top - FoldersList.Height, FilesGrid.Margin.Right, FilesGrid.Margin.Bottom);
         }
 
@@ -99,8 +98,6 @@ namespace PowerliminalsPlayer {
             FoldersList.Visibility = Visibility.Visible;
             AddFolderButton.Visibility = Visibility.Visible;
             RemoveFolderButton.Visibility = Visibility.Visible;
-            //VolumeText.Visibility = Visibility.Hidden;
-            //VolumeSlider.Visibility = Visibility.Hidden;
             FilesGrid.Margin = new Thickness(FilesGrid.Margin.Left, FilesGrid.Margin.Top + FoldersList.Height, FilesGrid.Margin.Right, FilesGrid.Margin.Bottom);
         }
 
@@ -148,6 +145,11 @@ namespace PowerliminalsPlayer {
                 return config.Presets.FirstOrDefault(p => p.Name == name);
             else
                 return null;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

@@ -37,6 +37,8 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
+            SessionCore.Instance.Business.SetEditorModeAsync(true);
+
             timerChangeFilters = new DispatcherTimer();
             timerChangeFilters.Interval = TimeSpan.FromSeconds(1);
             timerChangeFilters.Tick += timerChangeFilters_Tick;
@@ -49,6 +51,12 @@ namespace NaturalGroundingPlayer {
             await MediaList.ManualLoadPlaylist();
             await LoadMediaInfoAsync();
             isLoaded = true;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e) {
+            // SessionCore.Instance.
+            SessionCore.Instance.Business.SetEditorModeAsync(false);
+            callback?.Invoke();
         }
 
         private async Task LoadMediaInfoAsync() {
@@ -110,10 +118,6 @@ namespace NaturalGroundingPlayer {
 
         private void EditButton_Click(object sender, RoutedEventArgs e) {
             MediaList.EditSelection();
-        }
-
-        private void Window_Closing(object sender, CancelEventArgs e) {
-            callback?.Invoke();
         }
 
         private void RatingCategoryCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {

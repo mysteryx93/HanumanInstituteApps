@@ -185,8 +185,7 @@ namespace NaturalGroundingPlayer {
 
         private async void PlayButton_Click(object sender, RoutedEventArgs e) {
             if (video.FileName != null) {
-                await SessionCore.Instance.Business.SetNextVideoFileAsync(PlayerMode.SpecialRequest, video.FileName);
-                await SessionCore.Instance.Business.SkipVideoAsync();
+                await SessionCore.Instance.Business.PlaySingleVideoAsync(video.FileName);
             }
         }
 
