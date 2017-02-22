@@ -133,10 +133,10 @@ Source: "..\Encoder\opusenc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameve
 Source: "..\Encoder\ResizeX.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\RgTools.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\RoboCrop26.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\Encoder\Shader.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\Encoder\Shader.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\Encoder\smdegrain.avsi"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
-Source: "..\Encoder\SmoothAdjust.dll"; DestDir: "{app}\Encoder\Shaders"; Flags: replacesameversion
+Source: "..\Encoder\Shader.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\Shader.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\smdegrain.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\SmoothAdjust.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\svpflow1.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\svpflow2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\TimeStretch.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
