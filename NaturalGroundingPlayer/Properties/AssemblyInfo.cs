@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Natural Grounding Player")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Emergence Guardian")]
+[assembly: AssemblyCompany("Spiritual Self Transformation")]
 [assembly: AssemblyProduct("Natural Grounding Player")]
-[assembly: AssemblyCopyright("Copyright Emergence Guardian © 2017")]
+[assembly: AssemblyCopyright("Copyright © 2016-2017, Spiritual Self Transformation")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

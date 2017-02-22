@@ -32,4 +32,7 @@ mklink /J C:\GitHub\NaturalGroundingPlayer\PowerliminalsPlayer\bin\Release\Encod
 mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 
+Mark this folder as read-only to prevent Visual Studio from modifying it during builds
+C:\GitHub\NaturalGroundingPlayer\Encoder
+
 Compile, and run.
