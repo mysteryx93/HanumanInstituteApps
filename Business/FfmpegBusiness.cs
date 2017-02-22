@@ -203,8 +203,8 @@ namespace Business {
             Process P = new Process();
             if (silent) {
                 P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                //P.StartInfo.RedirectStandardError = true;
-                //P.StartInfo.UseShellExecute = false;
+                P.StartInfo.RedirectStandardError = true;
+                P.StartInfo.UseShellExecute = false;
             }
             P.StartInfo.FileName = command;
             P.StartInfo.Arguments = arguments;
@@ -218,8 +218,19 @@ namespace Business {
             // Give a change for the caller to track the process.
             callback?.Invoke(null, new ExecutingProcessEventArgs(P));
             P.WaitForExit();
+
             // ExitCode is 0 for normal exit. Different value when closing the console.
-            return P.ExitCode == 0;
+            if (P.ExitCode == 0)
+                return true;
+            else {
+                if (silent) {
+                    string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+                    File.WriteAllText(LogFile, P.StandardError.ReadToEnd());
+                    Run("notepad.exe", LogFile, false);
+                    File.Delete(LogFile);
+                }
+                return false;
+            }
         }
 
         private static string RunToString(string command, string arguments) {
@@ -233,6 +244,15 @@ namespace Business {
             P.Start();
             P.WaitForExit();
             return P.StandardError.ReadToEnd();
+        }
+
+        /// <summary>
+        /// Encloses the command to be passed as 'cmd /c'
+        /// </summary>
+        /// <param name="cmd">The command with arguments.</param>
+        /// <returns>The full command to execute.</returns>
+        private static string CommandPipe(string cmd) {
+            return string.Format(@" /c "" {0} """, cmd);
         }
 
         /// <summary>
@@ -252,8 +272,8 @@ namespace Business {
         /// <param name="log">A file to write the log.</param>
         /// <returns>Whether the operation was completed.</returns>
         private static bool RunFfmpeg(string arguments, string log) {
-            string PipeArgs = string.Format("/c {0}ffmpeg.exe {1} 2> {2}", Settings.AviSynthPluginsPath, arguments, log);
-            return Run("cmd", PipeArgs, true);
+            string PipeArgs = string.Format(@"""{0}ffmpeg.exe"" {1} 2> {2}", Settings.AviSynthPluginsPath, arguments, log);
+            return Run("cmd", CommandPipe(PipeArgs), true);
         }
 
         /// <summary>
@@ -265,17 +285,17 @@ namespace Business {
             File.Delete(settings.OutputFile);
             string PipeArgs;
             if (settings.VideoCodec == VideoCodecs.x264) {
-                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {2} -crf {3} ""{4}""",
+                PipeArgs = string.Format(@"""{0}avs2yuv.exe"" ""{1}"" -o - | ""{0}ffmpeg.exe"" -y -i - -an -c:v libx264 -psy-rd 1:0.05 -preset {2} -crf {3} ""{4}""",
                     Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             } else if (settings.VideoCodec == VideoCodecs.x265) {
-                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v libx265 -preset {2} -crf {3} ""{4}""",
+                PipeArgs = string.Format(@"""{0}avs2yuv.exe"" ""{1}"" -o - | ""{0}ffmpeg.exe"" -y -i - -an -c:v libx265 -preset {2} -crf {3} ""{4}""",
                     Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             } else { // AVI
-                PipeArgs = string.Format(@"/c {0}avs2yuv.exe ""{1}"" -o - | {0}ffmpeg.exe -y -i - -an -c:v utvideo ""{4}""",
+                PipeArgs = string.Format(@"""{0}avs2yuv.exe"" ""{1}"" -o - | ""{0}ffmpeg.exe"" -y -i - -an -c:v utvideo ""{4}""",
                     Settings.AviSynthPluginsPath, settings.ScriptFile, settings.EncodePreset, settings.EncodeQuality, settings.OutputFile);
             }
             //}
-            return Run("cmd", PipeArgs, false);
+            return Run("cmd", CommandPipe(PipeArgs), false);
         }
 
         public static bool RunDeshakerPass(MediaEncoderSettings settings, ExecutingProcessHandler callback) {
@@ -381,7 +401,7 @@ namespace Business {
             foreach (string item in OutStreams) {
                 PosStart = 14;
                 PosEnd = -1;
-                for (int i=PosStart; i<item.Length; i++) {
+                for (int i = PosStart; i < item.Length; i++) {
                     if (!char.IsDigit(item[i])) {
                         PosEnd = i;
                         break;
@@ -397,7 +417,7 @@ namespace Business {
                 PosStart = PosEnd + 2;
                 PosEnd = item.IndexOfAny(new char[] { ' ', ',' }, PosStart);
                 StreamFormat = PosEnd >= 0 ? item.Substring(PosStart, PosEnd - PosStart) : "";
-                if (StreamType == "Video" || StreamType == "Audio") 
+                if (StreamType == "Video" || StreamType == "Audio")
                     Result.Add(new FfmpegStream(file, FileName, StreamType == "Video" ? FfmpegStreamType.Video : FfmpegStreamType.Audio, StreamIndex, StreamFormat));
             }
             return Result;
@@ -410,9 +430,9 @@ namespace Business {
         /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
         public static float? GetAudioGain(MediaEncoderSettings settings) {
             string TempResult = settings.TempFile + ".txt";
-            string Args = string.Format(@"/c Encoder\\ffmpeg.exe -i ""{0}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1",
-                settings.FilePath, TempResult);
-            Run("cmd", Args, true);
+            string Args = string.Format(@"""{0}ffmpeg.exe"" -i ""{1}"" -af ""volumedetect"" -f null null > ""{1}"" 2>&1",
+                Settings.AviSynthPluginsPath, settings.FilePath, TempResult);
+            Run("cmd", CommandPipe(Args), true);
             float? Result = null;
             if (File.Exists(TempResult)) {
                 string FileString = File.ReadAllText(TempResult);
@@ -454,7 +474,7 @@ namespace Business {
             Script.WriteToFile(TempScript);
 
             // Run script.
-            Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o {1}", TempScript, TempOut), true);
+            Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o ""{1}""", TempScript, TempOut), true);
 
             // Read auto crop coordinates
             Rect Result = new Rect();
@@ -584,7 +604,7 @@ namespace Business {
             Script.WriteToFile(TempScript);
 
             // Run script.
-            FfmpegBusiness.Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o {1}", TempScript, TempOut), true);
+            FfmpegBusiness.Run(@"Encoder\avs2yuv.exe", String.Format(@"""{0}"" -o ""{1}""", TempScript, TempOut), true);
 
             // Read frame count
             bool Result = false;
