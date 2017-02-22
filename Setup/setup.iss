@@ -43,10 +43,10 @@
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © Emergence Guardian 2008-2017
+AppCopyright=Copyright © 2016-2017, Spiritual Self Transformation
 VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany=Emergence Guardian
-AppPublisher=Emergence Guardian
+VersionInfoCompany=Spiritual Self Transformation
+AppPublisher=Spiritual Self Transformation
 AppPublisherURL=https://www.spiritualselftransformation.com
 ;AppSupportURL=http://...
 ;AppUpdatesURL=http://...
@@ -128,8 +128,8 @@ Source: "..\Encoder\LSMASHSource.dll"; DestDir: "{app}\Encoder"; Flags: replaces
 Source: "..\Encoder\masktools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\MedianBlur2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\mvtools2.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
-Source: "..\Encoder\NeroAacEnc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
 Source: "..\Encoder\nnedi3.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
+Source: "..\Encoder\opusenc.exe"; DestDir: "{app}\Encoder"; Flags: replacesameversion ignoreversion
 Source: "..\Encoder\ResizeX.avsi"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\RgTools.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
 Source: "..\Encoder\RoboCrop26.dll"; DestDir: "{app}\Encoder"; Flags: replacesameversion
