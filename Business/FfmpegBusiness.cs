@@ -203,8 +203,8 @@ namespace Business {
             Process P = new Process();
             if (silent) {
                 P.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                P.StartInfo.RedirectStandardError = true;
-                P.StartInfo.UseShellExecute = false;
+                //P.StartInfo.RedirectStandardError = true;
+                //P.StartInfo.UseShellExecute = false;
             }
             P.StartInfo.FileName = command;
             P.StartInfo.Arguments = arguments;
@@ -220,17 +220,18 @@ namespace Business {
             P.WaitForExit();
 
             // ExitCode is 0 for normal exit. Different value when closing the console.
-            if (P.ExitCode == 0)
-                return true;
-            else {
-                if (silent) {
-                    string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
-                    File.WriteAllText(LogFile, P.StandardError.ReadToEnd());
-                    Run("notepad.exe", LogFile, false);
-                    File.Delete(LogFile);
-                }
-                return false;
-            }
+            return P.ExitCode == 0;
+            //if (P.ExitCode == 0)
+            //    return true;
+            //else {
+            //    if (silent) {
+            //        string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+            //        File.WriteAllText(LogFile, P.StandardError.ReadToEnd());
+            //        Run("notepad.exe", LogFile, false);
+            //        File.Delete(LogFile);
+            //    }
+            //    return false;
+            //}
         }
 
         private static string RunToString(string command, string arguments) {
