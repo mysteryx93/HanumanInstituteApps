@@ -36,7 +36,8 @@
         <RoutedUICommand x:Key="BuyResources" Text="Buy Resources" />
         <RoutedUICommand x:Key="EnergyTuneUp" Text="Energy Tune-Up" />
         <RoutedUICommand x:Key="OfficialResources" Text="OfficialResources" />
-        <RoutedUICommand x:Key="AboutUs" Text="About Us" />
+        <RoutedUICommand x:Key="AboutPlayer" Text="About Player" />
+        <RoutedUICommand x:Key="AboutAuthor" Text="About Author" />
     </Control.Resources>
     <Control.CommandBindings>
         <CommandBinding Command="{StaticResource StartSession}" Executed="CommandBinding_StartSession" />
@@ -69,7 +70,8 @@
         <CommandBinding Command="{StaticResource ForceOfLife}" Executed="CommandBinding_ForceOfLife" />
         <CommandBinding Command="{StaticResource EnergyTuneUp}" Executed="CommandBinding_EnergyTuneUp" />
         <CommandBinding Command="{StaticResource OfficialResources}" Executed="CommandBinding_OfficialResources" />
-        <CommandBinding Command="{StaticResource AboutUs}" Executed="CommandBinding_AboutUs" />
+        <CommandBinding Command="{StaticResource AboutPlayer}" Executed="CommandBinding_AboutPlayer" />
+        <CommandBinding Command="{StaticResource AboutAuthor}" Executed="CommandBinding_AboutAuthor" />
     </Control.CommandBindings>
     <Control.InputBindings>
         <KeyBinding Key="F5" Command="{StaticResource StartSession}" />
@@ -144,7 +146,8 @@
                 <MenuItem x:Name="menuEnergyTuneUp" Header="_Get Your Energy Reading..." Command="{StaticResource EnergyTuneUp}"/>
                 <MenuItem x:Name="menuOfficialRessources" Header="Official Resources List..." Command="{StaticResource OfficialResources}"/>
                 <Separator />
-                <MenuItem x:Name="menuAbout" Header="_About This Player..." Command="{StaticResource AboutUs}"/>
+                <MenuItem x:Name="menuAbout" Header="_About This Player..." Command="{StaticResource AboutPlayer}"/>
+                <MenuItem x:Name="menuAuthor" Header="_About The Author..." Command="{StaticResource AboutAuthor}"/>
             </MenuItem>
         </Menu>
     </Grid>

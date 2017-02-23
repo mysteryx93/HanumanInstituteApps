@@ -110,7 +110,7 @@ namespace NaturalGroundingPlayer {
                 RatingViewer.UpdatePreference();
                 Business.ClosePlayer();
                 Downloads.Close();
-                App.Current.Shutdown();
+                Application.Current.Shutdown();
             }
         }
 
@@ -149,7 +149,7 @@ namespace NaturalGroundingPlayer {
             catch (Exception ex) {
                 string ErrorMessage = "Cannot connect to database.\r\n" + ex.Message;
                 MessageBox.Show(Main, ErrorMessage, "Natural Grounding Player");
-                App.Current.Shutdown();
+                Application.Current.Shutdown();
             }
         }
 

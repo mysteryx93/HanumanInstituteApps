@@ -19,8 +19,10 @@ namespace PowerliminalsPlayer {
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e) {
-            WmpPlayer.Player.Stop();
-            WmpPlayer.Player.Dispose();
+            if (!App.HasExited) {
+                WmpPlayer.Player.Stop();
+                WmpPlayer.Player.Dispose();
+            }
         }
 
         private void Player_MediaStop(object sender, EventArgs e) {

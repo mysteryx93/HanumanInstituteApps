@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace _432hz_Player {
+namespace PowerliminalsPlayer {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>

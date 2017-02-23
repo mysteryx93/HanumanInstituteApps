@@ -10,5 +10,11 @@ namespace PowerliminalsPlayer {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
+        public static bool HasExited = false;
+
+        protected override void OnExit(ExitEventArgs e) {
+            HasExited = true;
+            base.OnExit(e);
+        }
     }
 }

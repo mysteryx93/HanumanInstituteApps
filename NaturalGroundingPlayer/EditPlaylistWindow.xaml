@@ -19,9 +19,9 @@
         <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="11" Margin="0,0,90,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
         <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="62,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,17,0,0" HorizontalAlignment="Left"/>
-        <Rectangle Fill="#FFE4FFE4" HorizontalAlignment="Left" Margin="37,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom"/>
+        <Rectangle Fill="#FFE4FFE4" HorizontalAlignment="Left" Margin="37,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom" RadiusX="4" RadiusY="4" />
         <TextBlock HorizontalAlignment="Left" Margin="60,0,0,13" Text="Not in database" Height="16" VerticalAlignment="Bottom"/>
-        <Rectangle Fill="#FFFFDADA" HorizontalAlignment="Left" Margin="171,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom"/>
+        <Rectangle Fill="#FFFFDADA" HorizontalAlignment="Left" Margin="171,0,0,11" Stroke="Black" Width="18" Height="18" VerticalAlignment="Bottom" RadiusX="4" RadiusY="4" />
         <TextBlock HorizontalAlignment="Left" Margin="194,0,0,13" Text="File not found" Height="16" VerticalAlignment="Bottom"/>
         <ComboBox x:Name="MediaTypeCombo" HorizontalAlignment="Left" Margin="88,49,0,0" VerticalAlignment="Top" Width="81" SelectionChanged="Settings_Changed" SelectedIndex="{Binding MediaType, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="5">
             <ComboBoxItem Content="Videos" />

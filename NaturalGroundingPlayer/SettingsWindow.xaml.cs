@@ -99,7 +99,7 @@ namespace NaturalGroundingPlayer {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             if (Settings.SavedFile == null)
-                App.Current.Shutdown();
+                Application.Current.Shutdown();
         }
 
         private void BrowseFolder_Click(object sender, RoutedEventArgs e) {

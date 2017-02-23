@@ -357,8 +357,12 @@ namespace NaturalGroundingPlayer {
             Process.Start(new ProcessStartInfo("http://sexenergysuccess.com/natural-grounding-resources-official/"));
         }
 
-        private void CommandBinding_AboutUs(object sender, ExecutedRoutedEventArgs e) {
+        private void CommandBinding_AboutPlayer(object sender, ExecutedRoutedEventArgs e) {
             AboutWindow.Instance();
+        }
+
+        private void CommandBinding_AboutAuthor(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("https://www.spiritualselftransformation.com/about-us/bio"));
         }
 
         private void Downloads_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {

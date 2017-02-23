@@ -3,64 +3,18 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
-namespace NaturalGroundingPlayer {
+namespace PowerliminalsPlayer {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
-    {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            // Set content vertical align for all textboxes
-            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.LoadedEvent,
-                new RoutedEventHandler(TextLoaded));
-            // Select the text in a TextBox when it receives focus.
-            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
-                new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
-            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotKeyboardFocusEvent,
-                new RoutedEventHandler(SelectAllText));
-            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.MouseDoubleClickEvent,
-                new RoutedEventHandler(SelectAllText));
-            base.OnStartup(e);
-        }
+    public partial class App : Application {
+        public static bool HasExited = false;
 
-        void TextLoaded(object sender, RoutedEventArgs e) {
-            TextBox obj = sender as TextBox;
-            if (obj.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
-                obj.VerticalContentAlignment = VerticalAlignment.Center;
-        }
-
-        void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
-        {
-            // Find the TextBox
-            DependencyObject parent = e.OriginalSource as UIElement;
-            while (parent != null && !(parent is TextBox))
-                parent = VisualTreeHelper.GetParent(parent);
-
-            if (parent != null)
-            {
-                var textBox = (TextBox)parent;
-                if (!textBox.IsKeyboardFocusWithin)
-                {
-                    // If the text box is not yet focused, give it the focus and
-                    // stop further processing of this click event.
-                    textBox.Focus();
-                    e.Handled = true;
-                }
-            }
-        }
-
-        void SelectAllText(object sender, RoutedEventArgs e)
-        {
-            var textBox = e.OriginalSource as TextBox;
-            if (textBox != null && textBox.VerticalScrollBarVisibility != ScrollBarVisibility.Visible)
-                textBox.SelectAll();
+        protected override void OnExit(ExitEventArgs e) {
+            HasExited = true;
+            base.OnExit(e);
         }
     }
 }
