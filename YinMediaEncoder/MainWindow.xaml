@@ -30,7 +30,7 @@
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                <GradientStop Color="#FF75C7C1" Offset="1"/>
+                <GradientStop Color="#FF93C775" Offset="1"/>
                 <GradientStop Color="White"/>
             </LinearGradientBrush>
         </Grid.Background>

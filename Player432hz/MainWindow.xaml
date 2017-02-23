@@ -13,22 +13,22 @@
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                <GradientStop Color="#FF75C7C1" Offset="1"/>
+                <GradientStop Color="#FFCDA791" Offset="1"/>
                 <GradientStop Color="White"/>
             </LinearGradientBrush>
         </Grid.Background>
         <Grid Margin="174,8,10,0" Height="104" VerticalAlignment="Top" Name="GridFolders">
             <Button x:Name="AddFolderButton" Content="Add" HorizontalAlignment="Right" Margin="0,0,80,0" VerticalAlignment="Top" Width="75" Click="AddFolderButton_Click" TabIndex="6"/>
-            <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders}" Height="81" VerticalAlignment="Top" TabIndex="5" />
+            <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders}" Height="81" VerticalAlignment="Top" TabIndex="5" Background="{x:Null}" />
             <Button x:Name="RemoveFolderButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" Click="RemoveFolderButton_Click" TabIndex="7"/>
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top" FontWeight="Bold"/>
-            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="18" Margin="80,2,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4"/>
+            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="18" Margin="80,2,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
         </Grid>
         <Business:WmpPlayerControl x:Name="AudioPlayer" Height="45" Margin="10,0,10,10" VerticalAlignment="Bottom" Loop="False" TabIndex="10"/>
-        <ListBox x:Name="FilesList" Margin="174,144,10,81" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" />
+        <ListBox x:Name="FilesList" Margin="174,144,10,81" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" Background="{x:Null}" />
         <TextBlock HorizontalAlignment="Left" Margin="174,125,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
         <Button x:Name="PlayButton" Content="Play" HorizontalAlignment="Right" Margin="0,121,10,0" VerticalAlignment="Top" Width="75" Click="PlayButton_Click" TabIndex="9"/>
-        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,31,0,81" Width="146" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectionChanged="PlaylistsList_SelectionChanged" TabIndex="1" MouseDoubleClick="PlaylistsList_MouseDoubleClick" />
+        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,31,0,81" Width="146" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectionChanged="PlaylistsList_SelectionChanged" TabIndex="1" MouseDoubleClick="PlaylistsList_MouseDoubleClick" Background="{x:Null}" />
         <TextBlock HorizontalAlignment="Left" Margin="10,12,0,0" Text="Playlists" VerticalAlignment="Top" FontWeight="Bold"/>
         <Button x:Name="AddPlaylistButton" Content="Add" HorizontalAlignment="Left" Margin="67,8,0,0" VerticalAlignment="Top" Width="50" Click="AddPlaylistButton_Click" TabIndex="2" />
         <Button x:Name="RemovePlaylistButton" Content="Del" HorizontalAlignment="Left" Margin="122,8,0,0" VerticalAlignment="Top" Width="34" Click="RemovePlaylistButton_Click" TabIndex="3" />
