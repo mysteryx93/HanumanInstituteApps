@@ -371,7 +371,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void CommandBinding_AppPlayer432hz(object sender, ExecutedRoutedEventArgs e) {
-            Process.Start(new ProcessStartInfo("Player432hz.exe"));
+            Process.Start(new ProcessStartInfo("432hzPlayer.exe"));
         }
 
         private void CommandBinding_AppPowerliminalsPlayer(object sender, ExecutedRoutedEventArgs e) {
