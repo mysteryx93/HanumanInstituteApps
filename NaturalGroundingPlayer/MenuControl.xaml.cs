@@ -369,5 +369,21 @@ namespace NaturalGroundingPlayer {
             if (!SessionCore.Instance.Downloads.IsVisible)
                 menuViewDownloads.IsChecked = false;
         }
+
+        private void CommandBinding_AppPlayer432hz(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("Player432hz.exe"));
+        }
+
+        private void CommandBinding_AppPowerliminalsPlayer(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("PowerliminalsPlayer.exe"));
+        }
+
+        private void CommandBinding_AppYinMediaEncoder(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("YinMediaEncoder.exe"));
+        }
+
+        private void CommandBinding_AppAudioVideoMuxer(object sender, ExecutedRoutedEventArgs e) {
+            Process.Start(new ProcessStartInfo("AudioVideoMuxer.exe"));
+        }
     }
 }

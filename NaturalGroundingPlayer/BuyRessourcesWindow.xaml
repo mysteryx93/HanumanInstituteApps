@@ -9,8 +9,8 @@
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
         <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
     </Window.Resources>
-    <Grid>
-        <ListView x:Name="VideosView" TabIndex="7" SelectionMode="Single" SelectedValuePath="MediaId" Margin="10,72,9,37" ButtonBase.Click="VideosView_ColumnHeaderClick">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListView x:Name="VideosView" TabIndex="7" SelectionMode="Single" SelectedValuePath="MediaId" Margin="10,93,9,37" ButtonBase.Click="VideosView_ColumnHeaderClick">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Artist, Mode=OneWay}" Header="Artist" Width="100"/>
@@ -69,25 +69,21 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <TabControl x:Name="ProductsTab" HorizontalAlignment="Left" Height="22" Margin="10,50,0,0" VerticalAlignment="Top" Width="264" SelectionChanged="ProductsTab_SelectionChanged" TabIndex="6" KeyboardNavigation.TabNavigation="Local">
-            <TabItem Header="Premium Products" />
-            <TabItem Header="Videos" />
-            <TabItem Header="Music" />
-            <TabItem Header="Other" />
-        </TabControl>
         <Button x:Name="EditButton" Width="75" VerticalAlignment="Bottom" TabIndex="10" Margin="0,0,10,10" IsDefault="True" Height="22" HorizontalAlignment="Right" Content="Edit" Click="EditButton_Click"/>
         <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="9" Margin="0,0,90,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
         <CheckBox x:Name="ShowMissing" Content="Show Only _Missing" HorizontalAlignment="Left" Margin="10,0,0,13" VerticalAlignment="Bottom" RenderTransformOrigin="0.235,-0.25" TabIndex="8" Click="ShowMissing_Click"/>
-        <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="56,15,0,0" Height="23" HorizontalAlignment="Left" PreviewKeyDown="SearchText_PreviewKeyDown" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,17,0,0" HorizontalAlignment="Left"/>
-        <ComboBox x:Name="RatingCategoryCombo" HorizontalAlignment="Left" Margin="281,16,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="Settings_Changed" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />
-        <TextBlock VerticalAlignment="Top" Text="Rating" Margin="240,17,0,0" HorizontalAlignment="Left"/>
-        <ComboBox x:Name="RatingOperatorCombo" HorizontalAlignment="Left" Margin="428,16,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding RatingOperator, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="3">
+        <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="56,65,0,0" Height="23" HorizontalAlignment="Left" PreviewKeyDown="SearchText_PreviewKeyDown" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,67,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingCategoryCombo" HorizontalAlignment="Left" Margin="281,66,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="Settings_Changed" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />
+        <TextBlock VerticalAlignment="Top" Text="Rating" Margin="240,67,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingOperatorCombo" HorizontalAlignment="Left" Margin="428,66,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding RatingOperator, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="3">
             <ComboBoxItem Content="&gt;=" />
             <ComboBoxItem Content="=" />
             <ComboBoxItem Content="&lt;" />
         </ComboBox>
-        <TextBox x:Name="RatingValueText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="479,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, ConverterParameter=12, Converter={StaticResource RatingConverter}, Mode=TwoWay}"/>
+        <TextBox x:Name="RatingValueText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="479,65,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, ConverterParameter=12, Converter={StaticResource RatingConverter}, Mode=TwoWay}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold"><Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals" RequestNavigate="Hyperlink_RequestNavigate" ><Run Text="Get Powerliminals"/></Hyperlink></TextBlock>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="12,28,0,0" TextWrapping="Wrap" Text="Many of the traditional resources below are out of stock. Register to be notified when they become available, and if enough people request it, they might refill their stocks. They've done so a few times." VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

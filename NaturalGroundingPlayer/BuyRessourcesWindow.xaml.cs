@@ -42,7 +42,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
-            SessionCore.Instance.Business.SetEditorModeAsync(true);
+            await SessionCore.Instance.Business.SetEditorModeAsync(true);
 
             timerChangeFilters = new DispatcherTimer();
             timerChangeFilters.Interval = TimeSpan.FromSeconds(1);
@@ -54,9 +54,9 @@ namespace NaturalGroundingPlayer {
             await LoadDataAsync();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             if (SessionCore.Instance.Business.IsStarted && !SessionCore.Instance.Business.IsPaused)
-                SessionCore.Instance.Business.SetEditorModeAsync(false);
+                await SessionCore.Instance.Business.SetEditorModeAsync(false);
             if (callback != null)
                 callback();
         }
@@ -68,7 +68,7 @@ namespace NaturalGroundingPlayer {
             else
                 settings.OrderBy = lastHeaderClicked.HeaderStringFormat;
             settings.OrderByDirection = lastDirection;
-            await business.LoadBuyListAsync(settings, (BuyProductType)ProductsTab.SelectedIndex, !ShowMissing.IsChecked.Value);
+            await business.LoadBuyListAsync(settings, BuyProductType.Videos, !ShowMissing.IsChecked.Value);
             DisplayData();
             isLoading = false;
         }

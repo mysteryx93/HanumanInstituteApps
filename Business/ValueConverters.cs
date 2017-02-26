@@ -268,13 +268,9 @@ namespace Business {
 
             double NumValue = 0;
 
-            try {
-                if (((string)value).Length > 0)
-                    NumValue = double.Parse((String)value);
-            }
-            catch (Exception e) {
-                return new ValidationResult(false, "Illegal characters or " + e.Message);
-            }
+            if (((string)value).Length > 0)
+                if (!double.TryParse((String)value, out NumValue))
+                    return new ValidationResult(false, "Invalid number");
 
             if ((Min.HasValue && NumValue < Min) || (Max.HasValue && NumValue > Max))
                 return new ValidationResult(false, "Please enter a value in the range: " + Min + " - " + Max);

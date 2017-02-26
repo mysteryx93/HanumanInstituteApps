@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:NaturalGroundingPlayer" x:Class="NaturalGroundingPlayer.DistributionGraphWindow"
         Title="Rating Distribution Graph" Height="515" Width="525" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" MinWidth="525" MinHeight="300">
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <ComboBox x:Name="GraphTypeCombo" HorizontalAlignment="Left" Margin="136,13,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="GraphTypeCombo_SelectionChanged" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />
         <TextBlock VerticalAlignment="Top" Margin="27,14,0,0" HorizontalAlignment="Left"><Run Text="Graph"/><Run Text=" Type"/></TextBlock>
         <Grid HorizontalAlignment="Left" Height="208" Margin="14,48,0,0" VerticalAlignment="Top" Width="485">

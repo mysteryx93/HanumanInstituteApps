@@ -7,8 +7,8 @@
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
         <Business:RatingConverter x:Key="RatingConverter"/>
     </Window.Resources>
-    <Grid>
-        <ListView x:Name="FilesView" Margin="10,50,10,37" SelectedValuePath="VideoId" TabIndex="3" SelectionChanged="FilesView_SelectionChanged">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListView x:Name="FilesView" Margin="10,50,10,37" SelectedValuePath="VideoId" TabIndex="3" SelectionChanged="FilesView_SelectionChanged" Background="{x:Null}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn>

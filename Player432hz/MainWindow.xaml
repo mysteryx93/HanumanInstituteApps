@@ -10,13 +10,7 @@
     <Window.Resources>
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
     </Window.Resources>
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                <GradientStop Color="#FFCDA791" Offset="1"/>
-                <GradientStop Color="White"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <Grid Margin="174,8,10,0" Height="104" VerticalAlignment="Top" Name="GridFolders">
             <Button x:Name="AddFolderButton" Content="Add" HorizontalAlignment="Right" Margin="0,-1,80,0" VerticalAlignment="Top" Width="75" Click="AddFolderButton_Click" TabIndex="6"/>
             <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders}" Height="81" VerticalAlignment="Top" TabIndex="5" Background="{x:Null}" />

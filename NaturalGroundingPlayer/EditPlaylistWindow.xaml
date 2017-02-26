@@ -14,7 +14,7 @@
         <Business:RatingConverter x:Key="RatingConverter"/>
         <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <Button x:Name="EditButton" Width="75" VerticalAlignment="Bottom" TabIndex="12" Margin="0,0,10,10" IsDefault="True" Height="22" HorizontalAlignment="Right" Content="Edit" Click="EditButton_Click"/>
         <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="11" Margin="0,0,90,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
         <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="62,15,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

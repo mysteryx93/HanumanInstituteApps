@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:PowerliminalsPlayer"
         mc:Ignorable="d"
         Title="Save Preset As..." Height="289.85" Width="205.263" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Icon="App.ico" Loaded="Window_Loaded">
-    <Grid>
-        <ListBox x:Name="PresetList" Margin="0,21,-0.737,27.85" TabIndex="1" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectionChanged="PresetList_SelectionChanged" MouseDoubleClick="PresetList_MouseDoubleClick"/>
-        <TextBox x:Name="NameBox" Height="20" Margin="0,1,0.263,0" TextWrapping="Wrap" Text="New Preset" VerticalAlignment="Top" TabIndex="0"/>
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListBox x:Name="PresetList" Margin="0,21,-0.737,27.85" TabIndex="1" ItemsSource="{Binding}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectionChanged="PresetList_SelectionChanged" MouseDoubleClick="PresetList_MouseDoubleClick" Background="{x:Null}"/>
+        <TextBox x:Name="NameBox" Height="20" Margin="0,1,0.263,0" TextWrapping="Wrap" Text="New Preset" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}"/>
         <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="4" Margin="0,0,4.263,2.85" IsDefault="True" Click="OkButton_Click"/>
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="3" Margin="0,0,79.263,2.85" IsCancel="True" Click="CancelButton_Click"/>
         <Button x:Name="DelButton" Content="Del" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="30" TabIndex="2" Margin="0,0,154.263,2.85" Click="DelButton_Click" />

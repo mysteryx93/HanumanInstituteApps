@@ -8,7 +8,7 @@
         <Business:FileSizeConverter x:Key="FileSizeConverter"/>
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <TextBlock HorizontalAlignment="Left" Margin="34,40,0,0" VerticalAlignment="Top"><Run Text="File"/><Run Text=" Name:"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="135,40,0,0" Text="{Binding OldFileName}" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="34,61,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">

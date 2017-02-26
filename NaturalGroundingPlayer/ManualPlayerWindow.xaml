@@ -24,17 +24,11 @@
     </Control.InputBindings>
     <DockPanel>
         <ContentControl x:Name="MainMenuContainer" DockPanel.Dock="Top" Focusable="False" />
-        <Grid Margin="0,0,0,0">
+        <Grid Margin="0,0,0,0" Style="{DynamicResource GradiantBackground}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="401*"/>
                 <RowDefinition x:Name="LayersRow" Height="0"/>
             </Grid.RowDefinitions>
-            <Grid.Background>
-                <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                    <GradientStop Color="#FF75C7C1" Offset="1"/>
-                    <GradientStop Color="White"/>
-                </LinearGradientBrush>
-            </Grid.Background>
             <TextBlock x:Name="txtCurrentVideo" HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" Height="16" Margin="0,68,0,0"/>
             <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="Now Playing" VerticalAlignment="Top" Width="79" Height="16" Margin="0,51,88,0"/>
             <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="Session Time" VerticalAlignment="Top" Width="79" Height="16" Margin="0,342,88,0"/>

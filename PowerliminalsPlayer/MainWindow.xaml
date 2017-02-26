@@ -6,14 +6,7 @@
         xmlns:local="clr-namespace:PowerliminalsPlayer"
         mc:Ignorable="d"
         Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183" Icon="App.ico" Closing="Window_Closing" Loaded="Window_Loaded">
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                <GradientStop Color="#FF8ED473" Offset="1"/>
-                <GradientStop Color="White"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-
+    <Grid Style="{DynamicResource GradiantBackground}">
         <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,420,0" Text="Volume" VerticalAlignment="Top" Visibility="Visible"/>
         <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1" TickFrequency="10" HorizontalAlignment="Right" Width="99" Visibility="Visible" Height="18" VerticalAlignment="Top" Value="{Binding MasterVolume}"/>
         <ScrollViewer HorizontalAlignment="Right" Width="302">

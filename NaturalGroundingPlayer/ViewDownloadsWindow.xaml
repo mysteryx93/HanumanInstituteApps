@@ -11,8 +11,8 @@
             <MenuItem x:Name="menuEdit" Header="_Edit" Click="menuEdit_Click" />
         </ContextMenu>
     </Window.Resources>
-    <Grid>
-        <ListView x:Name="DownloadsView" SelectionMode="Single">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListView x:Name="DownloadsView" SelectionMode="Single" Background="{x:Null}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Title}" Header="Title" Width="340"/>

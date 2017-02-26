@@ -6,7 +6,7 @@
     <Window.Resources>
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <TextBox HorizontalAlignment="Left" Height="21" Margin="190,21,0,0" VerticalAlignment="Top" Width="283" Text="{Binding NaturalGroundingFolder, Mode=TwoWay}" TabIndex="1"/>
         <TextBlock HorizontalAlignment="Left" Margin="18,22,0,0" TextWrapping="Wrap" Text="Natural Grounding Folder" VerticalAlignment="Top" />
         <TextBox x:Name="SvpPathText" HorizontalAlignment="Left" Height="21" Margin="190,73,0,0" VerticalAlignment="Top" Width="283" Text="{Binding SvpPath, Mode=TwoWay}" TabIndex="7"  IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />

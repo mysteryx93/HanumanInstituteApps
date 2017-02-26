@@ -11,17 +11,11 @@
         <ContentControl x:Name="MainMenuContainer" DockPanel.Dock="Top" Focusable="False">
             <w:MenuControl x:Name="MainMenu" />
         </ContentControl>
-        <Grid Margin="0,0,0,0">
+        <Grid Margin="0,0,0,0" Style="{DynamicResource GradiantBackground}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="281*"/>
                 <RowDefinition x:Name="LayersRow" Height="0"/>
             </Grid.RowDefinitions>
-            <Grid.Background>
-                <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                    <GradientStop Color="#FF75C7C1" Offset="1"/>
-                    <GradientStop Color="White"/>
-                </LinearGradientBrush>
-            </Grid.Background>
             <Slider x:Name="GrowthSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="191" Height="26" Maximum="0.8" LargeChange="0.4" TickPlacement="BottomRight" TickFrequency="0.4" SmallChange="0.05" Minimum="-0.8" Value="0.3" ValueChanged="Settings_Changed" TabIndex="6" Margin="104,186,0,0" Foreground="#FF828282"/>
             <Slider x:Name="ToleranceSlider" HorizontalAlignment="Left" VerticalAlignment="Top" Width="191" Height="26" Maximum="3" LargeChange="0.4" TickPlacement="BottomRight" TickFrequency="0.5" Value="0.8" ValueChanged="Settings_Changed" TabIndex="7" Margin="104,217,0,0" Foreground="#FF828282" SmallChange="0.2"/>
             <TextBlock HorizontalAlignment="Left" Text="{Binding Value, ElementName=GrowthSlider, Mode=OneWay, StringFormat=\{0:0.00\}}" VerticalAlignment="Top" Height="26" Padding="0,2,0,0" Width="52" Margin="300,186,0,0"/>

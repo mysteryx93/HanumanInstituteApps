@@ -7,7 +7,7 @@
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
         <Business:RatingConverter x:Key="RatingConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
 
         <TextBox x:Name="SearchText" Width="238" VerticalAlignment="Top" TabIndex="1" Text="{Binding Search, Mode=TwoWay}" Margin="76,15,0,0" Height="23" HorizontalAlignment="Left"/>
         <TextBlock VerticalAlignment="Top" Text="Filter" Margin="12,17,0,0" HorizontalAlignment="Left"/>
