@@ -16,11 +16,11 @@ Natural Grounding is a very deep topic. I'm currently writing two books to prope
 [Join the Natural Grounding community on Facebook here.](https://www.facebook.com/groups/sxenergytransformationalentertainment/)
 
 ## Screenshots
-<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot1.png">Main Window</a>
+<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot1.png">Natural Grounding Player</a>
 
-<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot2.png">Playlist Editor</a>
+<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot2.png">432hz Player</a>
 
-<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot3.png">Media Encoder</a>
+<a href="https://raw.githubusercontent.com/mysteryx93/NaturalGroundingPlayer/master/Setup/Screenshots/Screenshot3.png">Yin Media Encoder</a>
 
 ## Best Video Catalog
 
