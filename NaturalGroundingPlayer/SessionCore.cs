@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 using Business;
-using DataAccess;
 using System.Threading;
-using System.Windows.Controls;
+using EmergenceGuardian.WpfCommon;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

@@ -41,7 +41,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
-            SessionCore.Instance.Business.SetEditorModeAsync(true);
+            await SessionCore.Instance.Business.SetEditorModeAsync(true);
 
             business.DownloadManager = SessionCore.Instance.Business.DownloadManager;
             timerChangeFilters = new DispatcherTimer();
@@ -55,8 +55,8 @@ namespace NaturalGroundingPlayer {
             isLoaded = true;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            SessionCore.Instance.Business.SetEditorModeAsync(false);
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            await SessionCore.Instance.Business.SetEditorModeAsync(false);
             if (ScanCancel != null)
                 ScanCancel.Cancel();
             if (callback != null)

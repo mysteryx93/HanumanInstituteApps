@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
+using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.WpfCommon;
 
 namespace AudioVideoMuxer {
     /// <summary>
@@ -21,7 +19,7 @@ namespace AudioVideoMuxer {
 
         public MainWindow Owner { get; set; }
         ObservableCollection<FileItem> files = new ObservableCollection<FileItem>();
-        ObservableCollection<FfmpegStream> sourceStreams = new ObservableCollection<FfmpegStream>();
+        ObservableCollection<UIFileStream> sourceStreams = new ObservableCollection<UIFileStream>();
 
         private void Page_Loaded(object sender, RoutedEventArgs e) {
             FilesList.DataContext = files;
@@ -34,20 +32,24 @@ namespace AudioVideoMuxer {
                 if (!string.IsNullOrEmpty(Result) && !files.Any(f => f.Path == Result)) {
                     string FileName = Path.GetFileName(Result);
 
-                    List<FfmpegStream> FileInfo = FfmpegBusiness.GetStreamList(Result);
+                    List<FFmpegStreamInfo> FileInfo = MediaMuxer.GetFileInfo(Result, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
                     if (files.Count == 0) {
                         // Store streams of first file.
-                        foreach (FfmpegStream item in FileInfo) {
-                            sourceStreams.Add(item);
+                        foreach (FFmpegStreamInfo item in FileInfo) {
+                            sourceStreams.Add(new UIFileStream(item, Result));
                         }
                     } else {
                         // Make sure streams match the first file.
                         bool Mismatch = false;
-                        for (int i=0; i<FileInfo.Count; i++) {
-                            if (FileInfo.Count != sourceStreams.Count || FileInfo[i].Type != sourceStreams[i].Type || FileInfo[i].Format != sourceStreams[i].Format) {
-                                Mismatch = true;
-                                MessageBox.Show("Streams don't match the first media file.", "Validation");
-                                break;
+                        if (FileInfo.Count != sourceStreams.Count)
+                            Mismatch = true;
+                        else {
+                            for (int i = 0; i < FileInfo.Count; i++) {
+                                if (FileInfo[i].StreamType != sourceStreams[i].Type || FileInfo[i].Format != sourceStreams[i].Format) {
+                                    Mismatch = true;
+                                    MessageBox.Show("Streams don't match the first media file.", "Validation");
+                                    break;
+                                }
                             }
                         }
                         if (Mismatch)

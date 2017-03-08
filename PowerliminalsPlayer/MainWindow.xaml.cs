@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using Business;
-using System.IO;
 using System.Windows.Input;
 using System.Diagnostics;
+using EmergenceGuardian.WpfCommon;
 
 namespace PowerliminalsPlayer {
     /// <summary>

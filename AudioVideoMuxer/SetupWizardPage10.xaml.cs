@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
+using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.WpfCommon;
 
 namespace AudioVideoMuxer {
     /// <summary>
@@ -21,7 +19,7 @@ namespace AudioVideoMuxer {
 
         public MainWindow Owner { get; set; }
         ObservableCollection<FileItem> files = new ObservableCollection<FileItem>();
-        ObservableCollection<FfmpegStream> fileStreams = new ObservableCollection<FfmpegStream>();
+        ObservableCollection<UIFileStream> fileStreams = new ObservableCollection<UIFileStream>();
 
         private void Page_Loaded(object sender, RoutedEventArgs e) {
             FilesList.DataContext = files;
@@ -33,42 +31,20 @@ namespace AudioVideoMuxer {
             if (!string.IsNullOrEmpty(Result) && !files.Any(f => f.Path == Result)) {
                 string FileName = Path.GetFileName(Result);
 
-                List<FfmpegStream> FileInfo = FfmpegBusiness.GetStreamList(Result);
-                foreach (FfmpegStream item in FileInfo) {
-                    fileStreams.Add(item);
-                }
-
-                //MediaInfoReader InfoReader = new MediaInfoReader();
-                //InfoReader.LoadInfo(Result);
-
-                //string StreamFormat = InfoReader.GetVideoFormat(0);
-                //int Index = 0;
-                //while (!string.IsNullOrEmpty(StreamFormat)) {
-                //    HasStream = true;
-                //    fileStreams.Add(new FfmpegStream(Result, FileName, FfmpegStreamType.Video, Index, StreamFormat));
-                //    Index++;
-                //    StreamFormat = InfoReader.GetVideoFormat(Index);
-                //}
-
-                //StreamFormat = InfoReader.GetAudioFormat(0);
-                //Index = 0;
-                //while (!string.IsNullOrEmpty(StreamFormat)) {
-                //    HasStream = true;
-                //    fileStreams.Add(new FfmpegStream(Result, FileName, FfmpegStreamType.Audio, Index, StreamFormat));
-                //    Index++;
-                //    StreamFormat = InfoReader.GetAudioFormat(Index);
-                //}
-
-                if (FileInfo.Count > 0)
+                List<FFmpegStreamInfo> FileInfo = MediaMuxer.GetFileInfo(Result, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
+                if (FileInfo != null && FileInfo.Count > 0) {
                     files.Add(new FileItem(Result, FileName));
-                else
+                    foreach (FFmpegStreamInfo item in FileInfo) {
+                        fileStreams.Add(new UIFileStream(item, Result));
+                    }
+                } else
                     MessageBox.Show("No video or audio stream found in file.", "Validation");
             }
         }
 
         public bool Validate() {
             Owner.Business.Clear();
-            foreach (FfmpegStream item in fileStreams.Where(s => s.IsChecked)) {
+            foreach (UIFileStream item in fileStreams.Where(s => s.IsChecked)) {
                 Owner.Business.FileStreams.Add(item);
             }
             if (Owner.Business.FileStreams.Count() > 0)

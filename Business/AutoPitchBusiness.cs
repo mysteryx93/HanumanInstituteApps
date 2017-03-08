@@ -17,6 +17,9 @@ namespace Business {
         /// <param name="video">The video for which to create the auto-pitch script file.</param>
         /// <returns>Whether auto-pitch is enabled for this video.</returns>
         public static bool AppyAutoPitch(Media video) {
+            if (!File.Exists(Settings.NaturalGroundingFolder + video.FileName))
+                return false;
+
             using (MediaInfoReader InfoReader = new MediaInfoReader()) {
                 InfoReader.LoadInfo(Settings.NaturalGroundingFolder + video.FileName);
                 if (Settings.SavedFile.ChangeAudioPitch && InfoReader.PixelAspectRatio == 1 && !video.DisablePitch && (InfoReader.BitDepth ?? 8) == 8) {

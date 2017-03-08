@@ -3,10 +3,9 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Windows;
 using Business;
-using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Controls.Primitives;
+using EmergenceGuardian.WpfCommon;
 
 namespace Player432hz {
     /// <summary>

@@ -7,8 +7,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Navigation;
 using NaturalGroundingPlayer;
-using DataAccess;
 using System.Windows.Controls;
+using DataAccess;
+using EmergenceGuardian.WpfCommon;
 
 namespace YinMediaEncoder {
     /// <summary>

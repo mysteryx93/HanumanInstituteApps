@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using Business;
 using DataAccess;
 using System.Windows.Media;
+using EmergenceGuardian.WpfCommon;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

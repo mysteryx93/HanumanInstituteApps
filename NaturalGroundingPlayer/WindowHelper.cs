@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Business;
 using System.Windows.Controls;
+using Business;
+using EmergenceGuardian.WpfCommon;
 
 namespace NaturalGroundingPlayer {
     public class WindowHelper {

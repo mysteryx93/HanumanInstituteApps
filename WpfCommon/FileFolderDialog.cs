@@ -1,26 +1,22 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Reflection;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Business {
+namespace EmergenceGuardian.WpfCommon {
     public static class FileFolderDialog {
         public static string ShowFolderDialog(string defaultPath) {
             return ShowFolderDialog(defaultPath, true);
         }
 
         public static string ShowFolderDialog(string defaultPath, bool allowCreate) {
-            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.ShowNewFolderButton = allowCreate;
             try {
                 if (!string.IsNullOrEmpty(defaultPath))
                     dlg.SelectedPath = Path.GetDirectoryName(defaultPath);
             }
             catch { }
-            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+            if (dlg.ShowDialog() == DialogResult.OK) {
                 if (dlg.SelectedPath.EndsWith("\\"))
                     return dlg.SelectedPath;
                 else

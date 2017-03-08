@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Business;
+using EmergenceGuardian.FFmpeg;
 
 namespace AudioVideoMuxer {
     /// <summary>
@@ -12,7 +10,7 @@ namespace AudioVideoMuxer {
     /// </summary>
     public class MuxerBusiness {
         public ObservableCollection<FileItem> Files = new ObservableCollection<FileItem>();
-        public ObservableCollection<FfmpegStream> FileStreams = new ObservableCollection<FfmpegStream>();
+        public ObservableCollection<FFmpegStream> FileStreams = new ObservableCollection<FFmpegStream>();
         public string OutputFile;
 
         public void Clear() {
@@ -21,16 +19,16 @@ namespace AudioVideoMuxer {
             OutputFile = null;
         }
 
-        public List<FfmpegStream> GetStreamList(string file) {
-            return FfmpegBusiness.GetStreamList(file);
+        public List<FFmpegStreamInfo> GetStreamList(string file) {
+            return MediaMuxer.GetFileInfo(file, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
         }
 
         public bool StartMuxe() {
-            return FfmpegBusiness.JoinAudioVideoMuxer(FileStreams, OutputFile, false, true);
+            return MediaMuxer.Muxe(FileStreams, OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Muxing Media Files")) == CompletedStatus.Success;
         }
 
         public bool StartMerge() {
-            return FfmpegBusiness.ConcatenateFiles(Files.Select(f => f.Path).ToList(), OutputFile, true);
+            return MediaMuxer.ConcatenateFiles(Files.Select(f => f.Path).ToList(), OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Merging Media Files")) == CompletedStatus.Success;
         }
 
         public bool StartSplit() {

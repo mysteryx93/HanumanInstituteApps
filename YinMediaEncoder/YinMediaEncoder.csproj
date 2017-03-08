@@ -211,6 +211,10 @@
       <Project>{d711e72d-4cde-4a5e-8fbb-216f0aa8d6d4}</Project>
       <Name>NaturalGroundingPlayer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WpfCommon\WpfCommon.csproj">
+      <Project>{44727313-5673-4089-b664-894cd3ae7c2f}</Project>
+      <Name>WpfCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.png" />

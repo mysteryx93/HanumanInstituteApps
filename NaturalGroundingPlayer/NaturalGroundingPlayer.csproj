@@ -480,6 +480,10 @@
       <Project>{fdaf09a3-6c17-480a-95d7-5fdc19ec85ee}</Project>
       <Name>MediaPlayer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WpfCommon\WpfCommon.csproj">
+      <Project>{44727313-5673-4089-b664-894cd3ae7c2f}</Project>
+      <Name>WpfCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\delete.png" />
