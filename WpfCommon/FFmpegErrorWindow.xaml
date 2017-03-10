@@ -8,7 +8,7 @@
         Title="ErrorWindow" Height="477.068" Width="578.571">
     <Grid>
         <TextBox x:Name="OutputText" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Margin="0,0,0,26" />
-        <Button x:Name="CloseButton" Content="_Close" HorizontalAlignment="Right" Margin="0,425,10,0" VerticalAlignment="Top" Width="80" IsDefault="True" IsCancel="True" Click="CloseButton_Click"/>
+        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,-1" VerticalAlignment="Bottom" IsDefault="True" IsCancel="True" Click="CloseButton_Click" HorizontalAlignment="Right" Width="80"/>
 
     </Grid>
 </Window>

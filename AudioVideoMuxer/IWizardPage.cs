@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudioVideoMuxer {
+namespace EmergenceGuardian.AudioVideoMuxer {
     public interface IWizardPage {
         MainWindow Owner { get; set; }
         bool Validate();

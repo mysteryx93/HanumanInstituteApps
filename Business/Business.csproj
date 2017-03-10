@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="AutoPitchBusiness.cs" />
     <Compile Include="AviSynthScriptBuilder.cs" />
+    <Compile Include="AvisynthTools.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MediaEncoderDeshakerSettings.cs" />
     <Compile Include="FileOperationAPIWrapper.cs" />
@@ -133,13 +134,14 @@
     <Compile Include="EditRatingsBusiness.cs" />
     <Compile Include="EditVideoBusiness.cs" />
     <Compile Include="Enumerations.cs" />
-    <Compile Include="FfmpegBusiness.cs" />
+    <None Include="FfmpegBusiness.cs" />
     <Compile Include="FilterPresets.cs" />
     <Compile Include="FormatHelper.cs" />
     <Compile Include="IMediaPlayerBusiness.cs" />
     <Compile Include="IMediaPlayerControl.cs" />
     <Compile Include="LayerItem.cs" />
     <Compile Include="MediaEncoderBusiness.cs" />
+    <Compile Include="MediaEncoderScript.cs" />
     <Compile Include="MediaEncoderSettings.cs" />
     <Compile Include="MediaInfoDLL.cs" />
     <Compile Include="MediaInfoReader.cs" />
@@ -179,6 +181,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FFmpeg\FFmpeg\FFmpeg.csproj">
+      <Project>{c01178b4-a869-45f8-9b2b-7683f9ebb53d}</Project>
+      <Name>FFmpeg</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\YoutubeExtractor\YoutubeExtractor\YoutubeExtractor\YoutubeExtractor.csproj">
       <Project>{ecdc127f-8def-4f99-8300-72c13597339d}</Project>
       <Name>YoutubeExtractor</Name>

@@ -464,6 +464,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FFmpeg\FFmpeg\FFmpeg.csproj">
+      <Project>{c01178b4-a869-45f8-9b2b-7683f9ebb53d}</Project>
+      <Name>FFmpeg</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\YoutubeExtractor\YoutubeExtractor\YoutubeExtractor\YoutubeExtractor.csproj">
       <Project>{ecdc127f-8def-4f99-8300-72c13597339d}</Project>
       <Name>YoutubeExtractor</Name>

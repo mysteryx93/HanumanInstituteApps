@@ -59,12 +59,12 @@ namespace YinMediaEncoder {
             e.Handled = true;
         }
 
-        private async void OkButton_Click(object sender, RoutedEventArgs e) {
+        private void OkButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
                 encodeSettings.DeshakerSettings = bindingSettings;
                 Close();
                 if (MessageBox.Show("Would you like to prescan the video now?", "Prescan", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                    await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings), ExecutingDeshakePass);
+                    // await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings), ExecutingDeshakePass);
                 }
             }
         }
@@ -83,9 +83,9 @@ namespace YinMediaEncoder {
         /// <summary>
         /// This gets called when the Deshaker process has started. Show the status window.
         /// </summary>
-        private void ExecutingDeshakePass(object sender, ExecutingProcessEventArgs e) {
-            Application.Current.Dispatcher.Invoke(() => DeshakerPassWindow.Instance(business, encodeSettings, e.Process));
-        }
+        //private void ExecutingDeshakePass(object sender, ExecutingProcessEventArgs e) {
+        //    Application.Current.Dispatcher.Invoke(() => DeshakerPassWindow.Instance(business, encodeSettings, e.Process));
+        //}
 
         private void AdvancedSettingsButton_Click(object sender, RoutedEventArgs e) {
             DeshakerAdvancedWindow.Instance(business, bindingSegmentSettings);

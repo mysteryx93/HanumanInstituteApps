@@ -8,8 +8,8 @@ namespace EmergenceGuardian.WpfCommon {
             Application.Current.Dispatcher.Invoke(() => FFmpegWindow.Instance(host));
         }
 
-        public void DisplayError(string displayTitle, string output) {
-            Application.Current.Dispatcher.Invoke(() => FFmpegErrorWindow.Instance(displayTitle, output));
+        public void DisplayError(FFmpegProcess host) {
+            Application.Current.Dispatcher.Invoke(() => FFmpegErrorWindow.Instance(host));
         }
     }
 }

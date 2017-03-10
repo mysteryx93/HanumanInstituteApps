@@ -28,34 +28,34 @@ namespace YinMediaEncoder {
         private MediaEncoderSettings settings;
         private Process process;
         private DispatcherTimer progressTimer = new DispatcherTimer();
-        private FfmpegBusiness.ClipInfo clipInfo;
+        // private FfmpegBusiness.ClipInfo clipInfo;
 
         public DeshakerPassWindow() {
             InitializeComponent();
             helper = new WindowHelper(this);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e) {
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
             progressTimer.Tick += ProgressTimer_Tick;
             progressTimer.Interval = new TimeSpan(0, 0, 1);
             progressTimer.Start();
 
-            clipInfo = await Task.Run(() => FfmpegBusiness.GetClipInfo(settings, settings.DeshakerScript, true));
-            ScanProgress.Maximum = clipInfo.FrameCount;
+            // clipInfo = await Task.Run(() => FfmpegBusiness.GetClipInfo(settings, settings.DeshakerScript, true));
+            // ScanProgress.Maximum = clipInfo.FrameCount;
         }
 
         /// <summary>
         /// Track progress by looking at the size of the Deshaker Log. 94 bytes per line.
         /// </summary>
         private void ProgressTimer_Tick(object sender, EventArgs e) {
-            if (process.HasExited)
-                Close();
-            else if (clipInfo != null && File.Exists(settings.DeshakerLog)) {
-                long Length = new FileInfo(settings.DeshakerLog).Length;
-                long Progress = Length / 94;
-                StatusText.Text = string.Format("{0} / {1}", Progress.ToString(), clipInfo.FrameCount);
-                ScanProgress.Value = Progress;
-            }
+            //if (process.HasExited)
+            //    Close();
+            //else if (clipInfo != null && File.Exists(settings.DeshakerLog)) {
+            //    long Length = new FileInfo(settings.DeshakerLog).Length;
+            //    long Progress = Length / 94;
+            //    StatusText.Text = string.Format("{0} / {1}", Progress.ToString(), clipInfo.FrameCount);
+            //    ScanProgress.Value = Progress;
+            //}
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e) {

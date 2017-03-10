@@ -7,6 +7,7 @@ using System.Windows;
 using Business;
 using System.Threading;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.FFmpeg;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -36,6 +37,11 @@ namespace NaturalGroundingPlayer {
         public void Start(Window main, System.Drawing.Bitmap splashImage) {
             // Make sure to initialize Settings static constructor to initialize database path.
             var a = Settings.SavedFile;
+
+            // Configure C# FFmpeg library.
+            FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
+            FFmpegConfig.Avs2yuvPath = "Encoder/avs2yuv.exe";
+            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager();
 
             NaturalGroundingPlayer.MainWindow NgMain = main as NaturalGroundingPlayer.MainWindow;
             if (NgMain != null) {

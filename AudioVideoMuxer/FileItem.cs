@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AudioVideoMuxer {
+namespace EmergenceGuardian.AudioVideoMuxer {
     public class FileItem {
         public string Path { get; set; }
         public string Display { get; set; }

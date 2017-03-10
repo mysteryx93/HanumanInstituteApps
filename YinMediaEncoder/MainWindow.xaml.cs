@@ -262,7 +262,7 @@ namespace YinMediaEncoder {
         private async void CalculateAudioGain_Click(object sender, RoutedEventArgs e) {
             CalculateAudioGain.IsEnabled = false;
             CalculateAudioGain.Content = "Wait";
-            float? Gain = await Task.Run(() => FfmpegBusiness.GetAudioGain(encodeSettings));
+            float? Gain = await Task.Run(() => AvisynthTools.GetAudioGain(encodeSettings));
             if (Gain.HasValue)
                 encodeSettings.AudioGain = Gain;
             CalculateAudioGain.IsEnabled = true;

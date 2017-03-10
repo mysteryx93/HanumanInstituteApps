@@ -12,6 +12,7 @@ using Business;
 using DataAccess;
 using YoutubeExtractor;
 using Microsoft.Win32;
+using EmergenceGuardian.FFmpeg;
 
 namespace NaturalGroundingPlayer {
     public delegate void ClosingCallback(Media result);
@@ -340,7 +341,7 @@ namespace NaturalGroundingPlayer {
                 SaveDlg.FileName = Path.GetFileNameWithoutExtension(video.FileName) + Ext;
 
                 if (SaveDlg.ShowDialog() == true) {
-                    FfmpegBusiness.ExtractAudio(Settings.NaturalGroundingFolder + video.FileName, SaveDlg.FileName);
+                    MediaMuxer.ExtractAudio(Settings.NaturalGroundingFolder + video.FileName, SaveDlg.FileName);
                 }
             }
         }

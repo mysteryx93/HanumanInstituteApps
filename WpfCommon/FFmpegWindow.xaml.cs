@@ -22,7 +22,7 @@ namespace EmergenceGuardian.WpfCommon {
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             SetPageTitle(null);
-            CommandTextBox.Text = string.Format(@"""{0}"" {1}", host.WorkProcess.StartInfo.FileName, host.WorkProcess.StartInfo.Arguments);
+            OutputTextBox.AppendText(host.CommandWithArgs + Environment.NewLine + Environment.NewLine);
 
             host.DataReceived += FFmpeg_DataReceived;
             host.InfoUpdated += FFmpeg_InfoUpdated;
@@ -38,12 +38,12 @@ namespace EmergenceGuardian.WpfCommon {
         }
 
         private void FFmpeg_InfoUpdated(object sender, EventArgs e) {
-            Dispatcher.Invoke(() => WorkProgressBar.Maximum = host.FileDuration.TotalSeconds);
+            Dispatcher.Invoke(() => WorkProgressBar.Maximum = host.FrameCount);
         }
 
         private void FFmpeg_ProgressUpdated(object sender, FFmpeg.ProgressUpdatedEventArgs e) {
             Dispatcher.Invoke(() => {
-                WorkProgressBar.Value = e.Progress.Time.TotalSeconds;
+                WorkProgressBar.Value = e.Progress.Frame;
                 PercentText.Text = (WorkProgressBar.Value / WorkProgressBar.Maximum).ToString("p1");
                 SetPageTitle(PercentText.Text);
                 FpsText.Text = e.Progress.Fps.ToString();
@@ -64,11 +64,15 @@ namespace EmergenceGuardian.WpfCommon {
             Dispatcher.Invoke(() => {
                 CompletedText.Text = e.Status.ToString();
                 SetPageTitle(CompletedText.Text);
-                CompletedText.Foreground = new SolidColorBrush((e.Status == FFmpeg.CompletedStatus.Success) ? Color.FromRgb(0x07, 0xC9, 0x07) : Colors.Red);
+                CompletedText.Foreground = new SolidColorBrush((e.Status == FFmpeg.CompletionStatus.Success) ? Color.FromRgb(0x07, 0xC9, 0x07) : Colors.Red);
             });
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e) {
+            host.Cancel();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             host.Cancel();
         }
     }

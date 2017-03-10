@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EmergenceGuardian.FFmpeg;
 
-namespace AudioVideoMuxer {
+namespace EmergenceGuardian.AudioVideoMuxer {
     /// <summary>
     /// Represents a file stream to display in the UI.
     /// </summary>

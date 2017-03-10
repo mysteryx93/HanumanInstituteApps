@@ -1,4 +1,4 @@
-﻿<Page x:Class="AudioVideoMuxer.SetupWizardPage10"
+﻿<Page x:Class="EmergenceGuardian.AudioVideoMuxer.SetupWizardPage10"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

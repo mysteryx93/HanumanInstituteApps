@@ -8,7 +8,7 @@ using System.Windows;
 using EmergenceGuardian.FFmpeg;
 using EmergenceGuardian.WpfCommon;
 
-namespace AudioVideoMuxer {
+namespace EmergenceGuardian.AudioVideoMuxer {
     /// <summary>
     /// Interaction logic for SetupWizard.xaml
     /// </summary>

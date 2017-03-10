@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using EmergenceGuardian.FFmpeg;
 
-namespace AudioVideoMuxer {
+namespace EmergenceGuardian.AudioVideoMuxer {
     /// <summary>
     /// Contains selection data to pass between wizard pages.
     /// </summary>
@@ -24,11 +24,11 @@ namespace AudioVideoMuxer {
         }
 
         public bool StartMuxe() {
-            return MediaMuxer.Muxe(FileStreams, OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Muxing Media Files")) == CompletedStatus.Success;
+            return MediaMuxer.Muxe(FileStreams, OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Muxing Media Files")) == CompletionStatus.Success;
         }
 
         public bool StartMerge() {
-            return MediaMuxer.ConcatenateFiles(Files.Select(f => f.Path).ToList(), OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Merging Media Files")) == CompletedStatus.Success;
+            return MediaMuxer.ConcatenateFiles(Files.Select(f => f.Path).ToList(), OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Merging Media Files")) == CompletionStatus.Success;
         }
 
         public bool StartSplit() {

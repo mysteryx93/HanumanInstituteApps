@@ -7,7 +7,7 @@
     <ProjectGuid>{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AudioVideoMuxer</RootNamespace>
+    <RootNamespace>EmergenceGuardian.AudioVideoMuxer</RootNamespace>
     <AssemblyName>AudioVideoMuxer</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EmergenceGuardian.WpfCommon"
         mc:Ignorable="d"
-        Title="FFmpegWindow" Height="310.15" Width="668.798" Loaded="Window_Loaded">
+        Title="FFmpegWindow" Height="310.15" Width="668.798" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
-        <TextBox x:Name="OutputTextBox" Margin="10,83,10,10" TextWrapping="Wrap" AcceptsReturn="True" TabIndex="3" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
+        <TextBox x:Name="OutputTextBox" Margin="10,61,10,10" TextWrapping="Wrap" AcceptsReturn="True" TabIndex="3" IsReadOnly="True" VerticalScrollBarVisibility="Visible" />
         <ProgressBar x:Name="WorkProgressBar" Height="20" Margin="10,10,10,0" VerticalAlignment="Top"/>
         <TextBlock x:Name="CompletedText" HorizontalAlignment="Right" Margin="0,35,10,0" VerticalAlignment="Top" FontWeight="Bold" />
         <TextBlock x:Name="PercentText" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Foreground="Blue"/>
@@ -16,6 +16,5 @@
         <TextBlock HorizontalAlignment="Left" Margin="183,35,0,0" VerticalAlignment="Top" Text="Time left:" />
         <TextBlock x:Name="TimeLeftText" HorizontalAlignment="Left" Margin="237,35,0,0" VerticalAlignment="Top" Foreground="Blue"/>
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Left" Margin="323,34,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Click="CancelButton_Click"/>
-        <TextBox x:Name="CommandTextBox" Margin="10,65,10,0" VerticalAlignment="Top" IsReadOnly="True" />
     </Grid>
 </Window>

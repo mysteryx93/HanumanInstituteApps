@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using YoutubeExtractor;
 using DataAccess;
-using System.Net;
+using EmergenceGuardian.FFmpeg;
 
 namespace Business {
     public class DownloadBusiness {
@@ -357,7 +355,7 @@ namespace Business {
                 File.Delete(Destination + DestinationExt);
 
                 // Merge audio and video files.
-                await Task.Run(() => FfmpegBusiness.JoinAudioVideo(Destination + File1Ext, Destination + File2Ext, Destination + DestinationExt, false, true));
+                await Task.Run(() => MediaMuxer.Muxe(Destination + File1Ext, Destination + File2Ext, Destination + DestinationExt));
 
                 // Delete source files
                 File.Delete(Destination + File1Ext);
@@ -377,9 +375,9 @@ namespace Business {
 
                 // Merge audio and video files.
                 await Task.Run(() => {
-                    FfmpegBusiness.ExtractVideo(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName, VideoDest, true);
+                    MediaMuxer.ExtractVideo(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName, VideoDest);
                     if (FileHasContent(VideoDest))
-                        FfmpegBusiness.JoinAudioVideo(VideoDest, Destination + AudioExt, Destination + DestinationExt, false, true);
+                        MediaMuxer.Muxe(VideoDest, Destination + AudioExt, Destination + DestinationExt);
                 });
 
                 // Delete source files
