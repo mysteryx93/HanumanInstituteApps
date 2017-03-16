@@ -168,7 +168,7 @@ namespace Business {
 
         private string MediaFileName {
             get {
-                return customFileName != null ? customFileName : IsAutoPitchEnabled ? Settings.AutoPitchFile : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
+                return customFileName != null ? customFileName : IsAutoPitchEnabled ? AutoPitchBusiness.LastScriptPath : Settings.NaturalGroundingFolder + CurrentVideo.FileName;
             }
         }
 

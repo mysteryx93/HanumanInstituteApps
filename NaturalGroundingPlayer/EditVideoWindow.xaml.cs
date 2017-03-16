@@ -107,13 +107,11 @@ namespace NaturalGroundingPlayer {
         }
 
         private async Task LoadMediaInfoAsync() {
-            using (MediaInfoReader MediaInfo = new MediaInfoReader()) {
-                await MediaInfo.LoadInfoAsync(video);
-                DimensionText.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
-                DisablePitchCheckBox.IsEnabled = MediaInfo.PixelAspectRatio == 1;
-                if (!DisablePitchCheckBox.IsEnabled)
-                    video.DisablePitch = false;
-            }
+            FFmpegProcess FileInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + video.FileName));
+            DimensionText.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+            DisablePitchCheckBox.IsEnabled = FileInfo?.VideoStream?.PixelAspectRatio == 1;
+            if (!DisablePitchCheckBox.IsEnabled)
+                video.DisablePitch = false;
         }
 
         private async void DownloadUrlText_LostFocus(object sender, RoutedEventArgs e) {
@@ -319,16 +317,15 @@ namespace NaturalGroundingPlayer {
 
         private async void menuExtractAudio_Click(object sender, RoutedEventArgs e) {
             if (video.FileName != null && File.Exists(Settings.NaturalGroundingFolder + video.FileName)) {
-                MediaInfoReader MInfo = new MediaInfoReader();
-                await MInfo.LoadInfoAsync(Settings.NaturalGroundingFolder + video.FileName);
+                FFmpegProcess MInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + video.FileName));
                 string Ext = null;
-                if (MInfo.AudioFormat == "MPEG Audio")
+                if (MInfo?.AudioStream?.Format == "MPEG Audio")
                     Ext = ".mp2";
-                else if (MInfo.AudioFormat == "PCM")
+                else if (MInfo?.AudioStream?.Format == "PCM")
                     Ext = ".wav";
-                else if (MInfo.AudioFormat == "Vorbis")
+                else if (MInfo?.AudioStream?.Format == "Vorbis")
                     Ext = ".ogg";
-                else if (MInfo.AudioFormat == "Opus")
+                else if (MInfo?.AudioStream?.Format == "Opus")
                     Ext = ".opus";
                 else
                     Ext = ".aac";

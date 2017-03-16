@@ -3,13 +3,19 @@ using System.Windows;
 using EmergenceGuardian.FFmpeg;
 
 namespace EmergenceGuardian.WpfCommon {
-    public class FFmpegUserInterfaceManager : IUserInterfaceManager {
-        public void CreateInstance(FFmpegProcess host) {
-            Application.Current.Dispatcher.Invoke(() => FFmpegWindow.Instance(host));
+    public class FFmpegUserInterfaceManager : UserInterfaceManagerBase {
+        private Window parent;
+
+        public FFmpegUserInterfaceManager(Window parent) {
+            this.parent = parent;
         }
 
-        public void DisplayError(FFmpegProcess host) {
-            Application.Current.Dispatcher.Invoke(() => FFmpegErrorWindow.Instance(host));
+        public override IUserInterface CreateUI(string title) {
+            return Application.Current.Dispatcher.Invoke(() => FFmpegWindow.Instance(parent, title));
+        }
+
+        public override void DisplayError(FFmpegProcess host) {
+            Application.Current.Dispatcher.Invoke(() => FFmpegErrorWindow.Instance(parent, host));
         }
     }
 }

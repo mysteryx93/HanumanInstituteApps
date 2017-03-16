@@ -20,7 +20,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
         }
 
         public List<FFmpegStreamInfo> GetStreamList(string file) {
-            return MediaMuxer.GetFileInfo(file, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
+            return MediaInfo.GetFileInfo(file, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
         }
 
         public bool StartMuxe() {

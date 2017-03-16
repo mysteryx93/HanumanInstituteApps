@@ -25,7 +25,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
             // helper = new WindowHelper(this);
 
             FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
-            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager();
+            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager(this);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {

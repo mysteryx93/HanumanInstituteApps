@@ -249,7 +249,6 @@
       <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowHelper.cs" />
-    <Compile Include="WindowManager.cs" />
     <Compile Include="WindowResizer.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>

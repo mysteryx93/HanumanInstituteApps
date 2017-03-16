@@ -29,7 +29,7 @@
         <Grid Margin="10,0,10,60" x:Name="GridPlaying" Height="16" VerticalAlignment="Bottom">
             <TextBlock HorizontalAlignment="Left" Text="Now Playing:" VerticalAlignment="Bottom"/>
             <TextBlock x:Name="NowPlayingLabel" Margin="79,0,56,0" Text="{Binding FileName}" VerticalAlignment="Bottom"/>
-            <TextBlock x:Name="NowPlayingPos" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="51" Visibility="Hidden" Foreground="#FF18BDB6"><Run Text="{Binding Position, Converter={StaticResource MediaTimeConverter}}"/><Run Text="/" /><Run Text="{Binding Duration, Converter={StaticResource MediaTimeConverter}}"/></TextBlock>
+            <TextBlock x:Name="NowPlayingPos" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="51" Visibility="Hidden"><Run Text="{Binding Position, Converter={StaticResource MediaTimeConverter}}"/><Run Text="/" /><Run Text="{Binding Duration, Converter={StaticResource MediaTimeConverter}}"/></TextBlock>
         </Grid>
 
     </Grid>

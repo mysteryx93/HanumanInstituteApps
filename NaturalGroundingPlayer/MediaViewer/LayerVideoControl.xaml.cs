@@ -25,6 +25,7 @@ namespace NaturalGroundingPlayer {
         private WmpPlayerBusiness playerBusiness;
         private WmpPlayerWindow playerWindow;
         public event EventHandler Closing;
+#pragma warning disable CS0414
         private bool isClosed;
 
         public Media Item { get; private set; }

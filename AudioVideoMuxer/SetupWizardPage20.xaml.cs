@@ -32,7 +32,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
                 if (!string.IsNullOrEmpty(Result) && !files.Any(f => f.Path == Result)) {
                     string FileName = Path.GetFileName(Result);
 
-                    List<FFmpegStreamInfo> FileInfo = MediaMuxer.GetFileInfo(Result, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
+                    List<FFmpegStreamInfo> FileInfo = MediaInfo.GetFileInfo(Result, new ProcessStartOptions(FFmpegDisplayMode.None)).FileStreams;
                     if (files.Count == 0) {
                         // Store streams of first file.
                         foreach (FFmpegStreamInfo item in FileInfo) {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
+using EmergenceGuardian.FFmpeg;
 
 namespace Business {
     /// <summary>
@@ -20,18 +21,25 @@ namespace Business {
             if (!File.Exists(Settings.NaturalGroundingFolder + video.FileName))
                 return false;
 
-            using (MediaInfoReader InfoReader = new MediaInfoReader()) {
-                InfoReader.LoadInfo(Settings.NaturalGroundingFolder + video.FileName);
-                if (Settings.SavedFile.ChangeAudioPitch && InfoReader.PixelAspectRatio == 1 && !video.DisablePitch && (InfoReader.BitDepth ?? 8) == 8) {
-                    CreateScript(Settings.NaturalGroundingFolder + video.FileName, InfoReader);
-                    return true;
-                } else
-                    return false;
-            }
+            FFmpegProcess InfoReader = MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + video.FileName);
+            if (Settings.SavedFile.ChangeAudioPitch && InfoReader?.VideoStream?.PixelAspectRatio == 1 && !video.DisablePitch && InfoReader?.VideoStream?.BitDepth == 8) {
+                CreateScript(Settings.NaturalGroundingFolder + video.FileName, InfoReader);
+                return true;
+            } else
+                return false;
         }
 
-        public static void CreateScript(string inputFile, MediaInfoReader infoReader) {
-            CreateScript(inputFile, infoReader, Settings.AutoPitchFile);
+        public static string LastScriptPath { get; private set; } = null;
+
+        public static void CreateScript(string inputFile, FFmpegProcess infoReader) {
+            if (LastScriptPath != null)
+                File.Delete(LastScriptPath);
+            LastScriptPath = GetAutoPitchFilePath(inputFile, infoReader?.VideoStream?.Format);
+            CreateScript(inputFile, infoReader, LastScriptPath);
+        }
+
+        public static string GetAutoPitchFilePath(string fileName, string videoCodec) {
+            return string.Format("{0}{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
         }
 
         /// <summary>
@@ -39,7 +47,7 @@ namespace Business {
         /// </summary>
         /// <param name="inputFile">The video to play.</param>
         /// <param name="infoReader">An object to read media information.</param>
-        public static void CreateScript(string inputFile, MediaInfoReader infoReader, string scriptLocation) {
+        public static void CreateScript(string inputFile, FFmpegProcess infoReader, string scriptLocation) {
             bool AviSynthPlus = MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynthPlus;
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
             Script.AddPluginPath();
@@ -47,7 +55,7 @@ namespace Business {
                 //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-                Script.OpenDirect(inputFile, !string.IsNullOrEmpty(infoReader.AudioFormat), !string.IsNullOrEmpty(infoReader.VideoFormat));
+                Script.OpenDirect(inputFile, infoReader.AudioStream != null, infoReader.VideoStream != null);
                 Script.AppendLine("Preroll(int(FrameRate*3))");
                 // This causes a slight audio delay in AviSynth 2.6
                 Script.LoadPluginDll("TimeStretch.dll");
@@ -57,7 +65,7 @@ namespace Business {
             } else {
                 int CPU = Environment.ProcessorCount / 2;
                 Script.AppendLine("SetMTMode(3,{0})", CPU);
-                Script.OpenDirect(inputFile, !string.IsNullOrEmpty(infoReader.AudioFormat), !string.IsNullOrEmpty(infoReader.VideoFormat));
+                Script.OpenDirect(inputFile, infoReader.AudioStream != null, infoReader.VideoStream != null);
                 Script.AppendLine("SetMTMode(2)");
                 Script.AppendLine("Preroll(int(FrameRate*3))");
                 //Script.AppendLine("Loop(int(FrameRate/2), 0, 0)");

@@ -1,17 +1,12 @@
-﻿using PropertyChanged;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using DataAccess;
 using System.Xml.Serialization;
 using System.IO;
 using System.Xml;
-using System.Collections.ObjectModel;
+using EmergenceGuardian.FFmpeg;
+using System.Collections.Generic;
 
 namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
@@ -192,12 +187,24 @@ namespace Business {
         public bool IsDownscaling { get; set; }
         [XmlIgnore()]
         public bool IsSameSize { get; set; }
+        [XmlIgnore()]
+        public int ResumeSegment { get; set; }
+        [XmlIgnore()]
+        public long ResumePos { get; set; }
+
+        [NonSerialized()]
+        private List<FFmpegProcess> processes = new List<FFmpegProcess>();
+        [XmlIgnore()]
+        public List<FFmpegProcess> Processes { get { return processes; } }
+        [XmlIgnore()]
+        public CompletionStatus CompletionStatus { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
 
         public MediaEncoderSettings() {
             JobIndex = -1;
+            ResumeSegment = 1;
             SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
             SourceChromaPlacement = ChromaPlacement.MPEG2;
@@ -364,9 +371,7 @@ namespace Business {
         }
 
         public string FileExtension {
-            get {
-                return EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv";
-            }
+            get { return PathManager.GetFileExtension(EncodeFormat); }
         }
 
         public bool HasFilePath {
@@ -374,89 +379,44 @@ namespace Business {
         }
 
         public string ScriptFile {
-            get {
-                if (JobIndex >= 0)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Script.avs", JobIndex);
-                else
-                    return MediaEncoderBusiness.PreviewScriptFile;
-            }
+            get { return PathManager.GetScriptFile(JobIndex); }
         }
 
         public string SettingsFile {
-            get {
-                if (JobIndex >= 0)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Settings.xml", JobIndex);
-                else
-                    return MediaEncoderBusiness.PreviewSettingsFile;
-            }
+            get { return PathManager.GetSettingsFile(JobIndex); }
         }
 
         public string InputFile {
             get {
-                if (ConvertToAvi) {
-                    if (JobIndex >= 0)
-                        return Settings.TempFilesPath + string.Format("Job{0}_Input.avi", JobIndex);
-                    else
-                        return MediaEncoderBusiness.PreviewSourceFile;
-                } else
+                if (ConvertToAvi)
+                    return PathManager.GetInputFile(JobIndex);
+                else
                     return FilePath;
             }
         }
 
         public string OutputFile {
-            get {
-                if (VideoCodec == VideoCodecs.Avi)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Output.avi", JobIndex);
-                else
-                    return Settings.TempFilesPath + string.Format("Job{0}_Output.mkv", JobIndex);
-            }
+            get { return PathManager.GetOutputFile(JobIndex, ResumeSegment, VideoCodec); }
         }
 
-        public string AudioFileWav {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.wav", JobIndex); }
-        }
-
-        public string AudioFileAac {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.aac", JobIndex); }
-        }
-
-        public string AudioFileOpus {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.opus", JobIndex); }
-        }
-
-        public string AudioFileFlac {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Output.flac", JobIndex); }
+        public string AudioFile {
+            get { return PathManager.GetAudioFile(JobIndex, AudioAction); }
         }
 
         public string FinalFile {
-            get { return Settings.TempFilesPath + string.Format("Job{0}_Final.{1}", JobIndex, EncodeFormat == VideoFormats.Mp4 ? "mp4" : "mkv"); }
+            get { return PathManager.GetFinalFile(JobIndex, EncodeFormat); }
         }
 
         public string TempFile {
-            get {
-                if (JobIndex >= 0)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Temp", JobIndex);
-                else
-                    return Settings.TempFilesPath + "Preview_Temp";
-            }
+            get { return PathManager.GetTempFile(JobIndex); }
         }
 
         public string DeshakerScript {
-            get {
-                if (JobIndex >= 0)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Deshaker.avs", JobIndex);
-                else
-                    return Settings.TempFilesPath + "Preview_Deshaker.avs";
-            }
+            get { return PathManager.GetDeshakerScript(JobIndex); }
         }
 
         public string DeshakerLog {
-            get {
-                if (JobIndex >= 0)
-                    return Settings.TempFilesPath + string.Format("Job{0}_Deshaker.log", JobIndex);
-                else
-                    return Settings.TempFilesPath + "Preview_Deshaker.log";
-            }
+            get { return PathManager.GetDeshakerLog(JobIndex); }
         }
 
         public MediaEncoderSettings Clone() {
@@ -497,6 +457,22 @@ namespace Business {
                 if (Result.CustomScript != null)
                     Result.CustomScript = Result.CustomScript.Replace("\n", "\r\n");
                 return Result;
+            }
+        }
+
+        public string Display {
+            get {
+                return Path.GetFileNameWithoutExtension(FilePath);
+            }
+        }
+
+        /// <summary>
+        /// Cancels any running processes.
+        /// </summary>
+        public void Cancel() {
+            CompletionStatus = CompletionStatus.Cancelled;
+            foreach (FFmpegProcess worker in Processes) {
+                worker.Cancel();
             }
         }
     }

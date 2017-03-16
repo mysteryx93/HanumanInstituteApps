@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EmergenceGuardian.WpfCommon"
         mc:Ignorable="d"
-        Title="ErrorWindow" Height="477.068" Width="578.571">
+        Title="ErrorWindow" Height="477.068" Width="578.571" ShowInTaskbar="False">
     <Grid>
-        <TextBox x:Name="OutputText" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Margin="0,0,0,26" />
-        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,-1" VerticalAlignment="Bottom" IsDefault="True" IsCancel="True" Click="CloseButton_Click" HorizontalAlignment="Right" Width="80"/>
+        <TextBox x:Name="OutputText" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Margin="0,0,0,26" VerticalAlignment="Top" TextWrapping="Wrap" VerticalContentAlignment="Top" />
+        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,3" VerticalAlignment="Bottom" IsDefault="True" IsCancel="True" Click="CloseButton_Click" HorizontalAlignment="Right" Width="80"/>
 
     </Grid>
 </Window>

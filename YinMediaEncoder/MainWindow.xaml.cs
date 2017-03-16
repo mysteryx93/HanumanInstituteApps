@@ -6,10 +6,13 @@ using Business;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Navigation;
-using NaturalGroundingPlayer;
+using System.Windows.Media.Imaging;
+using System.Windows.Input;
 using System.Windows.Controls;
 using DataAccess;
+using NaturalGroundingPlayer;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.FFmpeg;
 
 namespace YinMediaEncoder {
     /// <summary>
@@ -20,10 +23,23 @@ namespace YinMediaEncoder {
         private WmpPlayerWindow playerOriginal;
         private WmpPlayerWindow playerChanges;
         private MediaEncoderSettings encodeSettings = new MediaEncoderSettings();
-        private MediaEncoderBusiness business = new MediaEncoderBusiness();
+        public MediaEncoderBusiness business = new MediaEncoderBusiness();
         private bool isBinding = false;
 
         public MainWindow() {
+            // Don't let Yin Media Encoder run if there are FFmpeg processes running.
+            if (MediaInfo.GetFFmpegProcesses().Any()) {
+                if (MessageBox.Show("There are FFmpeg processes running. Would you like to stop them?\r\n\r\nTo avoid conflicts, please wait until these processes are finished before running Yin Media Encoder.", "FFmpeg Processes Running", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No) == MessageBoxResult.Yes) {
+                    foreach (Process item in MediaInfo.GetFFmpegProcesses()) {
+                        MediaProcesses.SoftKill(item);
+                    }
+                }
+                if (MediaInfo.GetFFmpegProcesses().Any()) {
+                    Application.Current.Shutdown();
+                    return;
+                }
+            }
+
             InitializeComponent();
             SessionCore.Instance.Start(this, Properties.Resources.AppIcon);
             helper = new WindowHelper(this);
@@ -47,7 +63,8 @@ namespace YinMediaEncoder {
             if (Settings.SavedFile.MediaPlayerApp != MediaPlayerApplication.Mpc)
                 PreviewMpcButton.Visibility = Visibility.Hidden;
             business.EncodingCompleted += business_EncodingCompleted;
-            ProcessingQueueList.ItemsSource = MediaEncoderBusiness.ProcessingQueue;
+            business.EncodingFailed += business_EncodingFailed;
+            ProcessingQueueList.ItemsSource = business.ProcessingQueue;
             MpcConfigBusiness.IsSvpEnabled = false;
 
             MediaEncoderSettings RecoverSettings = await business.AutoLoadPreviewFileAsync();
@@ -56,9 +73,12 @@ namespace YinMediaEncoder {
 
             encodeSettings.AutoCalculateSize = true;
 
-            // Only recover jobs if there are no jobs running
-            if (!MediaEncoderBusiness.ProcessingQueue.Any())
-                await business.AutoLoadJobsAsync();
+            business.AutoLoadJobs();
+            if (business.ProcessingQueue.Count == 0)
+                PauseButton_Click(null, null);
+
+            // Run GPU test on startup.
+            await Task.Run(() => AvisynthTools.GpuSupport);
         }
 
         /// <summary>
@@ -72,10 +92,17 @@ namespace YinMediaEncoder {
         }
 
         private void business_EncodingCompleted(object sender, EncodingCompletedEventArgs e) {
-            CompletedWindow.Instance(e);
+            Application.Current.Dispatcher.Invoke(() => EncodingCompletedWindow.Instance(this,e));
+        }
+
+        private void business_EncodingFailed(object sender, EncodingCompletedEventArgs e) {
+            Application.Current.Dispatcher.Invoke(() => EncodingFailedWindow.Instance(this, e));
         }
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            foreach (Window item in OwnedWindows) {
+                item.Close();
+            }
             playerOriginal?.Player?.Close();
             playerChanges?.Player?.Close();
             await business.DeletePreviewFilesAsync();
@@ -190,8 +217,10 @@ namespace YinMediaEncoder {
                 HidePreview();
                 SetEncodeSettings((MediaEncoderSettings)encodeSettings.Clone());
                 encodeSettings.FilePath = "";
+                encodeSettings.DisplayName = "";
                 await Task.Delay(100); // Wait for media player file to be released.
-                await business.EncodeFileAsync(EncodeSettings);
+                business.PrepareJobFiles(EncodeSettings);
+                business.AddJobToQueue(EncodeSettings);
             } catch (Exception ex) {
                 if (!encodeSettings.ConvertToAvi || System.IO.File.Exists(Settings.TempFilesPath + "Preview.avi"))
                     SetEncodeSettings(EncodeSettings);
@@ -262,7 +291,7 @@ namespace YinMediaEncoder {
         private async void CalculateAudioGain_Click(object sender, RoutedEventArgs e) {
             CalculateAudioGain.IsEnabled = false;
             CalculateAudioGain.Content = "Wait";
-            float? Gain = await Task.Run(() => AvisynthTools.GetAudioGain(encodeSettings));
+            float? Gain = await Task.Run(() => AvisynthTools.GetAudioGain(encodeSettings, null));
             if (Gain.HasValue)
                 encodeSettings.AudioGain = Gain;
             CalculateAudioGain.IsEnabled = true;
@@ -284,6 +313,41 @@ namespace YinMediaEncoder {
             //DeshakerGenerateButton.IsEnabled = false;
             //await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings));
             //DeshakerGenerateButton.IsEnabled = true;
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e) {
+            PauseButton.IsEnabled = false;
+            if (business.IsEncoding) {
+                business.PauseEncoding();
+                PauseButtonImage.Source = new BitmapImage(new Uri(@"/YinMediaEncoder;component/Icons/play.png", UriKind.Relative));
+                PauseButton.ToolTip = "Start";
+            } else {
+                business.ResumeEncoding();
+                PauseButtonImage.Source = new BitmapImage(new Uri(@"/YinMediaEncoder;component/Icons/pause.png", UriKind.Relative));
+                PauseButton.ToolTip = "Pause";
+            }
+            PauseButton.IsEnabled = true;
+        }
+
+        /// <summary>
+        /// Cancels an encoding task and display it to change settings.
+        /// </summary>
+        /// <param name="settings">The encoding task to display.</param>
+        public async void EditEncodingTask(MediaEncoderSettings settings) {
+            HidePreview();
+            await business.MovePreviewFilesAsync(settings);
+            SetEncodeSettings(settings);
+            PathManager.DeleteJobFiles(settings.JobIndex);
+            settings.JobIndex = -1;
+            business.ProcessingQueue.Remove(settings);
+        }
+
+        private void ProcessingQueueList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            var dataContext = ((FrameworkElement)e.OriginalSource).DataContext as MediaEncoderSettings;
+            if (dataContext != null && e.LeftButton == MouseButtonState.Pressed) {
+                if (!business.IsEncoding || business.ProcessingQueue.IndexOf(dataContext) > 0)
+                    EditEncodingTask(dataContext);
+            }
         }
     }
 }

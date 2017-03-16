@@ -8,9 +8,10 @@ namespace EmergenceGuardian.WpfCommon {
     /// Interaction logic for ErrorWindow.xaml
     /// </summary>
     public partial class FFmpegErrorWindow : Window {
-        public static void Instance(FFmpegProcess host) {
+        public static void Instance(Window parent, FFmpegProcess host) {
             FFmpegErrorWindow F = new FFmpegErrorWindow();
-            F.Title = "Failed: " + host.Options.DisplayTitle;
+            F.Owner = parent;
+            F.Title = (host.LastCompletionStatus == CompletionStatus.Timeout ? "Timeout: " : "Failed: ") + host.Options.Title;
             F.OutputText.Text = host.CommandWithArgs + Environment.NewLine + Environment.NewLine + host.Output;
             F.Show();
         }

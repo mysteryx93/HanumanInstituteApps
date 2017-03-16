@@ -12,6 +12,7 @@ using System.Windows.Navigation;
 using Business;
 using DataAccess;
 using System.Diagnostics;
+using EmergenceGuardian.WpfCommon;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

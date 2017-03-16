@@ -4,6 +4,7 @@ using System.Windows.Input;
 using Business;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using EmergenceGuardian.WpfCommon;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

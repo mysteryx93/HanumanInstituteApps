@@ -143,10 +143,9 @@
     <Compile Include="MediaEncoderBusiness.cs" />
     <Compile Include="MediaEncoderScript.cs" />
     <Compile Include="MediaEncoderSettings.cs" />
-    <Compile Include="MediaInfoDLL.cs" />
-    <Compile Include="MediaInfoReader.cs" />
     <Compile Include="MoveFilesBusiness.cs" />
     <Compile Include="AudioPlayerManager.cs" />
+    <Compile Include="PathManager.cs" />
     <Compile Include="ProcessWatcher.cs" />
     <Compile Include="MpcConfigBusiness.cs" />
     <Compile Include="SyncMedia.cs" />
@@ -201,15 +200,16 @@
       <Project>{767f8df3-2ecc-4d54-8cd6-75fa1814a3e6}</Project>
       <Name>MPC_API_LIB</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WpfCommon\WpfCommon.csproj">
+      <Project>{44727313-5673-4089-b664-894cd3ae7c2f}</Project>
+      <Name>WpfCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="AviSynth.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="FodyWeavers.xml" />
-    <None Include="MediaInfo.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="WmpPlayerControl.xaml">

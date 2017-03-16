@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="YinMediaEncoder.MainWindow" 
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="Yin Media Encoder" Height="568" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated" Icon="App.ico">
+        Title="Yin Media Encoder" Height="568" Width="530" WindowStartupLocation="CenterOwner" Closing="Window_Closing" Loaded="Window_Loaded" ResizeMode="CanMinimize" Activated="Window_Activated" Icon="Icons/App.ico">
     <Window.Resources>
         <Business:VisibilityConverter x:Key="VisibilityConverter"/>
         <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
@@ -298,7 +298,7 @@
             </TabItem>
             <TabItem x:Name="TabScript" Header="AviSynth Script" TabIndex="7">
                 <Grid Background="Transparent">
-                    <TextBox x:Name="ScriptText" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TabIndex="89">
+                    <TextBox x:Name="ScriptText" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TabIndex="89" VerticalContentAlignment="Top">
                         <TextBox.Background>
                             <SolidColorBrush Color="Transparent"/>
                         </TextBox.Background>
@@ -310,9 +310,14 @@
         <Button x:Name="PreviewChangesButton" Content="_Preview Changes" HorizontalAlignment="Left" Margin="391,169,0,0" VerticalAlignment="Top" Width="115" Click="PreviewChangesButton_Click" TabIndex="92" IsDefault="True" IsEnabled="{Binding HasFileName}"/>
         <TextBox HorizontalAlignment="Left" Height="21" Margin="456,116,0,0" VerticalAlignment="Top" Width="50" TabIndex="90" Text="{Binding Position, Converter={StaticResource MediaTimeConverter}}" />
         <TextBlock HorizontalAlignment="Left" Margin="397,117,0,0" Text="Position" VerticalAlignment="Top"/>
-        <ListBox x:Name="ProcessingQueueList" HorizontalAlignment="Left" Height="98" Margin="391,0,0,44" VerticalAlignment="Bottom" Width="115" TabIndex="92" ScrollViewer.HorizontalScrollBarVisibility="Hidden"/>
-        <TextBlock HorizontalAlignment="Left" Margin="391,0,0,143" Text="Processing Queue" VerticalAlignment="Bottom"/>
+        <ListBox x:Name="ProcessingQueueList" HorizontalAlignment="Left" Height="98" Margin="391,0,0,44" VerticalAlignment="Bottom" Width="115" TabIndex="92" ScrollViewer.HorizontalScrollBarVisibility="Hidden" DisplayMemberPath="Display" MouseDoubleClick="ProcessingQueueList_MouseDoubleClick"/>
+        <TextBlock HorizontalAlignment="Left" Margin="391,0,0,145" Text="Processing Queue" VerticalAlignment="Bottom"/>
         <CheckBox x:Name="ConvertToAviCheckbox" Content="Convert to AVI" HorizontalAlignment="Left" Margin="391,34,0,0" VerticalAlignment="Top" IsChecked="{Binding ConvertToAvi}" TabIndex="3" Click="ConvertToAviCheckbox_Click" ToolTip="Work-around if direct opening doesn't work" />
+        <Button x:Name="PauseButton" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" IsTabStop="False" Focusable="False" Width="24" Height="24" Click="PauseButton_Click" Margin="486,0,0,141" ToolTip="Start" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <StackPanel>
+                <Image x:Name="PauseButtonImage" Source="/NaturalGroundingPlayer;component/Icons/play.png" />
+            </StackPanel>
+        </Button>
 
     </Grid>
 </Window>

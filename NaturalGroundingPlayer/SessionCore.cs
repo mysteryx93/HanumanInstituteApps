@@ -41,7 +41,7 @@ namespace NaturalGroundingPlayer {
             // Configure C# FFmpeg library.
             FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
             FFmpegConfig.Avs2yuvPath = "Encoder/avs2yuv.exe";
-            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager();
+            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager(main);
 
             NaturalGroundingPlayer.MainWindow NgMain = main as NaturalGroundingPlayer.MainWindow;
             if (NgMain != null) {

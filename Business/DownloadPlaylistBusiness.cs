@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DataAccess;
 using YoutubeExtractor;
 using System.IO;
+using EmergenceGuardian.FFmpeg;
 
 namespace Business {
     /// <summary>
@@ -21,7 +22,6 @@ namespace Business {
 
         public async Task StartScan(List<VideoListItem> selection, CancellationToken cancel) {
             await selection.ForEachAsync(5, cancel, async item => {
-                MediaInfoReader InfoReader = new MediaInfoReader();
                 Media VideoData = PlayerAccess.GetVideoById(item.MediaId.Value);
 
                 if (VideoData != null) {
@@ -81,9 +81,8 @@ namespace Business {
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // Original VCD files and files of unrecognized extensions should not be replaced.
-            MediaInfoReader InfoReader = new MediaInfoReader();
-            await InfoReader.LoadInfoAsync(localFile);
-            if (!DownloadBusiness.DownloadedExtensions.Contains(LocalFileExt) || InfoReader.VideoFormat == "MPEG Video") {
+            FFmpegProcess InfoReader = await Task.Run(() => MediaInfo.GetFileInfo(localFile));
+            if (!DownloadBusiness.DownloadedExtensions.Contains(LocalFileExt) || InfoReader?.VideoStream?.Format == "mpeg1video") {
                 serverFile.StatusText = "Not from YouTube";
                 return VideoListItemStatusEnum.OK;
             }
@@ -93,11 +92,11 @@ namespace Business {
             if (serverFile.BestVideo.VideoType == VideoType.WebM && serverFile.BestVideo.AdaptiveType == AdaptiveType.Video)
                 ServerFileSize = (long)(ServerFileSize * 1.35);
             long LocalFileSize = new FileInfo(localFile).Length;
-            if (InfoReader.VideoFormat == "VP9")
+            if (InfoReader?.VideoStream?.Format == "vp9")
                 LocalFileSize = (long)(LocalFileSize * 1.35);
 
             // If server resolution is better, download unless local file is bigger.
-            int LocalFileHeight = InfoReader.Height ?? 0;
+            int LocalFileHeight = InfoReader?.VideoStream?.Height ?? 0;
             if (serverFile.BestVideo.Resolution > LocalFileHeight) {
                 if (ServerFileSize > LocalFileSize)
                     return VideoListItemStatusEnum.HigherQualityAvailable;
@@ -113,11 +112,13 @@ namespace Business {
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // download audio and merge with local video. (that didn't work, ffmpeg failed to merge back)
-            int? LocalAudioBitRate = InfoReader.AudioBitRate;
+            int LocalAudioBitRate = InfoReader?.AudioStream?.Bitrate ?? 0;
+            if (LocalAudioBitRate == 0 && InfoReader?.AudioStream.Format == "opus" || InfoReader?.AudioStream.Format == "vorbis")
+                LocalAudioBitRate = 160; // FFmpeg doesn't return bitrate of Opus and Vorbis audios, but it's 160.
             int ServerAudioBitRate = serverFile.BestAudio != null ? serverFile.BestAudio.AudioBitrate : serverFile.BestVideo.AudioBitrate;
             // Fix a bug where MediaInfo returns no bitrate for MKV containers with AAC audio.
-            if (LocalAudioBitRate != null || LocalFileExt != ".mkv") {
-                if ((LocalAudioBitRate == null || LocalAudioBitRate < ServerAudioBitRate * .8) && serverFile.BestVideo.Resolution == LocalFileHeight) {
+            if (LocalAudioBitRate > 0 || LocalFileExt != ".mkv") {
+                if ((LocalAudioBitRate == 0 || LocalAudioBitRate < ServerAudioBitRate * .8) && serverFile.BestVideo.Resolution == LocalFileHeight) {
                     // Only redownload for audio if video file size is similar. Videos with AdaptiveType=None don't have file size.
                     if (ServerFileSize > LocalFileSize * .9 && serverFile.BestVideo.AdaptiveType == AdaptiveType.Video) {
                         serverFile.StatusText = "Audio";

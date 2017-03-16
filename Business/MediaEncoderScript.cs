@@ -391,7 +391,8 @@ namespace Business {
             File.WriteAllText(settings.DeshakerScript, Script.Script);
 
             // Run pass.
-            // await Task.Run(() => FfmpegBusiness.RunDeshakerPass(settings, callback));
+            //await Task.Run(() => FfmpegBusiness.RunDeshakerPass(settings, callback));
+            await Task.Run(() => { });
             File.Delete(settings.DeshakerScript);
         }
     }

@@ -6,6 +6,7 @@ using Business;
 using System.Windows.Controls;
 using System.Windows.Input;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.FFmpeg;
 
 namespace Player432hz {
     /// <summary>
@@ -148,8 +149,8 @@ namespace Player432hz {
 
         private void PlayManager_StartPlaying(object sender, PlayingEventArgs e) {
             NowPlayingLabel.Text = e.FileName;
-            MediaInfoReader infoReader = new MediaInfoReader();
-            infoReader.LoadInfo(e.FileName);
+
+            FFmpegProcess infoReader = MediaInfo.GetFileInfo(e.FileName);
             AutoPitchBusiness.CreateScript(e.FileName, infoReader, Settings.Player432hzScriptFile);
             AudioPlayer.Player.Source = Settings.Player432hzScriptFile;
             posTimer.Stop();

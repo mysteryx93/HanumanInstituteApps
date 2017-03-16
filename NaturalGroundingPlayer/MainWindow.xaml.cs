@@ -287,7 +287,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void window_Closed(object sender, EventArgs e) {
-            MediaEncoderBusiness.ClearTempFolder();
+            PathManager.ClearTempFolder();
         }
 
         private async void SkipVideo_Click(object sender, RoutedEventArgs e) {

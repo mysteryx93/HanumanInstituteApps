@@ -362,7 +362,7 @@ namespace Business {
                 File.Delete(Destination + File2Ext);
             } else if (downloadInfo.UpgradeAudio) {
                 // Get original video format.
-                MediaInfoReader MediaReader = new MediaInfoReader();
+                // FFmpegProcess MediaReader = new MediaInfoReader();
                 //await MediaReader.LoadInfoAsync(Settings.NaturalGroundingFolder + downloadInfo.Request.FileName);
                 string VideoDestExt = ".mkv";
                 //if (MediaReader.VideoFormat == "VP8" || MediaReader.VideoFormat == "VP9")

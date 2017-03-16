@@ -8,8 +8,7 @@ using System.Linq.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
-using MediaPlayer;
-using System.Threading;
+using EmergenceGuardian.FFmpeg;
 
 namespace Business {
     public class EditPlaylistBusiness {
@@ -237,7 +236,6 @@ namespace Business {
                 string FilePath;
                 DefaultMediaPath PathCalc = new DefaultMediaPath();
                 PathCalc.LoadData();
-                MediaInfoReader MediaInfo = new MediaInfoReader();
 
                 foreach (Media item in Query) {
                     // Try to auto-attach file if default file name exists.
@@ -255,8 +253,8 @@ namespace Business {
                     }
 
                     // Load media file to set Length, Width and Height.
-                    if (item.FileName != null && MediaInfoReader.HasMissingInfo(item)) {
-                        await MediaInfo.LoadInfoAsync(item);
+                    if (item.FileName != null && FileEntryHasMissingInfo(item)) {
+                        await LoadFileEntryInfoAsync(item);
                         HasChanges = true;
                     }
 
@@ -264,7 +262,6 @@ namespace Business {
                     if (loadingMediaInfoProgress != null)
                         loadingMediaInfoProgress.Report(++ItemsCompleted);
                 }
-                MediaInfo.Dispose();
                 if (HasChanges)
                     context.SaveChanges();
             }
@@ -272,6 +269,29 @@ namespace Business {
             loadingMediaInfoCount = 0;
             loadingMediaInfoProgress = null;
             return HasChanges;
+        }
+
+        public static bool FileEntryHasMissingInfo(Media item) {
+            return (item.FileName != null &&
+                File.Exists(Settings.NaturalGroundingFolder + item.FileName)
+                && (item.Length == null || (FileEntryHasDimensions(item) && item.Height == null)));
+        }
+
+        public static bool FileEntryHasDimensions(Media item) {
+            return item.MediaTypeId == (int)MediaType.Video || item.MediaTypeId == (int)MediaType.Image;
+        }
+
+        /// <summary>
+        /// Loads the Length, Width and Height of specified media file.
+        /// </summary>
+        /// <param name="item">The media file to read.</param>
+        /// <returns>True if data was loaded, false if no data was needed.</returns>
+        public async Task LoadFileEntryInfoAsync(Media item) {
+            FFmpegProcess FileInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + item.FileName));
+            if (FileInfo.FileDuration > TimeSpan.Zero)
+                item.Length = (short)FileInfo.FileDuration.TotalSeconds;
+            if (FileInfo.VideoStream != null && FileInfo.VideoStream.Height > 0)
+                item.Height = (short)FileInfo.VideoStream.Height;
         }
 
         public async Task LoadBuyListAsync(SearchSettings settings, BuyProductType productType, bool showAllFiles) {

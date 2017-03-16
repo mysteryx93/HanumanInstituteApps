@@ -9,29 +9,18 @@ using System.Globalization;
 using System.Diagnostics;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
+using System.Threading;
+using System.Windows;
 
 namespace Business {
     public class MediaEncoderBusiness {
-        private static int JobIndex = 0;
-        private static Task<EncodingCompletedEventArgs> EncoderTask = null;
-        public static ObservableCollection<string> ProcessingQueue = new ObservableCollection<string>();
+        private int JobIndex = 0;
+        public ObservableCollection<MediaEncoderSettings> ProcessingQueue = new ObservableCollection<MediaEncoderSettings>();
+        public bool IsEncoding { get; private set; } = false;
+        private Thread JobThread = null;
 
         public event EventHandler<EncodingCompletedEventArgs> EncodingCompleted;
-        static public string PreviewScriptFile {
-            get { return Settings.TempFilesPath + "Preview.avs"; }
-        }
-        static public string PreviewSettingsFile {
-            get { return Settings.TempFilesPath + "Preview.xml"; }
-        }
-        static public string PreviewSourceFile {
-            get { return Settings.TempFilesPath + "Preview.avi"; }
-        }
-        static public string PreviewDeshakerScript {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.avs"; }
-        }
-        static public string PreviewDeshakerLog {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.log"; }
-        }
+        public event EventHandler<EncodingCompletedEventArgs> EncodingFailed;
 
         public void GenerateScript(MediaEncoderSettings settings, bool preview, bool multiThreaded) {
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
@@ -42,8 +31,8 @@ namespace Business {
                 Script.AppendLine(@"ConvertToRGB32(matrix=""Rec709"")");
             } else if (!multiThreaded)
                 Script.RemoveMT();
-            Script.WriteToFile(PreviewScriptFile);
-            settings.Save(PreviewSettingsFile);
+            Script.WriteToFile(PathManager.PreviewScriptFile);
+            settings.Save(PathManager.PreviewSettingsFile);
         }
 
         public void GenerateCustomScript(MediaEncoderSettings settings) {
@@ -56,7 +45,7 @@ namespace Business {
 
         public string GetPreviewSourceFile(MediaEncoderSettings settings) {
             if (settings.ConvertToAvi)
-                return PreviewSourceFile;
+                return PathManager.PreviewSourceFile;
             else
                 return settings.FilePath;
         }
@@ -64,11 +53,11 @@ namespace Business {
         public async Task DeletePreviewFilesAsync() {
             for (int i = 0; i < 5; i++) {
                 try {
-                    File.Delete(PreviewSourceFile);
-                    File.Delete(PreviewScriptFile);
-                    File.Delete(PreviewSettingsFile);
-                    File.Delete(PreviewDeshakerScript);
-                    File.Delete(PreviewDeshakerLog);
+                    File.Delete(PathManager.PreviewSourceFile);
+                    File.Delete(PathManager.PreviewScriptFile);
+                    File.Delete(PathManager.PreviewSettingsFile);
+                    File.Delete(PathManager.PreviewDeshakerScript);
+                    File.Delete(PathManager.PreviewDeshakerLog);
                     return;
                 }
                 catch {
@@ -77,167 +66,170 @@ namespace Business {
             }
         }
 
-        /// <summary>
-        /// Starts encoding with specified settings. If an encoding is already in process, it will be added
-        /// to the queue and start once the previous encodings are finished.
-        /// </summary>
-        /// <param name="settings">The encoding settings.</param>
-        public async Task EncodeFileAsync(MediaEncoderSettings settings) {
-            settings.JobIndex = ++JobIndex;
-            // Files must be prepared before adding to queue so that user can replace preview files.
-            DeleteJobFiles(settings);
-            File.Delete(PreviewScriptFile);
-            File.Delete(PreviewSettingsFile);
-            if (settings.ConvertToAvi)
-                SafeMove(PreviewSourceFile, settings.InputFile);
-            if (settings.Deshaker)
-                SafeMove(PreviewDeshakerLog, settings.DeshakerLog);
-            settings.Save(settings.SettingsFile);
-            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
-            if (Script.IsEmpty)
-                Script = MediaEncoderScript.GenerateVideoScript(settings, settings.InputFile, false, true);
-            else {
-                Script.Replace(Script.GetAsciiPath(PreviewSourceFile), Script.GetAsciiPath(settings.InputFile));
-                Script.Replace(Script.GetAsciiPath(PreviewDeshakerLog), Script.GetAsciiPath(settings.DeshakerLog));
+        public void AddJobToQueue(MediaEncoderSettings settings) {
+            ProcessingQueue.Add(settings);
+            if (IsEncoding && ProcessingQueue.Count == 1)
+                StartEncoderThread();
+        }
+
+        public void ResumeEncoding() {
+            if (IsEncoding)
+                return;
+
+            IsEncoding = true;
+            StartEncoderThread();
+        }
+
+        public void PauseEncoding() {
+            if (!IsEncoding)
+                return;
+
+            IsEncoding = false;
+            ProcessingQueue.FirstOrDefault()?.Cancel();
+        }
+
+        private void StartEncoderThread() {
+            if (JobThread == null && ProcessingQueue.Count > 0) {
+                JobThread = new Thread(EncoderThread);
+                JobThread.Start(ProcessingQueue.First());
             }
-            //Script.DitherOut(true);
-            Script.WriteToFile(settings.ScriptFile);
-            await StartEncodeFileAsync(settings);
         }
 
-        private async Task StartEncodeFileAsync(MediaEncoderSettings settings) {
-            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FilePath));
-
-            EncodingCompletedEventArgs EncodingResult;
-            if (EncoderTask == null)
-                EncoderTask = Task.Run(() => EncodeFileThread(settings));
-            else
-                EncoderTask = EncoderTask.ContinueWith((prevTask) => EncodeFileThread(settings));
-            EncodingResult = await EncoderTask;
-
-            ProcessingQueue.RemoveAt(0);
-            if (EncodingResult != null && EncodingCompleted != null)
-                EncodingCompleted(this, EncodingResult);
-        }
-
-        private async Task WaitEncodeProcessAsync(MediaEncoderSettings settings, Process jobProcess) {
-            ProcessingQueue.Add(Path.GetFileNameWithoutExtension(settings.FilePath));
-
-            EncodingCompletedEventArgs EncodingResult;
-            if (EncoderTask == null)
-                EncoderTask = Task.Run(() => {
-                    jobProcess.WaitForExit();
-                    return FinalizeEncoding(settings, DateTime.Now);
-                });
-            else
-                EncoderTask = EncoderTask.ContinueWith((prevTask) => {
-                    jobProcess.WaitForExit();
-                    return FinalizeEncoding(settings, DateTime.Now);
-                });
-            EncodingResult = await EncoderTask;
-
-            ProcessingQueue.RemoveAt(0);
-            if (EncodingResult != null && EncodingCompleted != null)
-                EncodingCompleted(this, EncodingResult);
-        }
-
-        private EncodingCompletedEventArgs EncodeFileThread(MediaEncoderSettings settings) {
-            EncodingCompletedEventArgs Result = null;
+        private void EncoderThread(object obj) {
+            MediaEncoderSettings settings = obj as MediaEncoderSettings;
+            settings.CompletionStatus = CompletionStatus.None;
             DateTime StartTime = DateTime.Now;
-            Task<CompletionStatus> VideoEnc = null;
-            if (settings.VideoCodec != VideoCodecs.Copy)
-                VideoEnc = Task.Run(() => AvisynthTools.EncodeVideo(settings));
 
-            // Encode audio stream
-            if (settings.IsAudioEncode) {
-                Task<CompletionStatus> AudioEnc = Task.Run(() => AvisynthTools.EncodeAudio(settings));
-                if (VideoEnc != null)
-                    Task.WaitAll(VideoEnc, AudioEnc);
-                else
-                    Task.WaitAll(AudioEnc);
-            } else if (VideoEnc != null)
-                Task.WaitAll(VideoEnc);
+            FFmpegConfig.UserInterfaceManager.Start(settings.JobIndex, "Processing Video");
 
-            Result = FinalizeEncoding(settings, StartTime);
-            return Result;
+            bool Run = PrepareExistingJob(settings);
+            if (Run) {
+                Task<CompletionStatus> VideoEnc = null;
+                if (settings.VideoCodec != VideoCodecs.Copy)
+                    VideoEnc = Task.Run(() => AvisynthTools.EncodeVideo(settings));
+
+                // Encode audio stream
+                if (settings.IsAudioEncode) {
+                    Task<CompletionStatus> AudioEnc = Task.Run(() => AvisynthTools.EncodeAudio(settings));
+                    if (VideoEnc != null)
+                        Task.WaitAll(VideoEnc, AudioEnc);
+                    else
+                        AudioEnc.Wait();
+                } else if (VideoEnc != null)
+                    VideoEnc.Wait();
+            }
+
+            if (IsEncoding || settings.CompletionStatus == CompletionStatus.Success)
+                Application.Current.Dispatcher.Invoke(() => ProcessingQueue.Remove(settings));
+
+            // Check if encode is completed.
+            EncodingCompletedEventArgs CompletedArgs = null;
+            if (settings.CompletionStatus == CompletionStatus.Success) {
+                CompletedArgs = FinalizeEncoding(settings, StartTime);
+                if (CompletedArgs != null)
+                    EncodingCompleted?.Invoke(this, CompletedArgs);
+            } else {
+                CompletedArgs = GetEncodingResults(settings, null, StartTime);
+                if (IsEncoding)
+                    EncodingFailed?.Invoke(this, CompletedArgs);
+            }
+
+            FFmpegConfig.UserInterfaceManager.Stop(settings.JobIndex);
+
+            // Start next job.
+            if (IsEncoding && ProcessingQueue.Count > 0)
+                EncoderThread(ProcessingQueue.First());
+
+            JobThread = null;
         }
-
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
             EncodingCompletedEventArgs Result = null;
-            string FinalFile = GetNextAvailableFileName(settings.FinalFile);
+            string FinalFile = PathManager.GetNextAvailableFileName(settings.FinalFile);
             string VideoFile = null;
             if (settings.VideoCodec == VideoCodecs.Copy)
                 VideoFile = settings.FilePath;
-            else
-                VideoFile = settings.OutputFile;
+            else {
+                VideoFile = PathManager.GetOutputFile(settings.JobIndex, 0, settings.VideoCodec);
+                MergeSegments(settings, VideoFile);
+            }
 
             if (settings.VideoCodec == VideoCodecs.Avi) {
                 File.Move(VideoFile, FinalFile);
             } else {
                 // Muxe video with audio.
                 string AudioFile = null;
-                if (settings.AudioAction == AudioActions.Copy)
-                    AudioFile = settings.FilePath;
-                else if (settings.AudioAction == AudioActions.EncodeWav)
-                    AudioFile = settings.AudioFileWav;
-                else if (settings.AudioAction == AudioActions.EncodeFlac)
-                    AudioFile = settings.AudioFileFlac;
-                else if (settings.AudioAction == AudioActions.EncodeAac)
-                    AudioFile = settings.AudioFileAac;
-                else if (settings.AudioAction == AudioActions.EncodeOpus)
-                    AudioFile = settings.AudioFileOpus;
-                MediaMuxer.Muxe(VideoFile, AudioFile, FinalFile, new ProcessStartOptions(FFmpegDisplayMode.ErrorOnly, "Muxing Audio and Video"));
+                AudioFile = settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
+                MediaMuxer.Muxe(VideoFile, AudioFile, FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
             }
             Result = GetEncodingResults(settings, FinalFile, startTime);
 
             return Result;
         }
 
+        /// <summary>
+        /// For files encoded in various segments (stop/resume), merge the various segments.
+        /// </summary>
+        private CompletionStatus MergeSegments(MediaEncoderSettings settings, string destination) {
+            int Segment = 0;
+            List<string> SegmentList = new List<string>();
+            List<Task<CompletionStatus>> TaskList = new List<Task<CompletionStatus>>();
+            while (File.Exists(PathManager.GetOutputFile(settings.JobIndex, ++Segment, settings.VideoCodec))) {
+                string OutputFile = PathManager.GetOutputFile(settings.JobIndex, Segment, settings.VideoCodec);
+                SegmentList.Add(OutputFile);
+            }
+
+            File.Delete(destination);
+            if (SegmentList.Count == 1)
+                File.Move(SegmentList[0], destination);
+            else if (SegmentList.Count > 1) {
+                return MediaMuxer.ConcatenateFiles(SegmentList, destination, new ProcessStartOptions(settings.JobIndex, "Merging Files", false));
+            }
+            return CompletionStatus.Success;
+        }
+
         private EncodingCompletedEventArgs GetEncodingResults(MediaEncoderSettings settings, string finalFile, DateTime? startTime) {
             // Create encoding result object.
             EncodingCompletedEventArgs Result = null;
-            if (File.Exists(finalFile)) {
+            if (finalFile == null || File.Exists(finalFile)) {
                 Result = new EncodingCompletedEventArgs();
+                Result.Settings = settings;
                 Result.OldFileName = settings.FilePath;
                 Result.NewFileName = settings.FinalFile;
                 if (startTime.HasValue)
                     Result.EncodingTime = DateTime.Now - startTime.Value;
-                FileInfo FinalFileInfo = new FileInfo(finalFile);
-                Result.NewFileSize = FinalFileInfo.Length;
-                FinalFileInfo = new FileInfo(settings.FilePath);
-                Result.OldFileSize = FinalFileInfo.Length;
-                Result.Settings = settings;
+                if (finalFile != null) {
+                    FileInfo FinalFileInfo = new FileInfo(finalFile);
+                    Result.NewFileSize = FinalFileInfo.Length;
+                    FinalFileInfo = new FileInfo(settings.FilePath);
+                    Result.OldFileSize = FinalFileInfo.Length;
+                }
             }
             return Result;
         }
-
-
 
         public async Task PreparePreviewFile(MediaEncoderSettings settings, bool overwrite, bool calcAutoCrop) {
             if (string.IsNullOrEmpty(settings.FilePath))
                 return;
 
             if (overwrite) {
-                File.Delete(PreviewSourceFile);
+                File.Delete(PathManager.PreviewSourceFile);
                 // Select default open method.
                 if (settings.FilePath.ToLower().EndsWith(".avi"))
                     settings.ConvertToAvi = false;
                 else {
-                    using (MediaInfoReader InfoReader = new MediaInfoReader()) {
-                        InfoReader.LoadInfo(settings.FilePath);
-                        if (settings.ConvertToAvi && InfoReader.Height.HasValue && InfoReader.Height >= 720)
-                            settings.ConvertToAvi = false;
-                    }
+                    FFmpegProcess FileInfo = await Task.Run(() => MediaInfo.GetFileInfo(settings.FilePath));
+                    if (settings.ConvertToAvi && FileInfo?.VideoStream?.Height >= 720)
+                        settings.ConvertToAvi = false;
                 }
             }
 
-            bool AviFileReady = File.Exists(PreviewSourceFile);
+            bool AviFileReady = File.Exists(PathManager.PreviewSourceFile);
             if (!AviFileReady && settings.ConvertToAvi)
-                AviFileReady = await Task.Run(() => MediaEncoder.ConvertToAvi(settings.FilePath, PreviewSourceFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Converting to AVI"))) == CompletionStatus.Success;
+                AviFileReady = await Task.Run(() => MediaEncoder.ConvertToAvi(settings.FilePath, PathManager.PreviewSourceFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Converting to AVI"))) == CompletionStatus.Success;
 
             if (AviFileReady && settings.ConvertToAvi)
-                await GetMediaInfo(PreviewSourceFile, settings);
+                await GetMediaInfo(PathManager.PreviewSourceFile, settings);
             else {
                 settings.ConvertToAvi = false;
                 await GetMediaInfo(settings.FilePath, settings);
@@ -246,7 +238,7 @@ namespace Business {
             // Auto-calculate crop settings.
             if (calcAutoCrop) {
                 if (settings.CropLeft == 0 && settings.CropTop == 0 && settings.CropRight == 0 && settings.CropBottom == 0) {
-                    Rect AutoCrop = await Task.Run(() => AvisynthTools.GetAutoCropRect(settings));
+                    Rect AutoCrop = await Task.Run(() => AvisynthTools.GetAutoCropRect(settings, null));
                     if (settings.CropLeft == 0)
                         settings.CropLeft = AutoCrop.Left;
                     if (settings.CropTop == 0)
@@ -259,10 +251,111 @@ namespace Business {
             }
         }
 
+        public void PrepareJobFiles(MediaEncoderSettings settings) {
+            settings.JobIndex = ++JobIndex;
+            // Files must be prepared before adding to queue so that user can replace preview files.
+            PathManager.DeleteJobFiles(settings.JobIndex);
+            File.Delete(PathManager.PreviewScriptFile);
+            File.Delete(PathManager.PreviewSettingsFile);
+            if (settings.ConvertToAvi)
+                PathManager.SafeMove(PathManager.PreviewSourceFile, settings.InputFile);
+            if (settings.Deshaker)
+                PathManager.SafeMove(PathManager.PreviewDeshakerLog, settings.DeshakerLog);
+            settings.Save(settings.SettingsFile);
+            AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
+            if (Script.IsEmpty)
+                Script = MediaEncoderScript.GenerateVideoScript(settings, settings.InputFile, false, true);
+            else {
+                Script.Replace(Script.GetAsciiPath(PathManager.PreviewSourceFile), Script.GetAsciiPath(settings.InputFile));
+                Script.Replace(Script.GetAsciiPath(PathManager.PreviewDeshakerLog), Script.GetAsciiPath(settings.DeshakerLog));
+            }
+            Script.WriteToFile(settings.ScriptFile);
+        }
+
+        /// <summary>
+        /// Prepares the files of an existing job.
+        /// </summary>
+        /// <returns>Whether job still needs to execute.</returns>
+        public bool PrepareExistingJob(MediaEncoderSettings settings) {
+            settings.ResumeSegment = 1;
+            settings.ResumePos = 0;
+            settings.CompletionStatus = CompletionStatus.Success;
+            if (File.Exists(settings.FinalFile)) {
+                // Merging was completed.
+                //EncodingCompletedEventArgs EncodeResult = GetEncodingResults(settings, settings.FinalFile, null);
+                //if (EncodeResult != null)
+                //    EncodingCompleted(this, EncodeResult);
+                return false;
+            } else if (File.Exists(settings.OutputFile) && new FileInfo(settings.OutputFile).Length > 10000) {
+                // Encoding produced partial files.
+                return PrepareResumeJob(settings);
+            } else {
+                // Encoding had not yet started.
+                File.Delete(settings.OutputFile);
+                return true;
+            }
+        }
+
+
+        /// <summary>
+        /// Prepares the files of an existing job that we resume.
+        /// </summary>
+        /// <returns>Whether job still needs to execute.</returns>
+        private bool PrepareResumeJob(MediaEncoderSettings settings) {
+            AvisynthTools.EditStartPosition(settings.ScriptFile, 0);
+            // At least one segment has been processed. Check if the entire file has been processed.
+            ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Resuming...", false).TrackProcess(settings);
+            Task<long> TaskCount = Task.Run(() => AvisynthTools.GetFrameCount(settings.ScriptFile, Options));
+
+            int Segment = 0;
+            List<Task<long>> TaskList = new List<Task<long>>();
+            while (File.Exists(PathManager.GetOutputFile(settings.JobIndex, ++Segment, settings.VideoCodec)) && settings.CompletionStatus != CompletionStatus.Cancelled) {
+                string SegmentFile = PathManager.GetOutputFile(settings.JobIndex, Segment, settings.VideoCodec);
+                // Discard segments of less than 10kb.
+                if (new FileInfo(SegmentFile).Length > 10000) {
+                    int SegmentLocal = Segment;
+                    TaskList.Add(Task.Run(() => AvisynthTools.GetFrameCount(PathManager.GetOutputFile(settings.JobIndex, SegmentLocal, settings.VideoCodec), null)));
+                } else {
+                    // There shouldn't be any resumed job following a segment that is being deleted.
+                    File.Delete(SegmentFile);
+                    break;
+                }
+            }
+
+            long OutputFrames = 0;
+            Task.WaitAll(TaskList.ToArray());
+            foreach (Task<long> item in TaskList) {
+                OutputFrames += item.Result;
+            }
+
+            TaskCount.Wait();
+            if (settings.CompletionStatus == CompletionStatus.Cancelled)
+                return false;
+
+            long ScriptFrames = TaskCount.Result;
+            if (OutputFrames >= ScriptFrames) {
+                // Job completed.
+                EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
+                if (EncodeResult != null)
+                    EncodingCompleted(this, EncodeResult);
+                else {
+                    PathManager.DeleteJobFiles(settings.JobIndex);
+                }
+                return false;
+            } else {
+                // Resume with new segment.
+                AvisynthTools.EditStartPosition(settings.ScriptFile, OutputFrames);
+                settings.ResumeSegment = Segment;
+                settings.ResumePos = OutputFrames;
+                File.Delete(settings.OutputFile);
+                return true;
+            }
+        }
+
         private async Task GetMediaInfo(string previewFile, MediaEncoderSettings settings) {
-            FFmpegProcess Worker = await Task.Run(() => MediaMuxer.GetFileInfo(previewFile));
+            FFmpegProcess Worker = await Task.Run(() => MediaInfo.GetFileInfo(previewFile));
             FFmpegVideoStreamInfo VInfo = Worker.VideoStream;
-            FFmpegAudioStreamInfo AInfo = settings.ConvertToAvi ? await Task.Run(() => MediaMuxer.GetFileInfo(settings.FilePath).AudioStream) : Worker.AudioStream;
+            FFmpegAudioStreamInfo AInfo = settings.ConvertToAvi ? await Task.Run(() => MediaInfo.GetFileInfo(settings.FilePath).AudioStream) : Worker.AudioStream;
 
             settings.SourceWidth = Worker.VideoStream.Width;
             settings.SourceHeight = Worker.VideoStream.Height;
@@ -304,10 +397,10 @@ namespace Business {
             Media EditVideo = EditBusiness.GetVideoByFileName(RelativePath);
             System.Threading.Thread.Sleep(200); // Give MPC time to release the file.
             string OriginalPath = Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName), "Original", Path.GetFileName(jobInfo.OldFileName));
-            string NewPath = Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName), Path.GetFileNameWithoutExtension(jobInfo.OldFileName) + Path.GetExtension(jobInfo.Settings.FinalFile));
+            string NewPath = PathManager.GetPathWithoutExtension(jobInfo.OldFileName) + Path.GetExtension(jobInfo.Settings.FinalFile);
             Directory.CreateDirectory(Path.GetDirectoryName(OriginalPath));
-            SafeMove(jobInfo.OldFileName, OriginalPath);
-            SafeMove(jobInfo.Settings.FinalFile, NewPath);
+            PathManager.SafeMove(jobInfo.OldFileName, OriginalPath);
+            PathManager.SafeMove(jobInfo.Settings.FinalFile, NewPath);
             jobInfo.Settings.FilePath = OriginalPath.Substring(Settings.NaturalGroundingFolder.Length);
 
             if (EditVideo != null) {
@@ -318,26 +411,8 @@ namespace Business {
         }
 
         public void FinalizeKeep(EncodingCompletedEventArgs jobInfo) {
-            string FinalFile = String.Format("{0} - Encoded.{1}",
-                Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName),
-                    Path.GetFileNameWithoutExtension(jobInfo.OldFileName)),
-                    jobInfo.Settings.FileExtension);
-            SafeMove(jobInfo.NewFileName, FinalFile);
-        }
-
-        public void DeleteJobFiles(MediaEncoderSettings settings) {
-            if (settings.ConvertToAvi)
-                File.Delete(settings.InputFile);
-            File.Delete(settings.OutputFile);
-            File.Delete(settings.AudioFileWav);
-            File.Delete(settings.AudioFileAac);
-            File.Delete(settings.AudioFileOpus);
-            File.Delete(settings.AudioFileFlac);
-            File.Delete(settings.FinalFile);
-            File.Delete(settings.ScriptFile);
-            File.Delete(settings.SettingsFile);
-            File.Delete(settings.DeshakerScript);
-            File.Delete(settings.DeshakerLog);
+            string FinalFile = String.Format("{0} - Encoded.{1}", PathManager.GetPathWithoutExtension(jobInfo.OldFileName), jobInfo.Settings.FileExtension);
+            PathManager.SafeMove(jobInfo.NewFileName, FinalFile);
         }
 
         /// <summary>
@@ -347,37 +422,18 @@ namespace Business {
         public async Task MovePreviewFilesAsync(MediaEncoderSettings settings) {
             await DeletePreviewFilesAsync();
             if (settings.ConvertToAvi)
-                File.Move(settings.InputFile, PreviewSourceFile);
+                File.Move(settings.InputFile, PathManager.PreviewSourceFile);
             if (settings.Deshaker && File.Exists(settings.DeshakerLog))
-                File.Move(settings.DeshakerLog, PreviewDeshakerLog);
+                File.Move(settings.DeshakerLog, PathManager.PreviewDeshakerLog);
             if (!string.IsNullOrEmpty(settings.CustomScript) && (settings.ConvertToAvi || settings.Deshaker)) {
                 AviSynthScriptBuilder Script = new AviSynthScriptBuilder(settings.CustomScript);
                 if (settings.ConvertToAvi)
-                    Script.Replace(Script.GetAsciiPath(settings.InputFile), Script.GetAsciiPath(PreviewSourceFile));
+                    Script.Replace(Script.GetAsciiPath(settings.InputFile), Script.GetAsciiPath(PathManager.PreviewSourceFile));
                 if (settings.Deshaker)
-                    Script.Replace(Script.GetAsciiPath(settings.DeshakerLog), Script.GetAsciiPath(PreviewDeshakerLog));
+                    Script.Replace(Script.GetAsciiPath(settings.DeshakerLog), Script.GetAsciiPath(PathManager.PreviewDeshakerLog));
                 settings.CustomScript = Script.Script;
             }
-            settings.Save(PreviewSettingsFile);
-        }
-
-        /// <summary>
-        /// Returns the next available file name to avoid overriding an existing file.
-        /// </summary>
-        /// <param name="dest">The attempted destination.</param>
-        /// <returns>The next available file name.</returns>
-        public string GetNextAvailableFileName(string dest) {
-            int DuplicateIndex = 0;
-            string DestFile;
-            do {
-                DuplicateIndex++;
-                DestFile = string.Format("{0}{1}{2}",
-                    Path.Combine(Path.GetDirectoryName(dest),
-                        Path.GetFileNameWithoutExtension(dest)),
-                    DuplicateIndex > 1 ? string.Format(" ({0})", DuplicateIndex) : "",
-                    Path.GetExtension(dest));
-            } while (File.Exists(DestFile));
-            return DestFile;
+            settings.Save(PathManager.PreviewSettingsFile);
         }
 
         /// <summary>
@@ -385,9 +441,9 @@ namespace Business {
         /// </summary>
         /// <returns>The previous preview encoding settings.</returns>
         public async Task<MediaEncoderSettings> AutoLoadPreviewFileAsync() {
-            if (File.Exists(PreviewSettingsFile)) {
-                MediaEncoderSettings settings = MediaEncoderSettings.Load(PreviewSettingsFile);
-                if (!File.Exists(PreviewSourceFile) && File.Exists(settings.FilePath)) {
+            if (File.Exists(PathManager.PreviewSettingsFile)) {
+                MediaEncoderSettings settings = MediaEncoderSettings.Load(PathManager.PreviewSettingsFile);
+                if (!File.Exists(PathManager.PreviewSourceFile) && File.Exists(settings.FilePath)) {
                     double? SourceFps = settings.SourceFrameRate; // Keep FPS in case it cannot be read from the file.
                     await PreparePreviewFile(settings, false, false);
                     if (!settings.SourceFrameRate.HasValue)
@@ -402,7 +458,7 @@ namespace Business {
         /// <summary>
         /// Automatically reloads jobs if the encoder was unexpectedly closed.
         /// </summary>
-        public async Task AutoLoadJobsAsync() {
+        public void AutoLoadJobs() {
             try {
                 if (!Directory.Exists(Settings.TempFilesPath))
                     Directory.CreateDirectory(Settings.TempFilesPath);
@@ -414,7 +470,7 @@ namespace Business {
             var JobList = Directory.EnumerateFiles(Settings.TempFilesPath, "Job*_Settings.xml");
             int Index = 0;
             MediaEncoderSettings settings;
-            List<Task> TaskList = new List<Task>();
+            //List<Task> TaskList = new List<Task>();
 
             // Get list of interrupted jobs.
             foreach (string item in JobList) {
@@ -431,43 +487,37 @@ namespace Business {
                         JobIndex = Index;
 
                     if (settings != null && File.Exists(settings.InputFile) && File.Exists(settings.ScriptFile) && File.Exists(settings.SettingsFile) && File.Exists(settings.FilePath)) {
-                        if (File.Exists(settings.FinalFile)) {
-                            // Merging was completed.
-                            EncodingCompletedEventArgs EncodeResult = GetEncodingResults(settings, settings.FinalFile, null);
-                            if (EncodeResult != null)
-                                EncodingCompleted(this, EncodeResult);
-                        } else if (File.Exists(settings.OutputFile) && new FileInfo(settings.OutputFile).Length > 10000) {
-                            if (!IsFileLocked(settings.OutputFile)) {
-                                // Encoding was completed
-                                EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
-                                if (EncodeResult != null)
-                                    EncodingCompleted(this, EncodeResult);
-                                else {
-                                    DeleteJobFiles(settings);
-                                }
-                            } else {
-                                // Encoding in progress.
-                                Process JobProcess = Getx264Process();
-                                if (JobProcess != null)
-                                    TaskList.Add(WaitEncodeProcessAsync(settings, JobProcess));
-                            }
-                        } else {
-                            // Encoding had not yet started.
-                            File.Delete(settings.OutputFile);
-                            TaskList.Add(StartEncodeFileAsync(settings));
-                        }
+                        ProcessingQueue.Add(settings);
+                        //TaskList.Add(StartJobAsync(settings));
                     } else {
                         // Resume job failed, delete files.
-                        DeleteJobFiles(settings);
+                        PathManager.DeleteJobFiles(settings.JobIndex);
                     }
                 }
             }
-            await Task.WhenAll(TaskList);
         }
 
-        private Process Getx264Process() {
-            string ProcessName = Path.GetFileNameWithoutExtension(FFmpegConfig.FFmpegPath);
-            return Process.GetProcessesByName(ProcessName).FirstOrDefault();
+        /// <summary>
+        /// Wait for any instance of FFmpeg to terminate.
+        /// </summary>
+        public async Task WaitForFFmpegAsync() {
+            List<Task> JobTasks = new List<Task>();
+            foreach (Process process in MediaInfo.GetFFmpegProcesses()) {
+                JobTasks.Add(Task.Run(() => process.WaitForExit()));
+            }
+            await Task.WhenAll(JobTasks);
+        }
+
+        /// <summary>
+        /// Kills all instances of FFmpeg.
+        /// </summary>
+        public void KillAllFFmpegInstances() {
+            foreach (Process process in MediaInfo.GetFFmpegProcesses()) {
+                try {
+                    process.Kill();
+                }
+                catch { }
+            }
         }
 
         /// <summary>
@@ -496,47 +546,6 @@ namespace Business {
             //file is not locked
             return false;
         }
-
-        /// <summary>
-        /// Moves specified file to specified destination, numerating the destination to avoid duplicates and attempting several times.
-        /// </summary>
-        /// <param name="source">The file to move.</param>
-        /// <param name="dest">The destination to move the file to.</param>
-        /// <returns>The file name being moved to.</returns>
-        public string SafeMove(string source, string dest) {
-            string DestFile = GetNextAvailableFileName(dest);
-            // Attempt to copy file until it becomes available.
-            for (int i = 0; i < 5; i++) {
-                try {
-                    File.Move(source, DestFile);
-                    return DestFile;
-                }
-                catch {
-                }
-                System.Threading.Thread.Sleep(500);
-            }
-            throw new IOException(string.Format("Cannot move file '{0}' because it is being used by another process.", source));
-        }
-
-        /// <summary>
-        /// Clears the temp folder (unfinished downloads) except Media Encoder files.
-        /// </summary>
-        public static void ClearTempFolder() {
-            if (Settings.SavedFile == null || !Directory.Exists(Settings.TempFilesPath))
-                return;
-
-            string FileName;
-            foreach (string item in Directory.EnumerateFiles(Settings.TempFilesPath)) {
-                FileName = Path.GetFileName(item);
-                if (!FileName.StartsWith("Preview.") && !FileName.StartsWith("Job")) {
-                    try {
-                        File.Delete(item);
-                    }
-                    catch {
-                    }
-                }
-            }
-        }
     }
 
     public class EncodingCompletedEventArgs : EventArgs {
@@ -548,7 +557,12 @@ namespace Business {
         public MediaEncoderSettings Settings { get; set; }
 
         public EncodingCompletedEventArgs() {
+        }
 
+        public string OldFileNameShort {
+            get {
+                return Path.GetFileName(OldFileName);
+            }
         }
     }
 }
