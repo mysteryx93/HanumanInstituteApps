@@ -33,13 +33,13 @@ namespace Business {
 
         public static void CreateScript(string inputFile, FFmpegProcess infoReader) {
             if (LastScriptPath != null)
-                File.Delete(LastScriptPath);
+                PathManager.SafeDelete(LastScriptPath);
             LastScriptPath = GetAutoPitchFilePath(inputFile, infoReader?.VideoStream?.Format);
             CreateScript(inputFile, infoReader, LastScriptPath);
         }
 
         public static string GetAutoPitchFilePath(string fileName, string videoCodec) {
-            return string.Format("{0}{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
+            return string.Format("432hz_{0}{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
         }
 
         public bool StartMerge() {
-            return MediaMuxer.ConcatenateFiles(Files.Select(f => f.Path).ToList(), OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Merging Media Files")) == CompletionStatus.Success;
+            return MediaMuxer.Concatenate(Files.Select(f => f.Path).ToList(), OutputFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Merging Media Files")) == CompletionStatus.Success;
         }
 
         public bool StartSplit() {

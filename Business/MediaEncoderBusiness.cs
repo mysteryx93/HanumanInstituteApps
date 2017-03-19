@@ -119,20 +119,23 @@ namespace Business {
                     VideoEnc.Wait();
             }
 
-            if (IsEncoding || settings.CompletionStatus == CompletionStatus.Success)
-                Application.Current.Dispatcher.Invoke(() => ProcessingQueue.Remove(settings));
-
             // Check if encode is completed.
             EncodingCompletedEventArgs CompletedArgs = null;
             if (settings.CompletionStatus == CompletionStatus.Success) {
                 CompletedArgs = FinalizeEncoding(settings, StartTime);
-                if (CompletedArgs != null)
+                if (settings.CompletionStatus == CompletionStatus.Success && CompletedArgs != null)
                     EncodingCompleted?.Invoke(this, CompletedArgs);
-            } else {
+
+            }
+            if (settings.CompletionStatus != CompletionStatus.Success) {
                 CompletedArgs = GetEncodingResults(settings, null, StartTime);
                 if (IsEncoding)
                     EncodingFailed?.Invoke(this, CompletedArgs);
             }
+
+            if (IsEncoding || settings.CompletionStatus == CompletionStatus.Success)
+                Application.Current.Dispatcher.Invoke(() => ProcessingQueue.Remove(settings));
+
 
             FFmpegConfig.UserInterfaceManager.Stop(settings.JobIndex);
 
@@ -144,27 +147,24 @@ namespace Business {
         }
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
-            EncodingCompletedEventArgs Result = null;
             string FinalFile = PathManager.GetNextAvailableFileName(settings.FinalFile);
             string VideoFile = null;
             if (settings.VideoCodec == VideoCodecs.Copy)
                 VideoFile = settings.FilePath;
             else {
                 VideoFile = PathManager.GetOutputFile(settings.JobIndex, 0, settings.VideoCodec);
-                MergeSegments(settings, VideoFile);
+                settings.CompletionStatus = MergeSegments(settings, VideoFile);
+                if (settings.CompletionStatus != CompletionStatus.Success)
+                    return null;
             }
 
-            if (settings.VideoCodec == VideoCodecs.Avi) {
-                File.Move(VideoFile, FinalFile);
-            } else {
-                // Muxe video with audio.
-                string AudioFile = null;
-                AudioFile = settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
-                MediaMuxer.Muxe(VideoFile, AudioFile, FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
-            }
-            Result = GetEncodingResults(settings, FinalFile, startTime);
+            // Muxe video with audio.
+            string AudioFile = settings.AudioAction == AudioActions.Ignore ? null : settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
+            settings.CompletionStatus = MediaMuxer.Muxe(VideoFile, AudioFile, FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
+            if (settings.CompletionStatus != CompletionStatus.Success)
+                return null;
 
-            return Result;
+            return GetEncodingResults(settings, FinalFile, startTime);
         }
 
         /// <summary>
@@ -179,13 +179,15 @@ namespace Business {
                 SegmentList.Add(OutputFile);
             }
 
+            CompletionStatus Result = CompletionStatus.Success;
             File.Delete(destination);
             if (SegmentList.Count == 1)
                 File.Move(SegmentList[0], destination);
             else if (SegmentList.Count > 1) {
-                return MediaMuxer.ConcatenateFiles(SegmentList, destination, new ProcessStartOptions(settings.JobIndex, "Merging Files", false));
+                Result = MediaMuxer.Concatenate(SegmentList, destination, new ProcessStartOptions(settings.JobIndex, "Merging Files", false));
             }
-            return CompletionStatus.Success;
+            settings.CompletionStatus = Result;
+            return Result;
         }
 
         private EncodingCompletedEventArgs GetEncodingResults(MediaEncoderSettings settings, string finalFile, DateTime? startTime) {
@@ -335,12 +337,12 @@ namespace Business {
             long ScriptFrames = TaskCount.Result;
             if (OutputFrames >= ScriptFrames) {
                 // Job completed.
-                EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
-                if (EncodeResult != null)
-                    EncodingCompleted(this, EncodeResult);
-                else {
-                    PathManager.DeleteJobFiles(settings.JobIndex);
-                }
+                //EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
+                //if (EncodeResult != null)
+                //    EncodingCompleted(this, EncodeResult);
+                //else {
+                //    PathManager.DeleteJobFiles(settings.JobIndex);
+                //}
                 return false;
             } else {
                 // Resume with new segment.
@@ -502,7 +504,7 @@ namespace Business {
         /// </summary>
         public async Task WaitForFFmpegAsync() {
             List<Task> JobTasks = new List<Task>();
-            foreach (Process process in MediaInfo.GetFFmpegProcesses()) {
+            foreach (Process process in MediaProcesses.GetFFmpegProcesses()) {
                 JobTasks.Add(Task.Run(() => process.WaitForExit()));
             }
             await Task.WhenAll(JobTasks);
@@ -512,7 +514,7 @@ namespace Business {
         /// Kills all instances of FFmpeg.
         /// </summary>
         public void KillAllFFmpegInstances() {
-            foreach (Process process in MediaInfo.GetFFmpegProcesses()) {
+            foreach (Process process in MediaProcesses.GetFFmpegProcesses()) {
                 try {
                     process.Kill();
                 }

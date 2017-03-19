@@ -10,8 +10,8 @@ namespace EmergenceGuardian.WpfCommon {
             this.parent = parent;
         }
 
-        public override IUserInterface CreateUI(string title) {
-            return Application.Current.Dispatcher.Invoke(() => FFmpegWindow.Instance(parent, title));
+        public override IUserInterface CreateUI(string title, bool autoClose) {
+            return Application.Current.Dispatcher.Invoke(() => FFmpegWindow.Instance(parent, title, autoClose));
         }
 
         public override void DisplayError(FFmpegProcess host) {

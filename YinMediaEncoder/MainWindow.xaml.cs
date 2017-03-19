@@ -28,13 +28,13 @@ namespace YinMediaEncoder {
 
         public MainWindow() {
             // Don't let Yin Media Encoder run if there are FFmpeg processes running.
-            if (MediaInfo.GetFFmpegProcesses().Any()) {
+            if (MediaProcesses.GetFFmpegProcesses().Any()) {
                 if (MessageBox.Show("There are FFmpeg processes running. Would you like to stop them?\r\n\r\nTo avoid conflicts, please wait until these processes are finished before running Yin Media Encoder.", "FFmpeg Processes Running", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No) == MessageBoxResult.Yes) {
-                    foreach (Process item in MediaInfo.GetFFmpegProcesses()) {
+                    foreach (Process item in MediaProcesses.GetFFmpegProcesses()) {
                         MediaProcesses.SoftKill(item);
                     }
                 }
-                if (MediaInfo.GetFFmpegProcesses().Any()) {
+                if (MediaProcesses.GetFFmpegProcesses().Any()) {
                     Application.Current.Shutdown();
                     return;
                 }

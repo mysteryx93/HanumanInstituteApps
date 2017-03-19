@@ -133,7 +133,17 @@ namespace Business {
         public bool ChangeSpeed { get; set; }
         public float ChangeSpeedValue { get; set; }
 
-        public VideoCodecs VideoCodec { get; set; }
+        private VideoCodecs videoCodec;
+        public VideoCodecs VideoCodec {
+            get { return videoCodec; }
+            set {
+                videoCodec = value;
+                if (videoCodec == VideoCodecs.Copy) {
+                    Trim = false;
+                    ChangeSpeed = false;
+                }
+            }
+        }
         public int EncodeQuality { get; set; }
         public EncodePresets EncodePreset { get; set; }
         [XmlIgnore()]
@@ -151,6 +161,10 @@ namespace Business {
                     EncodeFormat = VideoFormats.Mp4;
                 else if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction != AudioActions.Copy)
                     EncodeFormat = VideoFormats.Mkv;
+                if (AudioAction == AudioActions.Copy) {
+                    Trim = false;
+                    ChangeSpeed = false;
+                }
             }
         }
         public int AudioQuality { get; set; }
@@ -195,7 +209,9 @@ namespace Business {
         [NonSerialized()]
         private List<FFmpegProcess> processes = new List<FFmpegProcess>();
         [XmlIgnore()]
-        public List<FFmpegProcess> Processes { get { return processes; } }
+        public List<FFmpegProcess> Processes {
+            get { return processes; }
+            set { processes = value; } }
         [XmlIgnore()]
         public CompletionStatus CompletionStatus { get; set; }
 
@@ -366,7 +382,7 @@ namespace Business {
 
         public bool CanAlterAudio {
             get {
-                return audioAction != AudioActions.Copy;
+                return audioAction != AudioActions.Copy && VideoCodec != VideoCodecs.Copy;
             }
         }
 

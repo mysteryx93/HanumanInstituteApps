@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Business {
     public static class PathManager {
@@ -44,7 +46,7 @@ namespace Business {
             if (resumeSegment > 0)
                 return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumeSegment, codec == VideoCodecs.Avi ? "avi" : "mkv");
             else
-                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumeSegment, codec == VideoCodecs.Avi ? "avi" : codec== VideoCodecs.Copy ? "mkv" : "mp4");
+                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumeSegment, codec == VideoCodecs.Avi ? "avi" : codec == VideoCodecs.Copy ? "mkv" : "mp4");
         }
 
         public static string GetAudioFile(int jobIndex, AudioActions codec) {
@@ -100,6 +102,9 @@ namespace Business {
 
         public static void DeleteOutputFiles(int jobIndex) {
             foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Output*", jobIndex))) {
+                //File.Delete(f);
+            }
+            foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Final*", jobIndex))) {
                 File.Delete(f);
             }
         }
@@ -123,6 +128,29 @@ namespace Business {
                 System.Threading.Thread.Sleep(500);
             }
             throw new IOException(string.Format("Cannot move file '{0}' because it is being used by another process.", source));
+        }
+
+        /// <summary>
+        /// Deletes specified file and keep trying for 10 seconds without blocking executing code.
+        /// </summary>
+        /// <param name="file">The file to delete.</param>
+        public static void SafeDelete(string file) {
+            try {
+                File.Delete(file);
+            } catch {
+                Thread DeleteThread = new Thread(() => {
+                    System.Threading.Thread.Sleep(2000);
+                    for (int i = 0; i < 5; i++) {
+                        try {
+                            File.Delete(file);
+                            return;
+                        }
+                        catch {}
+                    }
+                });
+                DeleteThread.IsBackground = true;
+                DeleteThread.Start();
+            }
         }
 
         /// <summary>

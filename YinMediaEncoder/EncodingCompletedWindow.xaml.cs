@@ -74,6 +74,7 @@ namespace YinMediaEncoder {
                 PathManager.DeleteJobFiles(jobInfo.Settings.JobIndex);
                 jobInfo.Settings.JobIndex = -1;
                 this.Close();
+                Owner?.Focus();
             }
             catch (Exception ex) {
                 OkButton.IsEnabled = true;

@@ -13,19 +13,6 @@
         <Business:RadioButtonCheckedConverter x:Key="RadioButtonCheckedConverter"/>
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
         <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
-        <!--<ControlTemplate x:Key="validationTemplate">
-            <DockPanel>
-                <AdornedElementPlaceholder/>
-                <TextBlock Foreground="Red" FontSize="20" FontWeight="Bold"><Run Text="!"/></TextBlock>
-            </DockPanel>
-        </ControlTemplate>
-        <Style x:Key="textBoxInError" TargetType="{x:Type TextBox}">
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="true">
-                    <Setter Property="ToolTip" Value="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={x:Static RelativeSource.Self}}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>-->
     </Window.Resources>
     <Grid Style="{DynamicResource GradiantBackground}">
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" Text="Select video to encode" VerticalAlignment="Top"/>
@@ -298,7 +285,7 @@
             </TabItem>
             <TabItem x:Name="TabScript" Header="AviSynth Script" TabIndex="7">
                 <Grid Background="Transparent">
-                    <TextBox x:Name="ScriptText" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TabIndex="89" VerticalContentAlignment="Top">
+                    <TextBox x:Name="ScriptText" Style="{DynamicResource TextBoxMultiLine}" HorizontalScrollBarVisibility="Auto" Text="{Binding CustomScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="89">
                         <TextBox.Background>
                             <SolidColorBrush Color="Transparent"/>
                         </TextBox.Background>

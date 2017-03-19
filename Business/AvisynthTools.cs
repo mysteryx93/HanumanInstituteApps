@@ -322,6 +322,8 @@ namespace Business {
         /// <returns>The options object.</returns>
         public static ProcessStartOptions TrackProcess(this ProcessStartOptions options, MediaEncoderSettings settings) {
             options.Started += (sender, e) => {
+                if (settings.Processes == null)
+                    settings.Processes = new List<FFmpegProcess>();
                 settings.Processes.Add(e.Process);
                 e.Process.Completed += (sender2, e2) => {
                     settings.CompletionStatus = e2.Status;
@@ -339,8 +341,7 @@ namespace Business {
         public static CompletionStatus EncodeAudio(MediaEncoderSettings settings) {
             CompletionStatus Result = CompletionStatus.Success;
             string WavFile = PathManager.GetAudioFile(settings.JobIndex, AudioActions.EncodeWav);
-            object JobId = settings.VideoCodec != VideoCodecs.Copy ? (object)settings.JobIndex : null;
-            ProcessStartOptions Options = new ProcessStartOptions(JobId, "Exporting Audio", JobId == null).TrackProcess(settings);
+            ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Exporting Audio", false).TrackProcess(settings);
             if (!File.Exists(WavFile)) {
                 AvisynthTools.SaveAudioToWav(settings, WavFile, Options);
                 if (settings.CompletionStatus == CompletionStatus.Cancelled) {

@@ -21,7 +21,7 @@ namespace Business {
             settings.CalculateSize();
 
             // Calculate encoding and final frame rates.
-            double ChangeSpeedValue = settings.ChangeSpeed ? (double)settings.ChangeSpeedValue / 100 : 1;
+            double ChangeSpeedValue = (settings.ChangeSpeed && settings.CanAlterAudio) ? (double)settings.ChangeSpeedValue / 100 : 1;
             double FrameRateBefore = settings.SourceFrameRate.Value * ChangeSpeedValue;
 
             // Generate video script.
@@ -37,7 +37,7 @@ namespace Business {
                 Script.OpenDirect(inputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
             if (FrameRateBefore != settings.SourceFrameRate)
                 Script.AppendLine(CultureInfo.InvariantCulture, "AssumeFPS({0}, true)", FrameRateBefore);
-            if (settings.Trim) {
+            if (settings.Trim && settings.CanAlterAudio) {
                 Script.AppendLine("Trim({0}, {1})",
                     (settings.TrimStart ?? 0) > 0 ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
                     (settings.TrimEnd ?? 0) > 0 && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
@@ -79,7 +79,7 @@ namespace Business {
                 }
                 Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D={0}, A={1}, h={2}{3}, device_type=""{4}""{5}{6})",
                     settings.DenoiseD, settings.DenoiseA,
-                    ((double)settings.DenoiseStrength / 10 * (AvisynthTools.GpuSupport == SupportedOpenClVersion.v12 ? 1.732 : 1)).ToString(CultureInfo.InvariantCulture), // v1.0.1 treats h differently, need to multipy by 1.732
+                    ((double)settings.DenoiseStrength / 10).ToString(CultureInfo.InvariantCulture),
                     settings.FrameDouble > 0 ? (AvisynthTools.GpuSupport == SupportedOpenClVersion.v12 ? ", channels=\"YUV\"" : ", cmode=true") : "",
                     AvisynthTools.GpuSupport != SupportedOpenClVersion.None ? "GPU" : "CPU",
                     AvisynthTools.GpuSupport != SupportedOpenClVersion.None ? ", device_id=" + Settings.SavedFile.GraphicDeviceId.ToString() : "",
@@ -351,7 +351,7 @@ namespace Business {
             settings.CalculateSize();
 
             // Calculate encoding and final frame rates.
-            double ChangeSpeedValue = settings.ChangeSpeed ? (double)settings.ChangeSpeedValue / 100 : 1;
+            double ChangeSpeedValue = (settings.ChangeSpeed && settings.CanAlterAudio) ? (double)settings.ChangeSpeedValue / 100 : 1;
             double FrameRateBefore = settings.SourceFrameRate.Value * ChangeSpeedValue;
 
             // Generate video script.
@@ -365,7 +365,7 @@ namespace Business {
                 Script.OpenDirect(inputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
             if (FrameRateBefore != settings.SourceFrameRate)
                 Script.AppendLine(CultureInfo.InvariantCulture, "AssumeFPS({0}, true)", FrameRateBefore);
-            if (settings.Trim) {
+            if (settings.Trim && settings.CanAlterAudio) {
                 Script.AppendLine("Trim({0}, {1})",
                     (settings.TrimStart ?? 0) > 0 ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
                     (settings.TrimEnd ?? 0) > 0 ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
