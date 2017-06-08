@@ -42,7 +42,10 @@ namespace EmergenceGuardian.WpfCommon {
                     host.InfoUpdated += FFmpeg_InfoUpdated;
                     host.StatusUpdated += FFmpeg_ProgressUpdated;
                     host.Completed += FFmpeg_Completed;
-                    PercentText.Text = 0.ToString("p1");
+                    if (host.Options.ResumePos > 0)
+                        PercentText.Text = (host.Options.ResumePos / WorkProgressBar.Maximum).ToString("p1");
+                    else
+                        PercentText.Text = 0.ToString("p1");
                     SetPageTitle(PercentText.Text);
                 } else {
                     task = taskArg;

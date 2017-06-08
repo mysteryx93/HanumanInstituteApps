@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Business {
     // Full documentation of parameters here
@@ -25,10 +26,10 @@ namespace Business {
         public int MotionSmoothRotation { get; set; } = 1000;
         public int MotionSmoothZoom { get; set; } = 1000;
         private int VideoOutput { get; set; } = 0;
-        public EdgeCompensationMethods EdgeCompensation { get; set; } = EdgeCompensationMethods.None;
+        public EdgeCompensationMethods EdgeCompensation { get; set; } = EdgeCompensationMethods.AdaptiveZoomFull;
         public int Resampling { get; set; } = 2;
         public string LogFile { get; set; } = "";
-        private bool AppendToFile { get; set; } = false;
+        public bool AppendToFile { get; set; } = false;
         private bool Interlaced { get; set; } = false; // we always deinterlace first
         private bool InterlacedUpperFieldFirst { get; set; } = false;
         public int ExtraZoomFactor { get; set; } = 1;
@@ -51,18 +52,13 @@ namespace Business {
         public bool UseColorMask { get; set; } = false;
         public string MaskColor { get; set; } = "ff00ff";
 
-        private ObservableCollection<MediaEncoderDeshakerSegmentSettings> segments;
-        public ObservableCollection<MediaEncoderDeshakerSegmentSettings> Segments {
-            get {
-                if (segments == null)
-                    segments = new ObservableCollection<MediaEncoderDeshakerSegmentSettings>();
-                if (segments.Count == 0)
-                    segments.Add(new MediaEncoderDeshakerSegmentSettings());
-                return segments;
-            } set {
-                segments = value;
-            }
-        }
+        public PrescanType PrescanAction { get; set; }
+        public short? PrescanStart { get; set; }
+        public short? PrescanEnd { get; set; }
+        [XmlIgnore()]
+        public bool PrescanCompleted { get; set; }
+
+        public ObservableCollection<MediaEncoderDeshakerSegmentSettings> Segments { get; set; }
 
         public bool FillBordersWithPreviousOrFutureFrames {
             get {
@@ -228,5 +224,17 @@ namespace Business {
         Every4 = 2,
         Every9 = 3,
         Every16 = 4
+    }
+
+    public enum PrescanType {
+        Full,
+        Preview
+    }
+
+    public enum LogGenerationStatus {
+        None,
+        Partial,
+        Full,
+        Working
     }
 }

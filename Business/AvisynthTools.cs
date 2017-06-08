@@ -183,32 +183,28 @@ namespace Business {
         /// <param name="options">The options that control the behaviors of the process.</param>
         /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
         public static float? GetAudioGain(MediaEncoderSettings settings, ProcessStartOptions options) {
-            string TempResult = settings.TempFile + ".txt";
             FFmpegProcess Worker = new FFmpegProcess(options);
-            string Args = string.Format(@"-af ""volumedetect"" -f null null > ""{0}"" 2>&1", TempResult);
-            Worker.RunAvisynthToFFmpeg(settings.FilePath, Args);
+            string Args = string.Format(@"-i ""{0}"" -af ""volumedetect"" -f null NUL", settings.FilePath);
+            Worker.RunFFmpeg(Args);
             float? Result = null;
-            if (File.Exists(TempResult)) {
-                string FileString = File.ReadAllText(TempResult);
-                // Find max_volume.
-                string SearchVal = "max_volume: ";
-                int Pos1 = FileString.IndexOf(SearchVal);
-                if (Pos1 >= 0) {
-                    Pos1 += SearchVal.Length;
-                    // Find end of line.
-                    int Pos2 = FileString.IndexOf('\r', Pos1);
-                    if (Pos2 >= 0) {
-                        string MaxVolString = FileString.Substring(Pos1, Pos2 - Pos1);
-                        if (MaxVolString.Length > 3) {
-                            // Remove ' dB'
-                            MaxVolString = MaxVolString.Substring(0, MaxVolString.Length - 3);
-                            float MaxVol = 0;
-                            if (float.TryParse(MaxVolString, out MaxVol))
-                                Result = Math.Abs(MaxVol);
-                        }
+            string FileString = Worker.Output;
+            // Find max_volume.
+            string SearchVal = "max_volume: ";
+            int Pos1 = FileString.IndexOf(SearchVal);
+            if (Pos1 >= 0) {
+                Pos1 += SearchVal.Length;
+                // Find end of line.
+                int Pos2 = FileString.IndexOf('\r', Pos1);
+                if (Pos2 >= 0) {
+                    string MaxVolString = FileString.Substring(Pos1, Pos2 - Pos1);
+                    if (MaxVolString.Length > 3) {
+                        // Remove ' dB'
+                        MaxVolString = MaxVolString.Substring(0, MaxVolString.Length - 3);
+                        float MaxVol = 0;
+                        if (float.TryParse(MaxVolString, out MaxVol))
+                            Result = Math.Abs(MaxVol);
                     }
                 }
-                File.Delete(TempResult);
             }
             return Result;
         }

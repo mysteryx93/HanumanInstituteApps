@@ -7,10 +7,18 @@
 ###          Special Thanks: Sagekilla, Didée, cretindesalpes, Gavino and MVtools people     ###
 ###                                                                                          ###
 ###                       v3.1.2d (Dogway's mod) - 21 July 2015                              ###
-###          mod in 2016-06-25 to fix subpixel=3 and add Prefilter auto 16 (lsb) support     ###
-###                           and yuy2 support in avs 2.6 with masktools 2.6                 ###
+###    v3.1.2.92s mod for v3.1.2d to fix subpixel=3 and add Prefilter auto 16 (lsb) support  ###
+###                     and yuy2 support in avs 2.6 with masktools 2.6                       ###
 ### and medianblur2 now will be used in Minblur instead of Quantile RemoveGrainHD in avs 2.6 ###
 ###                                    and add TV_range bool                                 ###
+###               less lsb if not use lsb things and get ready for yv16 and yv24             ###
+###              add dct, device_id and move all prefilters to external function             ###
+###                                some cleanup and others                                   ###
+###                        add MDegrain4 and MDegrain5 and MDegrain6                         ###
+###                               add always_MDegrainN bool                                  ###
+###                                  SMDegrain_KNLMeansCL                                    ###
+###                 masktools 2.2.5 or up now required in avs26 and avs+                     ###
+###                  now work basically with new high bit depth in avs+                      ###
 ###                                                                                          ###
 ################################################################################################
 ###
@@ -19,13 +27,12 @@
 ### The reason behind is to keep it simple so aside masktools2 you will only need MVTools2.
 ###
 ### Check documentation for deep explanation on settings and defaults.
-### VideoHelp thread: (http://forum.videohelp.com/threads/369142)
 ###
 ################################################################################################
 
 function SMDegrain (clip input   , int "tr"      , int "thSAD"    , int  "thSADC" , bool "RefineMotion",  val  "contrasharp", clip "CClip"      , bool "interlaced" ,  int   "plane" ,  int   "Globals",                                  \
                      int "pel"   , int "subpixel", val "prefilter", clip "mfilter", int  "blksize"     , int  "overlap"     ,  int  "search"    , bool "truemotion" , int  "limit"   ,  int   "limitc" ,  int   "thSCD1" , int "thSCD2",  \
-                    bool "chroma", int "hpad"    , int "vpad"     , bool "lsb"    , bool "lsb_in"      ,  bool "lsb_out"    , int  "mode"       , bool  "slices"    , val  "Show"    ,  float "Str"    ,  float "Amp" , bool "TV_range"){
+                    bool "chroma", int "hpad"    , int "vpad"     , bool "lsb"    , bool "lsb_in"      ,  bool "lsb_out"    , int  "mode"       , bool  "slices"    , val  "Show"    ,  float "Str"    ,  float "Amp" , bool "TV_range", int "dct", int "device_id", int "searchparam", int "pelsearch", bool "trymany", bool "always_MDegrainN"){
 
 
 
@@ -36,7 +43,8 @@ tr           = default( tr,       2 )
 thSAD        = default( thSAD,  300 )
 thSAD2=int(thSAD/2)
 thSADC       = default( thSADC, thSAD2)
-RefineMotion = default( RefineMotion,false)
+RefineMotion = default( RefineMotion, false)
+alway_grainN = default( always_MDegrainN, false)
 
 lsb_in       = default( lsb_in,  false)
 lsb_out      = default( lsb_out, false)
@@ -47,36 +55,35 @@ ampn         = mode != 9 ? 0.0  : 1.0
 slices       = default(slices, true)
 
 Globals      = default( Globals,  0 )
-GlobalR = Globals == 1        ? true : false
-GlobalO = Globals == 3        ? true : false
-if1     = Defined(CClip)      ? true : false
+GlobalR = Globals == 1 
+GlobalO = Globals == 3 
+if1     = Defined(CClip)
 
-Contrasharp  = default( Contrasharp, !GlobalO && if1 ? true : false)
+Contrasharp  = default( Contrasharp, !GlobalO && if1)
 Interlaced   = default( Interlaced,  false)
 
 w       = input.width ()
 h       = input.height()
-sShow   = IsString(show)      ? true : false
-preclip = IsClip(prefilter)   ? true : false
-planar  = IsYUY2(input)       ? true : false
-ifC     = IsBool(Contrasharp) ? true : false
+sShow   = IsString(show)
+preclip = IsClip(prefilter)
+planar  = IsYUY2(input)
+ifC     = IsBool(Contrasharp)
 if0     = ifC ? (Contrasharp  ? true : false) : (Contrasharp > 0.0 ? true : false)
-if2     = if0 && lsb && !GlobalO                                    ? true : false
-if3     = tr > 3                                                    ? true : false
-if4     = (w > 1099 ||  h > (lsb_in ? 1199 : 599))                  ? true : false
-if5     = interlaced ? (GetParity(input)                            ? true : false) : nop()
+if2     = if0 && lsb && !GlobalO
 avs26   = VersionNumber() < 2.60 ? false : true
-yuy25   = !avs26 && planar
+if3     = alway_grainN ? true : !avs26 ? tr > 3 : tr > 6
+if4     = (w > 1099 ||  h > (lsb_in ? 1199 : 599))
+if5     = interlaced ? (GetParity(input)                            ? true : false) : nop()
 
 
 pel          = default( pel, if4 ? 1 : 2 )
 subpixel     = default( subpixel,  2 )
 prefilter    = default( prefilter, -1 )
-MFilterB     = defined(mfilter) ? true : false
-pelclip      = pel>1 && subpixel == 3 ? true : false
+MFilterB     = defined(mfilter)
+pelclip      = pel>1 && subpixel == 3
 Str          = default( Str, 1.0 )
 Amp          = default( Amp, 0.0625 )
-TV_range     = default( TV_range, true)
+TV_range     = default( TV_range, !(Isrgb(input)))
 
 blksize      = default( blksize,  if4 ? 16 : 8 )
 blk2=blksize/2
@@ -84,15 +91,16 @@ overlap      = default( overlap,  blk2 )
 ovl2=overlap/2
 search       = default( search,   4 )
 truemotion   = default( truemotion, !if4)
+dct          = default( dct,   0 )
 thSCD1       = default( thSCD1,  int(pow((blksize*2.5),2)))
 thSCD2       = default( thSCD2,  130 )
 
 
 plane        = default( plane,    4 )
-chroma       = default( chroma,    true)
+chroma       = default( chroma, true)
 Chr          = chroma ? 3 : 1
-Chr2         = chroma ? 3 : (prefilter==3 ? 2 : 1)
-plane0       = plane!=0        ? true : false
+Chr2         = chroma ? 3 : preclip ? 1 : (prefilter==3 ? 2 : 1)
+plane0       = plane!=0
 U            = plane0 && plane!=2 ? 3 : 2
 V            = plane0 && plane!=1 ? 3 : 2
 Uin          = lsb_in ? 3 : u
@@ -117,7 +125,6 @@ Show         = default( Show,  false)
                   Assert(IsBool(Show) || sShow,        "'Show' only accepts bool inputs (true,false), or string modes ('Speed','Memory',Quality')")
                   Assert(preclip || IsInt(prefilter),  "'prefilter' only accepts integers and clip inputs")
                   Assert(ifC     || IsInt(Contrasharp),"'Contrasharp' only accepts integers and bool inputs")
-!chroma         ? Assert(plane==0,                     "Denoising chroma with luma only vectors is bugged in mvtools and thus unsupported") : nop()
 MFilterB        ? Assert(IsClip(mfilter),              "'mfilter' only accepts clip inputs")                        : nop()
 interlaced      ? Assert(h%4==0,                       "Interlaced sources require mod 4 height sizes")             : nop()
 lsb_in          ? Assert(!interlaced,                  "Interlaced 16 bit stacked clip is not a recognized format") : nop()
@@ -157,58 +164,14 @@ input8  = lsb_in      ? (planar   ? input8y.Interleaved2planar()                
 
 Mfilter = MFilterB ? Mfilter : input8
 
-bug_wa = interlaced && planar && chroma && !avs26 ? 2 : Chr # bug: crash prevention workaround (http://forum.doom9.org/showthread.php?p=1546684#post1546684)
+bug_wa = interlaced && planar && chroma && !avs26 ? 2 : Chr # bug: crash prevention workaround
 
-# The mt_merge() line for prefilter=3 should be swapped with a high bitdepth variant (Dither_merge16_8() ?) due to a 1 point limited range
-# in both range ends, but then it won't work with planar sources. This isn't as critical since we are only trying to find motion vectors.
-pref   = !GlobalR ? ( preclip        ?  prefilter                                                                  : \
-                    ((prefilter==-1) ?  inputP                                                                     : \
-                     (prefilter==0)  ?  input8.MinBlur(0,Chr,planar)                                               : \
-                     (prefilter==1)  ?  input8.MinBlur(1,Chr,planar)                                               : \
-                     (prefilter==2)  ?  input8.MinBlur(2,Chr,planar)                                               : \
-                     (prefilter==3)  ?  (!planar && lsb ? Dither_merge16_8(inputP.Dfttest(sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,lsb=true,lsb_in=lsb_in,quiet=true), lsb_in?inputP:inputP.Dither_convert_8_to_16(),                                \
-                                                                   lsb_in?inputP.Dither_lut16("x 4096 < 65535 x 19200 > 0 65535 x 4096 - 65535 19200 4096 - / * - ? ?",u=1,v=1).Ditherpost(mode=6, slice=slices, u=Chr,   v=Chr)                                           \
-                                                                         :inputP.mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=chroma,                       u=Chr2,  v=Chr2)                                                       : \
-                                 avs26 && planar && lsb ? Dither_merge16_8(inputP.Dfttest(sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,lsb=true,lsb_in=lsb_in,quiet=true), lsb_in?inputP:inputP.Dither_convert_8_to_16(),                                \
-                                                                   lsb_in?inputP.Dither_lut16("x 4096 < 65535 x 19200 > 0 65535 x 4096 - 65535 19200 4096 - / * - ? ?",u=1,v=1).Ditherpost(mode=6, slice=slices, u=Chr,   v=Chr)                                           \
-                                                                         :inputP.Planar2Interleaved().ConvertToYV16().mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=chroma,                       u=Chr2,  v=Chr2).ConvertToYUY2().Interleaved2planar()                                                       : \
-                                           planar && avs26 ? mt_merge(           Dfttest(!lsb_in?inputP.Planar2Interleaved(!chroma):input8y,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1).ConvertToYV16(),!lsb_in?input8y.Planar2Interleaved().ConvertToYV16():input8y.ConvertToYV16(),                                                   \
-                                                                          input8y.Planar2Interleaved().ConvertToYV16().mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=planar?false:chroma,          u=bug_wa,v=bug_wa).ConvertToYUY2().Interleaved2planar()                                                    : \
-                                                             mt_merge( planar ?  Dfttest(!lsb_in?inputP.Planar2Interleaved(!chroma):input8y,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1).Interleaved2planar(!chroma)                          : \
-                                                                                 Dfttest(        inputP,                                    sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1),!lsb_in?input8y:input8y.Interleaved2planar(!chroma),   \
-                                                                          input8y.mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=planar?false:chroma,          u=bug_wa,v=bug_wa))                                                   : \
-                     (prefilter==4)  ?  eval("""
-                                              # In a more lucid state I could probably have laid out this block much better... or not...
-                                              NL_in   = !planar ? (lsb_in ? inputP : input8.Dither_convert_8_to_16()) : Interlaced ? (if5 ? input.AssumeTFF().SeparateFields().Dither_convert_8_to_16() : input.AssumeBFF().SeparateFields().Dither_convert_8_to_16()) : (lsb_in ? input : input.Dither_convert_8_to_16())
-                                              NL_W    = width(NL_in)
-                                              U8      = chroma || planar ? UToY8(NL_in) : nop()
-                                              V8      = chroma || planar ? VToY8(NL_in) : nop()
-                                              NL_lsb  = chroma ? (!planar ?           StackVertical(StackVertical(Dither_get_msb(u8),Dither_get_msb(v8)),\
-                                                                                      StackVertical(Dither_get_lsb(u8),Dither_get_lsb(v8)))              :\
-                                                                                      StackHorizontal(u8.ConvertToYV12(),v8.ConvertToYV12())) : nop()
-
-                                              Y8      = chroma ? (!planar ? StackHorizontal(ConvertToY8(NL_in),NL_lsb) : \
-                                                                            StackHorizontal(StackVertical(Dither_get_msb(ConvertToY8(NL_in)),Dither_get_lsb(ConvertToY8(NL_in))).ConvertToYV12(),NL_lsb)) : \
-                                                                 (!planar ? NL_in : NL_in.converttoY8())
-
-                                              Y8      = Y8.KNLMeansCL(D=1, A=1, h=7.0,lsb_inout=true,device_type="GPU")
-
-                                              my      = planar ? Y8.Dither_get_msb().crop(0,0,chroma?-NL_W:0,0) : nop()
-                                              ly      = planar ? Y8.Dither_get_lsb().crop(0,0,chroma?-NL_W:0,0) : nop()
-
-                                              chroma ? eval ("
-                                              u_h = u8.height()/2
-                                              v_h = v8.height()/2
-
-                                              u16 = !planar ? StackVertical(Dither_get_msb(Y8).crop(NL_W,0,0,-v_h),Dither_get_lsb(Y8).crop(NL_W,0,0,-v_h))                : \
-                                                              StackVertical(Dither_get_msb(Y8).crop(NL_W,0,-NL_W/2 ,0),Dither_get_lsb(Y8).crop(NL_W,0,-NL_W/2 ,0))
-                                              v16 = !planar ? StackVertical(Dither_get_msb(Y8).crop(NL_W,u_h, 0,0),Dither_get_lsb(Y8).crop(NL_W,u_h, 0,0))                : \
-                                                              StackVertical(Dither_get_msb(Y8).crop(NL_W+NL_W/2,0,0,0),Dither_get_lsb(Y8).crop(NL_W+NL_W/2,0,0,0))
-
-                                              !planar ? YToUV(u16,v16,Y8.crop(0,0,-u8.width(),0)) : avs26 ? YToUV(u16, v16, StackVertical(my, ly)) : YToUV(u16, v16, StackVertical(StackVertical (my,my), StackVertical (ly,ly))) ") : \
-                                            ( !planar || avs26 ? Y8 : YToUV (u8, v8, StackVertical (StackVertical (my, my), StackVertical (ly, ly)))) """)                                   : \
-                      Assert(false,    "Mode must be between -1~3: "+string(prefilter))))                                                                                           : \
-                      input8
+pref   = !GlobalR ? preclip ? prefilter                                                                                                                                   : \
+                              input.SMDegrain_prefilters(inputP=inputP,input8=input8,input8y=input8y\
+                                                                      ,inputY=inputY,input8h=input8h,prefilter=prefilter,chroma=chroma\
+                                                                      ,Chr=Chr,Chr2=Chr2,bug_wa=bug_wa,lsb=lsb,lsb_in=lsb_in,Interlaced=Interlaced\
+                                                                      ,if5=if5,pel=pel,device_type="GPU",device_id=device_id,a=1,d=1,h=7.0,slices=slices,planar=planar)   : \
+                    input8
 
 
 
@@ -216,18 +179,17 @@ pref   = !GlobalR ? ( preclip        ?  prefilter                               
 
 # Default Auto-Prefilter - Luma expansion TV->PC (up to 16% more values for motion estimation)
 
-pref   = avs26 && planar && ((lsb_in && prefilter==-1) || prefilter==4) ? pref.Dither_YUY2toInterleaved16().Interleaved2planar() : pref
 pref16 = (Height(pref)) == (Height(input8)*2) ? true : false
-pref   = !GlobalR ? (!yuy25 && (lsb || (!preclip ? prefilter==4 : false) ) ? ((!preclip ? ((lsb_in && prefilter==-1) || prefilter==3 || prefilter==4 ) : false)          ? \
+pref   = !GlobalR ? (!planar && lsb ? ((!preclip ? ((lsb_in && prefilter==-1) || prefilter==3 || prefilter==4 ) : false)          ? \
                      !TV_range ? pref.Ditherpost(mode=6,ampn=0.0,slice=slices,staticnoise=false,u=Chr2,v=Chr2)                                      : \
                      pref.Dither_Luma_Rebuild(S0=Str,c=Amp,slice=slices,lsb_in=true,uv=Chr2)                                      : \
                      !TV_range ? pref16 ? pref.Ditherpost(mode=6,ampn=0.0,slice=slices,staticnoise=false,u=Chr2,v=Chr2) : pref                                      : \
-                     pref.Dither_Luma_Rebuild(S0=Str,c=Amp,slice=slices,lsb   =true,lsb_in=pref16,uv=Chr2))                       : \
-                                      ((!preclip ?  ((lsb_in && prefilter==-1) || prefilter==4)                                   : false)                                 ? \
-                     !TV_range ? pref.Ditherpost(mode=6,slice=slices,u=Chr,v=Chr).Dither_YUY2toInterleaved().Interleaved2planar(!chroma)   : \
-                     pref.Ditherpost(mode=6,slice=slices,u=Chr,v=Chr).Dither_YUY2toInterleaved().Interleaved2planar(!chroma).Dither_Luma_Rebuild(S0=Str,c=Amp,uv=Chr   )   : \
-                     !TV_range ? pref16 ? pref.Dither_YUY2toPlanar16().Ditherpost(mode=6,slice=slices,u=bug_wa,v=bug_wa).Dither_YUY2toInterleaved().Interleaved2planar(!chroma) : pref                                  : \
-                     pref.                                                    Dither_Luma_Rebuild(S0=Str,lsb_in=pref16,slice=slices,c=Amp,uv=bug_wa)))                                  : \
+                     pref.Dither_Luma_Rebuild(S0=Str,c=Amp,slice=slices,lsb=true,lsb_in=pref16,uv=Chr2))                       : \
+                                      ((!preclip ?  (lsb_in && prefilter==-1)                                   : false)                                 ? \
+                     !TV_range ? !planar ? pref.Ditherpost(mode=6,slice=slices,u=Chr,v=Chr) : pref.Ditherpost(mode=6,slice=slices,u=Chr,v=Chr).Dither_YUY2toInterleaved().Interleaved2planar(!chroma)   : \
+                                 !planar ? pref.Dither_Luma_Rebuild(S0=Str,c=Amp,uv=chr, lsb_in=true) : pref.Dither_Luma_Rebuild(S0=Str,c=Amp,uv=chr, lsb_in=true).Dither_YUY2toInterleaved().Interleaved2planar(!chroma) : \
+                     !TV_range ? pref16 ? !planar ? pref.Ditherpost(mode=6,slice=slices,u=Chr,v=Chr) : pref.planar2Interleaved(!chroma).Dither_YUY2toPlanar16().Ditherpost(mode=6,slice=slices,u=chr,v=chr).Dither_YUY2toInterleaved().Interleaved2planar(!chroma) : pref                                  : \
+                     pref.Dither_Luma_Rebuild(S0=Str,lsb=lsb,lsb_in=pref16,slice=slices,c=Amp,uv=bug_wa)))                                  : \
                      pref
 
 
@@ -255,33 +217,50 @@ super_render = !GlobalR ?                 (pelclip ? MSuper(input8,   pel=pel,  
 Recalculate  = !GlobalR && RefineMotion ? (pelclip ? MSuper(pref,     pel=pel,               chroma=chroma, hpad=hpad, vpad=vpad,levels=1, pelclip=pclip            , planar=planar) : \
                                                      MSuper(pref,     pel=pel,sharp=subpixel,chroma=chroma, hpad=hpad, vpad=vpad,levels=1                           , planar=planar)): nop()
 !if3  ? eval("
-bv6  =   interlaced && (tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 6,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         bv6) :  nop()
-bv6  =   interlaced && (tr > 2) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv6,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  bv6
-bv4  =   interlaced && (tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 4,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         bv4) :  nop()
-bv4  =   interlaced && (tr > 1) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv4,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  bv4
-bv3  =  !interlaced ? ((tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 3,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         bv3) :  nop()) : nop()
-bv3  =  !interlaced ? ((tr > 2  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, bv3,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  bv3               )   : nop()
-bv2  =  (interlaced ||  tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 2,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         bv2) :  nop()
-bv2  = ((interlaced ||  tr > 1) && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, bv2,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  bv2
-bv1  =  !interlaced ?                              (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 1,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         bv1        ) : nop()
-bv1  =  !interlaced ?            ( RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv1,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  bv1               ) : nop()
+t2 = interlaced ? tr > 1 ? tr*2 : tr : tr
+bv12 =   interlaced && (tr > 5)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta =12,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv12) : nop()
+bv12 =   interlaced && (tr > 5) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate,bv12,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv12
+bv10 =   interlaced && (tr > 4)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta =10,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv10) : nop()
+bv10 =   interlaced && (tr > 4) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate,bv10,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv10
+bv8  =   interlaced && (tr > 3)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 8,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv8)  : nop()
+bv8  =   interlaced && (tr > 3) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv8,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv8
+bv6  =                  t2 > 5                   ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 6,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv6)  : nop()
+bv6  =                  t2 > 5  && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv6,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv6
+bv5  =  !interlaced ? ((tr > 4)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 5,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv5)  : nop()) : nop()
+bv5  =  !interlaced ? ((tr > 4  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, bv5,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv5)  : nop()
+bv4  =                  t2 > 3                   ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 4,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv4)  : nop()
+bv4  =                  t2 > 3  && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv4,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv4
+bv3  =  !interlaced ? ((tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 3,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv3)  : nop()) : nop()
+bv3  =  !interlaced ? ((tr > 2  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, bv3,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv3)  : nop()
+bv2  =  (interlaced ||  tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 2,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv2)  : nop()
+bv2  = ((interlaced ||  tr > 1) && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, bv2,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv2
+bv1  =  !interlaced ?                              (!GlobalR  ? super_search.MAnalyse(isb = true, delta = 1,  overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : bv1)  : nop()
+bv1  =  !interlaced ?            ( RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, bv1,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              bv1)  : nop()
 
-fv1  =  !interlaced ?                              (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 1, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         fv1        ) : nop()
-fv1  =  !interlaced ?            ( RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv1,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  fv1               ) : nop()
-fv2  =  (interlaced ||  tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 2, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         fv2) :  nop()
-fv2  = ((interlaced ||  tr > 1) && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, fv2,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  fv2
-fv3  =  !interlaced ? ((tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 3, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         fv3) :  nop()) : nop()
-fv3  =  !interlaced ? ((tr > 2  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, fv3,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  fv3               )   : nop()
-fv4  =   interlaced && (tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 4, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         fv4) :  nop()
-fv4  =   interlaced && (tr > 1) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv4,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  fv4
-fv6  =   interlaced && (tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 6, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion) :         fv6) :  nop()
-fv6  =   interlaced && (tr > 2) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv6,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion) :  fv6 " )     : \
- \
-eval("
+fv1  =  !interlaced ?                              (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 1, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv1)  : nop()
+fv1  =  !interlaced ?            ( RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv1,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv1)  : nop()
+fv2  =  (interlaced ||  tr > 1)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 2, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv2)  : nop()
+fv2  = ((interlaced ||  tr > 1) && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, fv2,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv2
+fv3  =  !interlaced ? ((tr > 2)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 3, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv3)  : nop()) : nop()
+fv3  =  !interlaced ? ((tr > 2  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, fv3,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv3)  : nop()
+fv4  =                  t2 > 3                   ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 4, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv4)  : nop()
+fv4  =                  t2 > 3  && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv4,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv4
+fv5  =  !interlaced ? ((tr > 4)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 5, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv5)  : nop()) : nop()
+fv5  =  !interlaced ? ((tr > 4  && RefineMotion &&  !GlobalR) ?   MRecalculate           (Recalculate, fv5,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv5)  : nop()
+fv6  =                  t2 > 5                   ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 6, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv6)  : nop()
+fv6  =                  t2 > 5  && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv6,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv6
+fv8  =   interlaced && (tr > 3)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta = 8, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv8)  : nop()
+fv8  =   interlaced && (tr > 3) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate, fv8,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv8
+fv10 =   interlaced && (tr > 4)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta =10, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv10) : nop()
+fv10 =   interlaced && (tr > 4) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate,fv10,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv10
+fv12 =   interlaced && (tr > 5)                  ? (!GlobalR  ? super_search.MAnalyse(isb = false, delta =12, overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma, truemotion=truemotion, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : fv12) : nop()
+fv12 =   interlaced && (tr > 5) && RefineMotion &&  !GlobalR  ?   MRecalculate           (Recalculate,fv12,   overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma, truemotion=truemotion, dct=dct) :                                                              fv12              
+              ") : eval("
 tr2    = tr*2
-vmulti =                   !GlobalR ? super_search.MAnalyse( multi=true,overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma,truemotion=truemotion, delta = interlaced ? tr2 : tr) : vmulti
-vmulti = RefineMotion   ? (!GlobalR ? MRecalculate (Recalculate, vmulti,overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma,truemotion=truemotion,    tr = interlaced ? tr2 : tr) : vmulti) : vmulti
-vmulti =                   !GlobalR ? (interlaced ? vmulti.SelectEvery (4, 2, 3) : vmulti) : vmulti.SelectRangeEvery (Rtr*2, tr2, 0, false)")
+vmulti =                   !GlobalR ? super_search.MAnalyse( multi=true,overlap=    overlap,blksize=    blksize,   search=search,chroma=chroma,truemotion=truemotion, delta = interlaced ? tr2 : tr, dct=dct,searchparam=searchparam,pelsearch=pelsearch, trymany=trymany) : vmulti
+vmulti = RefineMotion   ? (!GlobalR ? MRecalculate (Recalculate, vmulti,overlap=halfoverlap,blksize=halfblksize, thSAD=halfthSAD,chroma=chroma,truemotion=truemotion,    tr = interlaced ? tr2 : tr, dct=dct) :                                                    vmulti) : vmulti
+vmulti =                   !GlobalR ? (interlaced ? vmulti.SelectEvery (4, 2, 3) : vmulti) : vmulti.SelectRangeEvery (Rtr*2, tr2, 0, false)
+                         ")
 
 
 
@@ -289,29 +268,43 @@ vmulti =                   !GlobalR ? (interlaced ? vmulti.SelectEvery (4, 2, 3)
 
 
 output  = !GlobalO ? (interlaced ?
- \        ((lsb ?     ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv2, fv2, bv4, fv4, bv6, fv6,                     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv2, fv2, bv4, fv4,                               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                             mfilter.MDegrain1(super_render, bv2, fv2,                                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true)):
- \                    ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=false):
- \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv2, fv2, bv4, fv4, bv6, fv6,                     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
- \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv2, fv2, bv4, fv4,                               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
- \                             mfilter.MDegrain1(super_render, bv2, fv2,                                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar))))       :
- \         (lsb ?     ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv1, fv1, bv2, fv2, bv3, fv3,                     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv1, fv1, bv2, fv2,                               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
- \                             mfilter.MDegrain1(super_render, bv1, fv1,                                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true)):
- \                    ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=false):
- \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv1, fv1, bv2, fv2, bv3, fv3,                     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
- \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv1, fv1, bv2, fv2,                               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
- \                             mfilter.MDegrain1(super_render, bv1, fv1,                                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar))))       : nop()
+ \        ((lsb ?     ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC,   thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 6) ? mfilter.MDegrain6(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8, bv10, fv10, bv12, fv12, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 5) ? mfilter.MDegrain5(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8, bv10, fv10,             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 4) ? mfilter.MDegrain4(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8,                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv2, fv2, bv4, fv4, bv6, fv6,                                   thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv2, fv2, bv4, fv4,                                             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                             mfilter.MDegrain1(super_render, bv2, fv2,                                                       thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true)):
+ \                    ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC,               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=false):
+ \                 (tr == 6) ? mfilter.MDegrain6(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8, bv10, fv10, bv12, fv12, thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 5) ? mfilter.MDegrain5(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8, bv10, fv10,             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 4) ? mfilter.MDegrain4(super_render, bv2, fv2, bv4, fv4, bv6, fv6, bv8, fv8,                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv2, fv2, bv4, fv4, bv6, fv6,                                   thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv2, fv2, bv4, fv4,                                             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                             mfilter.MDegrain1(super_render, bv2, fv2,                                                       thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar))))       :
+ \         (lsb ?     ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC,               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 6) ? mfilter.MDegrain6(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4, bv5, fv5, bv6, fv6,     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 5) ? mfilter.MDegrain5(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4, bv5, fv5,               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 4) ? mfilter.MDegrain4(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4,                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv1, fv1, bv2, fv2, bv3, fv3,                                   thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv1, fv1, bv2, fv2,                                             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true) :
+ \                             mfilter.MDegrain1(super_render, bv1, fv1,                                                       thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=true)):
+ \                    ( if3  ? mfilter.MDegrainN(super_render, vmulti, tr, thSAD2=halfthSAD, thSADC2=halfthSADC,               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar,lsb=false):
+ \                 (tr == 6) ? mfilter.MDegrain6(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4, bv5, fv5, bv6, fv6,     thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 5) ? mfilter.MDegrain5(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4, bv5, fv5,               thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 4) ? mfilter.MDegrain4(super_render, bv1, fv1, bv2, fv2, bv3, fv3, bv4, fv4,                         thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 3) ? mfilter.MDegrain3(super_render, bv1, fv1, bv2, fv2, bv3, fv3,                                   thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                 (tr == 2) ? mfilter.MDegrain2(super_render, bv1, fv1, bv2, fv2,                                             thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar)          :
+ \                             mfilter.MDegrain1(super_render, bv1, fv1,                                                       thSAD=thSAD, thSADC=thSADC, thSCD1=thSCD1, thSCD2=thSCD2, limit=limit, limitc=limitc, plane=plane, planar=planar))))       :    nop()
 
 
 # LSB_IN merging
 
+type  = avs26 ? input.PixelType() : "YV12"
+
 outputI= !GlobalO && planar && (lsb || ifC) ? output.Planar2Interleaved()                                                                                             : nop()
 !GlobalO && lsb   ? eval("
-blnkclp= lsb_in  || (if2 && !planar) ? BlankClip (lsb_in?input8h:input8, pixel_type="+Chr(34)+"YV12"+Chr(34)+", color_yuv=0)                                          : nop()
+blnkclp= lsb_in  || (if2 && !planar) ? BlankClip (lsb_in?input8h:input8, pixel_type=type, color_yuv=0)                                          : nop()
 output = lsb && planar               ? Dither_YUY2toPlanar16(outputI)                                                                                                 : output
 output = lsb_in                      ? inputY.Dither_add16 (Dither_sub16(output, planar?inputY:input8.Dither_convert_8_to_16 (), dif=true,u=u,v=v), dif=true,u=u,v=v) : output") : nop()
 
@@ -362,7 +355,11 @@ ctr16   = MergeChroma(ctr16, output)                                            
 
 GlobalO || Globals == 2  ? (!if3 ? eval("
 global Super           = super_render
+global bv12            = bv12
+global bv10            = bv10
+global bv8             = bv8
 global bv6             = bv6
+global bv5             = bv5
 global bv4             = bv4
 global bv3             = bv3
 global bv2             = bv2
@@ -372,7 +369,34 @@ global fv1             = fv1
 global fv2             = fv2
 global fv3             = fv3
 global fv4             = fv4
+global fv5             = fv5
 global fv6             = fv6
+global fv8             = fv8
+global fv10            = fv10
+global fv12            = fv12
+") : avs26 ? eval("
+global bv1             =                                             vmulti.SelectEvery (tr2,  0)
+global bv2             = interlaced ? bv1                          : vmulti.SelectEvery (tr2,  2)
+global bv3             =                                             vmulti.SelectEvery (tr2,  4)
+global bv4             = interlaced ? vmulti.SelectEvery (tr2,  2) : vmulti.SelectEvery (tr2,  6)
+global bv5             =                                             vmulti.SelectEvery (tr2,  8)
+global bv6             = interlaced ? bv3                          : vmulti.SelectEvery (tr2, 10)
+global bv8             = interlaced ? vmulti.SelectEvery (tr2,  6) : nop()
+global bv10            = interlaced ? bv5                          : nop()
+global bv12            = interlaced ? vmulti.SelectEvery (tr2, 10) : nop()
+
+global fv1             =                                             vmulti.SelectEvery (tr2,  1)
+global fv2             = interlaced ? fv1                          : vmulti.SelectEvery (tr2,  3)
+global fv3             =                                             vmulti.SelectEvery (tr2,  5)
+global fv4             = interlaced ? vmulti.SelectEvery (tr2,  3) : vmulti.SelectEvery (tr2,  7)
+global fv5             =                                             vmulti.SelectEvery (tr2,  9)
+global fv6             = interlaced ? fv3                          : vmulti.SelectEvery (tr2, 11)
+global fv8             = interlaced ? vmulti.SelectEvery (tr2,  7) : nop()
+global fv10            = interlaced ? fv5                          : nop()
+global fv12            = interlaced ? vmulti.SelectEvery (tr2, 11) : nop()
+global Super           = super_render
+global vmulti          = vmulti
+global Rtr             = tr
 ") : eval("
 global bv1             =                                            vmulti.SelectEvery (tr2, 0)
 global bv2             = interlaced ? bv1                         : vmulti.SelectEvery (tr2, 2)
@@ -424,7 +448,7 @@ lsp   = interlaced?15:30
 lsp   = AR < 1.9 ? lsp : floor(AR < 1.9 ? lsp : ((AR>2.4) ? 0 : lsp-((AR-1.9)*(lsp/(2.4-1.9)))))
 ys    = round(lsb_in ? h2/6 : (interlaced?h2/15:h2/6))
 s     = floor(((interlaced?w2/1.6:w2)/720.0)*16.0)
-type  = planar?"YUY2":"YV12"
+type  = avs26 ? input.PixelType() : planar?"YUY2":"YV12"
 
 Wadd  = w2/40
 Wadd2 = Wadd/2
@@ -455,9 +479,12 @@ a=interlaced?h*0.37:h*0.74
 b=interlaced?h*0.40:h*0.80
 c=interlaced?h*0.43:h*0.86
 
-!planar ? mt_merge(mt_lut(yexpr="127",uexpr="183",vexpr="47" ,u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(a)+" >= y "+string(interlaced?h*0.3835:h*0.767)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
-!planar ? mt_merge(mt_lut(yexpr="81" ,uexpr="91" ,vexpr="240",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(b)+" >= y "+string(interlaced?h*0.4135:h*0.827)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
-!planar ? mt_merge(mt_lut(yexpr="210",uexpr="16" ,vexpr="146",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(c)+" >= y "+string(interlaced?h*0.4435:h*0.887)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
+!planar ? avs26 ? mt_merge(mt_lut(yexpr="127 scalef",uexpr="183 scalef",vexpr="47 scalef" ,u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(a)+" >= y "+string(interlaced?h*0.3835:h*0.767)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true)
+          \     : mt_merge(mt_lut(yexpr="127",uexpr="183",vexpr="47" ,u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(a)+" >= y "+string(interlaced?h*0.3835:h*0.767)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
+!planar ? avs26 ? mt_merge(mt_lut(yexpr="81 scalef" ,uexpr="91 scalef" ,vexpr="240 scalef",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(b)+" >= y "+string(interlaced?h*0.4135:h*0.827)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true)
+          \     : mt_merge(mt_lut(yexpr="81" ,uexpr="91" ,vexpr="240",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(b)+" >= y "+string(interlaced?h*0.4135:h*0.827)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
+!planar ? avs26 ? mt_merge(mt_lut(yexpr="210 scalef",uexpr="16 scalef" ,vexpr="146 scalef",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(c)+" >= y "+string(interlaced?h*0.4435:h*0.887)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true)
+          \     : mt_merge(mt_lut(yexpr="210",uexpr="16" ,vexpr="146",u=3,v=3) ,mt_lutspa(mode="absolute", yexpr="x "+w3s+" >= x "+w3sq+" <= & y "+string(c)+" >= y "+string(interlaced?h*0.4435:h*0.887)+" <= & & 255 0 ?").trim(0,-1).FreezeFrame(0, FrameCount(pref)-1, 0),luma=true) : nop()
 
 
   # Parameters List
@@ -531,7 +558,7 @@ lsb_out ? StackVertical (last, BlankClip (last, pixel_type=type, color_yuv=0,len
 ## Didée's functions:
 
  # contra-sharpening: sharpen the denoised clip, but don't add more to any pixel than what was removed previously.
- # script function from Didée, at the VERY GRAINY thread (http://forum.doom9.org/showthread.php?p=1076491#post1076491)
+ # script function from Didée, at the VERY GRAINY thread
 
  # In final version 2.0d ContraHD() was merged, to allow proper HD sharpening.
  # In this case global variables of (before denoising) source MSuper and forward and backward
@@ -559,19 +586,20 @@ allD = mt_makediff(original,denoised)                                           
 ssD  = mt_makediff(s,HD?s.removegrain(20,-1,planar=planar).\
                           removegrain(20,-1,planar=planar):\
                         s.removegrain(11,-1,planar=planar))                       # The difference of a simple kernel blur.
-allD = yuy26 ? allD.ConvertToYUY2().Interleaved2planar() : allD
-ssD  = yuy26 ? ssD.ConvertToYUY2().Interleaved2planar() : ssD
+allD = yuy26 ? allD.ConvertToYUY2().Interleaved2planar(true) : allD
+ssD  = yuy26 ? ssD.ConvertToYUY2().Interleaved2planar(true) : ssD
 ssDD = ssD.repair(HD?ssD.repair(allD,1,planar=planar):allD,HD?12:1,planar=planar) # Limit the difference to the max of what the denoising removed locally.
 ssDD = yuy26 ? ssDD.Planar2Interleaved().ConvertToYV16() : ssDD
 ssD  = yuy26 ? ssD.Planar2Interleaved().ConvertToYV16() : ssD
-ssDD = SSDD.mt_lutxy(ssD,"x 128 - abs y 128 - abs < x y ?")                       # abs(diff) after limiting may not be bigger than before.
+ssDD = avs26 ? SSDD.mt_lutxy(ssD,"x range_half - abs y range_half - abs < x y ?")
+       \     : SSDD.mt_lutxy(ssD,"x 128 - abs y 128 - abs < x y ?")                       # abs(diff) after limiting may not be bigger than before.
 
 denoised.mt_adddiff(ssDD,U=2,V=2)                                                 # Apply the limited difference. (Sharpening is just inverse blurring)
 HD ? mt_clamp(last,pmax,pmin,overshoot,overshoot,chroma="copy first") : last
 yuy26 ? last.ConvertToYUY2().Interleaved2planar() : last
 }
 
- # MinBlur   by Didée (http://avisynth.org/mediawiki/MinBlur)
+ # MinBlur   by Didée
  # Nifty Gauss/Median combination (Modified for Planar input)
 
 function MinBlur(clip clp, int "r", int "uv", bool "planar"){
@@ -590,15 +618,17 @@ uvm2   = r==2 ? (uv==3?2:uv==2?0:-1) : nop()
 uvm3   = r==3 ? (uv==3?3:uv==2?0:-1) : nop()
 medf   = (uv==3) ? 1 : -200
 
-RG11D = (r==0) ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.sbr(planar=planar).Planar2Interleaved().ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.sbr(planar=planar),U=uv2,V=uv2)
- \    : (r==1) ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).Planar2Interleaved().ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar),U=uv2,V=uv2)
- \    : (r==2) ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).Planar2Interleaved().ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar),U=uv2,V=uv2)
- \    :          yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).removegrain(20,rg20,planar=planar).Planar2Interleaved().ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).removegrain(20,rg20,planar=planar),U=uv2,V=uv2)
-RG4D  = (r<=1) ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.removegrain(4,rg4,planar=planar).Planar2Interleaved().ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.removegrain(4,rg4,planar=planar),U=uv2,V=uv2)
- \    : (r==2) ? avs26 ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.Planar2Interleaved().ConvertToYV16().medianblur(2,2*medf,2*medf),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.medianblur(2,2*medf,2*medf),U=uv2,V=uv2) : mt_makediff(clp,clp.Quantile(radius_y=2, radius_u=uvm2, radius_v=uvm2, planar=planar), U=uv2,V=uv2)
- \    :          avs26 ? yuy26 ? mt_makediff(clp.Planar2Interleaved().ConvertToYV16(),clp.Planar2Interleaved().ConvertToYV16().medianblur(3,3*medf,3*medf),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_makediff(clp,clp.medianblur(3,3*medf,3*medf),U=uv2,V=uv2) : mt_makediff(clp,clp.Quantile(radius_y=3, radius_u=uvm3, radius_v=uvm3, planar=planar), U=uv2,V=uv2)
-DD    = yuy26 ? mt_lutxy(RG11D.Planar2Interleaved().ConvertToYV16(),RG4D.Planar2Interleaved().ConvertToYV16(),"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?",U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar() : mt_lutxy(RG11D,RG4D,"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?",U=uv2,V=uv2)
-return (yuy26 ? clp.Planar2Interleaved().ConvertToYV16().mt_makediff(DD.Planar2Interleaved().ConvertToYV16(),U=uv,V=uv).ConvertToYUY2().Interleaved2planar() : clp.mt_makediff(DD,U=uv,V=uv)) }
+RG11D = (r==0) ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.sbr(planar=planar).Planar2Interleaved(uv2==1).ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.sbr(planar=planar),U=uv2,V=uv2)
+ \    : (r==1) ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).Planar2Interleaved(uv2==1).ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar),U=uv2,V=uv2)
+ \    : (r==2) ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).Planar2Interleaved(uv2==1).ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar),U=uv2,V=uv2)
+ \    :          yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).removegrain(20,rg20,planar=planar).Planar2Interleaved(uv2==1).ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.removegrain(11,rg11,planar=planar).removegrain(20,rg20,planar=planar).removegrain(20,rg20,planar=planar),U=uv2,V=uv2)
+RG4D  = (r<=1) ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.removegrain(4,rg4,planar=planar).Planar2Interleaved(uv2==1).ConvertToYV16(),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.removegrain(4,rg4,planar=planar),U=uv2,V=uv2)
+ \    : (r==2) ? avs26 ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.Planar2Interleaved(uv2==1).ConvertToYV16().medianblur(2,2*medf,2*medf),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.medianblur(2,2*medf,2*medf),U=uv2,V=uv2) : mt_makediff(clp,clp.Quantile(radius_y=2, radius_u=uvm2, radius_v=uvm2, planar=planar), U=uv2,V=uv2)
+ \    :          avs26 ? yuy26 ? mt_makediff(clp.Planar2Interleaved(uv2==1).ConvertToYV16(),clp.Planar2Interleaved(uv2==1).ConvertToYV16().medianblur(3,3*medf,3*medf),U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv2==1) : mt_makediff(clp,clp.medianblur(3,3*medf,3*medf),U=uv2,V=uv2) : mt_makediff(clp,clp.Quantile(radius_y=3, radius_u=uvm3, radius_v=uvm3, planar=planar), U=uv2,V=uv2)
+DD    = yuy26 ? mt_lutxy(RG11D.Planar2Interleaved(uv2==1).ConvertToYV16(),RG4D.Planar2Interleaved(uv2==1).ConvertToYV16(),"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?",U=uv2,V=uv2).ConvertToYUY2().Interleaved2planar(uv==1)
+    \ : avs26 ? mt_lutxy(RG11D,RG4D,"x range_half - y range_half - * 0 < range_half x range_half - abs y range_half - abs < x y ? ?",U=uv2,V=uv2)
+    \         : mt_lutxy(RG11D,RG4D,"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?",U=uv2,V=uv2)
+return (yuy26 ? clp.Planar2Interleaved(uv==1).ConvertToYV16().mt_makediff(DD.Planar2Interleaved(uv==1).ConvertToYV16(),U=uv,V=uv).ConvertToYUY2().Interleaved2planar(uv==1) : clp.mt_makediff(DD,U=uv,V=uv)) }
 
 
  # helper function: make a highpass on a blur's difference (well, kind of that)
@@ -611,12 +641,14 @@ avs26 = VersionNumber() < 2.60 ? false : true
 yuy26 = avs26 && Isyuy2(c) && planar
 
 rg11   = c.removegrain(11,-1,planar=planar)
-rg11D  = yuy26 ? mt_makediff(c.Planar2Interleaved().ConvertToYV16(),rg11.Planar2Interleaved().ConvertToYV16()).ConvertToYUY2().Interleaved2planar() : mt_makediff(c,rg11)
-rg11DD = yuy26 ? mt_makediff(rg11D.Planar2Interleaved().ConvertToYV16(),rg11D.removegrain(11,-1,planar=planar).Planar2Interleaved().ConvertToYV16()).mt_lutxy(rg11D.Planar2Interleaved().ConvertToYV16(),"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?").ConvertToYUY2().Interleaved2planar() : mt_makediff(rg11D,rg11D.removegrain(11,-1,planar=planar)).mt_lutxy(rg11D,"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?")
+rg11D  = yuy26 ? mt_makediff(c.Planar2Interleaved(true).ConvertToYV16(),rg11.Planar2Interleaved(true).ConvertToYV16()).ConvertToYUY2().Interleaved2planar(true) : mt_makediff(c,rg11)
+rg11DD = yuy26 ? mt_makediff(rg11D.Planar2Interleaved(true).ConvertToYV16(),rg11D.removegrain(11,-1,planar=planar).Planar2Interleaved(true).ConvertToYV16()).mt_lutxy(rg11D.Planar2Interleaved(true).ConvertToYV16(),"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?").ConvertToYUY2().Interleaved2planar(true)
+     \ : avs26 ? mt_makediff(rg11D,rg11D.removegrain(11,-1,planar=planar)).mt_lutxy(rg11D,"x range_half - y range_half - * 0 < range_half x range_half - abs y range_half - abs < x y ? ?")
+     \         : mt_makediff(rg11D,rg11D.removegrain(11,-1,planar=planar)).mt_lutxy(rg11D,"x 128 - y 128 - * 0 < 128 x 128 - abs y 128 - abs < x y ? ?")
 yuy26 ? c.Planar2Interleaved().ConvertToYV16().mt_makediff(rg11DD.Planar2Interleaved().ConvertToYV16(),U=2,V=2).ConvertToYUY2().Interleaved2planar() : c.mt_makediff(rg11DD,U=2,V=2) }
 
 ########################################
-## cretindesalpes' functions: (http://forum.doom9.org/showthread.php?p=1505297#post1505297)
+## cretindesalpes' functions
 
 # Converts 16 bit interleaved YUY2 to 16bit planar YUY2 suitable for Ditherpost. (Use right before Ditherpost; this format is not suitable for filtering)
 
@@ -660,29 +692,161 @@ yuy26 ? ConvertToYUY2() : YToUV (u, v, y)}
 
 
 # Converts luma (and chroma) to PC levels, and optionally allows tweaking for pumping up the darks. (for the clip to be fed to motion search only)
-# By courtesy of cretindesalpes. (http://forum.doom9.org/showthread.php?p=1548318#post1548318)
+# By courtesy of cretindesalpes.
 
 function Dither_Luma_Rebuild (clip src, float "s0", float "c",int "uv", bool "lsb", bool "lsb_in", bool "lsb_out", int "mode", float "ampn", bool "slice"){
 lsb_in  = Default( lsb_in  ,false)
 lsb_out = Default( lsb_out ,false)
 lsb     = Default( lsb     ,lsb_in || lsb_out)
+lsb     = !lsb && (lsb_in || lsb_out) ? true : lsb
 mode    = Default( mode ,6)
 uv      = Default(uv,    3)
 s0      = Default(s0,  2.0)
 c       = Default(c,  1.0/16)
 ampn    = Default(ampn, 0.0)
 slice   = Default(slice, true)
-yuy26   = !(VersionNumber() < 2.60) && isyuy2(src)
-src     = yuy26 ? src.Planar2Interleaved().ConvertToYV16() : src
+yuy2    = isyuy2(src)
+avs26   = VersionNumber() < 2.60 ? false : true
+ssispmt = Findstr(VersionString(), "AviSynth+") != 0 && Findstr(VersionString(), "r1576") == 0
+lsb_native = ssispmt ? !(src.BitsPerComponent() > 8 && (lsb)) : true
+ssispmt ? Assert(lsb_native, "lsb hack is not Compatible with native high bit depth" ) : nop()
+ssispmt ? Assert(!(src.isYUVA() && lsb), "lsb hack is not Compatible with YUVA" ) : nop()
+Assert(!(src.isrgb()), "Dither_Luma_Rebuild: RGB Color formats is not supported" )
+src     = yuy2 ? lsb_in ? src.Planar2Interleaved(uv==1).Dither_YUY2toPlanar16() : avs26 ? src.Planar2Interleaved(uv==1).ConvertToYV16() : lsb ? src.Planar2Interleaved(uv==1).Dither_YUY2toPlanar() : src : src
 
     k = (s0 - 1) * c
-    t = lsb_in ? "x 4096 - 56064 / 0 1 clip" : "x 16 - 219 / 0 1 clip"
+    t = lsb_in ? "x 4096 - 56064 / 0 1 clip"
+     \ : avs26 ? "x 16 scalef - 219 scalef / 0 1 clip"
+             \ : "x 16 - 219 / 0 1 clip"
     e = String(k)+" "+String(1+c)+" "+String((1+c)*c)+" "+t+" "+String(c)
-\       +" + / - * "+t+" 1 "+String(k)+" - * + "+String(lsb?65536:255)+" *"
+\       +" + / - * "+t+" 1 "+String(k)+" - * + "+String(lsb?65536:avs26?"range_size":255)+" *"
 src
-lsb ? (lsb_in ? Dither_lut16 (yexpr=e,expr="x 32768 - 32768 * 28672 / 32768 +",y=3, u=uv, v=uv)   : \
-                Dither_lut8  (yexpr=e,expr="x 128 - 32768 * 112 / 32768 +"    ,y=3, u=uv, v=uv))  : \
-                mt_lut       (yexpr=e,expr="x 128 - 128 * 112 / 128 +"        ,y=3, u=uv, v=uv)
-lsb_out ? last : (lsb ? Ditherpost(mode=mode,ampn=ampn,slice=slice,staticnoise=ampn!=0.0?true:false,u=uv,v=uv) : last)
-return yuy26 ? last.ConvertToYUY2().Interleaved2planar() : last
+lsb ? (lsb_in ? Dither_lut16  (yexpr=e,expr="x 32768 - 32768 * 28672 / 32768 +",y=3, u=uv, v=uv)                 : \
+                Dither_lut8   (yexpr=e,expr="x 128 - 32768 * 112 / 32768 +"    ,y=3, u=uv, v=uv))                : \
+                avs26 ? mt_lut(yexpr=e,expr="x range_half - range_half * 112 scalef / range_half +",y=3, u=uv, v=uv) : \
+                        mt_lut(yexpr=e,expr="x 128 - 128 * 112 / 128 +"        ,y=3, u=uv, v=uv)
+
+lsb_out && !yuy2 ? last : (lsb && !lsb_out ? yuy2 ? Ditherpost(mode=mode,ampn=ampn,slice=slice,staticnoise=ampn!=0.0?true:false,u=uv,v=uv).Dither_YUY2toInterleaved().Interleaved2planar(uv==1) : Ditherpost(mode=mode,ampn=ampn,slice=slice,staticnoise=ampn!=0.0?true:false,u=uv,v=uv) : last)
+return yuy2 && lsb_out ? last.Dither_YUY2toInterleaved16().Interleaved2planar(uv==1) : yuy2 && avs26 && !lsb ? converttoyuy2().Interleaved2planar(uv==1) : last
+}
+
+
+
+# SMDegrain prefilters
+
+function SMDegrain_prefilters (clip input, int "prefilter", bool "chroma", int "Chr", int "Chr2", int "bug_wa", bool "lsb", bool "lsb_in", bool "Interlaced", val "if5", int "pel", String "device_type", int "device_id", int "d", int "a", bool "slices", bool "planar", clip "inputP", clip "input8", clip "input8y", clip "inputY", val "input8h", float "h", String "knlm_params")
+{
+Interlaced   = Default( Interlaced  ,false)
+slices       = default(slices, true)
+if5          = Default( if5  ,interlaced ? (GetParity(input)                            ? true : false) : nop())
+lsb_in       = Default( lsb_in  ,false)
+lsb          = Default( lsb     ,lsb_in)
+pel          = default( pel, (input.width () > 1099 ||  input.height() > (lsb_in ? 1199 : 599)) ? 1 : 2 )
+ssispmt      = Findstr(VersionString(), "AviSynth+") != 0 && Findstr(VersionString(), "r1576") == 0
+chroma       = default( chroma, true)
+planar       = Default( planar , input.isyuy2())
+prefilter    = Default( prefilter, 3)
+
+Chr          = Default(Chr,     chroma ? 3 : 1)
+Chr2         = Default(Chr2,    chroma ? 3 : (prefilter==3 ? 2 : 1))
+avs26        = !(VersionNumber() < 2.60)
+
+Assert(!(!defined(inputP) && prefilter==-1), "prefilter must be between 0~4: "+string(prefilter))
+lsb_native = ssispmt ? !(Input.BitsPerComponent() > 8 && (lsb)) : true
+ssispmt ? Assert(lsb_native, "lsb hack is not Compatible with native high bit depth" ) : nop()
+
+# Input preparation for: LSB_IN, Interlacing, Planar and MSuper optimization when pel=2
+
+inputY  = defined(inputY )                    ? inputY  : planar      ? (lsb_in   ? Dither_YUY2toPlanar16(input)         : Interleaved2planar(input))                           : input
+
+inputP  = defined(inputP )                    ? inputP  : !interlaced ? (pel == 2 ? inputY.AssumeFrameBased()            : inputY)                                             : \
+                                                                        (if5      ? inputY.AssumeTFF().SeparateFields()  : inputY.AssumeBFF().SeparateFields())
+
+input8h = defined(input8h) && isclip(input8h) ? input8h : lsb_in      ?             inputP. Ditherpost(mode=6, slice=slices)                                                    : nop()
+input8y = defined(input8y)                    ? input8y : planar      ? (lsb_in   ? input8h.Dither_YUY2toInterleaved()   :  inputP)                                             : inputP
+input8  = defined(input8 )                    ? input8  : lsb_in      ? (planar   ? input8y.Interleaved2planar()         : input8h)                                             : input8y
+
+inputd  = (prefilter == 3 || prefilter == 4)  ? Interlaced ? if5 ? input.AssumeTFF().SeparateFields() : \
+                                                                   input.AssumeBFF().SeparateFields() : \
+                                                             input : nop()
+
+bug_wa    = defined(bug_wa) ? bug_wa : interlaced && planar && chroma && !avs26 ? 2 : Chr # bug: crash prevention workaround
+
+# The mt_merge() line for prefilter=3 should be swapped with a high bitdepth variant (Dither_merge16_8() ?) due to a 1 point limited range
+# in both range ends, but then it won't work with planar sources. This isn't as critical since we are only trying to find motion vectors.
+                     (prefilter==-1) ?  inputP                                                                                                                                      : \
+                     (prefilter==0)  ?  input8.MinBlur(0,Chr,planar)                                               : \
+                     (prefilter==1)  ?  input8.MinBlur(1,Chr,planar)                                               : \
+                     (prefilter==2)  ?  input8.MinBlur(2,Chr,planar)                                               : \
+                     (prefilter==3)  ?  (!planar && lsb ? Dither_merge16_8( inputd.Dfttest(sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,lsb=true,lsb_in=lsb_in,quiet=true), lsb_in?inputP:inputP.Dither_convert_8_to_16(),                                \
+                                                                   lsb_in?inputP.Dither_lut16("x 4096 < 65535 x 19200 > 0 65535 x 4096 - 4.338916843220339 * - ? ?",u=1,v=1).Ditherpost(mode=6, slice=slices, u=Chr,   v=Chr)                                           \
+                                                                         :inputd.mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=chroma,                       u=Chr2,  v=Chr2)                                                       : \
+                                 avs26 && planar && lsb ? Dither_merge16_8( inputd.Dfttest(sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,lsb=true,lsb_in=lsb_in,quiet=true).ConvertToYV16(), lsb_in?inputP:inputd.ConvertToYV16().Dither_convert_8_to_16(),                                \
+                                                                   lsb_in?inputP.Dither_lut16("x 4096 < 65535 x 19200 > 0 65535 x 4096 - 4.338916843220339 * - ? ?",u=1,v=1).Ditherpost(mode=6, slice=slices, u=Chr,   v=Chr)                                           \
+                                                                         :inputd.ConvertToYV16().mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 255 75 16 - / * - ? ?",u=1,v=1), luma=chroma,                       u=Chr2,  v=Chr2).ConvertToYUY2().Interleaved2planar(!chroma)                                                       : \
+                                           avs26 && planar ? mt_merge     (        Dfttest(!lsb_in?inputd:input8y,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1).ConvertToYV16(),!lsb_in?input8y.Planar2Interleaved(!chroma).ConvertToYV16():input8y.ConvertToYV16(),                                                   \
+                                                                          input8.Planar2Interleaved(!chroma).ConvertToYV16().mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 4.322033898305085 * - ? ?",u=1,v=1), luma=planar?false:chroma,          u=bug_wa,v=bug_wa).ConvertToYUY2().Interleaved2planar(!chroma)                                                    : \
+                                                     avs26 ? mt_merge     (Dfttest(inputd,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1),input8,   \
+                                                                          input8.mt_lut("x 16 scalef < range_max x 75 scalef > 0 range_max x 16 scalef - range_max 75 scalef 16 scalef - / * - ? ?",u=1,v=1), luma=chroma, u=chr,v=chr)                                                   : \
+                                                             mt_merge     (planar ? Dfttest(!lsb_in?inputd:input8y,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1).Interleaved2planar(!chroma)                          : \
+                                                                                    Dfttest(!lsb_in?inputd:input8 ,sstring="0.0:4.0 0.2:9.0 1.0:15.0",tbsize=1,u=chroma,v=chroma,dither=1),input8,   \
+                                                                          input8.mt_lut(      "x 16 < 255 x 75 > 0 255 x 16 - 4.322033898305085 * - ? ?",u=1,v=1), luma=chroma,          u=bug_wa,v=bug_wa))                                                   : \
+                     (prefilter==4)  ?  planar ? inputd.SMDegrain_KNLMeansCL(lsb=lsb, lsb_in=lsb_in, device_type=device_type, device_id=device_id, chroma=chroma, h=h, d=d, a=a, knlm_params=knlm_params).Interleaved2planar(!chroma) : \ 
+                                                 inputd.SMDegrain_KNLMeansCL(lsb=lsb, lsb_in=lsb_in, device_type=device_type, device_id=device_id, chroma=chroma, h=h, d=d, a=a, knlm_params=knlm_params) : \
+                                         Assert(false,    "prefilter must be between -1~4: "+string(prefilter))
+}
+
+
+
+# SMDegrain_KNLMeansCL
+
+function SMDegrain_KNLMeansCL (clip input, String "device_type", int "device_id", bool "chroma", bool "lsb", bool "lsb_in", float "h", int "d", int "a", String "knlm_params")
+{
+d            = Default( d ,0)
+a            = Default( a ,1)
+h            = Default( h ,7.0)
+deviceid     = Default( device_id ,0)
+knlm_params  = default(knlm_params, "")
+chroma       = Default( chroma  ,true)
+lsb_in       = Default( lsb_in  ,false)
+lsb          = Default( lsb     ,lsb_in)
+
+                                              avspmt  = Findstr(VersionString(), "AviSynth+") != 0 && Findstr(VersionString(), "r1576") == 0
+                                              fullchr = avspmt ? input.is444() : input.isyv24()
+                                              chr420  = avspmt ? input.is420() : input.isyv12()
+                                              nochr   = avspmt ?   input.isy() : input.isy8()
+                                              chrlsb  = chroma && !fullchr && !nochr
+                                              NL_in   = lsb && !lsb_in ? input.Dither_convert_8_to_16() : input
+                                              cnl     = chrlsb ? "Y" : input.isrgb() ? "auto" : chroma ? "YUV" : "Y"
+
+NL_in = !chrlsb && input.isyuy2() ? NL_in.converttoyv16() : NL_in
+
+                               chrlsb ? eval("""
+                                              # In a more lucid state I could probably have laid out this block much better... or not...
+
+                                              NL_W    = width(NL_in)
+                                              Uclip   = avspmt ? ExtractU(NL_in) : UToY8(NL_in)
+                                              Vclip   = avspmt ? ExtractV(NL_in) : VToY8(NL_in)
+                                              NL_lsb  = (chr420 ? StackVertical(  lsb ? StackVertical(Dither_get_msb(uclip),Dither_get_msb(vclip)) : uclip,\
+                                                                                  lsb ? StackVertical(Dither_get_lsb(uclip),Dither_get_lsb(vclip)) : vclip) : \
+                                                                  StackHorizontal(uclip,vclip))
+
+                                              nlc     = StackHorizontal(avspmt ? ConvertToY(NL_in) : ConvertToY8(NL_in),NL_lsb)
+
+                                              nlc     = Eval("nlc.KNLMeansCL(D=d, A=a, h=h,lsb_inout=lsb_in || lsb,device_type=device_type,device_id=deviceid,channels=cnl" + knlm_params + ")")
+
+                                              uvh = lsb_in || lsb ? uclip.height()/2 : uclip.height()
+                                              uvw = uclip.width()
+
+                                              nly = nlc.crop(0,0,chr420 ? -uvw : -(uvw+uvw),0)
+
+                                              nlu = chr420 ? lsb_in || lsb ? StackVertical(Dither_get_msb(nlc).crop(NL_W,0,0,-uvh),Dither_get_lsb(nlc).crop(NL_W,0,0,-uvh)) : nlc.crop(NL_W,0,0,-uvh)                : \
+                                                              nlc.crop(NL_W    ,0,-uvw,0)
+                                              nlv = chr420 ? lsb_in || lsb ? StackVertical(Dither_get_msb(nlc).crop(NL_W,uvh, 0,0),Dither_get_lsb(nlc).crop(NL_W,uvh, 0,0)) : nlc.crop(NL_W,uvh, 0,0)                : \
+                                                              nlc.crop(NL_W+uvw,0,   0,0)
+                                              YToUV(nlu, nlv, nly)
+                                             """) :   Eval("NL_in.KNLMeansCL(D=d, A=a, h=h,lsb_inout=lsb_in || lsb,device_type=device_type,device_id=deviceid,channels=cnl" + knlm_params + ")")
+
+!lsb && lsb_in ? Ditherpost(mode=6,slice=false) : last
+input.isyuy2() ? converttoyuy2() : last
 }

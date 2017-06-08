@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:YinMediaEncoder"
         xmlns:Business="clr-namespace:Business;assembly=Business" x:Name="window" x:Class="YinMediaEncoder.DeshakerAdvancedWindow"
         mc:Ignorable="d"
         Title="Advanced Deshaker Pass 1 Settings" Height="369.045" Width="300.872" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
@@ -25,7 +24,7 @@
         </Style>
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" Margin="0,0,14,14" VerticalAlignment="Bottom" Width="75" IsDefault="True" Click="OkButton_Click"/>
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Right" Margin="0,0,94,14" VerticalAlignment="Bottom" Width="75" IsCancel="True" Click="CancelButton_Click"/>
         <TextBlock x:Name="HelpLink" HorizontalAlignment="Right" Margin="0,13,14,0" VerticalAlignment="Top"><Hyperlink NavigateUri="http://www.guthspot.se/video/deshaker.htm#faq" RequestNavigate="HelpLink_RequestNavigate">Help</Hyperlink></TextBlock>

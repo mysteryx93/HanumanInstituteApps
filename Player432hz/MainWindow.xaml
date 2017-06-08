@@ -16,7 +16,7 @@
             <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders}" Height="81" VerticalAlignment="Top" TabIndex="5" Background="{x:Null}" />
             <Button x:Name="RemoveFolderButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" Click="RemoveFolderButton_Click" TabIndex="7" Margin="0,-1,0,0"/>
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top" FontWeight="Bold"/>
-            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="18" Margin="80,2,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
+            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="21" Margin="80,0,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
         </Grid>
         <Business:WmpPlayerControl x:Name="AudioPlayer" Height="45" Margin="10,0,10,10" VerticalAlignment="Bottom" Loop="False" TabIndex="10"/>
         <ListBox x:Name="FilesList" Margin="174,144,10,81" ItemsSource="{Binding}" MouseDoubleClick="FilesList_MouseDoubleClick" TabIndex="8" Background="{x:Null}" />

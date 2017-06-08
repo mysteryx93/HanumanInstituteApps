@@ -92,7 +92,7 @@ namespace YinMediaEncoder {
         }
 
         private void business_EncodingCompleted(object sender, EncodingCompletedEventArgs e) {
-            Application.Current.Dispatcher.Invoke(() => EncodingCompletedWindow.Instance(this,e));
+            Application.Current.Dispatcher.Invoke(() => EncodingCompletedWindow.Instance(this, e));
         }
 
         private void business_EncodingFailed(object sender, EncodingCompletedEventArgs e) {
@@ -148,7 +148,8 @@ namespace YinMediaEncoder {
 
                 try {
                     await business.PreparePreviewFile(encodeSettings, true, true);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     MessageBox.Show(this, ex.Message, "Cannot Open File", MessageBoxButton.OK, MessageBoxImage.Error);
                     encodeSettings.FilePath = "";
                 }
@@ -221,7 +222,8 @@ namespace YinMediaEncoder {
                 await Task.Delay(100); // Wait for media player file to be released.
                 business.PrepareJobFiles(EncodeSettings);
                 business.AddJobToQueue(EncodeSettings);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 if (!encodeSettings.ConvertToAvi || System.IO.File.Exists(Settings.TempFilesPath + "Preview.avi"))
                     SetEncodeSettings(EncodeSettings);
                 MessageBox.Show(this, ex.Message, "Encoding Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -237,9 +239,14 @@ namespace YinMediaEncoder {
                 string.IsNullOrEmpty(encodeSettings.FilePath) ||
                 !encodeSettings.SourceHeight.HasValue ||
                 !encodeSettings.SourceWidth.HasValue ||
-                !encodeSettings.SourceFrameRate.HasValue;
+                !encodeSettings.SourceFrameRate.HasValue ||
+                !encodeSettings.SourceAspectRatio.HasValue;
             if (Error)
                 MessageBox.Show(this, "You must enter required file information.", "Validation Error");
+            if (encodeSettings.Trim && encodeSettings.TrimStart.HasValue && encodeSettings.TrimEnd.HasValue && encodeSettings.TrimEnd < encodeSettings.TrimStart) {
+                Error = true;
+                MessageBox.Show(this, "Trim End must be greater than TrimStart.", "Validation Error");
+            }
             return !Error;
         }
 
@@ -308,11 +315,24 @@ namespace YinMediaEncoder {
             encodeSettings.EncodePreset = EncodePresets.medium;
         }
 
-        private void DeshakerGenerateButton_Click(object sender, RoutedEventArgs e) {
-            DeshakerWindow.Instance(business, encodeSettings);
-            //DeshakerGenerateButton.IsEnabled = false;
-            //await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings));
-            //DeshakerGenerateButton.IsEnabled = true;
+        private void DeshakerSettingsButton_Click(object sender, RoutedEventArgs e) {
+            if (Validate()) {
+                if (DeshakerWindow.Instance(business, encodeSettings) == true) {
+                    encodeSettings.DeshakerSettings.PrescanCompleted = false;
+                }
+            }
+        }
+
+        private async void DeshakerPrescanButton_Click(object sender, RoutedEventArgs e) {
+            encodeSettings.DeshakerSettings.PrescanCompleted = false;
+            if (Validate() && DeshakerPrescanWindow.Instance(business, encodeSettings)) {
+                DeshakerPrescanButton.IsEnabled = false;
+                business.GenerateScript(encodeSettings, false, true);
+                CompletionStatus Result = await Task.Run(() => business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings))).ConfigureAwait(false);
+                encodeSettings.DeshakerSettings.PrescanCompleted = Result == CompletionStatus.Success;
+                business.DeshakerSourceSettings = encodeSettings;
+                Dispatcher.Invoke(() => DeshakerPrescanButton.IsEnabled = true);
+            }
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) {

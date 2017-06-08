@@ -233,7 +233,6 @@ namespace Business {
 
                 int ItemsCompleted = 0;
                 string DefaultFileName;
-                string FilePath;
                 DefaultMediaPath PathCalc = new DefaultMediaPath();
                 PathCalc.LoadData();
 
@@ -241,15 +240,9 @@ namespace Business {
                     // Try to auto-attach file if default file name exists.
                     if (item.FileName == null) {
                         DefaultFileName = PathCalc.GetDefaultFileName(item.Artist, item.Title, item.MediaCategoryId, item.MediaType);
-                        foreach (string ext in Settings.GetMediaTypeExtensions(item.MediaType)) {
-                            FilePath = Settings.NaturalGroundingFolder + DefaultFileName + ext;
-                            if (File.Exists(FilePath)) {
-                                item.FileName = DefaultFileName + ext;
-                                HasChanges = true;
-                                await Task.Delay(1);
-                                break;
-                            }
-                        }
+                        if (AutoAttachFile(item, DefaultFileName))
+                            HasChanges = true;
+                        await Task.Delay(1);
                     }
 
                     // Load media file to set Length, Width and Height.
@@ -269,6 +262,18 @@ namespace Business {
             loadingMediaInfoCount = 0;
             loadingMediaInfoProgress = null;
             return HasChanges;
+        }
+
+        public static bool AutoAttachFile(Media item, string fileName) {
+            string FilePath;
+            foreach (string ext in Settings.GetMediaTypeExtensions(item.MediaType)) {
+                FilePath = Settings.NaturalGroundingFolder + fileName + ext;
+                if (File.Exists(FilePath)) {
+                    item.FileName = fileName + ext;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static bool FileEntryHasMissingInfo(Media item) {

@@ -122,7 +122,7 @@
                     <TextBox HorizontalAlignment="Left" Height="21" Margin="281,34,0,0" VerticalAlignment="Top" Width="75" TabIndex="14">
                         <Binding Path="SourceAspectRatio" StringFormat="0.####">
                             <Binding.ValidationRules>
-                                <Business:NumericRangeRule Min="0" ValidatesOnTargetUpdated="True" />
+                                <Business:NumericRangeRule Min="0.0001" AllowNull="True" ValidatesOnTargetUpdated="True" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
@@ -222,8 +222,8 @@
                         <ComboBoxItem Content="PC.601" />
                         <ComboBoxItem Content="PC.709" />
                     </ComboBox>
-                    <CheckBox x:Name="DeshakerCheckbox" Content="Deshaker" HorizontalAlignment="Left" Margin="7,178,0,0" VerticalAlignment="Top" IsChecked="{Binding Deshaker}" TabIndex="20" Visibility="Hidden"/>
-                    <Button x:Name="DeshakerGenerateButton" Content="Settings" HorizontalAlignment="Left" Margin="94,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerGenerateButton_Click" Visibility="Hidden"/>
+                    <CheckBox x:Name="DeshakerCheckbox" Content="Deshaker" HorizontalAlignment="Left" Margin="7,178,0,0" VerticalAlignment="Top" IsChecked="{Binding Deshaker}" TabIndex="27" />
+                    <Button x:Name="DeshakerSettingsButton" Content="Settings" HorizontalAlignment="Left" Margin="94,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerSettingsButton_Click" TabIndex="28" />
                     <ComboBox HorizontalAlignment="Left" Margin="198,151,0,0" VerticalAlignment="Top" Width="79" SelectedIndex="{Binding DegrainPrefilter, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}" TabIndex="25">
                         <ComboBoxItem Content="SD" IsSelected="True" />
                         <ComboBoxItem Content="HD" />
@@ -234,6 +234,7 @@
                         <ComboBoxItem Content="MPEG2" IsSelected="True" />
                         <ComboBoxItem Content="DV" />
                     </ComboBox>
+                    <Button x:Name="DeshakerPrescanButton" Content="Prescan" HorizontalAlignment="Left" Margin="178,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerPrescanButton_Click" TabIndex="29" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabEncoding" Header="Encoding" TabIndex="6">

@@ -13,11 +13,12 @@ namespace YinMediaEncoder {
     /// Interaction logic for DeshakerWindow.xaml
     /// </summary>
     public partial class DeshakerWindow : Window {
-        public static void Instance(MediaEncoderBusiness business, MediaEncoderSettings settings) {
+        public static bool Instance(MediaEncoderBusiness business, MediaEncoderSettings settings) {
             DeshakerWindow NewForm = new DeshakerWindow();
             NewForm.business = business;
             NewForm.encodeSettings = settings;
             SessionCore.Instance.Windows.ShowDialog(NewForm);
+            return NewForm.Result;
         }
 
         private WindowHelper helper;
@@ -26,6 +27,7 @@ namespace YinMediaEncoder {
         private MediaEncoderDeshakerSettings bindingSettings;
         private MediaEncoderDeshakerSegmentSettings bindingSegmentSettings;
         public int StartFrameTextBoxValue { get; set; } = 0;
+        public bool Result = false;
 
         public DeshakerWindow() {
             InitializeComponent();
@@ -62,10 +64,8 @@ namespace YinMediaEncoder {
         private void OkButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
                 encodeSettings.DeshakerSettings = bindingSettings;
+                Result = true;
                 Close();
-                if (MessageBox.Show("Would you like to prescan the video now?", "Prescan", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                    // await business.GenerateDeshakerLog(encodeSettings, business.GetPreviewSourceFile(encodeSettings), ExecutingDeshakePass);
-                }
             }
         }
 

@@ -17,6 +17,12 @@ namespace Business {
         public static string PreviewDeshakerScript {
             get { return Settings.TempFilesPath + "Preview_Deshaker.avs"; }
         }
+        public static string PreviewDeshakerTempOut {
+            get { return Settings.TempFilesPath + "Preview_Deshaker.avi"; }
+        }
+        public static string PreviewDeshakerTempLog {
+            get { return Settings.TempFilesPath + "Preview_Deshaker.txt"; }
+        }
         public static string PreviewDeshakerLog {
             get { return Settings.TempFilesPath + "Preview_Deshaker.log"; }
         }
@@ -85,6 +91,20 @@ namespace Business {
                 return string.Format("{0}Job{1}_Deshaker.avs", Settings.TempFilesPath, jobIndex);
             else
                 return PreviewDeshakerScript;
+        }
+
+        public static string GetDeshakerTempOut(int jobIndex) {
+            if (jobIndex >= 0)
+                return string.Format("{0}Job{1}_Deshaker.avi", Settings.TempFilesPath, jobIndex);
+            else
+                return PreviewDeshakerTempOut;
+        }
+
+        public static string GetDeshakerTempLog(int jobIndex) {
+            if (jobIndex >= 0)
+                return string.Format("{0}Job{1}_Deshaker.txt", Settings.TempFilesPath, jobIndex);
+            else
+                return PreviewDeshakerTempLog;
         }
 
         public static string GetDeshakerLog(int jobIndex) {

@@ -25,12 +25,12 @@
         </Style>
         <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid Style="{DynamicResource GradiantBackground}">
         <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" Margin="0,0,14,14" VerticalAlignment="Bottom" Width="75" IsDefault="True" Click="OkButton_Click"/>
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Right" Margin="0,0,94,14" VerticalAlignment="Bottom" Width="75" IsCancel="True" Click="CancelButton_Click"/>
-        <TabControl x:Name="tabControl" Margin="10,10,11,39">
+        <TabControl x:Name="tabControl" Margin="10,10,11,39" Background="{x:Null}">
             <TabItem Header="Pass _1">
-                <Grid x:Name="Pass1Grid" Background="Transparent">
+                <Grid x:Name="Pass1Grid">
                     <CheckBox x:Name="RollingShutterCheckbox" VerticalAlignment="Top" TabIndex="18" Margin="10,35,0,0" IsChecked="{Binding RollingShutter}" HorizontalAlignment="Left" Content="Camera has rolling shutter (0-100)"/>
                     <TextBox HorizontalAlignment="Left" Height="21" Margin="230,34,0,0" VerticalAlignment="Top" Width="50" TabIndex="19" IsEnabled="{Binding IsChecked, ElementName=RollingShutterCheckbox}" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
                         <Binding Path="RollingShutterAmount" UpdateSourceTrigger="PropertyChanged">

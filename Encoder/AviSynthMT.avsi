@@ -189,7 +189,8 @@ SetFilterMTMode("MRecalculate",        MT_MULTI_INSTANCE)
 #Filters from EEDI2 v0.9.2 (from http://forum.doom9.org/showthread.php?t=173238 ) Tested On 2016/03/06
 SetFilterMTMode("EEDI2",               MT_MULTI_INSTANCE)
 
-SetFilterMTMode("KNLMeansCL",          MT_SERIALIZED)
+SetFilterMTMode("KNLMeansCL",          MT_MULTI_INSTANCE)
+SetFilterMTMode("MP_Pipeline",         MT_SPECIAL_MT)
 
 #keep it the last line please
 if (FunctionExists("avstp_set_threads")) {

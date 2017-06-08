@@ -100,8 +100,11 @@ namespace NaturalGroundingPlayer {
                 if (File.Exists(Settings.NaturalGroundingFolder + video.FileName))
                     await LoadMediaInfoAsync();
                 else {
-                    fileNotFound = true;
-                    ErrorText.Text = "File not found.";
+                    // Try to auto-attach same path with different extension.
+                    if (!EditPlaylistBusiness.AutoAttachFile(video, PathManager.GetPathWithoutExtension(video.FileName))) {
+                        fileNotFound = true;
+                        ErrorText.Text = "File not found.";
+                    }
                 }
             }
         }

@@ -134,6 +134,7 @@ namespace Business {
             string[] Lines = script.ToString().TrimEnd('\r','\n').Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             script = new StringBuilder();
             AddPluginPath();
+            LoadPluginAvsi("AviSynthMT.avsi");
             LoadPluginDll("MP_Pipeline.dll");
             AppendLine("SetMemoryMax(1)");
             AppendLine();
@@ -157,24 +158,26 @@ namespace Business {
                 AppendLine("### ###");
             }
             AppendLine("\"\"\")");
-            AppendLine();
-            if (!string.IsNullOrEmpty(AudioDubLine) && string.IsNullOrEmpty(TrimLine) && string.IsNullOrEmpty(AssumeFpsLine)) {
-                AppendLine(AudioDubLine);
-            } else {
-                if (string.IsNullOrEmpty(AudioDubLine))
-                    AppendLine("A=" + AviSourceLine);
-                else {
-                    // We must create a clip with the original frame count and frame rate so that Trim and AssumeFps functions perform what they are meant to.
-                    AppendLine("SourceFps=" + sourceFrameRate.ToString(CultureInfo.InvariantCulture));
-                    AppendLine("A=BlankClip(1,1,1)." + AudioDubLine);
-                    AppendLine(@"Blank=BlankClip(int(A.AudioDuration*SourceFps), 4, 4, ""YV12"", SourceFps)");
-                    AppendLine("A=AudioDub(Blank, A)");
+            if (!string.IsNullOrEmpty(AudioDubLine) || !string.IsNullOrEmpty(AviSourceLine)) {
+                AppendLine();
+                if (!string.IsNullOrEmpty(AudioDubLine) && string.IsNullOrEmpty(TrimLine) && string.IsNullOrEmpty(AssumeFpsLine)) {
+                    AppendLine(AudioDubLine);
+                } else {
+                    if (string.IsNullOrEmpty(AudioDubLine))
+                        AppendLine("A=" + AviSourceLine);
+                    else {
+                        // We must create a clip with the original frame count and frame rate so that Trim and AssumeFps functions perform what they are meant to.
+                        AppendLine("SourceFps=" + sourceFrameRate.ToString(CultureInfo.InvariantCulture));
+                        AppendLine("A=BlankClip(1,1,1)." + AudioDubLine);
+                        AppendLine(@"Blank=BlankClip(int(A.AudioDuration*SourceFps), 4, 4, ""YV12"", SourceFps)");
+                        AppendLine("A=AudioDub(Blank, A)");
+                    }
+                    if (!string.IsNullOrEmpty(TrimLine))
+                        AppendLine("A=A." + TrimLine);
+                    if (!string.IsNullOrEmpty(AssumeFpsLine))
+                        AppendLine("A=A." + AssumeFpsLine);
+                    AppendLine("AudioDub(last, A)");
                 }
-                if (!string.IsNullOrEmpty(TrimLine))
-                    AppendLine("A=A." + TrimLine);
-                if (!string.IsNullOrEmpty(AssumeFpsLine))
-                    AppendLine("A=A." + AssumeFpsLine);
-                AppendLine("AudioDub(last, A)");
             }
         }
 

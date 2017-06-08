@@ -18,6 +18,7 @@ namespace Business {
         public ObservableCollection<MediaEncoderSettings> ProcessingQueue = new ObservableCollection<MediaEncoderSettings>();
         public bool IsEncoding { get; private set; } = false;
         private Thread JobThread = null;
+        public MediaEncoderSettings DeshakerSourceSettings { get; set; }
 
         public event EventHandler<EncodingCompletedEventArgs> EncodingCompleted;
         public event EventHandler<EncodingCompletedEventArgs> EncodingFailed;
@@ -97,27 +98,35 @@ namespace Business {
 
         private void EncoderThread(object obj) {
             MediaEncoderSettings settings = obj as MediaEncoderSettings;
-            settings.CompletionStatus = CompletionStatus.None;
+            settings.CompletionStatus = CompletionStatus.Success;
             DateTime StartTime = DateTime.Now;
 
             FFmpegConfig.UserInterfaceManager.Start(settings.JobIndex, "Processing Video");
 
             bool Run = PrepareExistingJob(settings);
             if (Run) {
-                Task<CompletionStatus> VideoEnc = null;
-                if (settings.VideoCodec != VideoCodecs.Copy)
-                    VideoEnc = Task.Run(() => AvisynthTools.EncodeVideo(settings));
+                if (settings.Deshaker && (settings.DeshakerSettings.PrescanAction != PrescanType.Full || !settings.DeshakerSettings.PrescanCompleted)) {
+                    settings.DeshakerSettings.PrescanAction = PrescanType.Full;
+                    settings.CompletionStatus = GenerateDeshakerLog(settings, settings.InputFile);
+                }
 
-                // Encode audio stream
-                if (settings.IsAudioEncode) {
-                    Task<CompletionStatus> AudioEnc = Task.Run(() => AvisynthTools.EncodeAudio(settings));
-                    if (VideoEnc != null)
-                        Task.WaitAll(VideoEnc, AudioEnc);
-                    else
-                        AudioEnc.Wait();
-                } else if (VideoEnc != null)
-                    VideoEnc.Wait();
-            }
+                if (settings.CompletionStatus == CompletionStatus.Success) {
+                    Task<CompletionStatus> VideoEnc = null;
+                    if (settings.VideoCodec != VideoCodecs.Copy)
+                        VideoEnc = Task.Run(() => AvisynthTools.EncodeVideo(settings));
+
+                    // Encode audio stream
+                    if (settings.IsAudioEncode) {
+                        Task<CompletionStatus> AudioEnc = Task.Run(() => AvisynthTools.EncodeAudio(settings));
+                        if (VideoEnc != null)
+                            Task.WaitAll(VideoEnc, AudioEnc);
+                        else
+                            AudioEnc.Wait();
+                    } else if (VideoEnc != null)
+                        VideoEnc.Wait();
+                }
+            } else
+                settings.CompletionStatus = CompletionStatus.None;
 
             // Check if encode is completed.
             EncodingCompletedEventArgs CompletedArgs = null;
@@ -135,7 +144,6 @@ namespace Business {
 
             if (IsEncoding || settings.CompletionStatus == CompletionStatus.Success)
                 Application.Current.Dispatcher.Invoke(() => ProcessingQueue.Remove(settings));
-
 
             FFmpegConfig.UserInterfaceManager.Stop(settings.JobIndex);
 
@@ -228,7 +236,7 @@ namespace Business {
 
             bool AviFileReady = File.Exists(PathManager.PreviewSourceFile);
             if (!AviFileReady && settings.ConvertToAvi)
-                AviFileReady = await Task.Run(() => MediaEncoder.ConvertToAvi(settings.FilePath, PathManager.PreviewSourceFile, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Converting to AVI"))) == CompletionStatus.Success;
+                AviFileReady = await Task.Run(() => MediaEncoder.ConvertToAvi(settings.FilePath, PathManager.PreviewSourceFile, true, new ProcessStartOptions(FFmpegDisplayMode.Interface, "Converting to AVI"))) == CompletionStatus.Success;
 
             if (AviFileReady && settings.ConvertToAvi)
                 await GetMediaInfo(PathManager.PreviewSourceFile, settings);
@@ -272,6 +280,7 @@ namespace Business {
                 Script.Replace(Script.GetAsciiPath(PathManager.PreviewDeshakerLog), Script.GetAsciiPath(settings.DeshakerLog));
             }
             Script.WriteToFile(settings.ScriptFile);
+            // if (settings.DeshakerSettings.PrescanAction == PrescanType.Full)
         }
 
         /// <summary>
@@ -499,54 +508,101 @@ namespace Business {
             }
         }
 
-        /// <summary>
-        /// Wait for any instance of FFmpeg to terminate.
-        /// </summary>
-        public async Task WaitForFFmpegAsync() {
-            List<Task> JobTasks = new List<Task>();
-            foreach (Process process in MediaProcesses.GetFFmpegProcesses()) {
-                JobTasks.Add(Task.Run(() => process.WaitForExit()));
-            }
-            await Task.WhenAll(JobTasks);
-        }
+        public CompletionStatus GenerateDeshakerLog(MediaEncoderSettings settings, string inputFile) {
+            // Prepare Deshaker settings.
+            settings.DeshakerSettings.Pass = 1;
+            settings.DeshakerSettings.LogFile = settings.DeshakerTempLog;
+            settings.DeshakerSettings.SourcePixelAspectRatio = settings.SourceAspectRatio.Value;
+            // settings.DeshakerSettings.AppendToFile = true;
+            File.Delete(settings.DeshakerLog);
 
-        /// <summary>
-        /// Kills all instances of FFmpeg.
-        /// </summary>
-        public void KillAllFFmpegInstances() {
-            foreach (Process process in MediaProcesses.GetFFmpegProcesses()) {
-                try {
-                    process.Kill();
+            // Start UI.
+            CompletionStatus Result = CompletionStatus.Success;
+            object JobId = "Deshaker";
+            FFmpegConfig.UserInterfaceManager.Start(JobId, "Running Deshaker Prescan");
+            ProcessStartOptions JobOptions = new ProcessStartOptions(JobId, "Getting Frame Count", false);
+
+            // Get frame count.
+            settings.CalculateSize();
+            int FrameStart = (int)((settings.DeshakerSettings.PrescanStart ?? 0) * settings.SourceFrameRate.Value);
+            int FrameEnd = (int)((settings.DeshakerSettings.PrescanEnd ?? 0) * settings.SourceFrameRate.Value);
+            string Script = MediaEncoderScript.GenerateDeshakerScript(settings, inputFile, 0, FrameStart, FrameEnd);
+            File.WriteAllText(settings.DeshakerScript, Script);
+            JobOptions.FrameCount = AvisynthTools.GetFrameCount(settings.DeshakerScript, JobOptions);
+
+            // Pad file start.
+            using (StreamWriter sw = new StreamWriter(File.Open(settings.DeshakerLog, FileMode.Create), Encoding.ASCII)) {
+                for (int i = 0; i < FrameStart; i++) {
+                    sw.WriteLine((i + 1).ToString().PadLeft(7) + "									skipped		#	   0.00	   0.00	");
                 }
-                catch { }
             }
+
+            // Run segments.
+            var Segments = settings.DeshakerSettings.Segments;
+            if (JobOptions.FrameCount > 0) {
+                for (int i = 0; i < Segments.Count; i++) {
+                    // Get start position of next segment.
+                    long NextSegmentStart = i < Segments.Count - 1 ? Segments[i + 1].FrameStart : 0;
+                    if (NextSegmentStart == 0 || NextSegmentStart > FrameStart) { // Enforce PrescanStart for preview
+                        long SegmentStart = Segments[i].FrameStart;
+                        long SegmentEnd = NextSegmentStart > 0 ? NextSegmentStart - 1 : 0;
+                        // Enforce PrescanEnd for preview
+                        if ((FrameEnd > 0 && SegmentStart > FrameEnd) || (SegmentEnd > 0 && SegmentStart > SegmentEnd))
+                            break;
+                        if ((FrameStart > 0 && FrameStart > SegmentStart) || SegmentStart == 0)
+                            SegmentStart = FrameStart;
+                        if ((FrameEnd > 0 && FrameEnd < SegmentEnd) || SegmentEnd == 0)
+                            SegmentEnd = FrameEnd;
+                        Result = GenerateDeshakerLogSegment(settings, inputFile, i, FrameStart, SegmentStart, SegmentEnd, JobOptions);
+                        if (Result != CompletionStatus.Success)
+                            break;
+
+                        // Merge log segment into log file and set right frame numbers.
+                        using (StreamWriter sw = new StreamWriter(File.Open(settings.DeshakerLog, FileMode.Append), Encoding.ASCII)) {
+                            using (StreamReader sr = new StreamReader(File.OpenRead(settings.DeshakerTempLog), Encoding.ASCII)) {
+                                string LogLine, LogNum, LogNumField, LineOut;
+                                long NewLineNum = SegmentStart;
+                                LogLine = sr.ReadLine();
+                                while (LogLine != null) {
+                                    if (LogLine.Length > 7) {
+                                        LogNum = LogLine.Substring(0, 7).Trim();
+                                        if (LogNum.Length > 0) {
+                                            LogNumField = LogNum[LogNum.Length - 1].ToString();
+                                            if (LogNumField != "A" && LogNumField != "B") // For interlaced videos
+                                                LogNumField = "";
+                                            NewLineNum++; // Log file starts at 1, not 0.
+                                            LineOut = (NewLineNum.ToString() + LogNumField).PadLeft(7) + LogLine.Substring(7, LogLine.Length - 8);
+                                            sw.WriteLine(LineOut);
+                                        }
+                                    }
+                                    LogLine = sr.ReadLine();
+                                }
+                            }
+                        }
+                        File.Delete(settings.DeshakerTempLog);
+                    }
+                }
+            } else
+                Result = CompletionStatus.Error;
+
+            // End UI.
+            FFmpegConfig.UserInterfaceManager.Stop(JobId);
+            return Result;
         }
 
-        /// <summary>
-        /// Returns whether specified file is in use.
-        /// </summary>
-        /// <param name="file">The file to check for access.</param>
-        /// <returns>True if file is locked, otherwise false.</returns>
-        private bool IsFileLocked(string fileName) {
-            FileStream stream = null;
+        private CompletionStatus GenerateDeshakerLogSegment(MediaEncoderSettings settings, string inputFile, int segment, long jobStart, long frameStart, long frameEnd, ProcessStartOptions jobOptions) {
+            // Write Deshaker Pass 1 script to file.
+            string Script = MediaEncoderScript.GenerateDeshakerScript(settings, inputFile, segment, frameStart, frameEnd);
+            File.WriteAllText(settings.DeshakerScript, Script);
 
-            try {
-                stream = (new FileInfo(fileName)).Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            }
-            catch (IOException) {
-                //the file is unavailable because it is:
-                //still being written to
-                //or being processed by another thread
-                //or does not exist (has already been processed)
-                return true;
-            }
-            finally {
-                if (stream != null)
-                    stream.Close();
-            }
-
-            //file is not locked
-            return false;
+            // Run pass.
+            jobOptions.IsMainTask = true;
+            jobOptions.Title = "Running Deshaker Prescan";
+            jobOptions.ResumePos = frameStart - jobStart;
+            CompletionStatus Result = MediaEncoder.ConvertToAvi(settings.DeshakerScript, settings.DeshakerTempOut, false, jobOptions);
+            File.Delete(settings.DeshakerScript);
+            File.Delete(settings.DeshakerTempOut);
+            return Result;
         }
     }
 

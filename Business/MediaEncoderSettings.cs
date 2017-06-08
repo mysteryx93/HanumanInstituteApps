@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml;
 using EmergenceGuardian.FFmpeg;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Business {
     [PropertyChanged.ImplementPropertyChanged]
@@ -35,8 +36,8 @@ namespace Business {
                 CalculateSize(false);
             }
         }
-        private float sourceAspectRatio;
-        public float SourceAspectRatio {
+        private float? sourceAspectRatio;
+        public float? SourceAspectRatio {
             get { return sourceAspectRatio; }
             set {
                 sourceAspectRatio = value;
@@ -221,7 +222,6 @@ namespace Business {
         public MediaEncoderSettings() {
             JobIndex = -1;
             ResumeSegment = 1;
-            SourceAspectRatio = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
             SourceChromaPlacement = ChromaPlacement.MPEG2;
             OutputHeight = 768;
@@ -253,6 +253,8 @@ namespace Business {
             AudioQuality = 256;
             ChangeAudioPitch = false;
             DeshakerSettings = new MediaEncoderDeshakerSettings();
+            DeshakerSettings.Segments = new ObservableCollection<MediaEncoderDeshakerSegmentSettings>();
+            DeshakerSettings.Segments.Add(new MediaEncoderDeshakerSegmentSettings());
         }
 
         /// <summary>
@@ -335,7 +337,7 @@ namespace Business {
             int CropHeight = ((SourceHeight.Value - CropSource.Top - CropSource.Bottom) * ScaleFactor) - CropAfter.Top - CropAfter.Bottom;
             int CropWidth = ((SourceWidth.Value - CropSource.Left - CropSource.Right) * ScaleFactor) - CropAfter.Left - CropAfter.Right;
             // Make width divisible by 4 without distorting pixels
-            float TotalWidth = (float)CropWidth * SourceAspectRatio / CropHeight * OutputHeight;
+            float TotalWidth = (float)CropWidth * SourceAspectRatio.Value / CropHeight * OutputHeight;
             OutputWidth = (int)Math.Round(TotalWidth / 4) * 4;
             if (TotalWidth >= OutputWidth.Value) {
                 float WidthAdjust = TotalWidth - OutputWidth.Value;
@@ -343,7 +345,7 @@ namespace Business {
                 CropAfter.Left += WidthAdjustInt;
                 CropAfter.Right += WidthAdjustInt;
             } else {
-                float HeightAdjust = (OutputWidth.Value - TotalWidth) / SourceAspectRatio;
+                float HeightAdjust = (OutputWidth.Value - TotalWidth) / SourceAspectRatio.Value;
                 int HeightAdjustInt = (int)Math.Round(HeightAdjust / 2);
                 CropAfter.Top += HeightAdjustInt;
                 CropAfter.Bottom += HeightAdjustInt;
@@ -429,6 +431,14 @@ namespace Business {
 
         public string DeshakerScript {
             get { return PathManager.GetDeshakerScript(JobIndex); }
+        }
+
+        public string DeshakerTempOut {
+            get { return PathManager.GetDeshakerTempOut(JobIndex); }
+        }
+
+        public string DeshakerTempLog {
+            get { return PathManager.GetDeshakerTempLog(JobIndex); }
         }
 
         public string DeshakerLog {

@@ -1,17 +1,20 @@
-﻿using DataAccess;
-using System;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using DataAccess;
+using EmergenceGuardian.FFmpeg;
 
 namespace Business {
     public static class MediaEncoderScript {
         public static AviSynthScriptBuilder GenerateVideoScript(MediaEncoderSettings settings, string inputFile, bool preview, bool multiThreaded) {
-            int CPU = Environment.ProcessorCount;
+            int CPU = multiThreaded ? Environment.ProcessorCount : 1;
             if (CPU <= 1)
                 multiThreaded = false;
             bool RunMultiProcesses = false;
-            if (settings.Deshaker) {
+            if (settings.Deshaker && multiThreaded) {
                 RunMultiProcesses = true; // Run through MP_Pipeline
                 multiThreaded = false; // Deshaker doesn't work with MT
                 CPU = 1;
@@ -135,7 +138,7 @@ namespace Business {
                             }
                         }
                         if (i == 0)
-                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU);
+                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
                     }
                 } else { // UpscaleMethod == SuperXBR
                     for (int i = 0; i < settings.FrameDouble; i++) {
@@ -166,7 +169,7 @@ namespace Business {
                                 i == 0 && IsLsb ? ", lsb_out=true" : "");
                         }
                         if (i == 0)
-                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU);
+                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
                         else
                             IsLsb = false;
                         if (IsLastDouble)
@@ -176,7 +179,7 @@ namespace Business {
             }
 
             if (settings.FrameDouble == 0)
-                ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU);
+                ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
             if (settings.DownscaleMethod != DownscaleMethods.SSim)
                 DitherPost(Script, ref IsLsb, ref IsYV24, settings.IncreaseFrameRate);
 
@@ -242,11 +245,11 @@ namespace Business {
         /// <summary>
         /// Applies filters after the first frame double.
         /// </summary>
-        private static void ApplySpecialFilters(AviSynthScriptBuilder Script, MediaEncoderSettings settings, ref bool IsLsb, ref bool IsYV24, int CPU) {
+        private static void ApplySpecialFilters(AviSynthScriptBuilder Script, MediaEncoderSettings settings, ref bool IsLsb, ref bool IsYV24, int CPU, bool multiProcess) {
             if (settings.Degrain)
                 ApplyDegrain(Script, settings, ref IsLsb, ref IsYV24);
             if (settings.Deshaker)
-                ApplyDeshaker(Script, settings, ref IsLsb, ref IsYV24);
+                ApplyDeshaker(Script, settings, ref IsLsb, ref IsYV24, multiProcess);
             if (settings.IncreaseFrameRate) {
                 DitherPost(Script, ref IsLsb, ref IsYV24, true);
                 ApplyInterFrame(Script, settings, CPU);
@@ -270,6 +273,8 @@ namespace Business {
             Script.LoadPluginDll("MedianBlur2.dll");
             if (settings.DegrainSharp)
                 Script.LoadPluginDll("rgtools.dll");
+            else
+                Script.LoadPluginDll("RemoveGrain.dll");
 
             if (isYV24) {
                 if (isLsb)
@@ -286,19 +291,23 @@ namespace Business {
                 isLsb ? ", lsb_in=true, lsb_out=true" : "");
         }
 
-        private static void ApplyDeshaker(AviSynthScriptBuilder Script, MediaEncoderSettings settings, ref bool isLsb, ref bool isYV24) {
+        private static void ApplyDeshaker(AviSynthScriptBuilder Script, MediaEncoderSettings settings, ref bool isLsb, ref bool isYV24, bool multiProcess) {
             settings.DeshakerSettings.LogFile = Script.GetAsciiPath(settings.DeshakerLog);
             settings.DeshakerSettings.Pass = 2;
             Script.LoadPluginDll(@"VDubFilter.dll");
 
             Script.AppendLine(@"LoadVirtualDubPlugin(P+""deshaker.vdf"", ""deshaker"", preroll=0)");
             Script.AppendLine(@"Dither_convert_yuv_to_rgb(output=""rgb32"", matrix=""709"", noring=true, lsb_in={0}, mode=6)", isLsb);
-            Script.AppendLine("### prefetch: 3, 3"); // Keep 3 frames before and after for temporal filters.
-            Script.AppendLine("### ###"); // MP_Pipeline starts new process here
+            if (multiProcess) {
+                Script.AppendLine("### prefetch: 3, 3"); // Keep 3 frames before and after for temporal filters.
+                Script.AppendLine("### ###"); // MP_Pipeline starts new process here
+            }
             Script.AppendLine(@"deshaker(""{0}"")", settings.DeshakerSettings.ToString());
             Script.AppendLine(@"ConvertToYV12(matrix=""Rec709"")");
-            Script.AppendLine("### prefetch: {0}, {1}", settings.DeshakerSettings.FillBordersWithFutureFrames ? settings.DeshakerSettings.FillBordersWithFutureFramesCount : 0, settings.DeshakerSettings.FillBordersWithPreviousFrames ? settings.DeshakerSettings.FillBordersWithPreviousFramesCount : 0);
-            Script.AppendLine("### ###"); // MP_Pipeline starts another here
+            if (multiProcess) {
+                Script.AppendLine("### prefetch: {0}, {1}", settings.DeshakerSettings.FillBordersWithFutureFrames ? settings.DeshakerSettings.FillBordersWithFutureFramesCount : 0, settings.DeshakerSettings.FillBordersWithPreviousFrames ? settings.DeshakerSettings.FillBordersWithPreviousFramesCount : 0);
+                Script.AppendLine("### ###"); // MP_Pipeline starts another here
+            }
             isLsb = false;
             isYV24 = false;
         }
@@ -347,11 +356,14 @@ namespace Business {
                 return "";
         }
 
-        public static async Task GenerateDeshakerLog(MediaEncoderSettings settings, string inputFile) {
-            settings.CalculateSize();
+        /// <summary>
+        /// Generates a script for Deshaker prescan. This is a much simplified version of the full script that will execute faster.
+        /// </summary>
+        public static string GenerateDeshakerScript(MediaEncoderSettings settings, string inputFile, int segment, long frameStart, long frameEnd) {
+            bool MultiProcesses = false;
 
             // Calculate encoding and final frame rates.
-            double ChangeSpeedValue = (settings.ChangeSpeed && settings.CanAlterAudio) ? (double)settings.ChangeSpeedValue / 100 : 1;
+            double ChangeSpeedValue = settings.ChangeSpeed ? (double)settings.ChangeSpeedValue / 100 : 1;
             double FrameRateBefore = settings.SourceFrameRate.Value * ChangeSpeedValue;
 
             // Generate video script.
@@ -360,12 +372,12 @@ namespace Business {
             Script.LoadPluginDll("VDubFilter.dll");
             Script.AppendLine(@"LoadVirtualDubPlugin(P+""deshaker.vdf"", ""deshaker"", preroll=0)");
             if (settings.ConvertToAvi || inputFile.ToLower().EndsWith(".avi"))
-                Script.OpenAvi(inputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
+                Script.OpenAvi(inputFile, false);
             else
-                Script.OpenDirect(inputFile, !string.IsNullOrEmpty(settings.SourceAudioFormat));
+                Script.OpenDirect(inputFile, false);
             if (FrameRateBefore != settings.SourceFrameRate)
                 Script.AppendLine(CultureInfo.InvariantCulture, "AssumeFPS({0}, true)", FrameRateBefore);
-            if (settings.Trim && settings.CanAlterAudio) {
+            if (settings.Trim) {
                 Script.AppendLine("Trim({0}, {1})",
                     (settings.TrimStart ?? 0) > 0 ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
                     (settings.TrimEnd ?? 0) > 0 ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
@@ -374,26 +386,37 @@ namespace Business {
                 Script.AppendLine("Crop({0}, {1}, -{2}, -{3})", settings.CropSource.Left, settings.CropSource.Top, settings.CropSource.Right, settings.CropSource.Bottom);
             }
 
-            // Prepare Deshaker settings.
-            settings.DeshakerSettings.Pass = 1;
-            settings.DeshakerSettings.LogFile = settings.DeshakerLog;
-            settings.DeshakerSettings.SourcePixelAspectRatio = settings.SourceAspectRatio;
+            // Generate script for a segment.
+            if (frameStart > 0 || frameEnd > 0)
+                Script.AppendLine("Trim({0}, {1})", frameStart, frameEnd);
+
+            // Resize to the dimention deshaker will run at.
+            if (settings.FrameDouble == 1) {
+                int FinalWidth = settings.OutputWidth.Value + settings.CropAfter.Left + settings.CropAfter.Right;
+                int FinalHeight = settings.OutputHeight + settings.CropAfter.Top + settings.CropAfter.Bottom;
+                Script.AppendLine("BicubicResize({0}, {1})", FinalWidth, FinalHeight);
+            } else if (settings.FrameDouble > 1) {
+                Script.AppendLine("BicubicResize(Width*2, Height*2)");
+            }
 
             // Deshaker requires RGB input.
             Script.AppendLine(@"ConvertToRGB32(matrix=""{0}"")",
                 settings.SourceColorMatrix == ColorMatrix.Rec601 ? "Rec601" : settings.SourceColorMatrix == ColorMatrix.Pc709 ? "Pc709" : settings.SourceColorMatrix == ColorMatrix.Pc601 ? "Pc601" : "Rec709");
-            // Generta
-            Script.AppendLine(@"deshaker(""{0}"")", settings.DeshakerSettings.ToString());
-            // FFMPEG will generate an AVI file; make it 4x4 to minimize processing.
-            Script.AppendLine("PointResize(8,8)");
 
-            // Write Deshaker Pass 1 script to file.
-            File.WriteAllText(settings.DeshakerScript, Script.Script);
+            // Generate log file
+            Script.AppendLine(@"deshaker(""{0}"")", settings.DeshakerSettings.ToString(segment));
 
-            // Run pass.
-            //await Task.Run(() => FfmpegBusiness.RunDeshakerPass(settings, callback));
-            await Task.Run(() => { });
-            File.Delete(settings.DeshakerScript);
+            // FFMPEG will generate an AVI file; make it 8x8 to minimize processing.
+            Script.AppendLine("ConvertToYV12()");
+            Script.AppendLine("PointResize(64,64)");
+            if (MultiProcesses) {
+                Script.AppendLine("### prefetch: 0, 0");
+                Script.AppendLine("### branch: 2");
+                Script.AppendLine("### ###");
+                Script.ConvertToMultiProcesses(settings.SourceFrameRate.Value);
+            }
+
+            return Script.Script;
         }
     }
 }

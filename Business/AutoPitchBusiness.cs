@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
+using System.Text.RegularExpressions;
 
 namespace Business {
     /// <summary>
@@ -39,7 +40,9 @@ namespace Business {
         }
 
         public static string GetAutoPitchFilePath(string fileName, string videoCodec) {
-            return string.Format("432hz_{0}{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
+            return Path.Combine(Settings.TempFilesPath, "Player.avs");
+            //string Result = string.Format("{0}432hz_{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
+            //return Regex.Replace(Result, @"[^\u0000-\u007F]+", string.Empty);
         }
 
         /// <summary>
