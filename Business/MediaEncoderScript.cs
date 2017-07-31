@@ -50,35 +50,39 @@ namespace Business {
             }
 
             // If possible, KNLMeans will output 16-bit frames before upscaling.
-            bool IsLsb = (settings.Denoise || settings.Dering || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec601 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
-            bool IsColorMatrixLsb = IsLsb;
+            bool IsHD = (settings.Denoise || settings.Dering || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec601 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
+            bool IsColorMatrixHD = IsHD;
             bool IsChromaFixed = settings.SourceChromaPlacement == ChromaPlacement.MPEG2;
-            if (IsLsb) {
-                Script.LoadPluginDll("Dither.dll");
-                Script.LoadPluginAvsi("Dither.avsi");
+            if (IsHD) {
                 Script.LoadPluginDll("masktools2.dll");
-                Script.AppendLine("Dither_convert_8_to_16()");
+                Script.AppendLine("ConvertBits(16)");
                 if (settings.SourceColorMatrix != ColorMatrix.Rec709)
                     Script.AppendLine("[ColorMatrixShader]"); // Placeholder that will be replaced after generating the rest.
                 if (settings.Denoise && settings.FrameDouble > 0) {
-                    Script.AppendLine(@"Dither_resize16nr(Width, Height/2, kernel=""Spline36"", csp=""YV24""{0})",
-                        !IsChromaFixed ? string.Format(@", cplaces=""{0}""", settings.SourceChromaPlacement.ToString()) : "");
+                    Script.AppendLine(@"ConvertToYUV444(chromaresample=""Spline36""{0})",
+                        !IsChromaFixed ? string.Format(@", ChromaInPlacement=""{0}""", settings.SourceChromaPlacement.ToString()) : "");
                     IsChromaFixed = true;
                 }
             }
 
+            bool OpenCL12 = AvisynthTools.GpuSupport == SupportedOpenClVersion.v12;
             if (settings.Denoise || (settings.Degrain && settings.DegrainPrefilter == DegrainPrefilters.KNLMeans))
-                Script.LoadPluginDll(AvisynthTools.GpuSupport == SupportedOpenClVersion.v12 ? "KNLMeansCL.dll" : "KNLMeansCL-6.11.dll");
+                Script.LoadPluginDll(OpenCL12 ? "KNLMeansCL.dll" : "KNLMeansCL-6.11.dll");
 
             if (settings.Denoise) {
+                OpenCL12 = false; // temporary fix
                 // Only use cmode=true (denoise chroma) when upscaling.
                 if (settings.FrameDouble > 0) {
-                    if (!IsLsb) {
-                        Script.AppendLine("ConvertToYV24(){0}",
+                    if (!IsHD) {
+                        Script.AppendLine("ConvertToYUV444(){0}",
                             !IsChromaFixed ? string.Format(@", ChromaInPlacement=""{0}""", settings.SourceChromaPlacement.ToString()) : "");
                         IsChromaFixed = true;
                     }
                     IsYV24 = true;
+                }
+                if (!OpenCL12 && IsHD) {
+                    Script.LoadPluginDll("ConvertStacked.dll");
+                    Script.AppendLine("ConvertToStacked()");
                 }
                 Script.AppendLine(CultureInfo.InvariantCulture, @"KNLMeansCL(D={0}, A={1}, h={2}{3}, device_type=""{4}""{5}{6})",
                     settings.DenoiseD, settings.DenoiseA,
@@ -86,7 +90,9 @@ namespace Business {
                     settings.FrameDouble > 0 ? (AvisynthTools.GpuSupport == SupportedOpenClVersion.v12 ? ", channels=\"YUV\"" : ", cmode=true") : "",
                     AvisynthTools.GpuSupport != SupportedOpenClVersion.None ? "GPU" : "CPU",
                     AvisynthTools.GpuSupport != SupportedOpenClVersion.None ? ", device_id=" + Settings.SavedFile.GraphicDeviceId.ToString() : "",
-                    IsLsb ? ", lsb_inout=true" : "");
+                    !OpenCL12 && IsHD ? ", lsb_inout=true" : "");
+                if (!OpenCL12 && IsHD)
+                    Script.AppendLine("ConvertFromStacked()");
             }
 
             if (settings.Dering) {
@@ -95,7 +101,7 @@ namespace Business {
                 Script.LoadPluginDll("dfttest.dll");
                 Script.LoadPluginDll("RgTools.dll");
                 Script.LoadPluginDll("SmoothAdjust.dll");
-                Script.AppendLine("HQDeringmod({0})", IsLsb ? "lsb_in=true, lsb=true" : "");
+                Script.AppendLine("HQDeringmod({0})", IsHD ? "lsb_in=true, lsb=true" : "");
             }
 
             string FinalSize = string.Format("fWidth={0}, fHeight={1}",
@@ -111,7 +117,7 @@ namespace Business {
             if (settings.FrameDouble > 0) {
                 bool IsLastDouble = false;
                 if (settings.UpscaleMethod == UpscaleMethods.NNedi3) {
-                    DitherPost(Script, ref IsLsb, ref IsYV24, true);
+                    DitherPost(Script, ref IsHD, ref IsYV24, true);
 
                     Script.LoadPluginDll("nnedi3.dll");
                     Script.LoadPluginAvsi("edi_rpow2.avsi");
@@ -122,56 +128,52 @@ namespace Business {
                         string DoubleScript = string.Format("edi_rpow2(2, nns=4, {0}, Threads=2)",
                             IsLastDouble && settings.DownscaleMethod == DownscaleMethods.Bicubic ? @"cshift=""Bicubic"", a1=0, a2=.75, " + FinalSize : @"cshift=""Spline16Resize""");
                         if (settings.SuperRes) {
-                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4}{5}{6})",
+                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperRes({0}, {1}, {2}, """"""{3}""""""{4}{5})",
                                 settings.SuperRes3Passes ? (i == 0 && settings.FrameDouble > 1 ? 5 : 3) : 2,
                                 settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f, DoubleScript,
                                 i == 0 ? GetMatrixIn(settings) : "",
-                                IsLastDouble && settings.DownscaleMethod == DownscaleMethods.SSim ? ", " + FinalResize : "",
-                                i == 0 && IsLsb ? ", lsb_in=true, lsb_out=true" : "");
+                                IsLastDouble && settings.DownscaleMethod == DownscaleMethods.SSim ? ", " + FinalResize : "");
                         } else {
                             Script.AppendLine(DoubleScript);
                             if (IsLastDouble && settings.DownscaleMethod == DownscaleMethods.SSim) {
-                                Script.AppendLine("ResizeShader({0}{1}{2})",
+                                Script.AppendLine("ResizeShader({0}{1})",
                                     FinalResize.Replace("fWidth=", "").Replace("fHeight=", "").Replace(" f", " "), // Use same string as FinalResize but remove 'f' parameter sufix.
-                                    GetMatrixIn(settings),
-                                    IsLsb ? ", lsb_in=true, lsb_out=true" : "");
+                                    GetMatrixIn(settings));
                             }
                         }
                         if (i == 0)
-                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
+                            ApplySpecialFilters(Script, settings, ref IsHD, ref IsYV24, CPU, RunMultiProcesses);
                     }
                 } else { // UpscaleMethod == SuperXBR
                     for (int i = 0; i < settings.FrameDouble; i++) {
                         IsLastDouble = i == settings.FrameDouble - 1;
                         if (!IsYV24) {
-                            if (!IsLsb) {
-                                Script.AppendLine("Dither_convert_8_to_16()");
-                                IsLsb = true;
+                            if (!IsHD) {
+                                Script.AppendLine("ConvertBits(16)");
+                                IsHD = true;
                             }
-                            Script.AppendLine(@"Dither_resize16nr(Width, Height/2, kernel=""Spline36"", csp=""YV24"")");
+                            Script.AppendLine(@"ConvertToYUV444(chromaresample=""Spline36""{0})");
                             IsYV24 = true;
                         }
                         if (settings.SuperRes) {
-                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperResXBR({0}, {1}, {2}, XbrStr={3}, XbrSharp={4}{5}{6}{7}{8})",
+                            Script.AppendLine(CultureInfo.InvariantCulture, @"SuperResXBR({0}, {1}, {2}, XbrStr={3}, XbrSharp={4}{5}{6}{7})",
                                 settings.SuperRes3Passes ? (i == 0 && settings.FrameDouble > 1 ? 5 : 3) : 2,
                                 settings.SuperResStrength / 100f, settings.SuperResSoftness / 100f,
                                 settings.SuperXbrStrength / 10f, settings.SuperXbrSharpness / 10f,
                                 i == 0 ? GetMatrixIn(settings) : "",
                                 IsLastDouble ? ", " + FinalResize + ", FormatOut=\"YV12\"" : "",
-                                IsLsb ? ", lsb_in=true" : "",
-                                i == 0 && IsLsb ? ", lsb_out=true" : "");
+                                IsHD && i > 0 ? ", PrecisionOut=1" : "");
                         } else {
-                            Script.AppendLine("SuperXBR(Str={0}, Sharp={1}{2}{3}{4}{5})",
+                            Script.AppendLine("SuperXBR(Str={0}, Sharp={1}{2}{3}{4})",
                                 settings.SuperXbrStrength / 10f, settings.SuperXbrSharpness / 10f,
                                 i == 0 ? GetMatrixIn(settings) : "",
                                 IsLastDouble ? ", " + FinalResize + ", FormatOut=\"YV12\"" : "",
-                                IsLsb ? ", lsb_in=true" : "",
-                                i == 0 && IsLsb ? ", lsb_out=true" : "");
+                                IsHD && i > 0 ? ", PrecisionOut=1" : "");
                         }
                         if (i == 0)
-                            ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
+                            ApplySpecialFilters(Script, settings, ref IsHD, ref IsYV24, CPU, RunMultiProcesses);
                         else
-                            IsLsb = false;
+                            IsHD = false;
                         if (IsLastDouble)
                             IsYV24 = false;
                     }
@@ -179,20 +181,19 @@ namespace Business {
             }
 
             if (settings.FrameDouble == 0)
-                ApplySpecialFilters(Script, settings, ref IsLsb, ref IsYV24, CPU, RunMultiProcesses);
+                ApplySpecialFilters(Script, settings, ref IsHD, ref IsYV24, CPU, RunMultiProcesses);
             if (settings.DownscaleMethod != DownscaleMethods.SSim)
-                DitherPost(Script, ref IsLsb, ref IsYV24, settings.IncreaseFrameRate);
+                DitherPost(Script, ref IsHD, ref IsYV24, settings.IncreaseFrameRate);
 
             string[] ShaderCommands = new string[] { "SuperRes", "SuperXBR", "SuperResXBR", "ResizeShader" };
             if (settings.CropAfter.HasValue || settings.FrameDouble == 0) {
                 if (settings.CropAfter.HasValue || settings.SourceAspectRatio != 1 || settings.OutputWidth != settings.SourceWidth || settings.OutputHeight != settings.OutputHeight) {
                     if (settings.DownscaleMethod == DownscaleMethods.SSim && settings.FrameDouble == 0) {
-                        Script.AppendLine("ResizeShader({0}{1}{2})",
+                        Script.AppendLine("ResizeShader({0}{1})",
                             FinalResize.Replace("fWidth=", "").Replace("fHeight=", "").Replace(" f", " "), // Use same string as FinalResize but remove 'f' parameter sufix.
-                            GetMatrixIn(settings),
-                            IsLsb ? ", lsb_in=true, lsb_out=true" : "");
+                            GetMatrixIn(settings));
                     }
-                    DitherPost(Script, ref IsLsb, ref IsYV24, false);
+                    DitherPost(Script, ref IsHD, ref IsYV24, false);
 
                     if (settings.CropAfter.HasValue || settings.DownscaleMethod == DownscaleMethods.Bicubic) {
                         Script.LoadPluginAvsi("ResizeX.avsi");
@@ -217,11 +218,11 @@ namespace Business {
                 // Apply color matrix
                 if (settings.SourceColorMatrix == ColorMatrix.Pc709) {
                     Script.LoadPluginDll("SmoothAdjust.dll");
-                    ColorMatrixScript = string.Format(@"SmoothLevels{0}(preset=""pc2tv"")", IsColorMatrixLsb ? "16" : "");
+                    ColorMatrixScript = string.Format(@"SmoothLevels{0}(preset=""pc2tv"")", IsColorMatrixHD ? "16" : "");
                 } else if (settings.SourceColorMatrix != ColorMatrix.Rec709) {
                     Script.LoadPluginDll("Shader.dll");
                     Script.LoadPluginAvsi("Shader.avsi");
-                    ColorMatrixScript = string.Format(@"ResizeShader(Kernel=""ColorMatrix""{0}{1})", GetMatrixIn(settings), IsColorMatrixLsb ? ", lsb_in=true, lsb_out=true" : "");
+                    ColorMatrixScript = string.Format(@"ResizeShader(Kernel=""ColorMatrix""{0})", GetMatrixIn(settings));
                 }
                 Script.Replace("[ColorMatrixShader]" + Environment.NewLine, ColorMatrixScript + Environment.NewLine);
             }
@@ -256,15 +257,13 @@ namespace Business {
             }
         }
 
-        private static void DitherPost(AviSynthScriptBuilder Script, ref bool isLsb, ref bool isYV24, bool furtherProcessing) {
-            if (isLsb) {
-                if (isYV24)
-                    Script.AppendLine(@"Dither_resize16nr(Width, Height/2, kernel=""Spline36"", csp=""YV12"")");
-                Script.AppendLine("DitherPost({0})", furtherProcessing ? "mode=6" : "");
-            } else if (isYV24)
-                Script.AppendLine("ConvertToYV12()");
-            isLsb = false;
-            isYV24 = false;
+        private static void DitherPost(AviSynthScriptBuilder Script, ref bool isHD, ref bool isYV24, bool furtherProcessing) {
+            //if (isYV24)
+            //    Script.AppendLine(@"ConvertToYUV420(chromaresample=""Spline36"")");
+            if (isHD)
+                Script.AppendLine("ConvertBits(8, dither={0})", furtherProcessing ? "1" : "0");
+            isHD = false;
+            //isYV24 = false;
         }
 
         private static void ApplyDegrain(AviSynthScriptBuilder Script, MediaEncoderSettings settings, ref bool isLsb, ref bool isYV24) {
@@ -313,13 +312,12 @@ namespace Business {
         }
 
         private static void ApplyInterFrame(AviSynthScriptBuilder Script, MediaEncoderSettings settings, int CPU) {
-            Script.LoadPluginDll("svpflow1.dll");
-            Script.LoadPluginDll("svpflow2.dll");
-            Script.LoadPluginAvsi("InterFrame2.avsi");
+            Script.LoadPluginDll("FrameRateConverter.dll");
+            Script.LoadPluginAvsi("FrameRateConverter.avsi");
+            Script.LoadPluginDll("MvTools2.dll");
+            Script.LoadPluginDll("RgTools.dll");
             if (settings.IncreaseFrameRateValue == FrameRateModeEnum.Double)
-                Script.AppendLine(@"InterFrame(Cores={0}{1}, FrameDouble=true{2})", CPU,
-                    settings.IncreaseFrameRateSmooth ? @", Tuning=""Smooth""" : "",
-                    Settings.SavedFile.EnableMadVR ? ", GPU=true" : "");
+                Script.AppendLine(@"FrameRateConverter(FrameDouble=true)");
             else {
                 int NewNum = 0;
                 int NewDen = 0;
@@ -333,9 +331,7 @@ namespace Business {
                     NewNum = 120; // 120000;
                     NewDen = 1; // 1001;
                 }
-                Script.AppendLine(@"InterFrame(Cores={0}{1}, NewNum={2}, NewDen={3}, GPU=true)", CPU,
-                    settings.IncreaseFrameRateSmooth ? @", Tuning=""Smooth""" : "",
-                    NewNum, NewDen);
+                Script.AppendLine(@"FrameRateConverter(NewNum={0}, NewDen={1})", NewNum, NewDen);
             }
         }
 

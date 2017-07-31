@@ -1,4 +1,4 @@
-# AviSynthShader v1.6 (February 13th 2016)
+# AviSynthShader v1.6.1 (March 21st 2017)
 # by Etienne Charland
 # 
 # Provides a bridge between AviSynth and HLSL pixel shaders for high bit depth processing on the GPU.
@@ -71,7 +71,7 @@
 # Shaders are written by Shiandow and are available here
 # https://github.com/zachsaw/MPDN_Extensions/
 
-function SuperRes(clip Input, int "Passes", float "Str", float "Soft", string "Upscale", string "MatrixIn", string "MatrixOut", string "FormatOut", bool "Convert", bool "ConvertYuv", bool "lsb_in", bool "lsb_upscale", bool "lsb_out", string "fKernel", int "fWidth", int "fHeight", float "fB", float "fC", bool "PlanarIn", bool "PlanarUpscale", bool "PlanarOut", int "Engines")
+function SuperRes(clip Input, int "Passes", float "Str", float "Soft", string "Upscale", int "PrecisionIn", int "PrecisionOut", int "PrecisionUpscale", string "MatrixIn", string "MatrixOut", string "FormatOut", bool "Convert", bool "ConvertYuv", bool "lsb_in", bool "lsb_upscale", bool "lsb_out", string "fKernel", int "fWidth", int "fHeight", float "fB", float "fC", bool "PlanarIn", bool "PlanarUpscale", bool "PlanarOut", int "Engines")
 {
 	Passes = default(Passes, 1)
 	Str = default(Str, 1)
@@ -104,11 +104,11 @@ function SuperRes(clip Input, int "Passes", float "Str", float "Soft", string "U
 	Input
 
 	sourceFormat = FormatOut != "" ? FormatOut : PixelType()
-	PrecisionIn = lsb_in || !Convert || Shader_GetBitDepth() > 8 ? 2 : 1
+	PrecisionIn = Default(PrecisionIn, lsb_in || !Convert || Shader_GetBitDepth() > 8 ? 2 : 1)
 	PrecisionInW = lsb_in || Convert ? 1 : 2
 	PrecisionInH = lsb_in ? 2 : 1
-	PrecisionUpscale = lsb_upscale || !Convert ? 2 : 1
-	PrecisionOut = IsY8 ? 0 : lsb_out || !Convert || Shader_GetBitDepth(sourceFormat) > 8 ? 2 : 1
+	PrecisionUpscale = Default(PrecisionUpscale, lsb_upscale || !Convert ? 2 : 1)
+	PrecisionOut = Default(PrecisionOut, IsY8 ? 0 : lsb_out || !Convert || Shader_GetBitDepth(sourceFormat) > 8 ? 2 : 1)
 
 	SmallWidth = Input.Width / PrecisionInW
 	SmallHeight = Input.Height / PrecisionInH

@@ -20,6 +20,9 @@ namespace NaturalGroundingPlayer {
         private WindowHelper helper;
         public double DefaultHeight;
         public SearchSettings settings;
+        private bool IsHeatAscending = true;
+        private double LastHeatValue;
+        private double RatioOffset; 
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -91,8 +94,13 @@ namespace NaturalGroundingPlayer {
                 if (IntensitySlider.Value == IntensitySlider.Minimum && GrowthSlider.Value < 0)
                     GrowthSlider.Value = 0;
                 ElementRangeSlider.IsEnabled = ElementList.SelectedIndex > 0;
-
                 SessionCore.Instance.Business.IsMinimumIntensity = (IntensitySlider.Value == IntensitySlider.Minimum);
+                if (IntensitySlider.Value > LastHeatValue)
+                    IsHeatAscending = true;
+                else if (IntensitySlider.Value < LastHeatValue)
+                    IsHeatAscending = false;
+                RatioSlider.Value = GetDefaultPriority(IsHeatAscending) + RatioOffset;
+                LastHeatValue = IntensitySlider.Value;
 
                 DisplayConditionsText();
                 SessionCore.Instance.Business.ChangeConditions();
@@ -281,6 +289,7 @@ namespace NaturalGroundingPlayer {
 
         private void RatioSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             if (this.IsLoaded) {
+                RatioOffset = RatioSlider.Value - GetDefaultPriority(IsHeatAscending);
                 SessionCore.Instance.RatingViewer.Ratio = (double)RatioSlider.Value;
                 Settings_Changed(null, null);
             }
@@ -309,6 +318,12 @@ namespace NaturalGroundingPlayer {
             Media Item = NextVideosCombo.SelectedItem as Media;
             if (Item != null)
                 await SessionCore.Instance.Business.SetNextVideoOptionAsync(Item).ConfigureAwait(false);
+        }
+
+        private double GetDefaultPriority(bool isHeatAscending) {
+            const double Deviation = .5; // Starts at 50% towards Height
+            double SliderValue = (IntensitySlider.Value - IntensitySlider.Minimum) / (IntensitySlider.Maximum - IntensitySlider.Minimum);
+            return (1 - SliderValue) * Deviation * (isHeatAscending ? -1 : 1);
         }
     }
 }
