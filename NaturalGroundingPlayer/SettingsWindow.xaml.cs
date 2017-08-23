@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using Business;
+using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Diagnostics;
 using EmergenceGuardian.WpfCommon;
@@ -72,6 +73,7 @@ namespace NaturalGroundingPlayer {
                 bool IsFirstRun = (Settings.SavedFile == null);
                 Settings.SavedFile = settings;
                 settings.Save();
+                SessionCore.Instance.Business.DownloadManager.Options = settings.Download;
                 this.Close();
 
                 if (settings.MediaPlayerApp == MediaPlayerApplication.Mpc) {
@@ -111,22 +113,6 @@ namespace NaturalGroundingPlayer {
             string Result = FileFolderDialog.ShowFileDialog(settings.SvpPath, "Executable File|*.exe");
             if (Result != null)
                 settings.SvpPath = Result;
-        }
-
-        /// <summary>
-        /// Represents an item to display in the ComboBox.
-        /// </summary>
-        public class ListItem<T> {
-            public string Text { get; set; }
-            public T Value { get; set; }
-
-            public ListItem() {
-            }
-
-            public ListItem(string text, T value) {
-                this.Text = text;
-                this.Value = value;
-            }
         }
 
         private void MediaPlayerCombo_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {

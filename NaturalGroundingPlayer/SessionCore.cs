@@ -42,6 +42,7 @@ namespace NaturalGroundingPlayer {
             FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
             FFmpegConfig.Avs2yuvPath = "Encoder/avs2yuv.exe";
             FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager(main);
+            FFmpegConfig.CloseProcess += FFmpegUserInterfaceManager.CloseProcess;
 
             NaturalGroundingPlayer.MainWindow NgMain = main as NaturalGroundingPlayer.MainWindow;
             if (NgMain != null) {

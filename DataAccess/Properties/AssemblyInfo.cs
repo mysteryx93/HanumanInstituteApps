@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DataAccess")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Spiritual Self Transformation")]
+[assembly: AssemblyCompany("Emergence Guardian")]
 [assembly: AssemblyProduct("Natural Grounding Player")]
-[assembly: AssemblyCopyright("Copyright © 2016-2017, Spiritual Self Transformation")]
+[assembly: AssemblyCopyright("Copyright © 2016-2017, Emergence Guardian")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

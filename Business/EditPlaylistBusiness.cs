@@ -390,6 +390,8 @@ namespace Business {
         /// </summary>
         /// <returns></returns>
         public string GetRatingInitials(string text) {
+            if (text.StartsWith("--"))
+                return "";
             string[] Words = text.Replace('-', ' ').Split(' ');
             if (Words.Length == 0)
                 return "";

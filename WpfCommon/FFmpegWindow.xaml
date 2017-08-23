@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EmergenceGuardian.WpfCommon"
         mc:Ignorable="d"
-        Title="FFmpegWindow" Height="102" Width="426" Loaded="Window_Loaded" Closing="Window_Closing" ShowInTaskbar="False" ResizeMode="NoResize">
+        Title="FFmpegWindow" Height="102" Width="426" Loaded="Window_Loaded" Closing="Window_Closing" ShowInTaskbar="False" ResizeMode="NoResize" Closed="Window_Closed">
     <Grid Style="{DynamicResource GradiantBackground}">
         <ProgressBar x:Name="WorkProgressBar" Height="20" Margin="10,10,10,0" VerticalAlignment="Top"/>
         <TextBlock x:Name="TaskStatusText" HorizontalAlignment="Left" Margin="14,12,0,0" VerticalAlignment="Top" />
@@ -14,6 +14,6 @@
         <TextBlock x:Name="FpsText" HorizontalAlignment="Left" Margin="113,35,0,0" VerticalAlignment="Top" Foreground="Blue" />
         <TextBlock HorizontalAlignment="Left" Margin="183,35,0,0" VerticalAlignment="Top" Text="Time left:" />
         <TextBlock x:Name="TimeLeftText" HorizontalAlignment="Left" Margin="237,35,0,0" VerticalAlignment="Top" Foreground="Blue"/>
-        <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Left" Margin="323,34,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Click="CancelButton_Click"/>
+        <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Left" Margin="308,34,0,0" VerticalAlignment="Top" Width="90" IsCancel="True" Click="CancelButton_Click"/>
     </Grid>
 </Window>

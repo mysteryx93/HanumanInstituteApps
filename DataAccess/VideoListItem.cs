@@ -1,13 +1,14 @@
 ﻿using PropertyChanged;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess {
-    [PropertyChanged.ImplementPropertyChanged]
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
     public class VideoListItem {
         public Guid? MediaId { get; set; }
         public MediaType MediaType { get; set; }
@@ -42,21 +43,30 @@ namespace DataAccess {
                     StatusText = "Higher Quality Available";
                 else if (status == VideoListItemStatusEnum.BetterAudioAvailable)
                     StatusText = "Better Audio Available";
+                else if (status == VideoListItemStatusEnum.BetterVideoAvailable)
+                    StatusText = "Better Video Available";
+                else if (status == VideoListItemStatusEnum.WrongContainer)
+                    StatusText = "Wrong Container";
                 else if (status == VideoListItemStatusEnum.DownloadingInfo)
                     StatusText = "Downloading Info";
                 else if (status == VideoListItemStatusEnum.Downloading)
                     StatusText = "Downloading";
+                else if (status == VideoListItemStatusEnum.Converting)
+                    StatusText = "Converting";
                 else if (status == VideoListItemStatusEnum.Done)
                     StatusText = "Done";
                 else if (status == VideoListItemStatusEnum.Failed)
                     StatusText = "Download Failed";
+                else
+                    StatusText = "Unknown Status";
             }
         }
         public string StatusText { get; set; }
+        public bool IsBusy { get; set; }
 
-        public bool CanUpgradeAudio {
+        public bool CanDownload {
             get {
-                return status == VideoListItemStatusEnum.BetterAudioAvailable || (status == VideoListItemStatusEnum.HigherQualityAvailable && StatusText.Contains("Audio"));
+                return status == VideoListItemStatusEnum.HigherQualityAvailable || status == VideoListItemStatusEnum.BetterAudioAvailable || status == VideoListItemStatusEnum.BetterVideoAvailable;
             }
         }
 

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Business;
 using DataAccess;
-using YoutubeExtractor;
 using Microsoft.Win32;
 using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     public delegate void ClosingCallback(Media result);
@@ -121,16 +121,11 @@ namespace NaturalGroundingPlayer {
             isUrlValid = false;
             ErrorText.Text = "";
             if (video.DownloadUrl.Length > 0) {
-                try {
-                    var VTask = DownloadBusiness.GetDownloadUrlsAsync(video.DownloadUrl);
-                    var VideoList = await VTask;
-                    VideoInfo FirstVid = VideoList.FirstOrDefault();
-                    if (FirstVid != null) {
-                        video.DownloadName = FirstVid.Title;
-                        isUrlValid = true;
-                    }
-                } catch { }
-                if (!isUrlValid)
+                string VTitle = await DownloadManager.GetVideoTitle(video.DownloadUrl);
+                if (VTitle != null) {
+                    video.DownloadName = VTitle;
+                    isUrlValid = true;
+                } else
                     ErrorText.Text = "Please enter a valid URL";
             }
         }

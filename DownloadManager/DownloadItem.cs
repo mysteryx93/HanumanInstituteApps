@@ -5,42 +5,43 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using DataAccess;
-using YoutubeExtractor;
+using System.ComponentModel;
+using YoutubeExplode.Models.MediaStreams;
 
-namespace Business {
-    [PropertyChanged.ImplementPropertyChanged]
+namespace EmergenceGuardian.Downloader {
+    [AddINotifyPropertyChangedInterface]
     public class DownloadItem {
         public DownloadItem() {
             this.Files = new List<FileProgress>();
         }
 
-        public DownloadItem(Media request, string destination, string title, int queuePos, bool upgradeAudio, EventHandler<DownloadCompletedEventArgs> callback) {
+        public DownloadItem(string url, string destination, string destinationNoExt, string title, DownloadAction action, EventHandler<DownloadCompletedEventArgs> callback, DownloadOptions options, object data) {
+            this.Url = url;
             this.Status = DownloadStatus.Waiting;
-            this.Request = request;
             this.Destination = destination;
+            this.DestinationNoExt = destinationNoExt;
             this.Title = title;
             this.Status = DownloadStatus.Waiting;
             UpdateProgress();
-            this.QueuePos = queuePos;
-            this.UpgradeAudio = upgradeAudio;
+            this.Action = action;
             this.Callback = callback;
+            this.Options = options;
+            this.Data = data;
             this.Files = new List<FileProgress>();
         }
 
-        public Media Request { get; set; }
+        public string Url { get; set; }
         public string Destination { get; set; }
+        public string DestinationNoExt { get; set; }
         public string Title { get; set; }
         public double ProgressValue { get; set; }
         public List<FileProgress> Files { get; set; }
         public EventHandler<DownloadCompletedEventArgs> Callback { get; set; }
-        /// <summary>
-        /// Indicate the position in the playlist for autoplay, or -1 to disable playback after complete.
-        /// </summary>
-        public int QueuePos { get; set; }
         private DownloadStatus status;
         public string Progress { get; set; }
-        public bool UpgradeAudio { get; set; }
+        public DownloadAction Action { get; set; }
+        public DownloadOptions Options { get; set; }
+        public object Data { get; set; }
 
         public DownloadStatus Status {
             get {
@@ -70,8 +71,8 @@ namespace Business {
                     Progress = "Failed";
                     break;
                 case DownloadStatus.Downloading:
-                    int TotalBytes = 0;
-                    int Downloaded = 0;
+                    long TotalBytes = 0;
+                    long Downloaded = 0;
                     bool BytesTotalLoaded = true;
                     foreach (FileProgress item in Files) {
                         if (item.BytesTotal > 0)
@@ -113,13 +114,10 @@ namespace Business {
                 return (status == DownloadStatus.Canceled || status == DownloadStatus.Failed); 
             }
         }
-        
-        public class FileProgress {
-            public VideoInfo Source { get; set; }
-            public string Destination { get; set; }
-            public int BytesTotal { get; set; }
-            public int BytesDownloaded { get; set; }
-            public bool Done { get; set; }
-        }
+    }
+
+    public enum StreamType {
+        Video,
+        Audio
     }
 }

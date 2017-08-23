@@ -6,12 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Business;
 using DataAccess;
 using System.Windows.Threading;
@@ -33,6 +27,7 @@ namespace NaturalGroundingPlayer {
         private WindowHelper helper;
         protected Action callback;
         CancellationTokenSource ScanCancel;
+        CancellationTokenSource DownloadCancel;
 
 
         public DownloadPlaylistWindow() {
@@ -43,7 +38,7 @@ namespace NaturalGroundingPlayer {
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
             await SessionCore.Instance.Business.SetEditorModeAsync(true);
 
-            business.DownloadManager = SessionCore.Instance.Business.DownloadManager;
+            business.Manager = SessionCore.Instance.Business.DownloadManager;
             timerChangeFilters = new DispatcherTimer();
             timerChangeFilters.Interval = TimeSpan.FromSeconds(1);
             timerChangeFilters.Tick += timerChangeFilters_Tick;
@@ -102,19 +97,17 @@ namespace NaturalGroundingPlayer {
             ScanCancel = null;
             ScanButton.Content = "_Scan";
             DownloadButton.IsEnabled = true;
-            UpgradeButton.IsEnabled = true;
         }
 
         private async void DownloadButton_Click(object sender, RoutedEventArgs e) {
-            DownloadButton.IsEnabled = false;
-            await business.StartDownload(SelectedItems, false);
-            DownloadButton.IsEnabled = true;
-        }
-
-        private async void UpgradeButton_Click(object sender, RoutedEventArgs e) {
-            UpgradeButton.IsEnabled = false;
-            await business.StartDownload(SelectedItems, true);
-            UpgradeButton.IsEnabled = true;
+            if (DownloadCancel == null) {
+                DownloadButton.IsEnabled = false;
+                DownloadCancel = new CancellationTokenSource();
+                await business.StartDownload(SelectedItems, DownloadCancel.Token);
+                DownloadButton.IsEnabled = true;
+            } else
+                DownloadCancel.Cancel();
+            DownloadCancel = null;
         }
 
         private List<VideoListItem> SelectedItems {

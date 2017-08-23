@@ -43,8 +43,7 @@ namespace YinMediaEncoder {
                 if (ResumeOption.IsChecked == true) {
                     business.AddJobToQueue(jobInfo.Settings);
                 } else if (RestartOption.IsChecked == true) {
-                    jobInfo.Settings.ResumeSegment = 1;
-                    AvisynthTools.EditStartPosition(jobInfo.Settings.ScriptFile, 0);
+                    AvisynthTools.EditStartPosition(jobInfo.Settings.ScriptFile, 0, 0);
                     PathManager.DeleteOutputFiles(jobInfo.Settings.JobIndex);
                     business.AddJobToQueue(jobInfo.Settings);
                 } else if (DeleteOption.IsChecked == true) {

@@ -1,0 +1,53 @@
+﻿<Window x:Name="window" x:Class="EmergenceGuardian.YangYouTubeDownloader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EmergenceGuardian.YangYouTubeDownloader"
+        mc:Ignorable="d"
+        Title="Yang YouTube Downloader" Height="346" Width="506" Loaded="Window_Loaded" Icon="App.ico" ResizeMode="CanMinimize">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListView x:Name="DownloadsView" SelectionMode="Single" Background="{x:Null}" Margin="10,0,10,10" Height="122" VerticalAlignment="Bottom">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Title}" Header="Title" Width="340"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Progress}" Header="Progress" Width="100"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <!--<EventSetter Event="UIElement.MouseRightButtonUp" Handler="DownloadsView_ItemRightButtonUp"/>-->
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <TextBox x:Name="DownloadUrl" Height="23" Margin="10,34,87,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" Text="Download URL" VerticalAlignment="Top"/>
+        <Button x:Name="QueryButton" Content="Query" Margin="0,34,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" IsDefault="True" Click="QueryButton_Click"/>
+        <Grid x:Name="GridInfo" Margin="10,64,10,137">
+            <TextBlock HorizontalAlignment="Left" Text="Video Info" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Text="Video" VerticalAlignment="Top" Margin="0,43,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Audio" VerticalAlignment="Top" Margin="0,66,0,0"/>
+            <Button x:Name="DownloadButton" Content="Download" Margin="0,83,0,0" VerticalAlignment="Top" Click="DownloadButton_Click" HorizontalAlignment="Right" Width="72"/>
+            <TextBlock HorizontalAlignment="Left" Text="Title" VerticalAlignment="Top" Margin="0,20,0,0"/>
+            <TextBlock x:Name="TitleText" HorizontalAlignment="Left" Margin="61,20,0,0" VerticalAlignment="Top" />
+            <TextBlock x:Name="VideoText" HorizontalAlignment="Left" Margin="61,43,0,0" VerticalAlignment="Top" />
+            <TextBlock x:Name="AudioText" HorizontalAlignment="Left" Margin="61,66,0,0" VerticalAlignment="Top" />
+            <TextBlock HorizontalAlignment="Left" Text="Container" VerticalAlignment="Top" Margin="0,89,0,0"/>
+            <TextBlock x:Name="ContainerText" HorizontalAlignment="Left" Margin="61,89,0,0" VerticalAlignment="Top" />
+        </Grid>
+        <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="10,64,0,0" Text="Invalid URL" VerticalAlignment="Top" Foreground="#FFB20000" Visibility="Hidden"/>
+        <ComboBox x:Name="PreferredFormatCombo" HorizontalAlignment="Right" Margin="0,8,218,0" VerticalAlignment="Top" Width="60">
+            <ComboBoxItem Content="Best" IsSelected="True" />
+            <ComboBoxItem Content="H264"/>
+            <ComboBoxItem Content="Vp9"/>
+        </ComboBox>
+        <TextBlock HorizontalAlignment="Right" Margin="0,10,285,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="Preferred "/><Run Text="Format"/></TextBlock>
+        <ComboBox x:Name="MaxDownloadQualityCombo" HorizontalAlignment="Right" Margin="0,8,88,0" VerticalAlignment="Top" Width="60" DisplayMemberPath="Text" SelectedValuePath="Value" />
+        <ComboBox x:Name="PreferredAudioCombo" HorizontalAlignment="Right" Margin="0,8,153,0" VerticalAlignment="Top" Width="60">
+            <ComboBoxItem Content="Best" IsSelected="True" />
+            <ComboBoxItem Content="AAC"/>
+            <ComboBoxItem Content="Opus"/>
+        </ComboBox>
+
+    </Grid>
+</Window>

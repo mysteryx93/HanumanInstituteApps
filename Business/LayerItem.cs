@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Business {
-    [PropertyChanged.ImplementPropertyChanged]
-    public class LayerItem {
+    public class LayerItem : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public LayerType Type { get; set; }
         public string FileName { get; set; }
     }

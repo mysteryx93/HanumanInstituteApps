@@ -15,16 +15,16 @@
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="420,213,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Click="SaveButton_Click" TabIndex="26"/>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="340,213,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Click="CancelButton_Click" TabIndex="25"/>
         <Button x:Name="BrowseSvp" Content="..." HorizontalAlignment="Left" Margin="473,73,0,0" VerticalAlignment="Top" Width="22" Height="21" Click="BrowseSvp_Click" TabIndex="8" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
-        <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="18,197,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="282" Foreground="Red" />
-        <ComboBox x:Name="ZoomComboBox" HorizontalAlignment="Left" Margin="190,153,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="0" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedValue="{Binding Zoom, Mode=TwoWay}" TabIndex="12" />
-        <TextBlock HorizontalAlignment="Left" Margin="18,156,0,0" TextWrapping="Wrap" Text="Zoom" VerticalAlignment="Top"/>
+        <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="18,216,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="282" Foreground="Red" />
+        <ComboBox x:Name="ZoomComboBox" HorizontalAlignment="Left" Margin="190,180,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="0" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedValue="{Binding Zoom, Mode=TwoWay}" TabIndex="12" />
+        <TextBlock HorizontalAlignment="Left" Margin="18,183,0,0" TextWrapping="Wrap" Text="Zoom" VerticalAlignment="Top"/>
         <ComboBox x:Name="MediaPlayerCombo" HorizontalAlignment="Left" Margin="190,99,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="{Binding MediaPlayerApp, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay}" TabIndex="10" LostKeyboardFocus="MediaPlayerCombo_LostKeyboardFocus">
             <ComboBoxItem Content="MPC-HC" />
             <ComboBoxItem Content="WMP" />
         </ComboBox>
         <TextBlock HorizontalAlignment="Left" Margin="18,102,0,0" TextWrapping="Wrap" Text="Media Player" VerticalAlignment="Top"/>
         <CheckBox x:Name="EnableSvpCheckbox" Content="Enable SVP (play @ 60 fps)" HorizontalAlignment="Left" Margin="308,102,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableSvp, Mode=TwoWay}" TabIndex="20" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
-        <ComboBox x:Name="MaxDownloadQualityCombo" HorizontalAlignment="Left" Margin="190,126,0,0" VerticalAlignment="Top" Width="80" SelectedValue="{Binding MaxDownloadQuality, Mode=TwoWay}" DisplayMemberPath="Text" SelectedValuePath="Value" TabIndex="11" />
+        <ComboBox x:Name="MaxDownloadQualityCombo" HorizontalAlignment="Left" Margin="190,126,0,0" VerticalAlignment="Top" Width="80" SelectedValue="{Binding Download.MaxQuality, Mode=TwoWay}" DisplayMemberPath="Text" SelectedValuePath="Value" TabIndex="11" />
         <TextBlock HorizontalAlignment="Left" Margin="18,129,0,0" TextWrapping="Wrap" Text="Max Download Quality" VerticalAlignment="Top"/>
         <CheckBox x:Name="EnableMadvrCheckbox" Content="Enable madVR (higher quality)" HorizontalAlignment="Left" Margin="308,123,0,0" VerticalAlignment="Top" IsChecked="{Binding EnableMadVR, Mode=TwoWay}" TabIndex="21" IsEnabled="{Binding IsMpcPlayer, ElementName=window}"  />
         <CheckBox Content="Stretch to Widescreen (16:9)" HorizontalAlignment="Left" Margin="308,163,0,0" VerticalAlignment="Top" IsChecked="{Binding Widescreen, Mode=TwoWay}" TabIndex="23" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
@@ -33,6 +33,12 @@
         <TextBlock HorizontalAlignment="Left" Margin="18,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="MPC-HC x86 Path "/><Hyperlink NavigateUri="https://mpc-hc.org/" RequestNavigate="Hyperlink_RequestNavigate" KeyboardNavigation.TabIndex="3"><Run Text="(download)"/></Hyperlink></TextBlock>
         <Button x:Name="BrowseMpc" Content="..." HorizontalAlignment="Left" Margin="473,47,0,0" VerticalAlignment="Top" Width="22" Height="21" Click="BrowseMpc_Click" TabIndex="5" IsEnabled="{Binding IsMpcPlayer, ElementName=window}" />
         <Button x:Name="BrowseFolder" Content="..." HorizontalAlignment="Left" Margin="473,21,0,0" VerticalAlignment="Top" Width="22" Height="21" Click="BrowseFolder_Click" TabIndex="2" />
+        <TextBlock HorizontalAlignment="Left" Margin="18,156,0,0" TextWrapping="Wrap" Text="Download Video Format" VerticalAlignment="Top"/>
+        <ComboBox x:Name="PreferredFormatCombo" HorizontalAlignment="Left" Margin="190,153,0,0" VerticalAlignment="Top" Width="80" SelectedIndex="{Binding Download.PreferredFormat, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay}" TabIndex="10">
+            <ComboBoxItem Content="Best" />
+            <ComboBoxItem Content="MP4" />
+            <ComboBoxItem Content="VP9" />
+        </ComboBox>
 
     </Grid>
 </Window>

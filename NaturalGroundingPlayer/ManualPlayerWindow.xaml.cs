@@ -5,17 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Business;
 using DataAccess;
-using System.ComponentModel;
 using System.Windows.Threading;
-using System.Windows.Controls.Primitives;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -222,7 +216,8 @@ namespace NaturalGroundingPlayer {
 
         private async void DownloadBusiness_DownloadCompleted(object sender, DownloadCompletedEventArgs e) {
             if (e.DownloadInfo.IsCompleted) {
-                MediaList.business.RefreshPlaylist(e.DownloadInfo.Request, null);
+                DownloadItemData IData = e.DownloadInfo.Data as DownloadItemData;
+                MediaList.business.RefreshPlaylist(IData.Media, null);
                 await MediaList.LoadDataAsync();
             }
         }

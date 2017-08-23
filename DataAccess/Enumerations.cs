@@ -64,8 +64,11 @@ namespace DataAccess {
         InvalidUrl,
         HigherQualityAvailable,
         BetterAudioAvailable,
+        BetterVideoAvailable,
+        WrongContainer,
         DownloadingInfo,
         Downloading,
+        Converting,
         Done,
         Failed
     }

@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using DataAccess;
 using System.Collections.ObjectModel;
 using System.Windows;
+using EmergenceGuardian.Downloader;
 
 namespace Business {
     public class PlayerBusiness {
@@ -23,7 +24,7 @@ namespace Business {
         private int lastSearchResultCount;
         public bool IsStarted { get; private set; }
         public bool IsPaused { get; private set; }
-        private DownloadBusiness downloadManager = new DownloadBusiness();
+        private DownloadBusiness downloadManager = new DownloadBusiness(Settings.SavedFile.Download);
         /// <summary>
         /// Contains all filter settings.
         /// </summary>
@@ -145,7 +146,7 @@ namespace Business {
         /// </summary>
         private async void player_PlayNext(object sender, EventArgs e) {
             if (!Loop) {
-                DownloadItem VideoDownload = GetNextVideoDownloading();
+                var VideoDownload = GetNextVideoDownloading();
                 if (VideoDownload == null) {
                     if (playMode == PlayerMode.Manual && nextVideo == null) {
                         if (player.CurrentVideo != null && (player.StartPos.HasValue || player.EndPos.HasValue) && !player.IgnorePos) // Enforce end position without moving to next video.
@@ -355,10 +356,11 @@ namespace Business {
         /// Cancels the download and autoplay of specified video.
         /// </summary>
         private void CancelNextDownload(Media video) {
-            DownloadItem VideoDownload = downloadManager.DownloadsList.FirstOrDefault(d => d.Request.MediaId == video.MediaId && !d.IsCompleted);
+            var VideoDownload = downloadManager.DownloadsList.FirstOrDefault(d => (d.Data as DownloadItemData).Media.MediaId == video.MediaId && !d.IsCompleted);
             if (VideoDownload != null) {
                 // Removes autoplay from the next video.
-                VideoDownload.QueuePos = -1;
+                DownloadItemData IData = VideoDownload.Data as DownloadItemData;
+                IData.QueuePos = -1;
                 // Cancel the download if progress is less than 40%
                 if (VideoDownload.ProgressValue < 40 && playMode != PlayerMode.Manual)
                     VideoDownload.Status = DownloadStatus.Canceled;
@@ -425,10 +427,11 @@ namespace Business {
             MpcConfigBusiness.AutoConfigure(nextVideo);
 
             // If next video is still downloading, advance QueuePos. If QueuePos = 0 when download finishes, it will auto-play.
-            DownloadItem VideoDownload = GetNextVideoDownloading();
+            var VideoDownload = GetNextVideoDownloading();
             if (VideoDownload != null) {
-                if (VideoDownload.QueuePos > 0)
-                    VideoDownload.QueuePos--;
+                DownloadItemData IData = VideoDownload.Data as DownloadItemData;
+                if (IData.QueuePos > 0)
+                    IData.QueuePos--;
                 return;
             }
 
@@ -538,12 +541,13 @@ namespace Business {
         /// Occurs when download is completed.
         /// </summary>
         private async void Download_Complete(object sender, DownloadCompletedEventArgs args) {
-            if (args.DownloadInfo.IsCompleted && (args.DownloadInfo.QueuePos == 0 || player.CurrentVideo == null) && !player.AllowClose) {
-                nextVideo = args.DownloadInfo.Request;
+            DownloadItemData IData = args.DownloadInfo.Data as DownloadItemData;
+            if (args.DownloadInfo.IsCompleted && (IData.QueuePos == 0 || player.CurrentVideo == null) && !player.AllowClose) {
+                nextVideo = IData.Media;
                 player_PlayNext(null, null);
-            } else if (args.DownloadInfo.IsCanceled && args.DownloadInfo.QueuePos > -1 && playMode != PlayerMode.Manual) {
+            } else if (args.DownloadInfo.IsCanceled && IData.QueuePos > -1 && playMode != PlayerMode.Manual) {
                 nextVideo = null;
-                await SelectNextVideoAsync(args.DownloadInfo.QueuePos, false).ConfigureAwait(false);
+                await SelectNextVideoAsync(IData.QueuePos, false).ConfigureAwait(false);
             }
         }
 
@@ -659,7 +663,7 @@ namespace Business {
         /// <returns>An object containing the information about the download.</returns>
         public DownloadItem GetNextVideoDownloading() {
             if (nextVideo != null) {
-                DownloadItem VideoDownload = downloadManager.DownloadsList.FirstOrDefault(d => d.Request.MediaId == nextVideo.MediaId);
+                var VideoDownload = downloadManager.DownloadsList.FirstOrDefault(d => (d.Data as DownloadItemData).Media.MediaId == nextVideo.MediaId);
                 if (VideoDownload != null && !VideoDownload.IsCompleted)
                     return VideoDownload;
             }

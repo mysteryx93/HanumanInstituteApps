@@ -7,11 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Business;
+using System.ComponentModel;
 
 namespace Player432hz {
     [Serializable]
     [XmlRoot("Player432hz")]
-    [PropertyChanged.ImplementPropertyChanged]
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
     public class ConfigFile {
         [XmlElement("Playlist")]
         public ObservableCollection<PlaylistItem> Playlists = new ObservableCollection<PlaylistItem>();

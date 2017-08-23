@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Core.Objects.DataClasses;
@@ -70,8 +71,9 @@ namespace DataAccess {
         }
     }
 
-    [PropertyChanged.ImplementPropertyChanged]
-    public partial class Media {
+    public partial class Media : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MediaType MediaType {
             get { return (MediaType)MediaTypeId; }
             set { MediaTypeId = (int)value; }
@@ -97,8 +99,9 @@ namespace DataAccess {
         }
     }
 
-    [PropertyChanged.ImplementPropertyChanged]
-    public partial class MediaRating {
+    public partial class MediaRating : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// Returns the computed value of Height * Depth on a scale of 11.
         /// </summary>
@@ -115,7 +118,7 @@ namespace DataAccess {
         }
     }
 
-    [PropertyChanged.ImplementPropertyChanged]
-    public partial class RatingCategory {
+    public partial class RatingCategory : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

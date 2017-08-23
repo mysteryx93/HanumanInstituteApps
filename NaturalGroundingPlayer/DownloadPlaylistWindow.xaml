@@ -27,6 +27,5 @@
         <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,10" IsCancel="True" Click="CloseButton_Click" TabIndex="15" HorizontalAlignment="Right" Width="90" Height="22" VerticalAlignment="Bottom"/>
         <Button x:Name="ScanButton" Content="_Scan" Margin="200,0,0,10" Click="ScanButton_Click" TabIndex="12" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsDefault="True"/>
         <Button x:Name="DownloadButton" Content="_Download" Margin="295,0,0,10" Click="DownloadButton_Click" TabIndex="13" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsEnabled="False"/>
-        <Button x:Name="UpgradeButton" Content="U_pgrade Audio" Margin="390,0,0,10" Click="UpgradeButton_Click" TabIndex="14" HorizontalAlignment="Left" Width="90" Height="22" VerticalAlignment="Bottom" IsEnabled="False"/>
     </Grid>
 </Window>

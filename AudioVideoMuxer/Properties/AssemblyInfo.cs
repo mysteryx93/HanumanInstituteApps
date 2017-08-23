@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Emergence Guardian")]
 [assembly: AssemblyProduct("Natural Grounding Player")]
-[assembly: AssemblyCopyright("Copyright © 2017, Emergence Guardian")]
+[assembly: AssemblyCopyright("Copyright © 2016-2017, Emergence Guardian")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

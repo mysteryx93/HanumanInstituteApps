@@ -1,14 +1,10 @@
-﻿using PropertyChanged;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using System.ComponentModel;
 
 namespace DataAccess {
-    [PropertyChanged.ImplementPropertyChanged]
-    public class MoveFileItem {
+    public class MoveFileItem : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Guid VideoId { get; set; }
         public MediaType MediaType { get; set; }
         public string Artist { get; set; }

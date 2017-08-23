@@ -10,8 +10,9 @@ namespace DataAccess {
     /// Contains settings to search videos.
     /// </summary>
     [Serializable()]
-    [PropertyChanged.ImplementPropertyChanged]
-    public class SearchSettings {
+    public class SearchSettings : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public SearchSettings() {
             // Add first row that is found to standard properties.
             RatingFilters = new List<SearchRatingSetting>();

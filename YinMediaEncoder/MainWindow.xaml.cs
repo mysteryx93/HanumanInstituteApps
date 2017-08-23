@@ -48,6 +48,7 @@ namespace YinMediaEncoder {
         private async void Window_Loaded(object sender, RoutedEventArgs e) {
             this.DataContext = encodeSettings;
             SettingsTab.Items.CurrentChanging += new CurrentChangingEventHandler(Items_CurrentChanging);
+            ((FFmpegUserInterfaceManager)FFmpegConfig.UserInterfaceManager).JobClosed += UserInterfaceManager_JobClosed;
             if (MediaPlayer.WindowsMediaPlayer.IsWmpInstalled) {
                 playerOriginal = new WmpPlayerWindow();
                 playerOriginal.Title = "Original";
@@ -100,6 +101,7 @@ namespace YinMediaEncoder {
         }
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            FFmpegConfig.UserInterfaceManager.AppExited = true;
             foreach (Window item in OwnedWindows) {
                 item.Close();
             }
@@ -336,9 +338,9 @@ namespace YinMediaEncoder {
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) {
-            PauseButton.IsEnabled = false;
             if (business.IsEncoding) {
-                business.PauseEncoding();
+                if (business.PauseEncoding())
+                    PauseButton.IsEnabled = false;
                 PauseButtonImage.Source = new BitmapImage(new Uri(@"/YinMediaEncoder;component/Icons/play.png", UriKind.Relative));
                 PauseButton.ToolTip = "Start";
             } else {
@@ -346,6 +348,9 @@ namespace YinMediaEncoder {
                 PauseButtonImage.Source = new BitmapImage(new Uri(@"/YinMediaEncoder;component/Icons/pause.png", UriKind.Relative));
                 PauseButton.ToolTip = "Pause";
             }
+        }
+
+        private void UserInterfaceManager_JobClosed(object sender, JobEventArgs e) {
             PauseButton.IsEnabled = true;
         }
 

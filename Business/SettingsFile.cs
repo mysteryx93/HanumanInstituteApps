@@ -1,15 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Serialization;
+using EmergenceGuardian.Downloader;
 
 namespace Business {
-    [PropertyChanged.ImplementPropertyChanged]
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
     public class SettingsFile {
         public string NaturalGroundingFolder { get; set; }
         public string SvpPath { get; set; }
@@ -20,7 +16,7 @@ namespace Business {
         public bool ChangeAudioPitch { get; set; }
         public bool Widescreen { get; set; }
         public MediaPlayerApplication MediaPlayerApp { get; set; }
-        public int MaxDownloadQuality { get; set; }
+        public DownloadOptions Download { get; set; }
         public double Zoom { get; set; }
         // Hidden properly allowing to change KNLMeans.device_id when encoding videos. It can only be set by editing Settings.xml
         public int GraphicDeviceId { get; set; }
@@ -32,7 +28,7 @@ namespace Business {
             ChangeAudioPitch = false;
             Widescreen = false;
             MediaPlayerApp = MediaPlayerApplication.Mpc;
-            MaxDownloadQuality = 0; // Max
+            Download = new DownloadOptions();
             Zoom = 1;
         }
 
@@ -138,7 +134,7 @@ namespace Business {
             Result.ChangeAudioPitch = ChangeAudioPitch;
             Result.Widescreen = Widescreen;
             Result.MediaPlayerApp = MediaPlayerApp;
-            Result.MaxDownloadQuality = MaxDownloadQuality;
+            Result.Download = Download?.Copy();
             Result.Zoom = Zoom;
             Result.GraphicDeviceId = GraphicDeviceId;
             return Result;

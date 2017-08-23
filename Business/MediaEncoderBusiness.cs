@@ -81,12 +81,17 @@ namespace Business {
             StartEncoderThread();
         }
 
-        public void PauseEncoding() {
-            if (!IsEncoding)
-                return;
-
-            IsEncoding = false;
-            ProcessingQueue.FirstOrDefault()?.Cancel();
+        public bool PauseEncoding() {
+            if (IsEncoding) {
+                IsEncoding = false;
+                MediaEncoderSettings Job = ProcessingQueue.FirstOrDefault();
+                if (Job != null) {
+                    Job.CompletionStatus = CompletionStatus.Cancelled;
+                    FFmpegConfig.UserInterfaceManager.Stop(Job.JobIndex);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void StartEncoderThread() {
@@ -103,30 +108,57 @@ namespace Business {
 
             FFmpegConfig.UserInterfaceManager.Start(settings.JobIndex, "Processing Video");
 
-            bool Run = PrepareExistingJob(settings);
-            if (Run) {
+            MediaEncoderSegments SegBusiness = PrepareExistingJob(settings);
+            // If merging is completed, SegBusiness==null. If work is completed but not merged, SegBusiness.SegLeft = empty list.
+            if (SegBusiness != null && SegBusiness.SegLeft.Count() > 0) {
                 if (settings.Deshaker && (settings.DeshakerSettings.PrescanAction != PrescanType.Full || !settings.DeshakerSettings.PrescanCompleted)) {
                     settings.DeshakerSettings.PrescanAction = PrescanType.Full;
                     settings.CompletionStatus = GenerateDeshakerLog(settings, settings.InputFile);
                 }
 
                 if (settings.CompletionStatus == CompletionStatus.Success) {
-                    Task<CompletionStatus> VideoEnc = null;
-                    if (settings.VideoCodec != VideoCodecs.Copy)
-                        VideoEnc = Task.Run(() => AvisynthTools.EncodeVideo(settings));
-
                     // Encode audio stream
-                    if (settings.IsAudioEncode) {
-                        Task<CompletionStatus> AudioEnc = Task.Run(() => AvisynthTools.EncodeAudio(settings));
-                        if (VideoEnc != null)
-                            Task.WaitAll(VideoEnc, AudioEnc);
-                        else
-                            AudioEnc.Wait();
-                    } else if (VideoEnc != null)
-                        VideoEnc.Wait();
+                    Task EncAudio = null;
+                    if (settings.IsAudioEncode)
+                        EncAudio = Task.Run(() => AvisynthTools.EncodeAudio(settings));
+
+                    // Encode video stream in segments
+                    List<Task<CompletionStatus>> EncTasks = new List<Task<CompletionStatus>>();
+                    if (settings.VideoCodec != VideoCodecs.Copy) {
+                        bool Cancel = false;
+                        foreach (SegmentInfo seg in SegBusiness.SegLeft) {
+                            MediaEncoderSettings EncSettings = settings.Clone();
+                            EncSettings.ResumePos = seg.Start;
+                            File.Delete(EncSettings.OutputFile);
+                            EncTasks.Add(Task.Run(() => AvisynthTools.EncodeVideo(EncSettings, seg.Length, SegBusiness.TotalFrames)));
+
+                            // If there are more segments than max parallel instances, wait until some threads finish
+                            if (EncTasks.Count >= settings.ParallelProcessing) {
+                                Task.WaitAny(EncTasks.ToArray());
+                                foreach (var item in EncTasks.ToArray()) {
+                                    if (item.IsCompleted) {
+                                        if (item.Result == CompletionStatus.Success)
+                                            EncTasks.Remove(item);
+                                        else {
+                                            settings.CompletionStatus = item.Result;
+                                            Cancel = true;
+                                        }
+                                    }
+                                }
+                            }
+                            if (Cancel)
+                                break;
+                        }
+                    }
+
+                    EncAudio?.Wait();
+                    Task.WaitAll(EncTasks.ToArray());
                 }
-            } else
-                settings.CompletionStatus = CompletionStatus.None;
+            } else if (settings.CompletionStatus == CompletionStatus.None)
+                settings.CompletionStatus = CompletionStatus.Success;
+
+            if (FFmpegConfig.UserInterfaceManager.AppExited)
+                return;
 
             // Check if encode is completed.
             EncodingCompletedEventArgs CompletedArgs = null;
@@ -155,36 +187,40 @@ namespace Business {
         }
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
-            string FinalFile = PathManager.GetNextAvailableFileName(settings.FinalFile);
-            string VideoFile = null;
-            if (settings.VideoCodec == VideoCodecs.Copy)
-                VideoFile = settings.FilePath;
-            else {
-                VideoFile = PathManager.GetOutputFile(settings.JobIndex, 0, settings.VideoCodec);
+            settings.ResumePos = -1;
+            string VideoFile = settings.VideoCodec == VideoCodecs.Copy ? VideoFile = settings.FilePath : VideoFile = settings.OutputFile;
+
+            if (!File.Exists(settings.OutputFile) && settings.VideoCodec != VideoCodecs.Copy) {
+                // Merge segments.
                 settings.CompletionStatus = MergeSegments(settings, VideoFile);
                 if (settings.CompletionStatus != CompletionStatus.Success)
                     return null;
             }
 
-            // Muxe video with audio.
-            string AudioFile = settings.AudioAction == AudioActions.Ignore ? null : settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
-            settings.CompletionStatus = MediaMuxer.Muxe(VideoFile, AudioFile, FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
-            if (settings.CompletionStatus != CompletionStatus.Success)
-                return null;
+            if (!File.Exists(settings.FinalFile)) {
+                // Muxe video with audio.
+                string AudioFile = settings.AudioAction == AudioActions.Ignore ? null : settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
+                settings.CompletionStatus = MediaMuxer.Muxe(VideoFile, AudioFile, settings.FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
+                if (settings.CompletionStatus != CompletionStatus.Success)
+                    return null;
 
-            return GetEncodingResults(settings, FinalFile, startTime);
+            }
+
+            return GetEncodingResults(settings, settings.FinalFile, startTime);
         }
 
         /// <summary>
         /// For files encoded in various segments (stop/resume), merge the various segments.
         /// </summary>
         private CompletionStatus MergeSegments(MediaEncoderSettings settings, string destination) {
-            int Segment = 0;
+            MediaEncoderSegments segBusiness = new MediaEncoderSegments();
+            segBusiness.Analyze(settings);
+            if (segBusiness.SegLeft.Count() > 0)
+                return CompletionStatus.Error;
+
             List<string> SegmentList = new List<string>();
-            List<Task<CompletionStatus>> TaskList = new List<Task<CompletionStatus>>();
-            while (File.Exists(PathManager.GetOutputFile(settings.JobIndex, ++Segment, settings.VideoCodec))) {
-                string OutputFile = PathManager.GetOutputFile(settings.JobIndex, Segment, settings.VideoCodec);
-                SegmentList.Add(OutputFile);
+            foreach (SegmentInfo seg in segBusiness.SegDone) {
+                SegmentList.Add(PathManager.GetOutputFile(settings.JobIndex, seg.Start, settings.VideoCodec));
             }
 
             CompletionStatus Result = CompletionStatus.Success;
@@ -286,24 +322,17 @@ namespace Business {
         /// <summary>
         /// Prepares the files of an existing job.
         /// </summary>
-        /// <returns>Whether job still needs to execute.</returns>
-        public bool PrepareExistingJob(MediaEncoderSettings settings) {
-            settings.ResumeSegment = 1;
+        /// <returns>A MediaEncoderSegments object containing the segments analysis.</returns>
+        public MediaEncoderSegments PrepareExistingJob(MediaEncoderSettings settings) {
             settings.ResumePos = 0;
             settings.CompletionStatus = CompletionStatus.Success;
             if (File.Exists(settings.FinalFile)) {
                 // Merging was completed.
-                //EncodingCompletedEventArgs EncodeResult = GetEncodingResults(settings, settings.FinalFile, null);
-                //if (EncodeResult != null)
-                //    EncodingCompleted(this, EncodeResult);
-                return false;
-            } else if (File.Exists(settings.OutputFile) && new FileInfo(settings.OutputFile).Length > 10000) {
-                // Encoding produced partial files.
-                return PrepareResumeJob(settings);
+                return null;
             } else {
-                // Encoding had not yet started.
-                File.Delete(settings.OutputFile);
-                return true;
+                MediaEncoderSegments SegBusiness = new MediaEncoderSegments();
+                SegBusiness.Analyze(settings);
+                return SegBusiness;
             }
         }
 
@@ -312,56 +341,56 @@ namespace Business {
         /// Prepares the files of an existing job that we resume.
         /// </summary>
         /// <returns>Whether job still needs to execute.</returns>
-        private bool PrepareResumeJob(MediaEncoderSettings settings) {
-            AvisynthTools.EditStartPosition(settings.ScriptFile, 0);
-            // At least one segment has been processed. Check if the entire file has been processed.
-            ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Resuming...", false).TrackProcess(settings);
-            Task<long> TaskCount = Task.Run(() => AvisynthTools.GetFrameCount(settings.ScriptFile, Options));
+        //private bool PrepareResumeJob(MediaEncoderSettings settings) {
+        //    AvisynthTools.EditStartPosition(settings.ScriptFile, 0);
+        //    // At least one segment has been processed. Check if the entire file has been processed.
+        //    ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Resuming...", false).TrackProcess(settings);
+        //    Task<long> TaskCount = Task.Run(() => AvisynthTools.GetFrameCount(settings.ScriptFile, Options));
 
-            int Segment = 0;
-            List<Task<long>> TaskList = new List<Task<long>>();
-            while (File.Exists(PathManager.GetOutputFile(settings.JobIndex, ++Segment, settings.VideoCodec)) && settings.CompletionStatus != CompletionStatus.Cancelled) {
-                string SegmentFile = PathManager.GetOutputFile(settings.JobIndex, Segment, settings.VideoCodec);
-                // Discard segments of less than 10kb.
-                if (new FileInfo(SegmentFile).Length > 10000) {
-                    int SegmentLocal = Segment;
-                    TaskList.Add(Task.Run(() => AvisynthTools.GetFrameCount(PathManager.GetOutputFile(settings.JobIndex, SegmentLocal, settings.VideoCodec), null)));
-                } else {
-                    // There shouldn't be any resumed job following a segment that is being deleted.
-                    File.Delete(SegmentFile);
-                    break;
-                }
-            }
+        //    int Segment = 0;
+        //    List<Task<long>> TaskList = new List<Task<long>>();
+        //    while (File.Exists(PathManager.GetOutputFile(settings.JobIndex, ++Segment, settings.VideoCodec)) && settings.CompletionStatus != CompletionStatus.Cancelled) {
+        //        string SegmentFile = PathManager.GetOutputFile(settings.JobIndex, Segment, settings.VideoCodec);
+        //        // Discard segments of less than 10kb.
+        //        if (new FileInfo(SegmentFile).Length > 10000) {
+        //            int SegmentLocal = Segment;
+        //            TaskList.Add(Task.Run(() => AvisynthTools.GetFrameCount(PathManager.GetOutputFile(settings.JobIndex, SegmentLocal, settings.VideoCodec), null)));
+        //        } else {
+        //            // There shouldn't be any resumed job following a segment that is being deleted.
+        //            File.Delete(SegmentFile);
+        //            break;
+        //        }
+        //    }
 
-            long OutputFrames = 0;
-            Task.WaitAll(TaskList.ToArray());
-            foreach (Task<long> item in TaskList) {
-                OutputFrames += item.Result;
-            }
+        //    long OutputFrames = 0;
+        //    Task.WaitAll(TaskList.ToArray());
+        //    foreach (Task<long> item in TaskList) {
+        //        OutputFrames += item.Result;
+        //    }
 
-            TaskCount.Wait();
-            if (settings.CompletionStatus == CompletionStatus.Cancelled)
-                return false;
+        //    TaskCount.Wait();
+        //    if (settings.CompletionStatus == CompletionStatus.Cancelled)
+        //        return false;
 
-            long ScriptFrames = TaskCount.Result;
-            if (OutputFrames >= ScriptFrames) {
-                // Job completed.
-                //EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
-                //if (EncodeResult != null)
-                //    EncodingCompleted(this, EncodeResult);
-                //else {
-                //    PathManager.DeleteJobFiles(settings.JobIndex);
-                //}
-                return false;
-            } else {
-                // Resume with new segment.
-                AvisynthTools.EditStartPosition(settings.ScriptFile, OutputFrames);
-                settings.ResumeSegment = Segment;
-                settings.ResumePos = OutputFrames;
-                File.Delete(settings.OutputFile);
-                return true;
-            }
-        }
+        //    long ScriptFrames = TaskCount.Result;
+        //    if (OutputFrames >= ScriptFrames) {
+        //        // Job completed.
+        //        //EncodingCompletedEventArgs EncodeResult = FinalizeEncoding(settings, null);
+        //        //if (EncodeResult != null)
+        //        //    EncodingCompleted(this, EncodeResult);
+        //        //else {
+        //        //    PathManager.DeleteJobFiles(settings.JobIndex);
+        //        //}
+        //        return false;
+        //    } else {
+        //        // Resume with new segment.
+        //        AvisynthTools.EditStartPosition(settings.ScriptFile, OutputFrames);
+        //        settings.ResumeSegment = Segment;
+        //        settings.ResumePos = OutputFrames;
+        //        File.Delete(settings.OutputFile);
+        //        return true;
+        //    }
+        //}
 
         private async Task GetMediaInfo(string previewFile, MediaEncoderSettings settings) {
             FFmpegProcess Worker = await Task.Run(() => MediaInfo.GetFileInfo(previewFile));
@@ -387,8 +416,7 @@ namespace Business {
                 settings.SourceColorMatrix = VInfo.Height < 600 ? (IsTvRange ? ColorMatrix.Rec601 : ColorMatrix.Pc601) : (IsTvRange ? ColorMatrix.Rec709 : ColorMatrix.Pc709);
             settings.SourceChromaPlacement = string.Compare(VInfo.Format, "mpeg1video", true) == 0 ? ChromaPlacement.MPEG1 : ChromaPlacement.MPEG2;
             settings.DegrainPrefilter = VInfo.Height < 600 ? DegrainPrefilters.SD : DegrainPrefilters.HD;
-            if (!settings.CanCopyAudio && settings.AudioAction == AudioActions.Copy)
-                settings.EncodeFormat = VideoFormats.Mkv;
+            settings.EncodeFormat = settings.CanEncodeMp4 ? VideoFormats.Mp4 : VideoFormats.Mkv;
             settings.SourceAudioBitrate = AInfo.Bitrate;
             if (!settings.IsAudioEncode)
                 settings.AudioQuality = AInfo.Bitrate > 0 ? AInfo.Bitrate : 256;
@@ -398,6 +426,9 @@ namespace Business {
             settings.DenoiseD = 2;
             settings.DenoiseA = settings.SourceHeight < 720 ? 2 : 1;
             settings.Position = Worker.FileDuration.TotalSeconds / 2;
+            settings.VideoCodec = settings.SourceHeight >= 1080 ? VideoCodecs.x264 : VideoCodecs.x265;
+            settings.EncodeQuality = settings.SourceHeight >= 1080 ? 23 : 22;
+            settings.EncodePreset = settings.SourceHeight >= 1080 ? EncodePresets.veryslow : EncodePresets.medium;
             // Use Cache to open file when file is over 500MB
             settings.CalculateSize();
         }

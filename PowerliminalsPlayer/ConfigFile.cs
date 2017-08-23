@@ -9,10 +9,11 @@ using System.Xml.Serialization;
 using Business;
 using System.Windows;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 namespace PowerliminalsPlayer {
     [XmlRoot("PowerliminalsPlayer")]
-    [PropertyChanged.ImplementPropertyChanged]
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
     public class ConfigFile {
         [XmlElement("Folder")]
         public ObservableCollection<string> Folders = new ObservableCollection<string>();

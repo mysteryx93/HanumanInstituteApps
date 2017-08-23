@@ -2,9 +2,11 @@
 using System.Windows;
 using System.Windows.Input;
 using Business;
+using DataAccess;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -39,19 +41,18 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void DownloadsView_ItemDoubleClick(object sender, MouseButtonEventArgs e) {
-            DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
+            var Item = DownloadsView.SelectedItem as DownloadItem;
             if (Item != null && IsPlayerMode) {
                 if (Item.IsCompleted) {
-                    await SessionCore.Instance.Business.PlaySingleVideoAsync(Item.Request.FileName);
-                } else {
+                    await SessionCore.Instance.Business.PlaySingleVideoAsync((Item.Data as DownloadItemData).Media.FileName);
+                } else
                     menuEdit_Click(null, null);
-                }
             }
         }
 
         private void DownloadsView_ItemRightButtonUp(object sender, MouseButtonEventArgs e) {
             DownloadsView.ContextMenu = null;
-            DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
+            var Item = DownloadsView.SelectedItem as DownloadItem;
             if (Item != null && IsPlayerMode) {
                 string MenuKey = null;
                 if (Item.IsCompleted || Item.IsCanceled)
@@ -71,15 +72,16 @@ namespace NaturalGroundingPlayer {
         }
 
         private void menuCancel_Click(object sender, RoutedEventArgs e) {
-            DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
+            var Item = DownloadsView.SelectedItem as DownloadItem;
             if (Item != null && !Item.IsCanceled && !Item.IsCompleted)
                 Item.Status = DownloadStatus.Canceled;
         }
 
         private void menuEdit_Click(object sender, RoutedEventArgs e) {
-            DownloadItem Item = DownloadsView.SelectedItem as DownloadItem;
-            if (Item != null)
-                EditVideoWindow.Instance(Item.Request.MediaId, null, null);
+            var Item = DownloadsView.SelectedItem as DownloadItem;
+            if (Item != null) {
+                EditVideoWindow.Instance((Item.Data as DownloadItemData).Media.MediaId, null, null);
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

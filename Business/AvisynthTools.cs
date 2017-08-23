@@ -288,8 +288,11 @@ namespace Business {
         /// Encodes specified video file according to settings. The script file must already be written.
         /// </summary>
         /// <param name="settings">An object containing the encoding settings.</param>
+        /// <param name="frameCount">The amount of frames to process.</param>
+        /// <param name="totalFrameCount">If encoding in various segments, the total amount of frames in the script.</param>
         /// <returns>The endoding completion status..</returns>
-        public static CompletionStatus EncodeVideo(MediaEncoderSettings settings) {
+        public static CompletionStatus EncodeVideo(MediaEncoderSettings settings, long frameCount, long totalFrameCount) {
+            CompletionStatus Result = CompletionStatus.None;
             File.Delete(settings.OutputFile);
             string Codec = "", Args = "";
             if (settings.VideoCodec == VideoCodecs.x264) {
@@ -300,14 +303,24 @@ namespace Business {
                 Args = string.Format("-preset {0} -crf {1}", settings.EncodePreset, settings.EncodeQuality);
             } else // AVI
                 Codec = "utvideo";
+            if (settings.ParallelProcessing > 1)
+                Args += " -threads 4";
 
             ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Processing Video", true).TrackProcess(settings);
-            Options.FrameCount = AvisynthTools.GetFrameCount(settings.ScriptFile, new ProcessStartOptions(settings.JobIndex, "Getting Frame Count", false).TrackProcess(settings));
+            // Options.FrameCount = AvisynthTools.GetFrameCount(settings.ScriptFile, new ProcessStartOptions(settings.JobIndex, "Getting Frame Count", false).TrackProcess(settings));
+            Options.FrameCount = frameCount;
             Options.ResumePos = settings.ResumePos;
-            if (settings.CompletionStatus == CompletionStatus.Success)
-                return MediaEncoder.Encode(settings.ScriptFile, Codec, null, Args, settings.OutputFile, Options);
-            else
-                return settings.CompletionStatus;
+            Options.TotalFrameCount = totalFrameCount;
+            if (settings.CompletionStatus == CompletionStatus.Success) {
+                string JobScript = settings.OutputScriptFile;
+                File.Delete(JobScript);
+                File.Copy(settings.ScriptFile, JobScript);
+                EditStartPosition(JobScript, settings.ResumePos, settings.ResumePos + frameCount - 1);
+                Result = MediaEncoder.Encode(JobScript, Codec, null, Args, settings.OutputFile, Options);
+                File.Delete(JobScript);
+            } else
+                Result = settings.CompletionStatus;
+            return Result;
         }
 
         /// <summary>
@@ -377,19 +390,19 @@ namespace Business {
         /// Edits specified script to start at specified frame position.
         /// </summary>
         /// <param name="frame">The frame position to start at.</param>
-        public static void EditStartPosition(string source, long frame) {
+        public static void EditStartPosition(string source, long start, long end) {
             List<string> Script = File.ReadAllLines(source).ToList();
             // If the START_POSITION marker is already present, replace it, otherwise insert it.
             string Marker = "## START_POSITION ##";
             for (int i = Script.Count - 1; i >= 0; i--) {
                 if (Script[i].Trim().Length > 1 && !Script[i].StartsWith("Prefetch(", StringComparison.InvariantCultureIgnoreCase)) {
-                    string NewLine = string.Format("Trim({0}, 0)  {1}", frame, Marker);
+                    string NewLine = string.Format("Trim({0}, {1})  {2}", start, end, Marker);
                     if (Script[i].EndsWith(Marker)) {
-                        if (frame > 0)
+                        if (start > 0 || end > 0)
                             Script[i] = NewLine;
                         else
                             Script.RemoveAt(i);
-                    } else if (frame > 0)
+                    } else if (start > 0 || end > 0)
                         Script.Insert(i + 1, NewLine);
                     break;
                 }

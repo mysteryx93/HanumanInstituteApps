@@ -27,10 +27,13 @@ namespace Business {
             get { return Settings.TempFilesPath + "Preview_Deshaker.log"; }
         }
 
-        public static string GetScriptFile(int jobIndex) {
-            if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Script.avs", Settings.TempFilesPath, jobIndex);
-            else
+        public static string GetScriptFile(int jobIndex, long resumePos) {
+            if (jobIndex >= 0) {
+                if (resumePos > -1)
+                    return string.Format("{0}Job{1}_Script_{2}.avs", Settings.TempFilesPath, jobIndex, resumePos);
+                else
+                    return string.Format("{0}Job{1}_Script.avs", Settings.TempFilesPath, jobIndex);
+            } else
                 return PreviewScriptFile;
         }
 
@@ -48,11 +51,11 @@ namespace Business {
                 return PreviewSourceFile;
         }
 
-        public static string GetOutputFile(int jobIndex, int resumeSegment, VideoCodecs codec) {
-            if (resumeSegment > 0)
-                return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumeSegment, codec == VideoCodecs.Avi ? "avi" : "mkv");
+        public static string GetOutputFile(int jobIndex, long resumePos, VideoCodecs codec) {
+            if (resumePos > -1)
+                return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumePos, codec == VideoCodecs.Avi ? "avi" : "mkv");
             else
-                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumeSegment, codec == VideoCodecs.Avi ? "avi" : codec == VideoCodecs.Copy ? "mkv" : "mp4");
+                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumePos, codec == VideoCodecs.Avi ? "avi" : codec == VideoCodecs.Copy ? "mkv" : "mp4");
         }
 
         public static string GetAudioFile(int jobIndex, AudioActions codec) {
@@ -122,7 +125,7 @@ namespace Business {
 
         public static void DeleteOutputFiles(int jobIndex) {
             foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Output*", jobIndex))) {
-                //File.Delete(f);
+                File.Delete(f);
             }
             foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Final*", jobIndex))) {
                 File.Delete(f);

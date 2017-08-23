@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,9 @@ namespace Business {
     // Full documentation of parameters here
     // http://www.guthspot.se/video/deshaker.htm
     [Serializable()]
-    [PropertyChanged.ImplementPropertyChanged]
-    public class MediaEncoderDeshakerSettings {
+    public class MediaEncoderDeshakerSettings : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public int Version { get; set; } = 19;
         public int Pass { get; set; } = 1;
         public float SourcePixelAspectRatio { get; set; } = 1;
@@ -163,8 +165,9 @@ namespace Business {
     }
 
     [Serializable()]
-    [PropertyChanged.ImplementPropertyChanged]
-    public class MediaEncoderDeshakerSegmentSettings {
+    public class MediaEncoderDeshakerSegmentSettings : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public int FrameStart { get; set; } = 0; // To apply settings for different segments of the clip
         public int BlockSize { get; set; } = 30;
         public int DifferentialSearchRange { get; set; } = 4;

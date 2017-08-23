@@ -5,15 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Business;
 using DataAccess;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -95,8 +89,9 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void DownloadBusiness_DownloadCompleted(object sender, DownloadCompletedEventArgs e) {
+            DownloadItemData IData = e.DownloadInfo.Data as DownloadItemData;
             if (e.DownloadInfo.IsCompleted && this.IsVisible && currentPage == downloadPage)
-                await PlayVideo(PlayerAccess.GetVideoById(e.DownloadInfo.Request.MediaId));
+                await PlayVideo(PlayerAccess.GetVideoById(IData.Media.MediaId));
         }
 
         private async Task PlayVideo(Media video) {

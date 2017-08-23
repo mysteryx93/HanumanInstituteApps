@@ -176,7 +176,8 @@ namespace DataAccess {
         /// <param name="preference">The preference between 0 and 10.</param>
         /// <returns>An integer representing its probability weight.</returns>
         private static int PreferenceToInt(double preference) {
-            return (int)(Math.Pow(preference, 1.4) * 100);
+            return (int)(Math.Pow(preference, 1.2) * 100);
+            // return (int)(preference * 100);
         }
 
         //public static void TestRandomness() {

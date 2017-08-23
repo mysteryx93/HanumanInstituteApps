@@ -7,15 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Business;
 using DataAccess;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     public partial class SetupWizardPage3 : Page {
@@ -55,8 +49,9 @@ namespace NaturalGroundingPlayer {
         }
 
         private async void DownloadBusiness_DownloadCompleted(object sender, DownloadCompletedEventArgs e) {
+            DownloadItemData IData = e.DownloadInfo.Data as DownloadItemData;
             if (e.DownloadInfo.IsCompleted) {
-                MediaList.business.RefreshPlaylist(e.DownloadInfo.Request, null);
+                MediaList.business.RefreshPlaylist(IData.Media, null);
                 await MediaList.LoadDataAsync();
             }
         }

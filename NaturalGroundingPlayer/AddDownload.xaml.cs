@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Business;
 using DataAccess;
-using YoutubeExtractor;
+using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -54,17 +45,11 @@ namespace NaturalGroundingPlayer {
             isUrlValid = false;
             ErrorText.Text = "";
             if (video.DownloadUrl.Length > 0) {
-                try {
-                    var VTask = DownloadBusiness.GetDownloadUrlsAsync(video.DownloadUrl);
-                    var VideoList = await VTask;
-                    VideoInfo FirstVid = VideoList.FirstOrDefault();
-                    if (FirstVid != null) {
-                        video.DownloadName = FirstVid.Title;
-                        isUrlValid = true;
-                    }
-                }
-                catch { }
-                if (!isUrlValid)
+                string VTitle = await DownloadManager.GetVideoTitle(video.DownloadUrl);
+                if (VTitle != null) {
+                    video.DownloadName = VTitle;
+                    isUrlValid = true;
+                } else
                     ErrorText.Text = "Please enter a valid URL";
             }
         }
@@ -104,7 +89,7 @@ namespace NaturalGroundingPlayer {
                 return false;
             }
 
-            if (SessionCore.Instance.Business.DownloadManager.IsDownloadDuplicate(video)) {
+            if (SessionCore.Instance.Business.DownloadManager.IsDownloadDuplicate(video.DownloadUrl)) {
                 ErrorText.Text = "You are already downloading this video.";
                 return false;
             }

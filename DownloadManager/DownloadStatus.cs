@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Business {
+﻿
+namespace EmergenceGuardian.Downloader {
     /// <summary>
     /// Represents the current status of a download.
     /// </summary>

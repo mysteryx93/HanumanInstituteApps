@@ -10,9 +10,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Business {
-    [PropertyChanged.ImplementPropertyChanged]
     [Serializable()]
-    public class MediaEncoderSettings {
+    public class MediaEncoderSettings : INotifyPropertyChanged {
+        [field:NonSerialized()]
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string FilePath { get; set; }
         public string DisplayName { get; set; }
         public bool ConvertToAvi { get; set; }
@@ -203,8 +205,6 @@ namespace Business {
         [XmlIgnore()]
         public bool IsSameSize { get; set; }
         [XmlIgnore()]
-        public int ResumeSegment { get; set; }
-        [XmlIgnore()]
         public long ResumePos { get; set; }
 
         [NonSerialized()]
@@ -212,21 +212,33 @@ namespace Business {
         [XmlIgnore()]
         public List<FFmpegProcess> Processes {
             get { return processes; }
-            set { processes = value; } }
+            set { processes = value; }
+        }
         [XmlIgnore()]
         public CompletionStatus CompletionStatus { get; set; }
 
         public string CustomScript { get; set; }
         public int JobIndex { get; set; }
+        [XmlIgnore()]
+        public int ParallelProcessing {
+            get {
+                return IncreaseFrameRate && IncreaseFrameRateSmooth ? Environment.ProcessorCount / 2 : 0;
+                // return IncreaseFrameRate && IncreaseFrameRateSmooth ? 2 : 0;
+            }
+        }
+        public int Threads {
+            get {
+                return IncreaseFrameRate && IncreaseFrameRateSmooth ? 1 : Environment.ProcessorCount;
+            }
+        }
 
         public MediaEncoderSettings() {
             JobIndex = -1;
-            ResumeSegment = 1;
             SourceColorMatrix = ColorMatrix.Rec601;
             SourceChromaPlacement = ChromaPlacement.MPEG2;
             OutputHeight = 768;
             Denoise = true;
-            DenoiseStrength = 15;
+            DenoiseStrength = 18;
             DenoiseD = 2;
             DenoiseA = 2;
             Degrain = false;
@@ -372,7 +384,7 @@ namespace Business {
 
         public bool IsAudioMp4 {
             get {
-                return string.IsNullOrEmpty(SourceAudioFormat) || new string[] { "AAC", "AC3", "MP3" }.Contains(SourceAudioFormat);
+                return string.IsNullOrEmpty(SourceAudioFormat) || new string[] { "AAC", "AC3", "MP3" }.Contains(SourceAudioFormat.ToUpper());
             }
         }
 
@@ -397,7 +409,7 @@ namespace Business {
         }
 
         public string ScriptFile {
-            get { return PathManager.GetScriptFile(JobIndex); }
+            get { return PathManager.GetScriptFile(JobIndex, -1); }
         }
 
         public string SettingsFile {
@@ -414,7 +426,11 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return PathManager.GetOutputFile(JobIndex, ResumeSegment, VideoCodec); }
+            get { return PathManager.GetOutputFile(JobIndex, ResumePos, VideoCodec); }
+        }
+
+        public string OutputScriptFile {
+            get { return PathManager.GetScriptFile(JobIndex, ResumePos); }
         }
 
         public string AudioFile {
