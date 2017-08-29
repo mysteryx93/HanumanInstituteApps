@@ -51,11 +51,11 @@ namespace Business {
                 return PreviewSourceFile;
         }
 
-        public static string GetOutputFile(int jobIndex, long resumePos, VideoCodecs codec) {
+        public static string GetOutputFile(int jobIndex, long resumePos, string ext) {
             if (resumePos > -1)
-                return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumePos, codec == VideoCodecs.Avi ? "avi" : "mkv");
+                return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumePos, ext);
             else
-                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumePos, codec == VideoCodecs.Avi ? "avi" : codec == VideoCodecs.Copy ? "mkv" : "mp4");
+                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumePos, ext);
         }
 
         public static string GetAudioFile(int jobIndex, AudioActions codec) {
@@ -63,24 +63,19 @@ namespace Business {
         }
 
         public static string GetAudioFileExtension(AudioActions codec) {
-            if (codec == AudioActions.EncodeAac)
+            if (codec == AudioActions.Aac)
                 return "aac";
-            else if (codec == AudioActions.EncodeFlac)
+            else if (codec == AudioActions.Flac)
                 return "flac";
-            else if (codec == AudioActions.EncodeOpus)
+            else if (codec == AudioActions.Opus)
                 return "opus";
             else
                 return "wav";
         }
 
-        public static string GetFinalFile(int jobIndex, VideoFormats codec) {
-            return string.Format("{0}Job{1}_Final.{2}", Settings.TempFilesPath, jobIndex, GetFileExtension(codec));
+        public static string GetFinalFile(int jobIndex, string container) {
+            return string.Format("{0}Job{1}_Final.{2}", Settings.TempFilesPath, jobIndex, container);
         }
-
-        public static string GetFileExtension(VideoFormats codec) {
-            return codec == VideoFormats.Mp4 ? "mp4" : "mkv";
-        }
-
 
         public static string GetTempFile(int jobIndex) {
             if (jobIndex >= 0)

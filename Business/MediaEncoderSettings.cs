@@ -11,10 +11,8 @@ using System.Collections.ObjectModel;
 
 namespace Business {
     [Serializable()]
-    public class MediaEncoderSettings : INotifyPropertyChanged {
-        [field:NonSerialized()]
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public class MediaEncoderSettings {
         public string FilePath { get; set; }
         public string DisplayName { get; set; }
         public bool ConvertToAvi { get; set; }
@@ -54,6 +52,8 @@ namespace Business {
         public int? SourceAudioBitrate { get; set; }
         [DefaultValue(null)]
         public string SourceVideoFormat { get; set; }
+        [DefaultValue(null)]
+        public int? SourceVideoBitrate { get; set; }
         public ColorMatrix SourceColorMatrix { get; set; }
         public ChromaPlacement SourceChromaPlacement { get; set; }
         public int? SourceBitDepth { get; set; }
@@ -69,6 +69,7 @@ namespace Business {
         public int DenoiseStrength { get; set; }
         public int DenoiseD { get; set; }
         public int DenoiseA { get; set; }
+        public bool FixDoubleFrames { get; set; }
         public bool Dering { get; set; }
         public bool Degrain { get; set; }
         public int DegrainStrength { get; set; }
@@ -136,15 +137,16 @@ namespace Business {
         public bool ChangeSpeed { get; set; }
         public float ChangeSpeedValue { get; set; }
 
-        private VideoCodecs videoCodec;
-        public VideoCodecs VideoCodec {
-            get { return videoCodec; }
+        private VideoAction videoAction;
+        public VideoAction VideoAction {
+            get { return videoAction; }
             set {
-                videoCodec = value;
-                if (videoCodec == VideoCodecs.Copy) {
+                videoAction = value;
+                if (videoAction == VideoAction.Copy) {
                     Trim = false;
                     ChangeSpeed = false;
                 }
+                SetContainer();
             }
         }
         public int EncodeQuality { get; set; }
@@ -154,20 +156,17 @@ namespace Business {
             get { return (int)EncodePreset; }
             set { EncodePreset = (EncodePresets)value; }
         }
-        public VideoFormats EncodeFormat { get; set; }
+        public string Container { get; set; }
         private AudioActions audioAction;
         public AudioActions AudioAction {
             get { return audioAction; }
             set {
                 audioAction = value;
-                if (audioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac || (audioAction == AudioActions.Copy && IsAudioMp4))
-                    EncodeFormat = VideoFormats.Mp4;
-                else if ((audioAction == AudioActions.Copy && !IsAudioMp4) || audioAction != AudioActions.Copy)
-                    EncodeFormat = VideoFormats.Mkv;
                 if (AudioAction == AudioActions.Copy) {
                     Trim = false;
                     ChangeSpeed = false;
                 }
+                SetContainer();
             }
         }
         public int AudioQuality { get; set; }
@@ -259,7 +258,7 @@ namespace Business {
             SSimSoft = false;
             TrimStart = 0;
             ChangeSpeedValue = 100;
-            VideoCodec = VideoCodecs.x265;
+            VideoAction = VideoAction.x265;
             EncodeQuality = 22;
             EncodePreset = EncodePresets.medium;
             AudioQuality = 256;
@@ -364,44 +363,77 @@ namespace Business {
             }
         }
 
-        public bool IsAudioEncode {
+        public void SetContainer() {
+            if (videoAction == VideoAction.Avi || videoAction == VideoAction.AviUtVideo || (videoAction == VideoAction.Copy && IsVideoAvi))
+                Container = "avi";
+            else if (videoAction == VideoAction.x264 || videoAction == VideoAction.x264_10bit || videoAction == VideoAction.x265 || videoAction == VideoAction.xvid || (videoAction == VideoAction.Copy && IsSourceVideoMp4)) {
+                if (audioAction == AudioActions.Aac || audioAction == AudioActions.Mp3 || audioAction == AudioActions.Discard || (audioAction == AudioActions.Copy && IsSourceAudioMp4))
+                    Container = "mp4";
+                else
+                    Container = "mkv";
+            } else if (videoAction == VideoAction.Discard) {
+                if (audioAction == AudioActions.Aac)
+                    Container = "m4a";
+                else if (audioAction == AudioActions.Flac)
+                    Container = "flac";
+                else if (audioAction == AudioActions.Opus)
+                    Container = "opus";
+                else if (audioAction == AudioActions.Wav)
+                    Container = "wav";
+                else if (audioAction == AudioActions.Mp3)
+                    Container = "mp3";
+                else
+                    Container = "";
+            } else
+                Container = "mkv";
+        }
+
+        public bool HasVideoOptions {
             get {
-                return AudioAction == AudioActions.EncodeAac || AudioAction == AudioActions.EncodeOpus || AudioAction == AudioActions.EncodeFlac || AudioAction == AudioActions.EncodeWav;
+                return videoAction == VideoAction.x264 || videoAction == VideoAction.x264_10bit || videoAction == VideoAction.x265;
+            }
+        }
+
+        public bool HasAudioOptions {
+            get {
+                return audioAction == AudioActions.Aac || audioAction == AudioActions.Opus || audioAction == AudioActions.Flac || audioAction == AudioActions.Wav || audioAction == AudioActions.Mp3;
             }
         }
 
         public bool IsAudioCompress {
             get {
-                return AudioAction == AudioActions.EncodeAac || AudioAction == AudioActions.EncodeOpus;
+                return AudioAction == AudioActions.Aac || AudioAction == AudioActions.Opus || audioAction == AudioActions.Mp3;
             }
         }
 
-        public bool CanEncodeMp4 {
+        public bool IsVideoAvi {
             get {
-                return IsAudioMp4 || AudioAction == AudioActions.Ignore || audioAction == AudioActions.EncodeAac;
+                return string.IsNullOrEmpty(SourceVideoFormat) || new string[] { "huffyuv", "utvideo" }.Contains(SourceVideoFormat.ToLower());
             }
         }
 
-        public bool IsAudioMp4 {
+        public bool IsSourceVideoMp4 {
             get {
-                return string.IsNullOrEmpty(SourceAudioFormat) || new string[] { "AAC", "AC3", "MP3" }.Contains(SourceAudioFormat.ToUpper());
+                return string.IsNullOrEmpty(SourceVideoFormat) || new string[] { "mpeg4", "h264", "hevc", "h263p", "h263i" }.Contains(SourceVideoFormat.ToLower());
+            }
+        }
+
+        public bool IsSourceAudioMp4 {
+            get {
+                return string.IsNullOrEmpty(SourceAudioFormat) || new string[] { "aac", "ac3", "mp3" }.Contains(SourceAudioFormat.ToLower());
             }
         }
 
         public bool CanCopyAudio {
             get {
-                return (IsAudioMp4 || EncodeFormat == VideoFormats.Mkv) && !Trim && !ChangeSpeed;
+                return !Trim && !ChangeSpeed;
             }
         }
 
         public bool CanAlterAudio {
             get {
-                return audioAction != AudioActions.Copy && VideoCodec != VideoCodecs.Copy;
+                return audioAction != AudioActions.Copy && VideoAction != VideoAction.Copy;
             }
-        }
-
-        public string FileExtension {
-            get { return PathManager.GetFileExtension(EncodeFormat); }
         }
 
         public bool HasFilePath {
@@ -426,7 +458,7 @@ namespace Business {
         }
 
         public string OutputFile {
-            get { return PathManager.GetOutputFile(JobIndex, ResumePos, VideoCodec); }
+            get { return PathManager.GetOutputFile(JobIndex, ResumePos, Container); }
         }
 
         public string OutputScriptFile {
@@ -438,7 +470,7 @@ namespace Business {
         }
 
         public string FinalFile {
-            get { return PathManager.GetFinalFile(JobIndex, EncodeFormat); }
+            get { return PathManager.GetFinalFile(JobIndex, Container); }
         }
 
         public string TempFile {
@@ -573,25 +605,25 @@ namespace Business {
         Bicubic
     }
 
-    public enum VideoCodecs {
+    public enum VideoAction {
         Copy,
+        Discard,
         x264,
+        x264_10bit,
         x265,
-        Avi
+        xvid,
+        Avi,
+        AviUtVideo
     }
-
-    public enum VideoFormats {
-        Mp4,
-        Mkv
-    }
-
+    
     public enum AudioActions {
         Copy,
-        Ignore,
-        EncodeWav,
-        EncodeFlac,
-        EncodeAac,
-        EncodeOpus
+        Discard,
+        Wav,
+        Flac,
+        Aac,
+        Opus,
+        Mp3
     }
 
     public enum EncodePresets {

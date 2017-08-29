@@ -72,7 +72,7 @@ namespace Business {
         /// </summary>
         /// <returns>The object created from the xml file</returns>
         public static SettingsFile Load() {
-            using (var stream = System.IO.File.OpenRead(Settings.SettingsPath)) {
+            using (var stream = System.IO.File.OpenRead(AppPaths.SettingsPath)) {
                 var serializer = new XmlSerializer(typeof(SettingsFile));
                 SettingsFile Result = serializer.Deserialize(stream) as SettingsFile;
                 if (Result.Zoom < 1)
@@ -87,10 +87,10 @@ namespace Business {
         /// Saves to an xml file
         /// </summary>
         public void Save() {
-            Directory.CreateDirectory(Path.GetDirectoryName(Settings.SettingsPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(AppPaths.SettingsPath));
             // Directory.CreateDirectory(NaturalGroundingFolder);
 
-            using (var writer = new System.IO.StreamWriter(Settings.SettingsPath)) {
+            using (var writer = new System.IO.StreamWriter(AppPaths.SettingsPath)) {
                 var serializer = new XmlSerializer(typeof(SettingsFile));
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");

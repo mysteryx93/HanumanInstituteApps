@@ -50,29 +50,5 @@ namespace Business {
 
         //public static string DownloadsFolder = "Downloads";
         public static int SimultaneousDownloads = 2;
-
-        public static readonly string[] VideoExtensions = new string[] { ".mp4", ".webm", ".avi", ".flv", ".mpg", ".mkv", ".wmv", ".tp", ".ts", ".mov", ".avs", ".m2v", ".vob" };
-        public static readonly string[] AudioExtensions = new string[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a", ".flac" };
-        public static readonly string[] ImageExtensions = new string[] { ".gif", ".jpg", ".png", ".bmp", ".tiff" };
-
-        public static readonly string SettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\Settings.xml");
-        public static readonly string UnhandledExceptionLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\Log.txt");
-        public static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\NaturalGroundingVideos.db");
-        public static readonly string InitialDatabasePath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "InitialDatabase.db");
-        public static readonly string AviSynthPluginsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Encoder\");
-        public static readonly string Player432hzScriptFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\432hzPlaying.avs");
-        public static readonly string Player432hzConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\432hzConfig.xml");
-        public static readonly string PowerliminalsPlayerConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Natural Grounding Player\PowerliminalsConfig.xml");
-
-        public static string[] GetMediaTypeExtensions(MediaType mediaType) {
-            if (mediaType == MediaType.Video)
-                return VideoExtensions;
-            else if (mediaType == MediaType.Audio)
-                return AudioExtensions;
-            else if (mediaType == MediaType.Image)
-                return ImageExtensions;
-            else
-                return null;
-        }
     }
 }

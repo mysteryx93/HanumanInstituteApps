@@ -266,7 +266,7 @@ namespace Business {
 
         public static bool AutoAttachFile(Media item, string fileName) {
             string FilePath;
-            foreach (string ext in Settings.GetMediaTypeExtensions(item.MediaType)) {
+            foreach (string ext in AppPaths.GetMediaTypeExtensions(item.MediaType)) {
                 FilePath = Settings.NaturalGroundingFolder + fileName + ext;
                 if (File.Exists(FilePath)) {
                     item.FileName = fileName + ext;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using EmergenceGuardian.FFmpeg;
 using EmergenceGuardian.WpfCommon;
+using Business;
 
 namespace EmergenceGuardian.AudioVideoMuxer {
     /// <summary>
@@ -24,8 +25,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
             InitializeComponent();
             // helper = new WindowHelper(this);
 
-            FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
-            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager(this);
+            AppPaths.ConfigureFFmpegPaths(this);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {

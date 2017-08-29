@@ -218,7 +218,8 @@ namespace NaturalGroundingPlayer {
                 menuSelectFile.Header = "_Select Existing Entry...";
             else
                 menuSelectFile.Header = "_Select Another File...";
-            menuDownloadVideo.IsEnabled = (!downloaded && (fileNotFound || video.FileName == null) && video.DownloadUrl.Length > 0);
+            // menuDownloadVideo.IsEnabled = (!downloaded && (fileNotFound || video.FileName == null) && video.DownloadUrl.Length > 0);
+            menuDownloadVideo.IsEnabled = video.DownloadUrl.Length > 0;
             menuExtractAudio.IsEnabled = (!fileNotFound && video.FileName != null);
             menuRemoveBinding.IsEnabled = (!isNew && video.FileName != null);
             menuDeleteVideo.IsEnabled = (!fileNotFound && video.FileName != null);
@@ -261,11 +262,11 @@ namespace NaturalGroundingPlayer {
                 Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
                 dlg.InitialDirectory = Settings.NaturalGroundingFolder;
                 if (video.MediaType == MediaType.Video)
-                    dlg.Filter = string.Format("Video Files|*{0})", string.Join(";*", Settings.VideoExtensions));
+                    dlg.Filter = string.Format("Video Files|*{0})", string.Join(";*", AppPaths.VideoExtensions));
                 else if (video.MediaType == MediaType.Audio)
-                    dlg.Filter = string.Format("Audio Files|*{0})", string.Join(";*", Settings.AudioExtensions));
+                    dlg.Filter = string.Format("Audio Files|*{0})", string.Join(";*", AppPaths.AudioExtensions));
                 else if (video.MediaType == MediaType.Image)
-                    dlg.Filter = string.Format("Image Files|*{0})", string.Join(";*", Settings.ImageExtensions));
+                    dlg.Filter = string.Format("Image Files|*{0})", string.Join(";*", AppPaths.ImageExtensions));
                 if (dlg.ShowDialog(IsLoaded ? this : Owner).Value == true) {
                     if (!dlg.FileName.StartsWith(Settings.NaturalGroundingFolder))
                         MessageBox.Show("You must select a file within your Natural Grounding folder.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -304,14 +305,15 @@ namespace NaturalGroundingPlayer {
             }
         }
 
-        private async void menuDownloadVideo_Click(object sender, RoutedEventArgs e) {
-            await menuDownloadVideo_ClickAsync();
+        private void menuDownloadVideo_Click(object sender, RoutedEventArgs e) {
+            DownloadWindow.Instance(video);
+            // await menuDownloadVideo_ClickAsync();
         }
 
-        private async Task menuDownloadVideo_ClickAsync() {
-            await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(video, -1, null);
-            downloaded = true;
-        }
+        //private async Task menuDownloadVideo_ClickAsync() {
+        //    await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(video, -1, null);
+        //    downloaded = true;
+        //}
 
         private async void menuExtractAudio_Click(object sender, RoutedEventArgs e) {
             if (video.FileName != null && File.Exists(Settings.NaturalGroundingFolder + video.FileName)) {
@@ -381,6 +383,13 @@ namespace NaturalGroundingPlayer {
                 business.Delete(video);
                 isFormSaved = true;
                 this.Close();
+            }
+        }
+
+        private void menuOpenFolder_Click(object sender, RoutedEventArgs e) {
+            if (video.FileName != null) {
+                string Args = "/select, \"" + Settings.NaturalGroundingFolder + video.FileName + "\"";
+                Process.Start("Explorer", Args);
             }
         }
 

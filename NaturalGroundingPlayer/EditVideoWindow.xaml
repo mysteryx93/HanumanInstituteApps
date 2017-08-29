@@ -78,16 +78,16 @@
             <TextBlock HorizontalAlignment="Left" Text="Depth" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="103,23,0,0" FontSize="10"/>
             <TextBlock HorizontalAlignment="Left" Text="Height" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="166,23,0,0" FontSize="10"/>
             <TextBlock HorizontalAlignment="Left" Text="Depth" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="200,23,0,0" FontSize="10"/>
-            <TextBlock x:Name="PMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,45,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="EMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,73,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="SMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,101,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="PFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,45,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="EFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,73,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="SFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,101,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="LoveValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,157,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="EgolessValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,129,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="Custom1ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,185,0,0" Foreground="#FF07D107"/>
-            <TextBlock x:Name="Custom2ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,214,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="PMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,44,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,68,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="SMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,92,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="PFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,44,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,68,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="SFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,92,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="LoveValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,140,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EgolessValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,116,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="Custom1ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,164,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="Custom2ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,188,0,0" Foreground="#FF07D107"/>
             <TextBlock HorizontalAlignment="Left" Margin="109,209,0,0" VerticalAlignment="Top" FontSize="10"><Run Text="Height * Depth * "/><Run Text="0"/><Run Text=".1"/><Run Text="1"/><Run Text=" = Power"/></TextBlock>
         </Grid>
         <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="10,276,0,0" VerticalAlignment="Top" Width="278" Foreground="Red" Grid.ColumnSpan="2" Height="16"/>
@@ -98,11 +98,12 @@
                     <MenuItem x:Name="menuEdit" Header="_Edit" Click="menuEdit_Click" />
                     <MenuItem x:Name="menuMoveFile" Header="_Move to Default Location" Click="menuMoveFile_Click" />
                     <MenuItem x:Name="menuSelectFile" Header="_Select Another File..." Click="menuSelectFile_Click" />
-                    <MenuItem x:Name="menuDownloadVideo" Header="Do_wnload File" Click="menuDownloadVideo_Click" />
+                    <MenuItem x:Name="menuDownloadVideo" Header="Do_wnload File..." Click="menuDownloadVideo_Click" />
                     <MenuItem x:Name="menuExtractAudio" Header="Extract _Audio..." Click="menuExtractAudio_Click" />
                     <MenuItem x:Name="menuRemoveBinding" Header="_Remove Binding" Click="menuRemoveBinding_Click" />
                     <MenuItem x:Name="menuDeleteVideo" Header="Delete Attached _File" Click="menuDeleteVideo_Click" />
                     <MenuItem x:Name="menuDeleteEntry" Header="_Delete This Entry" Click="menuDeleteEntry_Click" />
+                    <MenuItem x:Name="menuOpenFolder" Header="Open Folder" Click="menuOpenFolder_Click" />
                 </ContextMenu>
             </Button.ContextMenu>
         </Button>

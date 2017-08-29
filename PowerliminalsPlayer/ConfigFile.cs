@@ -31,9 +31,9 @@ namespace PowerliminalsPlayer {
         /// </summary>
         /// <returns>The object created from the xml file</returns>
         public static ConfigFile Load() {
-            if (File.Exists(Settings.PowerliminalsPlayerConfigFile)) {
+            if (File.Exists(AppPaths.PowerliminalsPlayerConfigFile)) {
                 try {
-                    using (var stream = System.IO.File.OpenRead(Settings.PowerliminalsPlayerConfigFile)) {
+                    using (var stream = System.IO.File.OpenRead(AppPaths.PowerliminalsPlayerConfigFile)) {
                         var serializer = new XmlSerializer(typeof(ConfigFile));
                         ConfigFile Result = serializer.Deserialize(stream) as ConfigFile;
                         return Result;
@@ -49,9 +49,9 @@ namespace PowerliminalsPlayer {
         /// Saves to an xml file
         /// </summary>
         public void Save() {
-            Directory.CreateDirectory(Path.GetDirectoryName(Settings.PowerliminalsPlayerConfigFile));
+            Directory.CreateDirectory(Path.GetDirectoryName(AppPaths.PowerliminalsPlayerConfigFile));
 
-            using (var writer = new System.IO.StreamWriter(Settings.PowerliminalsPlayerConfigFile)) {
+            using (var writer = new System.IO.StreamWriter(AppPaths.PowerliminalsPlayerConfigFile)) {
                 var serializer = new XmlSerializer(typeof(ConfigFile));
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");

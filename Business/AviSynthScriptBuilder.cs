@@ -112,7 +112,7 @@ namespace Business {
         /// Adds a line containing the plugin path. Must be called before loading any other plugin.
         /// </summary>
         public void AddPluginPath() {
-            AppendLine(@"P=""{0}""", GetAsciiPath(Settings.AviSynthPluginsPath));
+            AppendLine(@"P=""{0}""", GetAsciiPath(AppPaths.AviSynthPluginsPath));
             //AppendLine(@"AddAutoloadDir(P, true)");
             //AppendLine(@"AddAutoloadDir(P+""Shaders\"", true)");
         }

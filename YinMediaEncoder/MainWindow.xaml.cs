@@ -131,7 +131,7 @@ namespace YinMediaEncoder {
                     DisplayName = PlaylistItem.FileName;
                 }
             } else {
-                string ExtFilter = string.Format("Video Files|*{0}", string.Join(";*", Settings.VideoExtensions));
+                string ExtFilter = string.Format("Video Files|*{0}", string.Join(";*", AppPaths.VideoExtensions));
                 SelectedFile = FileFolderDialog.ShowFileDialog(Settings.NaturalGroundingFolder, ExtFilter);
                 DisplayName = SelectedFile;
             }
@@ -245,9 +245,12 @@ namespace YinMediaEncoder {
                 !encodeSettings.SourceAspectRatio.HasValue;
             if (Error)
                 MessageBox.Show(this, "You must enter required file information.", "Validation Error");
-            if (encodeSettings.Trim && encodeSettings.TrimStart.HasValue && encodeSettings.TrimEnd.HasValue && encodeSettings.TrimEnd < encodeSettings.TrimStart) {
+            else if (encodeSettings.Trim && encodeSettings.TrimStart.HasValue && encodeSettings.TrimEnd.HasValue && encodeSettings.TrimEnd < encodeSettings.TrimStart) {
                 Error = true;
                 MessageBox.Show(this, "Trim End must be greater than TrimStart.", "Validation Error");
+            } else if (string.IsNullOrEmpty(encodeSettings.Container)) {
+                Error = true;
+                MessageBox.Show(this, "You must select valid encoding options.");
             }
             return !Error;
         }
@@ -307,16 +310,6 @@ namespace YinMediaEncoder {
             CalculateAudioGain.Content = "Auto";
         }
 
-        private void Codec264Option_Click(object sender, RoutedEventArgs e) {
-            encodeSettings.EncodeQuality = 23;
-            encodeSettings.EncodePreset = EncodePresets.veryslow;
-        }
-
-        private void Codec265Option_Click(object sender, RoutedEventArgs e) {
-            encodeSettings.EncodeQuality = 22;
-            encodeSettings.EncodePreset = EncodePresets.medium;
-        }
-
         private void DeshakerSettingsButton_Click(object sender, RoutedEventArgs e) {
             if (Validate()) {
                 if (DeshakerWindow.Instance(business, encodeSettings) == true) {
@@ -372,6 +365,17 @@ namespace YinMediaEncoder {
             if (dataContext != null && e.LeftButton == MouseButtonState.Pressed) {
                 if (!business.IsEncoding || business.ProcessingQueue.IndexOf(dataContext) > 0)
                     EditEncodingTask(dataContext);
+            }
+        }
+
+        private void VideoActionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            VideoAction Value = (VideoAction)VideoActionCombo.SelectedIndex;
+            if (Value == VideoAction.x264 || Value == VideoAction.x264_10bit) {
+                encodeSettings.EncodeQuality = 23;
+                encodeSettings.EncodePreset = EncodePresets.veryslow;
+            } else if (Value == VideoAction.x265) {
+                encodeSettings.EncodeQuality = 22;
+                encodeSettings.EncodePreset = EncodePresets.medium;
             }
         }
     }

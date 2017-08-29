@@ -10,12 +10,12 @@ using YoutubeExplode.Models;
 using YoutubeExplode.Models.MediaStreams;
 using PropertyChanged;
 using EmergenceGuardian.FFmpeg;
+using Business;
 
 namespace EmergenceGuardian.YangYouTubeDownloader {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    [AddINotifyPropertyChangedInterface]
     public partial class MainWindow : Window {
         public DownloadManager Manager = new DownloadManager();
         public VideoInfo Info;
@@ -27,8 +27,7 @@ namespace EmergenceGuardian.YangYouTubeDownloader {
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
-            FFmpegConfig.FFmpegPath = "Encoder/ffmpeg.exe";
-            FFmpegConfig.UserInterfaceManager = new FFmpegUserInterfaceManager(this);
+            AppPaths.ConfigureFFmpegPaths(this);
 
             GridInfo.Visibility = Visibility.Hidden;
             DownloadsView.Visibility = Visibility.Hidden;
@@ -105,7 +104,7 @@ namespace EmergenceGuardian.YangYouTubeDownloader {
             string Destination = FileFolderDialog.ShowSaveFileDialog(null, Filter);
             if (!string.IsNullOrEmpty(Destination)) {
                 DownloadsView.Visibility = Visibility.Visible;
-                await Manager.DownloadVideoAsync(VideoUrl, Destination, TitleText.Text, DownloadAction.Download, null, Options, null);
+                await Manager.DownloadVideoAsync(VideoUrl, Destination, TitleText.Text, null, DownloadAction.Download, Options, null);
             }
         }
     }

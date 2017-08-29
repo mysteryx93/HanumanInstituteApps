@@ -33,7 +33,7 @@ namespace EmergenceGuardian.Downloader {
         /// <param name="video">The video to download.</param>
         /// <param name="upgradeAudio">If true, only the audio will be downloaded and it will be merged with the local video file.</param>
         /// <param name="callback">The method to call once download is completed.</param>
-        public async Task DownloadVideoAsync(string url, string destination, string description, DownloadAction action, EventHandler<DownloadCompletedEventArgs> callback, DownloadOptions options, object data) {
+        public async Task DownloadVideoAsync(string url, string destination, string description, EventHandler<DownloadCompletedEventArgs> callback, DownloadAction action, DownloadOptions options, object data) {
             if (IsDownloadDuplicate(url))
                 return;
 
@@ -296,8 +296,8 @@ namespace EmergenceGuardian.Downloader {
             //    MaxResolutionList = MaxResolutionList.Where(v => GetVideoFrameRate(v) == Framerate).ToList();
 
             MediaStreamInfo BestVideo = (from v in MaxResolutionList
-                                             // WebM VP9 encodes ~35% better. non-DASH is VP8 and isn't better than MP4.
-                                         let Preference = (int)((GetVideoEncoding(v) == VideoEncoding.Vp9) ? v.ContentLength * 1.35 : v.ContentLength)
+                                             // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
+                                         let Preference = (int)((GetVideoEncoding(v) == VideoEncoding.Vp9) ? v.ContentLength * 1.3 : v.ContentLength)
                                          where options.PreferredFormat == SelectStreamFormat.Best ||
                                             (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
                                             (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
@@ -327,30 +327,37 @@ namespace EmergenceGuardian.Downloader {
         public static int GetVideoHeight(MediaStreamInfo stream) {
             VideoStreamInfo VInfo = stream as VideoStreamInfo;
             MixedStreamInfo MInfo = stream as MixedStreamInfo;
-            if (VInfo == null && MInfo == null)
-                return 0;
-            VideoQuality Q = VInfo?.VideoQuality ?? MInfo.VideoQuality;
-            if (Q == VideoQuality.High4320)
-                return 4320;
-            else if (Q == VideoQuality.High3072)
-                return 3072;
-            else if (Q == VideoQuality.High2160)
-                return 2160;
-            else if (Q == VideoQuality.High1440)
-                return 1440;
-            else if (Q == VideoQuality.High1080)
-                return 1080;
-            else if (Q == VideoQuality.High720)
-                return 720;
-            else if (Q == VideoQuality.Medium480)
-                return 480;
-            else if (Q == VideoQuality.Medium360)
-                return 360;
-            else if (Q == VideoQuality.Low240)
-                return 240;
-            else if (Q == VideoQuality.Low144)
-                return 144;
-            else
+            if (VInfo != null) {
+                if (VInfo.VideoResolution != null)
+                    return VInfo.VideoResolution.Height;
+                else
+                    return 0;
+            }
+            else if (MInfo != null) {
+                VideoQuality Q = VInfo?.VideoQuality ?? MInfo.VideoQuality;
+                if (Q == VideoQuality.High4320)
+                    return 4320;
+                else if (Q == VideoQuality.High3072)
+                    return 3072;
+                else if (Q == VideoQuality.High2160)
+                    return 2160;
+                else if (Q == VideoQuality.High1440)
+                    return 1440;
+                else if (Q == VideoQuality.High1080)
+                    return 1080;
+                else if (Q == VideoQuality.High720)
+                    return 720;
+                else if (Q == VideoQuality.Medium480)
+                    return 480;
+                else if (Q == VideoQuality.Medium360)
+                    return 360;
+                else if (Q == VideoQuality.Low240)
+                    return 240;
+                else if (Q == VideoQuality.Low144)
+                    return 144;
+                else
+                    return 0;
+            } else
                 return 0;
         }
 

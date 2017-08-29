@@ -119,12 +119,12 @@ namespace Business {
                 if (settings.CompletionStatus == CompletionStatus.Success) {
                     // Encode audio stream
                     Task EncAudio = null;
-                    if (settings.IsAudioEncode)
+                    if (settings.HasAudioOptions)
                         EncAudio = Task.Run(() => AvisynthTools.EncodeAudio(settings));
 
                     // Encode video stream in segments
                     List<Task<CompletionStatus>> EncTasks = new List<Task<CompletionStatus>>();
-                    if (settings.VideoCodec != VideoCodecs.Copy) {
+                    if (settings.VideoAction != VideoAction.Copy) {
                         bool Cancel = false;
                         foreach (SegmentInfo seg in SegBusiness.SegLeft) {
                             MediaEncoderSettings EncSettings = settings.Clone();
@@ -188,9 +188,9 @@ namespace Business {
 
         private EncodingCompletedEventArgs FinalizeEncoding(MediaEncoderSettings settings, DateTime? startTime) {
             settings.ResumePos = -1;
-            string VideoFile = settings.VideoCodec == VideoCodecs.Copy ? VideoFile = settings.FilePath : VideoFile = settings.OutputFile;
+            string VideoFile = settings.VideoAction == VideoAction.Discard ? null : settings.VideoAction == VideoAction.Copy ? settings.FilePath : settings.OutputFile;
 
-            if (!File.Exists(settings.OutputFile) && settings.VideoCodec != VideoCodecs.Copy) {
+            if (!File.Exists(settings.OutputFile) && settings.VideoAction != VideoAction.Copy) {
                 // Merge segments.
                 settings.CompletionStatus = MergeSegments(settings, VideoFile);
                 if (settings.CompletionStatus != CompletionStatus.Success)
@@ -199,8 +199,13 @@ namespace Business {
 
             if (!File.Exists(settings.FinalFile)) {
                 // Muxe video with audio.
-                string AudioFile = settings.AudioAction == AudioActions.Ignore ? null : settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
-                settings.CompletionStatus = MediaMuxer.Muxe(VideoFile, AudioFile, settings.FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
+                string AudioFile = settings.AudioAction == AudioActions.Discard ? null : settings.AudioAction == AudioActions.Copy ? settings.FilePath : settings.AudioFile;
+                if (AudioFile == null)
+                    File.Move(VideoFile, settings.FinalFile);
+                else if (VideoFile == null)
+                    File.Move(AudioFile, settings.FinalFile);
+                else
+                    settings.CompletionStatus = MediaMuxer.Muxe(VideoFile, AudioFile, settings.FinalFile, new ProcessStartOptions(settings.JobIndex, "Muxing Audio and Video", false));
                 if (settings.CompletionStatus != CompletionStatus.Success)
                     return null;
 
@@ -220,7 +225,7 @@ namespace Business {
 
             List<string> SegmentList = new List<string>();
             foreach (SegmentInfo seg in segBusiness.SegDone) {
-                SegmentList.Add(PathManager.GetOutputFile(settings.JobIndex, seg.Start, settings.VideoCodec));
+                SegmentList.Add(PathManager.GetOutputFile(settings.JobIndex, seg.Start, settings.Container));
             }
 
             CompletionStatus Result = CompletionStatus.Success;
@@ -393,12 +398,12 @@ namespace Business {
         //}
 
         private async Task GetMediaInfo(string previewFile, MediaEncoderSettings settings) {
-            FFmpegProcess Worker = await Task.Run(() => MediaInfo.GetFileInfo(previewFile));
-            FFmpegVideoStreamInfo VInfo = Worker.VideoStream;
-            FFmpegAudioStreamInfo AInfo = settings.ConvertToAvi ? await Task.Run(() => MediaInfo.GetFileInfo(settings.FilePath).AudioStream) : Worker.AudioStream;
+            FFmpegProcess FInfo = await Task.Run(() => MediaInfo.GetFileInfo(previewFile));
+            FFmpegVideoStreamInfo VInfo = FInfo.VideoStream;
+            FFmpegAudioStreamInfo AInfo = settings.ConvertToAvi ? await Task.Run(() => MediaInfo.GetFileInfo(settings.FilePath).AudioStream) : FInfo.AudioStream;
 
-            settings.SourceWidth = Worker.VideoStream.Width;
-            settings.SourceHeight = Worker.VideoStream.Height;
+            settings.SourceWidth = FInfo.VideoStream.Width;
+            settings.SourceHeight = FInfo.VideoStream.Height;
             if (settings.SourceHeight > 768)
                 settings.OutputHeight = settings.SourceHeight.Value;
             settings.SourceAspectRatio = (float)VInfo.PixelAspectRatio;
@@ -416,17 +421,18 @@ namespace Business {
                 settings.SourceColorMatrix = VInfo.Height < 600 ? (IsTvRange ? ColorMatrix.Rec601 : ColorMatrix.Pc601) : (IsTvRange ? ColorMatrix.Rec709 : ColorMatrix.Pc709);
             settings.SourceChromaPlacement = string.Compare(VInfo.Format, "mpeg1video", true) == 0 ? ChromaPlacement.MPEG1 : ChromaPlacement.MPEG2;
             settings.DegrainPrefilter = VInfo.Height < 600 ? DegrainPrefilters.SD : DegrainPrefilters.HD;
-            settings.EncodeFormat = settings.CanEncodeMp4 ? VideoFormats.Mp4 : VideoFormats.Mkv;
+
+            settings.SourceVideoBitrate = (int)(new FileInfo(previewFile).Length / FInfo.FileDuration.TotalSeconds / 1024 * 8);
             settings.SourceAudioBitrate = AInfo.Bitrate;
-            if (!settings.IsAudioEncode)
+            if (!settings.HasAudioOptions)
                 settings.AudioQuality = AInfo.Bitrate > 0 ? AInfo.Bitrate : 256;
             if (settings.AudioQuality > 384)
                 settings.AudioQuality = 384;
             settings.SourceBitDepth = 8; // VInfo.BitDepth;
             settings.DenoiseD = 2;
             settings.DenoiseA = settings.SourceHeight < 720 ? 2 : 1;
-            settings.Position = Worker.FileDuration.TotalSeconds / 2;
-            settings.VideoCodec = settings.SourceHeight >= 1080 ? VideoCodecs.x264 : VideoCodecs.x265;
+            settings.Position = FInfo.FileDuration.TotalSeconds / 2;
+            settings.VideoAction = settings.SourceHeight >= 1080 ? VideoAction.x264 : VideoAction.x265;
             settings.EncodeQuality = settings.SourceHeight >= 1080 ? 23 : 22;
             settings.EncodePreset = settings.SourceHeight >= 1080 ? EncodePresets.veryslow : EncodePresets.medium;
             // Use Cache to open file when file is over 500MB
@@ -453,7 +459,7 @@ namespace Business {
         }
 
         public void FinalizeKeep(EncodingCompletedEventArgs jobInfo) {
-            string FinalFile = String.Format("{0} - Encoded.{1}", PathManager.GetPathWithoutExtension(jobInfo.OldFileName), jobInfo.Settings.FileExtension);
+            string FinalFile = String.Format("{0} - Encoded.{1}", PathManager.GetPathWithoutExtension(jobInfo.OldFileName), jobInfo.Settings.Container);
             PathManager.SafeMove(jobInfo.NewFileName, FinalFile);
         }
 

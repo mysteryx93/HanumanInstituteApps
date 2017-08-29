@@ -23,6 +23,8 @@ namespace Player432hz {
 
         public MainWindow() {
             InitializeComponent();
+            AppPaths.ConfigureFFmpegPaths(this);
+
             playManager.StartPlaying += PlayManager_StartPlaying;
             AudioPlayer.Player.MediaOpened += Player_MediaOpened;
             AudioPlayer.Player.MediaStop += Player_MediaStop;
@@ -149,10 +151,10 @@ namespace Player432hz {
 
         private void PlayManager_StartPlaying(object sender, PlayingEventArgs e) {
             NowPlayingLabel.Text = e.FileName;
-
+            AudioPlayer.Player.Source = null;
             FFmpegProcess infoReader = MediaInfo.GetFileInfo(e.FileName);
-            AutoPitchBusiness.CreateScript(e.FileName, infoReader, Settings.Player432hzScriptFile);
-            AudioPlayer.Player.Source = Settings.Player432hzScriptFile;
+            AutoPitchBusiness.CreateScript(e.FileName, infoReader, AppPaths.Player432hzScriptFile);
+            AudioPlayer.Player.Source = AppPaths.Player432hzScriptFile;
             posTimer.Stop();
             NowPlayingPos.Visibility = Visibility.Hidden;
         }

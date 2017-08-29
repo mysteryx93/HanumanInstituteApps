@@ -73,7 +73,7 @@ namespace Business {
         public static void SaveAudioToWav(MediaEncoderSettings settings, string destination, ProcessStartOptions options) {
             string TempFile = settings.TempFile + ".avs";
             AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
-            if (settings.VideoCodec != VideoCodecs.Copy) {
+            if (settings.VideoAction != VideoAction.Copy) {
                 // Read source script.
                 Script.Script = File.ReadAllText(settings.ScriptFile);
                 // Remote MT code.
@@ -295,16 +295,22 @@ namespace Business {
             CompletionStatus Result = CompletionStatus.None;
             File.Delete(settings.OutputFile);
             string Codec = "", Args = "";
-            if (settings.VideoCodec == VideoCodecs.x264) {
+            if (settings.VideoAction == VideoAction.x264) {
                 Codec = "libx264";
-                Args = string.Format("-psy-rd 1:0.05 -preset {0} -crf {1}", settings.EncodePreset, settings.EncodeQuality);
-            } else if (settings.VideoCodec == VideoCodecs.x265) {
+            } else if (settings.VideoAction == VideoAction.x265) {
                 Codec = "libx265";
                 Args = string.Format("-preset {0} -crf {1}", settings.EncodePreset, settings.EncodeQuality);
-            } else // AVI
+            } else if (settings.VideoAction == VideoAction.Avi)
+                Codec = "huffyuv";
+            else if (settings.VideoAction == VideoAction.AviUtVideo)
                 Codec = "utvideo";
+            else if (settings.VideoAction == VideoAction.xvid)
+                Codec = "xvid";
+            else if (settings.VideoAction == VideoAction.x264_10bit)
+                Args = string.Format("--preset {0} --crf {1}", settings.EncodePreset, settings.EncodeQuality);
+
             if (settings.ParallelProcessing > 1)
-                Args += " -threads 4";
+                Args += settings.VideoAction == VideoAction.x264_10bit ? " --threads 4" : " -threads 4";
 
             ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Processing Video", true).TrackProcess(settings);
             // Options.FrameCount = AvisynthTools.GetFrameCount(settings.ScriptFile, new ProcessStartOptions(settings.JobIndex, "Getting Frame Count", false).TrackProcess(settings));
@@ -316,10 +322,35 @@ namespace Business {
                 File.Delete(JobScript);
                 File.Copy(settings.ScriptFile, JobScript);
                 EditStartPosition(JobScript, settings.ResumePos, settings.ResumePos + frameCount - 1);
-                Result = MediaEncoder.Encode(JobScript, Codec, null, Args, settings.OutputFile, Options);
+                if (settings.VideoAction == VideoAction.x264_10bit)
+                    Result = EncodeX264_10bit(JobScript, Args, settings.OutputFile, Options);
+                else
+                    Result = MediaEncoder.Encode(JobScript, Codec, null, Args, settings.OutputFile, Options);
                 File.Delete(JobScript);
             } else
                 Result = settings.CompletionStatus;
+            return Result;
+        }
+
+        /// <summary>
+        /// Encodes an Avisynth script through X264 10bit.
+        /// </summary>
+        /// <param name="source">The script to encode.</param>
+        /// <param name="encodeArgs">Options for x264.</param>
+        /// <param name="destination">The destination file.</param>
+        /// <param name="options">The options for starting the process.</param>
+        /// <returns></returns>
+        public static CompletionStatus EncodeX264_10bit(string source, string encodeArgs, string destination, ProcessStartOptions options) {
+            File.Delete(destination);
+            StringBuilder Query = new StringBuilder("--demuxer y4m ");
+            Query.Append(encodeArgs);
+            Query.Append(" -o \"");
+            Query.Append(destination);
+            Query.Append("\" -");
+
+            // Run x264 with query.
+            FFmpegProcess Worker = new FFmpegProcess(options);
+            CompletionStatus Result = Worker.RunAvisynthToEncoder(source, Query.ToString(), EncoderApp.x264, AppPaths.X264Path);
             return Result;
         }
 
@@ -349,7 +380,7 @@ namespace Business {
         /// <returns>The endoding completion status..</returns>
         public static CompletionStatus EncodeAudio(MediaEncoderSettings settings) {
             CompletionStatus Result = CompletionStatus.Success;
-            string WavFile = PathManager.GetAudioFile(settings.JobIndex, AudioActions.EncodeWav);
+            string WavFile = PathManager.GetAudioFile(settings.JobIndex, AudioActions.Wav);
             ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Exporting Audio", false).TrackProcess(settings);
             if (!File.Exists(WavFile)) {
                 AvisynthTools.SaveAudioToWav(settings, WavFile, Options);
@@ -366,13 +397,13 @@ namespace Business {
             string DestFile = PathManager.GetAudioFile(settings.JobIndex, settings.AudioAction);
             if (!File.Exists(DestFile)) {
                 Options.Title = "Encoding Audio";
-                if (settings.AudioAction == AudioActions.EncodeOpus) {
+                if (settings.AudioAction == AudioActions.Opus) {
                     string Args = string.Format(@"--bitrate {0} ""{1}"" ""{2}""", settings.AudioQuality, WavFile, DestFile);
                     FFmpegProcess Worker = new FFmpegProcess(Options);
                     Result = Worker.Run("Encoder\\opusenc.exe", Args);
-                } else if (settings.AudioAction == AudioActions.EncodeAac || settings.AudioAction == AudioActions.EncodeFlac) {
+                } else if (settings.AudioAction == AudioActions.Aac || settings.AudioAction == AudioActions.Flac) {
                     Result = MediaEncoder.Encode(WavFile, null,
-                        settings.AudioAction == AudioActions.EncodeFlac ? "flac" : "aac",
+                        settings.AudioAction == AudioActions.Flac ? "flac" : "aac",
                         string.Format("-b:a {0}k", settings.AudioQuality),
                         DestFile,
                         Options);

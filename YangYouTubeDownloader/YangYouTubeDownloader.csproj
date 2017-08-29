@@ -130,6 +130,10 @@
       <Project>{c01178b4-a869-45f8-9b2b-7683f9ebb53d}</Project>
       <Name>FFmpeg</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Business\Business.csproj">
+      <Project>{f6b30751-62d4-4672-b96b-3d795687f9e2}</Project>
+      <Name>Business</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DownloadManager\DownloadManager.csproj">
       <Project>{103acd13-888b-49fb-bbe7-b34fc14f4152}</Project>
       <Name>DownloadManager</Name>

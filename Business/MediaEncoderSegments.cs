@@ -52,7 +52,7 @@ namespace Business {
 
             // Get list of output files in folder. The number after "_Output_" is the frame position of that segment.
             string FileName = string.Format("Job{0}_Output_", settings.JobIndex);
-            string FileNameExt = string.Format(".{0}", settings.VideoCodec == VideoCodecs.Avi ? "avi" : "mkv");
+            string FileNameExt = string.Format(".{0}", settings.Container);
             string[] SegFiles = Directory.GetFiles(Settings.TempFilesPath, FileName + "*" + FileNameExt);
 
             // Scan each segment file and discard files smaller than 10kb or of less than 10 frames.

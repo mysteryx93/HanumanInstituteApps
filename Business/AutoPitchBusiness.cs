@@ -40,8 +40,8 @@ namespace Business {
         }
 
         public static string GetAutoPitchFilePath(string fileName, string videoCodec) {
-            return Path.Combine(Settings.TempFilesPath, "Player.avs");
-            //string Result = string.Format("{0}432hz_{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName) , string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
+            //return Path.Combine(Settings.TempFilesPath, "Player.avs");
+            return string.Format("{0}432hz_{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName), string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
             //return Regex.Replace(Result, @"[^\u0000-\u007F]+", string.Empty);
         }
 
@@ -58,7 +58,8 @@ namespace Business {
                 //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
                 //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-                Script.OpenDirect(inputFile, infoReader.AudioStream != null, infoReader.VideoStream != null);
+                bool IsAudio = AppPaths.AudioExtensions.Contains(Path.GetExtension(inputFile).ToLower());
+                Script.OpenDirect(inputFile, infoReader.AudioStream != null, !IsAudio && infoReader.VideoStream != null);
                 Script.AppendLine("Preroll(int(FrameRate*3))");
                 // This causes a slight audio delay in AviSynth 2.6
                 Script.LoadPluginDll("TimeStretch.dll");

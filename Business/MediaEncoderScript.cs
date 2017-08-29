@@ -54,21 +54,31 @@ namespace Business {
             }
 
             // If possible, KNLMeans will output 16-bit frames before upscaling.
-            bool IsHD = (settings.Denoise || settings.Dering || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec709 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
+            bool IsHD = (settings.Dering || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec709 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
             bool IsColorMatrixHD = IsHD;
             bool IsChromaFixed = settings.SourceChromaPlacement == ChromaPlacement.MPEG2;
             if (IsHD) {
-                Script.LoadPluginDll("masktools2.dll");
                 Script.AppendLine("ConvertBits(16)");
                 if (settings.SourceColorMatrix != ColorMatrix.Rec709)
                     Script.AppendLine("[ColorMatrixShader]"); // Placeholder that will be replaced after generating the rest.
             }
 
             if (settings.Denoise) {
+                Script.LoadPluginDll("MvTools2.dll");
+                Script.LoadPluginDll("MaskTools2.dll");
                 Script.LoadPluginDll("FFT3DFilter.dll");
                 Script.LoadPluginDll("ModPlus.dll");
+                Script.LoadPluginDll("RgTools.dll");
                 Script.LoadPluginAvsi("MClean.avsi");
-                Script.AppendLine("MClean(450)");
+                Script.AppendLine("MClean(rn=10)");
+            }
+
+            if (settings.FixDoubleFrames) {
+                Script.LoadPluginDll("FrameRateConverter.dll");
+                Script.LoadPluginAvsi("FrameRateConverter.avsi");
+                Script.LoadPluginDll("MaskTools2.dll");
+                Script.LoadPluginDll("MvTools2.dll");
+                Script.AppendLine("InterpolateDoubles(.1)");
             }
 
             if (settings.Dering) {

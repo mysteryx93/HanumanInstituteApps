@@ -305,3 +305,24 @@ function FRC_GaussianBlur42(clip C,
     \    : (B.Width>8 && B.Height>8) ? B.GaussResize(w0, h0, p=p)
     \                                : B.BilinearResize(w0, h0)
 }
+
+
+function InterpolateDoubles(clip c, float "Thr", string "Preset", bool "Sep")
+{
+    Thr    = default(thr, .1)
+    Preset = default(Preset, "Normal")
+    Sep    = default(Sep, true)
+
+
+    even       = c.SeparateFields().SelectEven()
+    even_flow  = FrameRateConverter(even, Preset=preset, FrameDouble=true).SelectOdd()
+
+    odd        = c.SeparateFields().SelectOdd()
+    odd_flow   = FrameRateConverter(odd,  Preset=preset, FrameDouble=true).SelectOdd()
+
+    even_fixed = ConditionalFilterMT(even, even_flow, even, "YDifferenceFromPrevious", "lessthan", string(thr))
+    odd_fixed  = ConditionalFilterMT(odd,  odd_flow,  odd,  "YDifferenceFromPrevious", "lessthan", string(thr))
+
+    Interleave(even_fixed, odd_fixed)
+    return Weave()
+}

@@ -143,6 +143,9 @@
     <Reference Include="Xceed.Wpf.Toolkit, Version=3.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.3.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
+    <Reference Include="YoutubeExplode, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YoutubeExplode.3.2.3\lib\net45\YoutubeExplode.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -163,6 +166,9 @@
     </Compile>
     <Compile Include="DownloadPlaylistWindow.xaml.cs">
       <DependentUpon>DownloadPlaylistWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DownloadWindow.xaml.cs">
+      <DependentUpon>DownloadWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="InitializingWindow.xaml.cs">
       <DependentUpon>InitializingWindow.xaml</DependentUpon>
@@ -248,6 +254,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DownloadPlaylistWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DownloadWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

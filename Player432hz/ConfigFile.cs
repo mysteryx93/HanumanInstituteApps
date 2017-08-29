@@ -25,9 +25,9 @@ namespace Player432hz {
         /// </summary>
         /// <returns>The object created from the xml file</returns>
         public static ConfigFile Load() {
-            if (File.Exists(Settings.Player432hzConfigFile)) {
+            if (File.Exists(AppPaths.Player432hzConfigFile)) {
                 try {
-                    using (var stream = System.IO.File.OpenRead(Settings.Player432hzConfigFile)) {
+                    using (var stream = System.IO.File.OpenRead(AppPaths.Player432hzConfigFile)) {
                         var serializer = new XmlSerializer(typeof(ConfigFile));
                         ConfigFile Result = serializer.Deserialize(stream) as ConfigFile;
                         return Result;
@@ -42,9 +42,9 @@ namespace Player432hz {
         /// Saves to an xml file
         /// </summary>
         public void Save() {
-            Directory.CreateDirectory(Path.GetDirectoryName(Settings.Player432hzConfigFile));
+            Directory.CreateDirectory(Path.GetDirectoryName(AppPaths.Player432hzConfigFile));
 
-            using (var writer = new System.IO.StreamWriter(Settings.Player432hzConfigFile)) {
+            using (var writer = new System.IO.StreamWriter(AppPaths.Player432hzConfigFile)) {
                 var serializer = new XmlSerializer(typeof(ConfigFile));
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");

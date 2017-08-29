@@ -31,7 +31,7 @@ namespace Business {
         /// <param name="upgradeAudio">If true, only the audio will be downloaded and it will be merged with the local video file.</param>
         /// <param name="callback">The method to call once download is completed.</param>
         public async Task DownloadVideoAsync(Media video, int queuePos, EventHandler<DownloadCompletedEventArgs> callback) {
-            await DownloadVideoAsync(video, queuePos, callback, DownloadAction.Download);
+            await DownloadVideoAsync(video, queuePos, callback, DownloadAction.Download, null);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Business {
         /// <param name="queuePos">The position in the queue to auto-play, or -1.</param>
         /// <param name="upgradeAudio">If true, only the audio will be downloaded and it will be merged with the local video file.</param>
         /// <param name="callback">The method to call once download is completed.</param>
-        public async Task DownloadVideoAsync(Media video, int queuePos, EventHandler<DownloadCompletedEventArgs> callback, DownloadAction action) {
+        public async Task DownloadVideoAsync(Media video, int queuePos, EventHandler<DownloadCompletedEventArgs> callback, DownloadAction action, DownloadOptions options) {
             if (video == null || string.IsNullOrEmpty(video.DownloadUrl))
                 throw new ArgumentException("Video object is null or doesn't contain a valid YouTube URL.");
 
@@ -51,7 +51,7 @@ namespace Business {
             string DownloadDesc = Path.GetFileName(Destination);
             Directory.CreateDirectory(Settings.TempFilesPath);
 
-            await DownloadVideoAsync(video.DownloadUrl, Destination, DownloadDesc, action, callback, Options, new DownloadItemData(video, queuePos)).ConfigureAwait(false);
+            await DownloadVideoAsync(video.DownloadUrl, Destination, DownloadDesc, callback, action, options ?? Options, new DownloadItemData(video, queuePos)).ConfigureAwait(false);
         }
 
         protected override void OnMuxing(object sender, DownloadCompletedEventArgs e) {

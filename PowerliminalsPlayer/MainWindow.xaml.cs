@@ -18,6 +18,8 @@ namespace PowerliminalsPlayer {
 
         public MainWindow() {
             InitializeComponent();
+
+            AppPaths.ConfigureFFmpegPaths(this);
             config = ConfigFile.Load();
             RefreshFiles();
             this.DataContext = config;

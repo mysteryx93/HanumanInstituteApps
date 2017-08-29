@@ -35,7 +35,7 @@ namespace Business {
 
             if (CurrentVersion == null) {
                 // Check if database exists. If it doesn't, create blank database.
-                if (!File.Exists(Settings.DatabasePath) || new FileInfo(Settings.DatabasePath).Length == 0)
+                if (!File.Exists(AppPaths.DatabasePath) || new FileInfo(AppPaths.DatabasePath).Length == 0)
                     await CreateNewDatabaseAsync();
 
                 await TryUntilTimeout(() => VersionAccess.GetVersionInfo(), 10000);
@@ -61,7 +61,7 @@ namespace Business {
                     throw new Exception(string.Format("Database is outdated."));
 
                 GC.Collect();
-                await TryUntilTimeout(() => FileOperationAPIWrapper.MoveToRecycleBin(Settings.DatabasePath), 10000);
+                await TryUntilTimeout(() => FileOperationAPIWrapper.MoveToRecycleBin(AppPaths.DatabasePath), 10000);
                 isDatabaseRecreated = true;
                 await EnsureAvailableAsync();
 
@@ -88,8 +88,8 @@ namespace Business {
         /// </summary>
         private async Task CreateNewDatabaseAsync() {
             // Restore initial database into Data folder.
-            Directory.CreateDirectory(Path.GetDirectoryName(Settings.DatabasePath));
-            await CopyFileAsync(Settings.InitialDatabasePath, Settings.DatabasePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(AppPaths.DatabasePath));
+            await CopyFileAsync(AppPaths.InitialDatabasePath, AppPaths.DatabasePath);
         }
 
         public async Task CopyFileAsync(string sourcePath, string destinationPath) {
@@ -140,8 +140,8 @@ namespace Business {
         /// </summary>
         /// <param name="ex">The exception to log.</param>
         public void LogException(Exception ex) {
-            File.WriteAllText(Settings.UnhandledExceptionLogPath, ex.ToString());
-            Process.Start("notepad.exe", Settings.UnhandledExceptionLogPath);
+            File.WriteAllText(AppPaths.UnhandledExceptionLogPath, ex.ToString());
+            Process.Start("notepad.exe", AppPaths.UnhandledExceptionLogPath);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Business {
         }
 
         public static IEnumerable<string> GetAudioFiles(string path) {
-            return GetFiles(path, Settings.AudioExtensions, SearchOption.AllDirectories);
+            return GetFiles(path, AppPaths.AudioExtensions, SearchOption.AllDirectories);
         }
 
         private static IEnumerable<string> GetFiles(string path, string[] searchPatterns, SearchOption searchOption = SearchOption.TopDirectoryOnly) {

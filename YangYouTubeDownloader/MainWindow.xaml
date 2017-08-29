@@ -20,7 +20,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <TextBox x:Name="DownloadUrl" Height="23" Margin="10,34,87,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBox x:Name="DownloadUrl" Height="23" Margin="10,34,87,0" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" Text="Download URL" VerticalAlignment="Top"/>
         <Button x:Name="QueryButton" Content="Query" Margin="0,34,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" IsDefault="True" Click="QueryButton_Click"/>
         <Grid x:Name="GridInfo" Margin="10,64,10,137">

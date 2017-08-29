@@ -37,7 +37,7 @@ namespace Business {
                             if (VideoFormat == null || VideoFormat.BestVideo == null)
                                 SetStatus(item, VideoListItemStatusEnum.Failed);
                             else
-                                SetStatus(item, await IsHigherQualityAvailable(Settings.NaturalGroundingFolder + VideoData.FileName, VideoFormat));
+                                SetStatus(item, await IsHigherQualityAvailable(VideoFormat, Settings.NaturalGroundingFolder + VideoData.FileName));
                             if (VideoFormat != null && !string.IsNullOrEmpty(VideoFormat.StatusText))
                                 SetStatus(item, item.Status, item.StatusText + string.Format(" ({0})", VideoFormat.StatusText));
                         } else
@@ -66,35 +66,64 @@ namespace Business {
         }
 
         /// <summary>
+        /// Returns the InfoReader from the last call to IsHigherQualityAvailable.
+        /// Note: this is not thread-safe! Only works for 1 call at a time (per class instance).
+        /// </summary>
+        public FFmpegProcess LastInfoReader { get; set; }
+
+        /// <summary>
         /// Returns whether the local file should be replaced by the YouTube version.
         /// </summary>
-        /// <param name="localFile">A path to the local file.</param>
         /// <param name="serverFile">The information of the available server file.</param>
+        /// <param name="localFile">A path to the local file.</param>
         /// <returns>True if the local file should be replaced.</returns>
-        public async Task<VideoListItemStatusEnum> IsHigherQualityAvailable(string localFile, BestFormatInfo serverFile) {
+        public async Task<VideoListItemStatusEnum> IsHigherQualityAvailable(BestFormatInfo serverFile, string localFile) {
             // If there is no local file, it should be downloaded.
             if (!File.Exists(localFile))
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
-            // If local file is FLV and there's another format available, it should be downloaded.
+            // Read local file info.
             string LocalFileExt = Path.GetExtension(localFile).ToLower();
+            FFmpegProcess InfoReader = await Task.Run(() => MediaInfo.GetFileInfo(localFile));
+            LastInfoReader = InfoReader;
+
+            VideoListItemStatusEnum Result = IsHigherQualityAvailableInternal(serverFile, localFile, InfoReader);
+
+            if (Result == VideoListItemStatusEnum.OK) {
+                // Check if video has right container.
+                string VFormat = InfoReader.VideoStream?.Format;
+                string AFormat = InfoReader.AudioStream?.Format;
+                VFormat = VFormat?.ToLower();
+                AFormat = AFormat?.ToLower();
+                if (VFormat == "h264" && (AFormat == null || AFormat == "aac") && LocalFileExt != ".mp4")
+                    return VideoListItemStatusEnum.WrongContainer;
+                else if (VFormat == "webm" && (AFormat == null || AFormat == "opus" || AFormat == "vorbis") && LocalFileExt != ".webm")
+                    return VideoListItemStatusEnum.WrongContainer;
+                else
+                    return VideoListItemStatusEnum.OK;
+            } else
+                return Result;
+        }
+
+        public VideoListItemStatusEnum IsHigherQualityAvailableInternal(BestFormatInfo serverFile, string localFile, FFmpegProcess InfoReader) {
+            string LocalFileExt = Path.GetExtension(localFile).ToLower();
+            // If local file is FLV and there's another format available, it should be downloaded.
             if (LocalFileExt == ".flv" && serverFile.BestVideo.Container != Container.Flv)
                 return VideoListItemStatusEnum.HigherQualityAvailable;
 
             // Original VCD files and files of unrecognized extensions should not be replaced.
-            FFmpegProcess InfoReader = await Task.Run(() => MediaInfo.GetFileInfo(localFile));
             if (!DownloadManager.DownloadedExtensions.Contains(LocalFileExt) || InfoReader?.VideoStream?.Format == "mpeg1video") {
                 serverFile.StatusText = "Not from YouTube";
                 return VideoListItemStatusEnum.OK;
             }
 
-            // For server file size, estimate 10% extra for audio. Estimate 35% advantage for VP9 format. non-DASH WebM is VP8 and doesn't have that bonus.
-            long ServerFileSize = (long)(serverFile.BestVideo.ContentLength * 1.1);
+            // For server file size, estimate 4% extra for audio. Estimate 30% advantage for VP9 format. non-DASH WebM is VP8 and doesn't have that bonus.
+            long ServerFileSize = (long)(serverFile.BestVideo.ContentLength * 1.04);
             if (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp9)
-                ServerFileSize = (long)(ServerFileSize * 1.35);
+                ServerFileSize = (long)(ServerFileSize * 1.3);
             long LocalFileSize = new FileInfo(localFile).Length;
             if (InfoReader?.VideoStream?.Format == "vp9")
-                LocalFileSize = (long)(LocalFileSize * 1.35);
+                LocalFileSize = (long)(LocalFileSize * 1.3);
 
             // If server resolution is better, download unless local file is bigger.
             int LocalFileHeight = InfoReader?.VideoStream?.Height ?? 0;
@@ -116,21 +145,28 @@ namespace Business {
             if (ServerFileSize > LocalFileSize * 1.15)
                 DownloadVideo = true;
             // If PreferredFormat is set to a format, download that format.
-            else if (Manager.Options.PreferredFormat == SelectStreamFormat.MP4 && InfoReader.VideoStream?.Format == "vp9" && (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.H264 || DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.H263))
-                DownloadVideo = true;
-            else if (Manager.Options.PreferredFormat == SelectStreamFormat.VP9 && InfoReader.VideoStream?.Format == "h264" && (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp9 || DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp8))
-                DownloadVideo = true;
+            else if (Manager != null) {
+                if (Manager.Options.PreferredFormat == SelectStreamFormat.MP4 && InfoReader.VideoStream?.Format == "vp9" && (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.H264 || DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.H263))
+                    DownloadVideo = true;
+                else if (Manager.Options.PreferredFormat == SelectStreamFormat.VP9 && InfoReader.VideoStream?.Format == "h264" && (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp9 || DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp8))
+                    DownloadVideo = true;
+            }
 
+            if (InfoReader.AudioStream == null)
+                DownloadAudio = true;
             // Can only upgrade is video length is same.
-            if (Math.Abs((InfoReader.FileDuration - serverFile.Duration).TotalSeconds) < 1) {
+            else if (Math.Abs((InfoReader.FileDuration - serverFile.Duration).TotalSeconds) < 1) {
                 // download audio and merge with local video.
-                string LocalAudio = InfoReader?.AudioStream?.Format;
+                string LocalAudio = InfoReader.AudioStream.Format;
                 AudioEncoding RemoteAudio = serverFile.BestAudio?.AudioEncoding ?? AudioEncoding.Aac;
-                int LocalAudioBitRate = InfoReader?.AudioStream?.Bitrate ?? 0;
-                if (LocalAudioBitRate == 0 && LocalAudio == "opus" || LocalAudio == "vorbis")
-                    LocalAudioBitRate = 160; // FFmpeg doesn't return bitrate of Opus and Vorbis audios, but it's 160.
+                if (InfoReader.AudioStream.Bitrate == 0 && LocalAudio == "opus" || LocalAudio == "vorbis")
+                    InfoReader.AudioStream.Bitrate = 160; // FFmpeg doesn't return bitrate of Opus and Vorbis audios, but it's 160.
+                if (InfoReader.AudioStream.Bitrate == 0)
+                    InfoReader.AudioStream.Bitrate = GetAudioBitrateMuxe(localFile);
+                int LocalAudioBitRate = InfoReader.AudioStream.Bitrate;
                 long ServerAudioBitRate = serverFile.BestAudio != null ? serverFile.BestAudio.Bitrate / 1024 : 0;
                 // MediaInfo returns no bitrate for MKV containers with AAC audio.
+                InfoReader.AudioStream.Bitrate = 160;
                 if (LocalAudioBitRate > 0 || LocalFileExt != ".mkv") {
                     if ((LocalAudioBitRate == 0 || LocalAudioBitRate < ServerAudioBitRate * .8))
                         DownloadAudio = true;
@@ -147,17 +183,7 @@ namespace Business {
             else if (DownloadAudio)
                 return VideoListItemStatusEnum.BetterAudioAvailable;
 
-            // Check if video has right container.
-            string VFormat = InfoReader.VideoStream?.Format;
-            string AFormat = InfoReader.AudioStream?.Format;
-            VFormat = VFormat?.ToLower();
-            AFormat = AFormat?.ToLower();
-            if (VFormat == "h264" && (AFormat == null || AFormat == "aac") && LocalFileExt != ".mp4")
-                return VideoListItemStatusEnum.WrongContainer;
-            else if (VFormat == "webm" && (AFormat == null || AFormat == "opus" || AFormat == "vorbis") && LocalFileExt != ".webm")
-                return VideoListItemStatusEnum.WrongContainer;
-            else
-                return VideoListItemStatusEnum.OK;
+            return VideoListItemStatusEnum.OK;
         }
 
         public async Task StartDownload(List<VideoListItem> selection, CancellationToken cancel) {
@@ -186,7 +212,7 @@ namespace Business {
                     await Manager.DownloadVideoAsync(ItemData, -1,
                         (sender, e) => {
                             SetStatus(item, e.DownloadInfo.IsCompleted ? VideoListItemStatusEnum.Done : VideoListItemStatusEnum.Failed);
-                        }, action);
+                        }, action, null);
                 }
             }
         }
@@ -229,6 +255,17 @@ namespace Business {
 
             // Store results in cache.
             scanResults[item.MediaId.Value] = new ScanResultItem(item.Status, item.StatusText);
+        }
+
+        public static int GetAudioBitrateMuxe(string file) {
+            int Result = 0;
+            string TmpFile = Settings.TempFilesPath + "GetBitrate - " + Path.GetFileNameWithoutExtension(file) + ".aac";
+            if (MediaMuxer.Muxe(null, file, TmpFile) == CompletionStatus.Success) {
+                FFmpegProcess InfoReader = MediaInfo.GetFileInfo(TmpFile);
+                Result = InfoReader.AudioStream?.Bitrate ?? 0;
+            }
+            File.Delete(TmpFile);
+            return Result;
         }
     }
 

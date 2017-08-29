@@ -32,118 +32,118 @@
         <TabControl x:Name="SettingsTab" Margin="10,35,0,12" Background="Transparent" HorizontalAlignment="Left" Width="376" TabIndex="5" KeyboardNavigation.TabNavigation="Local" IsSynchronizedWithCurrentItem="True">
             <TabItem x:Name="TabTransform" Header="Transform" TabIndex="6">
                 <Grid Background="Transparent">
-                    <CheckBox x:Name="IncreaseFrameRateCheckbox" Content="Increase Frame Rate" HorizontalAlignment="Left" Margin="7,201,0,0" VerticalAlignment="Top" IsChecked="{Binding IncreaseFrameRate}" TabIndex="30"/>
-                    <CheckBox x:Name="CropCheckbox" Content="Crop" HorizontalAlignment="Left" Margin="7,225,0,0" VerticalAlignment="Top" IsChecked="{Binding Crop}" TabIndex="33" />
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="84,224,0,0" VerticalAlignment="Top" Width="40" TabIndex="34" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
+                    <CheckBox x:Name="IncreaseFrameRateCheckbox" Content="Increase Frame Rate" HorizontalAlignment="Left" Margin="7,213,0,0" VerticalAlignment="Top" IsChecked="{Binding IncreaseFrameRate}" TabIndex="30"/>
+                    <CheckBox x:Name="CropCheckbox" Content="Crop" HorizontalAlignment="Left" Margin="7,237,0,0" VerticalAlignment="Top" IsChecked="{Binding Crop}" TabIndex="33" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="84,236,0,0" VerticalAlignment="Top" Width="40" TabIndex="34" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
                         <Binding Path="CropLeft" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="60,225,0,0" Text="Left" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="155,224,0,0" VerticalAlignment="Top" Width="40" TabIndex="35" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
+                    <TextBlock HorizontalAlignment="Left" Margin="60,237,0,0" Text="Left" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="155,236,0,0" VerticalAlignment="Top" Width="40" TabIndex="35" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
                         <Binding Path="CropTop" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="130,225,0,0" Text="Top" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="234,224,0,0" VerticalAlignment="Top" Width="40" TabIndex="36" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
+                    <TextBlock HorizontalAlignment="Left" Margin="130,237,0,0" Text="Top" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="234,236,0,0" VerticalAlignment="Top" Width="40" TabIndex="36" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
                         <Binding Path="CropRight" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="202,225,0,0" Text="Right" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="323,224,0,0" VerticalAlignment="Top" Width="40" TabIndex="37" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
+                    <TextBlock HorizontalAlignment="Left" Margin="202,237,0,0" Text="Right" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="323,236,0,0" VerticalAlignment="Top" Width="40" TabIndex="37" IsEnabled="{Binding IsChecked, ElementName=CropCheckbox}">
                         <Binding Path="CropBottom" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="280,225,0,0" Text="Bottom" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="97,250,0,0" VerticalAlignment="Top" Width="68" TabIndex="38">
+                    <TextBlock HorizontalAlignment="Left" Margin="280,237,0,0" Text="Bottom" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="97,262,0,0" VerticalAlignment="Top" Width="68" TabIndex="38">
                         <Binding Path="OutputHeight" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="10000" Mod="4"/>
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <CheckBox x:Name="DeringCheckbox" Content="Dering" HorizontalAlignment="Left" Margin="7,107,0,0" VerticalAlignment="Top" IsChecked="{Binding Dering}" TabIndex="18"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="7,373,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio cannot be copied with the following option"/>
-                    <CheckBox x:Name="TrimCheckbox" Content="Trim" HorizontalAlignment="Left" Margin="7,397,0,0" VerticalAlignment="Top" IsChecked="{Binding Trim}" TabIndex="60" IsEnabled="{Binding CanAlterAudio}"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="115,396,0,0" VerticalAlignment="Top" Width="60" TabIndex="61" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimStart, Converter={StaticResource MediaTimeConverter}}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="84,397,0,0" Text="Start" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="220,396,0,0" VerticalAlignment="Top" Width="60" TabIndex="62" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimEnd, Converter={StaticResource MediaTimeConverter}}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="193,397,0,0" Text="End" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="ChangeSpeedCheckbox" Content="Change Speed (1-200 %)" HorizontalAlignment="Left" Margin="7,422,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeSpeed}" TabIndex="63" IsEnabled="{Binding CanAlterAudio}"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="170,421,0,0" VerticalAlignment="Top" Width="40" TabIndex="64" IsEnabled="{Binding IsChecked, ElementName=ChangeSpeedCheckbox}">
+                    <CheckBox x:Name="DeringCheckbox" Content="Dering" HorizontalAlignment="Left" Margin="7,119,0,0" VerticalAlignment="Top" IsChecked="{Binding Dering}" TabIndex="18"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="7,381,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio cannot be copied with the following option"/>
+                    <CheckBox x:Name="TrimCheckbox" Content="Trim" HorizontalAlignment="Left" Margin="7,405,0,0" VerticalAlignment="Top" IsChecked="{Binding Trim}" TabIndex="60" IsEnabled="{Binding CanAlterAudio}"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="115,404,0,0" VerticalAlignment="Top" Width="60" TabIndex="61" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimStart, Converter={StaticResource MediaTimeConverter}}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="84,405,0,0" Text="Start" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="220,404,0,0" VerticalAlignment="Top" Width="60" TabIndex="62" IsEnabled="{Binding IsChecked, ElementName=TrimCheckbox}" Text="{Binding TrimEnd, Converter={StaticResource MediaTimeConverter}}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="193,405,0,0" Text="End" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="ChangeSpeedCheckbox" Content="Change Speed (1-200 %)" HorizontalAlignment="Left" Margin="7,430,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeSpeed}" TabIndex="63" IsEnabled="{Binding CanAlterAudio}"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="170,429,0,0" VerticalAlignment="Top" Width="40" TabIndex="64" IsEnabled="{Binding IsChecked, ElementName=ChangeSpeedCheckbox}">
                         <Binding Path="ChangeSpeedValue">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="200" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <ComboBox HorizontalAlignment="Left" Margin="147,198,0,0" VerticalAlignment="Top" Width="70" TabIndex="31" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" SelectedValue="" SelectedIndex="{Binding IncreaseFrameRateValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox HorizontalAlignment="Left" Margin="147,210,0,0" VerticalAlignment="Top" Width="70" TabIndex="31" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" SelectedValue="" SelectedIndex="{Binding IncreaseFrameRateValue, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <ComboBoxItem Content="Double" IsSelected="True" />
                         <ComboBoxItem Content="30 fps" />
                         <ComboBoxItem Content="60 fps" />
                         <ComboBoxItem Content="120 fps" />
                     </ComboBox>
-                    <CheckBox x:Name="DenoiseCheckbox" Content="Denoise Str (1-50)" HorizontalAlignment="Left" Margin="7,129,0,0" VerticalAlignment="Top" IsChecked="{Binding Denoise}" TabIndex="19"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="137,128,0,0" VerticalAlignment="Top" Width="50" TabIndex="20" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
+                    <CheckBox x:Name="DenoiseCheckbox" Content="Denoise Str (1-50)" HorizontalAlignment="Left" Margin="7,141,0,0" VerticalAlignment="Top" IsChecked="{Binding Denoise}" TabIndex="19"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="137,140,0,0" VerticalAlignment="Top" Width="50" TabIndex="20" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
                         <Binding Path="DenoiseStrength" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="50" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,251,0,0" Text="Output Height" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,9,0,0" VerticalAlignment="Top" Width="75" TabIndex="10">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,263,0,0" Text="Output Height" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,3,0,0" VerticalAlignment="Top" Width="75" TabIndex="10">
                         <Binding Path="SourceWidth" TargetNullValue="">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" AllowNull="True" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"><Run Text="Source "/><Run Text="Width"/></TextBlock>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,34,0,0" VerticalAlignment="Top" Width="75" TabIndex="11">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top"><Run Text="Source "/><Run Text="Width"/></TextBlock>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,26,0,0" VerticalAlignment="Top" Width="75" TabIndex="11">
                         <Binding Path="SourceHeight" TargetNullValue="">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" AllowNull="True" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock Margin="10,35,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Source "/><Run Text="Height"/></TextBlock>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,34,0,0" VerticalAlignment="Top" Width="75" TabIndex="14">
+                    <TextBlock Margin="10,27,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Source "/><Run Text="Height"/></TextBlock>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,26,0,0" VerticalAlignment="Top" Width="75" TabIndex="14">
                         <Binding Path="SourceAspectRatio" StringFormat="0.####">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0.0001" AllowNull="True" ValidatesOnTargetUpdated="True" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="178,35,0,0" VerticalAlignment="Top"><Run Text="Pixel Aspect "/><Run Text="R"/><Run Text="atio"/></TextBlock>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,9,0,0" VerticalAlignment="Top" Width="75" TabIndex="13">
+                    <TextBlock HorizontalAlignment="Left" Margin="178,27,0,0" VerticalAlignment="Top"><Run Text="Pixel Aspect "/><Run Text="R"/><Run Text="atio"/></TextBlock>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,3,0,0" VerticalAlignment="Top" Width="75" TabIndex="13">
                         <Binding Path="SourceFrameRate" TargetNullValue="">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" AllowNull="True" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="212,10,0,0" VerticalAlignment="Top" Text="Frame Rate"/>
-                    <TextBlock Margin="10,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="F"/><Run Text="ormat"/></TextBlock>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,59,0,0" VerticalAlignment="Top" Width="75" TabIndex="12" IsReadOnly="True" Text="{Binding SourceAudioFormat}" />
-                    <TextBlock Margin="200,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="Bitrate"/></TextBlock>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,59,0,0" VerticalAlignment="Top" Width="75" TabIndex="15" IsReadOnly="True" Text="{Binding SourceAudioBitrate}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Text="Color Matrix"/>
-                    <CheckBox Content="Smooth" HorizontalAlignment="Left" Margin="229,201,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" ToolTip="May cause more artifacts" IsChecked="{Binding IncreaseFrameRateSmooth}" TabIndex="32" />
-                    <TextBlock HorizontalAlignment="Left" Margin="185,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding OutputWidth}" />
-                    <TextBlock HorizontalAlignment="Left" Margin="174,251,0,0" TextWrapping="Wrap" Text="x" VerticalAlignment="Top"/>
-                    <Grid Margin="7,278,0,0" x:Name="GridUpscale" Visibility="{Binding IsUpscaling, Converter={StaticResource VisibilityConverter}}" Height="90" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
+                    <TextBlock HorizontalAlignment="Left" Margin="212,4,0,0" VerticalAlignment="Top" Text="Frame Rate"/>
+                    <TextBlock Margin="10,73,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Audio Format" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,72,0,0" VerticalAlignment="Top" Width="75" TabIndex="12" IsReadOnly="True" Text="{Binding SourceAudioFormat}" />
+                    <TextBlock Margin="200,73,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Audio Bitrate" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,72,0,0" VerticalAlignment="Top" Width="75" TabIndex="15" IsReadOnly="True" Text="{Binding SourceAudioBitrate}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="10,98,0,0" VerticalAlignment="Top" Text="Color Matrix"/>
+                    <CheckBox Content="Smooth" HorizontalAlignment="Left" Margin="229,213,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=IncreaseFrameRateCheckbox}" ToolTip="May cause more artifacts" IsChecked="{Binding IncreaseFrameRateSmooth}" TabIndex="32" />
+                    <TextBlock HorizontalAlignment="Left" Margin="185,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding OutputWidth}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="174,263,0,0" TextWrapping="Wrap" Text="x" VerticalAlignment="Top"/>
+                    <Grid Margin="7,290,0,0" x:Name="GridUpscale" Visibility="{Binding IsUpscaling, Converter={StaticResource VisibilityConverter}}" Height="90" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
                         <TextBox HorizontalAlignment="Left" Height="21" Margin="136,60,0,0" VerticalAlignment="Top" Width="50" TabIndex="45" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}">
                             <Binding Path="SuperResStrength" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
@@ -180,7 +180,7 @@
                         <TextBlock HorizontalAlignment="Left" Margin="190,61,0,0" VerticalAlignment="Top"><Run Text="Soft (0-"/><Run Text="1"/><Run Text="00"/><Run Text=")"/><Run Text=" "/></TextBlock>
                         <CheckBox Content="SuperRes Multi-Passes" HorizontalAlignment="Left" Margin="187,42,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=SuperResCheckbox}" IsChecked="{Binding SuperRes3Passes}" TabIndex="47" />
                     </Grid>
-                    <Grid Margin="7,278,0,0" x:Name="GridDownscale" Visibility="{Binding IsDownscaling, Converter={StaticResource VisibilityConverter}}" Height="81" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
+                    <Grid Margin="7,290,0,0" x:Name="GridDownscale" Visibility="{Binding IsDownscaling, Converter={StaticResource VisibilityConverter}}" Height="81" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
                         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3,0,0,0"><Run Text="Downscale"/><Run Text=" Settings"/></TextBlock>
                         <TextBox HorizontalAlignment="Left" Height="21" Margin="136,20,0,0" VerticalAlignment="Top" Width="50" TabIndex="48">
                             <Binding Path="SSimStrength" UpdateSourceTrigger="PropertyChanged">
@@ -192,59 +192,62 @@
                         <CheckBox Content="Soft" HorizontalAlignment="Left" Margin="197,22,0,0" VerticalAlignment="Top" IsChecked="{Binding SSimSoft}" TabIndex="49" />
                         <TextBlock HorizontalAlignment="Left" Margin="19,21,0,0" VerticalAlignment="Top"><Run Text="Sharp"/><Run Text="ness"/><Run Text=" (0-100)"/></TextBlock>
                     </Grid>
-                    <CheckBox x:Name="DegrainCheckbox" Content="Degrain Str (1-200)" HorizontalAlignment="Left" Margin="7,154,0,0" VerticalAlignment="Top" IsChecked="{Binding Degrain}" TabIndex="23"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="137,153,0,0" VerticalAlignment="Top" Width="50" TabIndex="24" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}">
+                    <CheckBox x:Name="DegrainCheckbox" Content="Degrain Str (1-200)" HorizontalAlignment="Left" Margin="7,166,0,0" VerticalAlignment="Top" IsChecked="{Binding Degrain}" TabIndex="23"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="137,165,0,0" VerticalAlignment="Top" Width="50" TabIndex="24" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}">
                         <Binding Path="DegrainStrength" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="200" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <CheckBox Content="Sharp" HorizontalAlignment="Left" Margin="286,154,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}" IsChecked="{Binding DegrainSharp}" TabIndex="26" />
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="295,127,0,0" VerticalAlignment="Top" Width="25" TabIndex="21" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
+                    <CheckBox Content="Sharp" HorizontalAlignment="Left" Margin="286,166,0,0" VerticalAlignment="Top" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}" IsChecked="{Binding DegrainSharp}" TabIndex="26" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="295,139,0,0" VerticalAlignment="Top" Width="25" TabIndex="21" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
                         <Binding Path="DenoiseD" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="0" Max="3" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <TextBlock HorizontalAlignment="Left" Margin="199,128,0,0" VerticalAlignment="Top" Text="Time/Space (0-3)"/>
-                    <TextBox HorizontalAlignment="Left" Height="21" Margin="325,127,0,0" VerticalAlignment="Top" Width="25" TabIndex="22" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
+                    <TextBlock HorizontalAlignment="Left" Margin="199,140,0,0" VerticalAlignment="Top" Text="Time/Space (0-3)"/>
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="325,139,0,0" VerticalAlignment="Top" Width="25" TabIndex="22" IsEnabled="{Binding IsChecked, ElementName=DenoiseCheckbox}">
                         <Binding Path="DenoiseA" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <Business:NumericRangeRule Min="1" Max="3" />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>
-                    <ComboBox HorizontalAlignment="Left" Margin="91,82,0,0" VerticalAlignment="Top" Width="96" SelectedIndex="{Binding SourceColorMatrix, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="16">
+                    <ComboBox HorizontalAlignment="Left" Margin="91,95,0,0" VerticalAlignment="Top" Width="96" SelectedIndex="{Binding SourceColorMatrix, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="16">
                         <ComboBoxItem Content="Rec.601 (SD)" IsSelected="True" />
                         <ComboBoxItem Content="Rec.709 (HD)" />
                         <ComboBoxItem Content="PC.601" />
                         <ComboBoxItem Content="PC.709" />
                     </ComboBox>
-                    <CheckBox x:Name="DeshakerCheckbox" Content="Deshaker" HorizontalAlignment="Left" Margin="7,178,0,0" VerticalAlignment="Top" IsChecked="{Binding Deshaker}" TabIndex="27" />
-                    <Button x:Name="DeshakerSettingsButton" Content="Settings" HorizontalAlignment="Left" Margin="94,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerSettingsButton_Click" TabIndex="28" />
-                    <ComboBox HorizontalAlignment="Left" Margin="198,151,0,0" VerticalAlignment="Top" Width="79" SelectedIndex="{Binding DegrainPrefilter, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}" TabIndex="25">
+                    <CheckBox x:Name="DeshakerCheckbox" Content="Deshaker" HorizontalAlignment="Left" Margin="7,190,0,0" VerticalAlignment="Top" IsChecked="{Binding Deshaker}" TabIndex="27" />
+                    <Button x:Name="DeshakerSettingsButton" Content="Settings" HorizontalAlignment="Left" Margin="94,187,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerSettingsButton_Click" TabIndex="28" />
+                    <ComboBox HorizontalAlignment="Left" Margin="198,163,0,0" VerticalAlignment="Top" Width="79" SelectedIndex="{Binding DegrainPrefilter, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsChecked, ElementName=DegrainCheckbox}" TabIndex="25">
                         <ComboBoxItem Content="SD" IsSelected="True" />
                         <ComboBoxItem Content="HD" />
                         <ComboBoxItem Content="KNLMeans" />
                     </ComboBox>
-                    <ComboBox HorizontalAlignment="Left" Margin="193,82,0,0" VerticalAlignment="Top" Width="76" SelectedIndex="{Binding SourceChromaPlacement, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="17">
+                    <ComboBox HorizontalAlignment="Left" Margin="193,95,0,0" VerticalAlignment="Top" Width="76" SelectedIndex="{Binding SourceChromaPlacement, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="17">
                         <ComboBoxItem Content="MPEG1" />
                         <ComboBoxItem Content="MPEG2" IsSelected="True" />
                         <ComboBoxItem Content="DV" />
                     </ComboBox>
-                    <Button x:Name="DeshakerPrescanButton" Content="Prescan" HorizontalAlignment="Left" Margin="178,175,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerPrescanButton_Click" TabIndex="29" />
+                    <Button x:Name="DeshakerPrescanButton" Content="Prescan" HorizontalAlignment="Left" Margin="178,187,0,0" VerticalAlignment="Top" Width="75" Click="DeshakerPrescanButton_Click" TabIndex="29" />
+                    <TextBlock Margin="10,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Video Format" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="91,49,0,0" VerticalAlignment="Top" Width="75" TabIndex="12" IsReadOnly="True" Text="{Binding SourceVideoFormat}" />
+                    <TextBlock Margin="200,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Text="Video Bitrate" />
+                    <TextBox HorizontalAlignment="Left" Height="21" Margin="281,49,0,0" VerticalAlignment="Top" Width="75" TabIndex="15" IsReadOnly="True" Text="{Binding SourceVideoBitrate}" />
+                    <CheckBox x:Name="InterpolateDoublesCheckbox" Content="Fix Double Frames" HorizontalAlignment="Left" Margin="137,119,0,0" VerticalAlignment="Top" IsChecked="{Binding FixDoubleFrames}" TabIndex="18"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabEncoding" Header="Encoding" TabIndex="6">
                 <Grid Background="Transparent">
-                    <TextBlock HorizontalAlignment="Left" Margin="10,101,0,0" Text="Container" VerticalAlignment="Top"/>
-                    <RadioButton Content="MKV (can mix any audio wth any video)" HorizontalAlignment="Left" Margin="10,136,0,0" VerticalAlignment="Top" IsChecked="{Binding EncodeFormat, ConverterParameter={x:Static Business:VideoFormats.Mkv}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="77" GroupName="ContainerFormat" />
-                    <RadioButton Content="MP4 (more compatible, requires AAC, AC3 or MP3 audio)" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" IsChecked="{Binding EncodeFormat, ConverterParameter={x:Static Business:VideoFormats.Mp4}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="76" IsEnabled="{Binding CanEncodeMp4}" GroupName="ContainerFormat"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="11,13,0,0" VerticalAlignment="Top" FontWeight="Bold"><Run Text="Video Setti"/><Run Text="n"/><Run Text="gs"/></TextBlock>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio Settings"/>
-                    <Grid HorizontalAlignment="Left" Height="86" Margin="28,298,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding IsAudioEncode}">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,242,0,0" Text="Container" VerticalAlignment="Top" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Video"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,117,0,0" VerticalAlignment="Top" FontWeight="Bold" Text="Audio"/>
+                    <Grid HorizontalAlignment="Left" Height="86" Margin="20,141,0,0" VerticalAlignment="Top" Width="228" IsEnabled="{Binding HasAudioOptions}">
                         <TextBlock HorizontalAlignment="Left" Margin="1,6,0,0" VerticalAlignment="Top"><Run Text="Quality (kbps)"/></TextBlock>
                         <TextBlock Margin="1,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" ><Run Text="Audio "/><Run Text="Gain"/></TextBlock>
                         <TextBox HorizontalAlignment="Left" Height="21" Margin="86,29,0,0" VerticalAlignment="Top" Width="84" TabIndex="85">
@@ -264,11 +267,7 @@
                         <CheckBox Content="Convert 440hz Pitch to 432hz" HorizontalAlignment="Left" Margin="1,55,0,0" VerticalAlignment="Top" IsChecked="{Binding ChangeAudioPitch}" TabIndex="87" />
                         <Button x:Name="CalculateAudioGain" Content="Auto" HorizontalAlignment="Left" Margin="175,28,0,0" VerticalAlignment="Top" Width="40" TabIndex="86" Click="CalculateAudioGain_Click"/>
                     </Grid>
-                    <RadioButton x:Name="VideoCopyOption" Content="Copy" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="70"/>
-                    <RadioButton x:Name="Codec264Option" Content="x264" HorizontalAlignment="Left" Margin="77,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x264}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="71" Click="Codec264Option_Click"/>
-                    <RadioButton x:Name="Codec265Option" Content="x265" HorizontalAlignment="Left" Margin="143,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.x265}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="72" Click="Codec265Option_Click"/>
-                    <RadioButton x:Name="CodecAviOption" Content="AVI (lossless)" HorizontalAlignment="Left" Margin="212,34,0,0" VerticalAlignment="Top" GroupName="VideoCodec" IsChecked="{Binding VideoCodec, ConverterParameter={x:Static Business:VideoCodecs.Avi}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="73" />
-                    <Grid HorizontalAlignment="Left" Height="52" Margin="29,49,0,0" VerticalAlignment="Top" Width="341" IsEnabled="{Binding IsChecked, Converter={StaticResource InverseBooleanConverter}, ElementName=VideoCopyOption}">
+                    <Grid HorizontalAlignment="Left" Height="52" Margin="20,37,0,0" VerticalAlignment="Top" Width="341" IsEnabled="{Binding HasVideoOptions}" >
                         <TextBlock HorizontalAlignment="Left" Margin="0,6,0,0" VerticalAlignment="Top"><Run Text="Quality"/><Run Text=" "/><Run Text="(30="/><Run Text="Low"/><Run Text=", "/><Run Text="1"/><Run Text="6"/><Run Text="="/><Run Text="High)"/></TextBlock>
                         <TextBlock HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top" ><Run Text="Preset"/><Run Text=" (slower = "/><Run Text="smaller "/><Run Text="file"/><Run Text=")"/></TextBlock>
                         <Slider x:Name="slider" HorizontalAlignment="Left" Margin="167,28,0,0" VerticalAlignment="Top" Width="104" Minimum="0" Maximum="6" SmallChange="1" TickPlacement="BottomRight" Value="{Binding EncodePresetInt}" Foreground="#FFA0A0A0" TabIndex="75" />
@@ -276,12 +275,26 @@
                         <Slider x:Name="slider_Copy" HorizontalAlignment="Left" Margin="167,3,0,0" VerticalAlignment="Top" Width="104" Minimum="16" Maximum="30" SmallChange="1" TickPlacement="BottomRight" Value="{Binding EncodeQuality}" Foreground="#FFA0A0A0" TabIndex="74" IsDirectionReversed="True" />
                         <TextBlock x:Name="EncodeQualityText" HorizontalAlignment="Left" Margin="278,3,0,0" Text="{Binding EncodeQuality}" VerticalAlignment="Top"/>
                     </Grid>
-                    <RadioButton Content="Copy (lossless)" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Copy}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="78"/>
-                    <RadioButton Content="Ignore" HorizontalAlignment="Left" Margin="10,213,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.Ignore}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="79"/>
-                    <RadioButton x:Name="AudioEncodeWavOption" Content="Encode WAV (lossless)" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeWav}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="80"/>
-                    <RadioButton x:Name="AudioEncodeFlacOption" Content="Encode FLAC (lossless)" HorizontalAlignment="Left" Margin="10,247,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeFlac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="81"/>
-                    <RadioButton x:Name="AudioEncodeAacOption" Content="Encode AAC (best compatibility)" HorizontalAlignment="Left" Margin="10,264,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeAac}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="82"/>
-                    <RadioButton x:Name="AudioEncodeOpusOption" Content="Encode Opus (best compression)" HorizontalAlignment="Left" Margin="10,281,0,0" VerticalAlignment="Top" GroupName="AudioAction" IsChecked="{Binding AudioAction, ConverterParameter={x:Static Business:AudioActions.EncodeOpus}, Converter={StaticResource RadioButtonCheckedConverter}}" TabIndex="83"/>
+                    <ComboBox x:Name="VideoActionCombo" HorizontalAlignment="Left" Margin="78,10,0,0" VerticalAlignment="Top" Width="193" SelectedIndex="{Binding VideoAction, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="16" SelectionChanged="VideoActionCombo_SelectionChanged">
+                        <ComboBoxItem Content="Copy (lossless)" IsSelected="True" />
+                        <ComboBoxItem Content="Discard" />
+                        <ComboBoxItem Content="x264 (best compatibility)" />
+                        <ComboBoxItem Content="x264 10bit (better quality)" />
+                        <ComboBoxItem Content="x265 (best quality)" />
+                        <ComboBoxItem Content="Xvid" />
+                        <ComboBoxItem Content="AVI (lossless)" />
+                        <ComboBoxItem Content="AVI Ut Video (lossless, faster)" />
+                    </ComboBox>
+                    <ComboBox HorizontalAlignment="Left" Margin="78,114,0,0" VerticalAlignment="Top" Width="193" SelectedIndex="{Binding AudioAction, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="16">
+                        <ComboBoxItem Content="Copy (lossless)" IsSelected="True" />
+                        <ComboBoxItem Content="Discard" />
+                        <ComboBoxItem Content="WAV (lossless)" />
+                        <ComboBoxItem Content="FLAC (lossless)" />
+                        <ComboBoxItem Content="AAC (best compatibility)" />
+                        <ComboBoxItem Content="Opus (best compression)" />
+                        <ComboBoxItem Content="MP3" />
+                    </ComboBox>
+                    <TextBlock HorizontalAlignment="Left" Margin="78,242,0,0" VerticalAlignment="Top" Text="{Binding Container}"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TabScript" Header="AviSynth Script" TabIndex="7">

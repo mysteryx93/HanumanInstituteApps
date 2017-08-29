@@ -103,11 +103,11 @@ namespace Business {
         public static MediaType GetFileType(string fileName) {
             MediaType Result = MediaType.None;
             string Ext = Path.GetExtension(fileName).ToLower();
-            if (Settings.VideoExtensions.Contains(Ext))
+            if (AppPaths.VideoExtensions.Contains(Ext))
                 Result = MediaType.Video;
-            else if (Settings.AudioExtensions.Contains(Ext))
+            else if (AppPaths.AudioExtensions.Contains(Ext))
                 Result = MediaType.Audio;
-            else if (Settings.ImageExtensions.Contains(Ext))
+            else if (AppPaths.ImageExtensions.Contains(Ext))
                 Result = MediaType.Image;
             return Result;
         }
