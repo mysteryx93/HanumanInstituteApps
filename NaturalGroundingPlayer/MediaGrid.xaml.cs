@@ -134,7 +134,7 @@ namespace NaturalGroundingPlayer {
             Settings.OrderByDirection = lastDirection;
             await business.LoadPlaylistAsync(Settings, true);
             DataLoaded?.Invoke(this, null);
-            DisplayData();
+            Dispatcher.Invoke(() => DisplayData());
         }
 
         public async Task ManualLoadPlaylist() {

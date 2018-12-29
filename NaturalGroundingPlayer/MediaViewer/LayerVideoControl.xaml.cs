@@ -41,7 +41,7 @@ namespace NaturalGroundingPlayer {
             TitleText.ToolTip = Item.Title;
             PositionText.Text = "";
             playerWindow = WmpPlayerWindow.Instance();
-            playerBusiness = new WmpPlayerBusiness(playerWindow.Player);
+            playerBusiness = new WmpPlayerBusiness(new WmpPlayerController(playerWindow.Player, playerWindow));
             playerBusiness.AllowClose = true;
             playerBusiness.Closed += playerBusiness_Closed;
             playerBusiness.PositionChanged += playerBusiness_PositionChanged;

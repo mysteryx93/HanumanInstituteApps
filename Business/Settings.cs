@@ -40,14 +40,6 @@ namespace Business {
             get { return SavedFile.NaturalGroundingFolder; }
         }
 
-        public static string TempFilesPath {
-            get { return SavedFile.NaturalGroundingFolder + @"Temp\"; }
-        }
-
-        //public static string AutoPitchFile {
-        //    get { return SavedFile.NaturalGroundingFolder + @"Player.avs"; }
-        //}
-
         //public static string DownloadsFolder = "Downloads";
         public static int SimultaneousDownloads = 2;
     }

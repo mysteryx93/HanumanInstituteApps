@@ -24,7 +24,7 @@ namespace Business {
         /// </summary>
         public static bool IsMadvrEnabled {
             get {
-                return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "DSVidRen", 0) == 12;
+                return (int?)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "DSVidRen", 0) == 12;
             }
             set {
                 if (value != IsMadvrEnabled && Settings.SavedFile.MpcPath.Length > 0) {
@@ -39,7 +39,7 @@ namespace Business {
         /// </summary>
         private static bool Loop {
             get {
-                return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "Loop", 0) > 0;
+                return (int?)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "Loop", 0) > 0;
             }
             set {
                 if (value != Loop && Settings.SavedFile.MpcPath.Length > 0) {
@@ -54,7 +54,7 @@ namespace Business {
         /// </summary>
         private static bool RememberFilePos {
             get {
-                return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "RememberFilePos", 0) > 0;
+                return (int?)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "RememberFilePos", 0) > 0;
             }
             set {
                 if (value != RememberFilePos && Settings.SavedFile.MpcPath.Length > 0) {
@@ -69,7 +69,7 @@ namespace Business {
         /// </summary>
         public static bool IsWidescreenEnabled {
             get {
-                return (int)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "AspectRatioX", 0) > 0;
+                return (int?)Registry.GetValue(@"HKEY_CURRENT_USER\Software\MPC-HC\MPC-HC\Settings\", "AspectRatioX", 0) > 0;
             }
             set {
                 if (value != IsWidescreenEnabled && Settings.SavedFile.MpcPath.Length > 0) {
@@ -129,6 +129,9 @@ namespace Business {
         /// </summary>
         /// <param name="videoStatus">The media containing performance status information.</param>
         public static void AutoConfigure(Media videoStatus) {
+            if (Settings.SavedFile.MediaPlayerApp == MediaPlayerApplication.Wmp)
+                return;
+
             // If no status information is supplied, create default object with default values of 'false'.
             if (videoStatus == null)
                 videoStatus = new Media();
@@ -190,24 +193,6 @@ namespace Business {
         private static Process GetSvpProcess() {
             string AppName = Path.GetFileNameWithoutExtension(Settings.SavedFile.SvpPath);
             return Process.GetProcessesByName(AppName).FirstOrDefault();
-        }
-
-        private static AviSynthVersion avisynthVersionCache;
-
-        public static AviSynthVersion GetAviSynthVersion() {
-            if (avisynthVersionCache != AviSynthVersion.None)
-                return avisynthVersionCache;
-
-            string AviSynthFile = Path.Combine(Environment.SystemDirectory, "AviSynth.dll");
-            if (File.Exists(AviSynthFile)) {
-                FileVersionInfo Info = FileVersionInfo.GetVersionInfo(AviSynthFile);
-                if (Info.ProductName.ToLower().StartsWith("avisynth+"))
-                    avisynthVersionCache = AviSynthVersion.AviSynthPlus;
-                else
-                    avisynthVersionCache = AviSynthVersion.AviSynth26;
-            } else
-                avisynthVersionCache = AviSynthVersion.None;
-            return avisynthVersionCache;
         }
     }
 }

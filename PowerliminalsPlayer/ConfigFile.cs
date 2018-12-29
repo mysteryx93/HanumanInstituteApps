@@ -136,20 +136,10 @@ namespace PowerliminalsPlayer {
             AdjustVolume(masterVolume);
         }
 
-        public static readonly DependencyProperty VolumeProperty =
-            DependencyProperty.Register("Volume", typeof(double),
-            typeof(FileItem), new PropertyMetadata(100.0, OnVolumeChanged));
-
+        public static readonly DependencyProperty VolumeProperty = DependencyProperty.Register("Volume", typeof(double), typeof(FileItem), 
+            new PropertyMetadata(100.0, OnVolumeChanged));
         [XmlIgnore]
-        public double Volume {
-            get {
-                return (double)GetValue(VolumeProperty);
-            }
-            set {
-                SetValue(VolumeProperty, value);
-            }
-        }
-
+        public double Volume { get => (double)GetValue(VolumeProperty); set => SetValue(VolumeProperty, value); }
         private static void OnVolumeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             FileItem Item = d as FileItem;
             if (!Item.adjustingVolume && Item.MasterVolume > 0)

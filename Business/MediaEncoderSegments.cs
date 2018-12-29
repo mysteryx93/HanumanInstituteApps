@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using EmergenceGuardian.FFmpeg;
 using System.Threading.Tasks;
+using EmergenceGuardian.Avisynth;
 
 namespace Business {
     /// <summary>
@@ -46,14 +47,14 @@ namespace Business {
             SegLeft = new List<SegmentInfo>();
 
             // Get script total frame count, and run in background until all other files are scanned.
-            AvisynthTools.EditStartPosition(settings.ScriptFile, 0, 0);
+            EncoderBusiness.EditStartPosition(settings.ScriptFile, 0, 0);
             ProcessStartOptions Options = new ProcessStartOptions(settings.JobIndex, "Analyzing Segments...", false).TrackProcess(settings);
             Task<long> TaskCount = Task.Run(() => AvisynthTools.GetFrameCount(settings.ScriptFile, Options));
 
             // Get list of output files in folder. The number after "_Output_" is the frame position of that segment.
             string FileName = string.Format("Job{0}_Output_", settings.JobIndex);
             string FileNameExt = string.Format(".{0}", settings.Container);
-            string[] SegFiles = Directory.GetFiles(Settings.TempFilesPath, FileName + "*" + FileNameExt);
+            string[] SegFiles = Directory.GetFiles(PathManager.TempFilesPath, FileName + "*" + FileNameExt);
 
             // Scan each segment file and discard files smaller than 10kb or of less than 10 frames.
             // Create a list of tasks to run them all in parallel.

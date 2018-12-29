@@ -1,4 +1,4 @@
-﻿<UserControl xmlns:Business="clr-namespace:Business;assembly=Business"  xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer"  x:Class="NaturalGroundingPlayer.LayerAudioControl"
+﻿<UserControl xmlns:MpvPlayerUI="clr-namespace:EmergenceGuardian.MpvPlayerUI;assembly=MpvPlayerUI"  xmlns:Business="clr-namespace:Business;assembly=Business"  xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer"  x:Class="NaturalGroundingPlayer.LayerAudioControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -21,7 +21,7 @@
                     <TextBlock x:Name="TitleText" Text="FileName"/>
                     <TextBlock x:Name="PositionText" Text="Position"/>
                 </StackPanel>
-                <Business:WmpPlayerControl x:Name="Player" Margin="0,2,0,0" />
+                <MpvPlayerUI:MpvMediaPlayer x:Name="Player" Margin="0,2,0,0" />
             </DockPanel>
         </Border>
     </Grid>

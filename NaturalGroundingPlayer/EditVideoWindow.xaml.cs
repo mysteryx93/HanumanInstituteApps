@@ -101,7 +101,7 @@ namespace NaturalGroundingPlayer {
                     await LoadMediaInfoAsync();
                 else {
                     // Try to auto-attach same path with different extension.
-                    if (!EditPlaylistBusiness.AutoAttachFile(video, PathManager.GetPathWithoutExtension(video.FileName))) {
+                    if (!EditPlaylistBusiness.AutoAttachFile(video, Path.ChangeExtension(video.FileName, null))) {
                         fileNotFound = true;
                         ErrorText.Text = "File not found.";
                     }
@@ -237,7 +237,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void menuEdit_Click(object sender, RoutedEventArgs e) {
-            EditVideoWindow.Instance(null, video.FileName, callback);
+            EditVideoWindow.Instance(video.MediaId, video.FileName, callback);
         }
 
         private void menuMoveFile_Click(object sender, RoutedEventArgs e) {
@@ -409,9 +409,8 @@ namespace NaturalGroundingPlayer {
 
         private void CategoryCombo_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             ComboBox Obj = sender as ComboBox;
-            MediaCategory ObjItem = Obj.SelectedItem as MediaCategory;
-            if (ObjItem != null)
-                Obj.Text = ObjItem.Name;
+            if (Obj.SelectedItem != null)
+                Obj.Text = ((KeyValuePair<Guid?, string>)Obj.SelectedItem).Value;
             else
                 Obj.Text = "";
         }

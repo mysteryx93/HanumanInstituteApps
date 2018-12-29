@@ -1,0 +1,11 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
+        xmlns:local="clr-namespace:YinMediaEncoder"
+        x:Class="YinMediaEncoder.WmpPlayerWindow" 
+        Title="Media Player" Height="600" Width="800" WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True">
+    <Grid>
+        <local:WmpPlayerControl x:Name="Player" x:FieldModifier="public" />
+    </Grid>
+</Window>

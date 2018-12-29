@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
-using System.Text.RegularExpressions;
+using EmergenceGuardian.Avisynth;
 
 namespace Business {
     /// <summary>
@@ -32,57 +27,19 @@ namespace Business {
 
         public static string LastScriptPath { get; private set; } = null;
 
-        public static void CreateScript(string inputFile, FFmpegProcess infoReader) {
-            if (LastScriptPath != null)
-                PathManager.SafeDelete(LastScriptPath);
-            LastScriptPath = GetAutoPitchFilePath(inputFile, infoReader?.VideoStream?.Format);
-            CreateScript(inputFile, infoReader, LastScriptPath);
+        public static void CreateScript(string inputFile, FFmpegProcess infoReader, string scriptPath = null) {
+            //if (LastScriptPath != null)
+            //    PathManager.SafeDelete(LastScriptPath);
+            if (scriptPath == null)
+                scriptPath = GetAutoPitchFilePath(inputFile, infoReader?.VideoStream?.Format);
+            ChangePitchBusiness.CreateScript(inputFile, infoReader, scriptPath);
+            LastScriptPath = scriptPath;
         }
 
         public static string GetAutoPitchFilePath(string fileName, string videoCodec) {
-            //return Path.Combine(Settings.TempFilesPath, "Player.avs");
-            return string.Format("{0}432hz_{1}{2}.avs", Settings.TempFilesPath, Path.GetFileNameWithoutExtension(fileName), string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
+            return Path.Combine(PathManager.TempFilesPath, "Player.avs");
+            //return string.Format("{0}432hz_{1}{2}.avs", PathManager.TempFilesPath, Path.GetFileNameWithoutExtension(fileName), string.IsNullOrEmpty(videoCodec) ? "" : ("_" + videoCodec));
             //return Regex.Replace(Result, @"[^\u0000-\u007F]+", string.Empty);
-        }
-
-        /// <summary>
-        /// Creates an AviSynth script that will auto-pitch the audio to 432hz. You then open this script file in the video player instead of directly opening the file.
-        /// </summary>
-        /// <param name="inputFile">The video to play.</param>
-        /// <param name="infoReader">An object to read media information.</param>
-        public static void CreateScript(string inputFile, FFmpegProcess infoReader, string scriptLocation) {
-            bool AviSynthPlus = MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynthPlus;
-            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
-            Script.AddPluginPath();
-            if (AviSynthPlus) {
-                //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
-                //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
-                //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-                bool IsAudio = AppPaths.AudioExtensions.Contains(Path.GetExtension(inputFile).ToLower());
-                Script.OpenDirect(inputFile, infoReader.AudioStream != null, !IsAudio && infoReader.VideoStream != null);
-                Script.AppendLine("Preroll(int(FrameRate*3))");
-                // This causes a slight audio delay in AviSynth 2.6
-                Script.LoadPluginDll("TimeStretch.dll");
-                Script.AppendLine("ResampleAudio(48000)");
-                Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
-                //Script.AppendLine("Prefetch({0})", CPU);
-            } else {
-                int CPU = Environment.ProcessorCount / 2;
-                Script.AppendLine("SetMTMode(3,{0})", CPU);
-                Script.OpenDirect(inputFile, infoReader.AudioStream != null, infoReader.VideoStream != null);
-                Script.AppendLine("SetMTMode(2)");
-                Script.AppendLine("Preroll(int(FrameRate*3))");
-                //Script.AppendLine("Loop(int(FrameRate/2), 0, 0)");
-                //Script.LoadPluginAvsi("UUSize4.avsi");
-                //Script.AppendLine("UUSize4(mod=4)");
-                // This slightly slows down playback speed but audio stays in sync
-                Script.AppendLine("V = AssumeFPS(432.0 / 440.0 * FrameRate)");
-                Script.AppendLine("A = AssumeSampleRate(int(432.0 / 440.0 * AudioRate))");
-                Script.AppendLine("AudioDub(V, A)");
-            }
-
-            Script.Cleanup();
-            Script.WriteToFile(scriptLocation);
         }
     }
 }

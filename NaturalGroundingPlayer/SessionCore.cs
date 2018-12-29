@@ -68,7 +68,7 @@ namespace NaturalGroundingPlayer {
             else if (Settings.SavedFile.MediaPlayerApp == MediaPlayerApplication.Mpc)
                 return new MpcPlayerBusiness();
             else
-                return new WmpPlayerBusiness(WmpPlayerWindow.Instance().Player);
+                return new WmpPlayerBusiness(new WmpPlayerController(WmpPlayerWindow.Instance().Player, WmpPlayerWindow.Instance()));
         }
 
         private async void Main_Loaded(object sender, EventArgs e) {

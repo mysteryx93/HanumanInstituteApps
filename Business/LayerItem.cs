@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Business {
-    public class LayerItem : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public class LayerItem {
         public LayerType Type { get; set; }
         public string FileName { get; set; }
     }

@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using NaturalGroundingPlayer;
-using Business;
-using DataAccess;
+using EmergenceGuardian.MediaEncoder;
 
 namespace YinMediaEncoder {
     /// <summary>
@@ -36,22 +27,21 @@ namespace YinMediaEncoder {
         }
 
         private async void OkButton_Click(object sender, RoutedEventArgs e) {
-            MainWindow ActiveWindow = SessionCore.Instance.Windows.Current as MainWindow;
-            MediaEncoderBusiness business = ActiveWindow.business;
+            MediaEncoderBusiness business = MainWindow.Instance.business;
             try {
                 OkButton.IsEnabled = false;
                 if (ResumeOption.IsChecked == true) {
                     business.AddJobToQueue(jobInfo.Settings);
                 } else if (RestartOption.IsChecked == true) {
-                    AvisynthTools.EditStartPosition(jobInfo.Settings.ScriptFile, 0, 0);
+                    EncoderBusiness.EditStartPosition(jobInfo.Settings.ScriptFile, 0, 0);
                     PathManager.DeleteOutputFiles(jobInfo.Settings.JobIndex);
                     business.AddJobToQueue(jobInfo.Settings);
                 } else if (DeleteOption.IsChecked == true) {
                     PathManager.DeleteJobFiles(jobInfo.Settings.JobIndex);
                 } else if (ChangeOption.IsChecked == true) {
-                    ActiveWindow.HidePreview();
+                    MainWindow.Instance.HidePreview();
                     await business.MovePreviewFilesAsync(jobInfo.Settings);
-                    ActiveWindow.SetEncodeSettings(jobInfo.Settings);
+                    MainWindow.Instance.SetEncodeSettings(jobInfo.Settings);
                     PathManager.DeleteJobFiles(jobInfo.Settings.JobIndex);
                     jobInfo.Settings.JobIndex = -1;
                 }

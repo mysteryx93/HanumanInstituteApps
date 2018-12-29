@@ -33,6 +33,8 @@ mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Debug\Encoder\ C:
 mklink /J C:\GitHub\NaturalGroundingPlayer\AudioVideoMuxer\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 mklink /J C:\GitHub\NaturalGroundingPlayer\YangYouTubeDownloader\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 mklink /J C:\GitHub\NaturalGroundingPlayer\YangYouTubeDownloader\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\YinMediaEncoder\bin\Debug\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
+mklink /J C:\GitHub\NaturalGroundingPlayer\YinMediaEncoder\bin\Release\Encoder\ C:\GitHub\NaturalGroundingPlayer\Encoder\
 
 Mark this folder as read-only to prevent Visual Studio from modifying it during builds
 C:\GitHub\NaturalGroundingPlayer\Encoder

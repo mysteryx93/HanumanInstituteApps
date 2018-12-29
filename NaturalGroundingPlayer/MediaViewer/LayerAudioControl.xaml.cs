@@ -33,7 +33,7 @@ namespace NaturalGroundingPlayer {
             TitleText.Text = Item.Title;
             TitleText.ToolTip = Item.Title;
             PositionText.Text = "";
-            playerBusiness = new WmpPlayerBusiness(Player);
+            playerBusiness = new WmpPlayerBusiness(new WmpPlayerController(Player));
             playerBusiness.PositionChanged += playerBusiness_PositionChanged;
             playerBusiness.Show();
             await playerBusiness.PlayVideoAsync(Item, false);
@@ -44,7 +44,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private void LoopButton_Click(object sender, RoutedEventArgs e) {
-            Player.Loop = LoopButton.IsChecked.Value;
+            Player.Host.Loop = LoopButton.IsChecked.Value;
         }
 
         private void playerBusiness_PositionChanged(object sender, EventArgs e) {

@@ -57,23 +57,29 @@ namespace EmergenceGuardian.Downloader {
 
             // Query the download URL for the right file.
             string VideoId = null;
-            VideoInfo VInfo = null;
+            Video VInfo = null;
+            MediaStreamInfoSet VStream = null;
             if (YoutubeClient.TryParseVideoId(downloadInfo.Url, out VideoId)) {
                 try {
-                    VInfo = await youtube.GetVideoInfoAsync(VideoId);
+                    var T1 = youtube.GetVideoAsync(VideoId);
+                    var T2 = youtube.GetVideoMediaStreamInfosAsync(VideoId);
+                    await Task.WhenAll(new Task[] { T1, T2 });
+                    VInfo = T1.Result;
+                    VStream = T2.Result;
                 }
                 catch {
                 }
             }
 
-            if (VInfo == null) {
+            if (VStream == null) {
                 downloadInfo.Status = DownloadStatus.Failed;
                 RaiseCallback(downloadInfo);
                 return;
             }
 
             // Get the highest resolution format.
-            BestFormatInfo BestFile = DownloadManager.SelectBestFormat(VInfo, downloadInfo.Options ?? Options);
+            BestFormatInfo BestFile = DownloadManager.SelectBestFormat(VStream, downloadInfo.Options ?? Options);
+            BestFile.Duration = VInfo.Duration;
 
             if (BestFile.BestVideo != null && (downloadInfo.Action == DownloadAction.Download || downloadInfo.Action == DownloadAction.DownloadVideo)) {
                 downloadInfo.Files.Add(new FileProgress() {
@@ -81,7 +87,7 @@ namespace EmergenceGuardian.Downloader {
                     Url = BestFile.BestVideo.Url,
                     Destination = downloadInfo.DestinationNoExt + GetVideoExtension(DownloadManager.GetVideoEncoding(BestFile.BestVideo)),
                     Stream = BestFile.BestVideo,
-                    BytesTotal = BestFile.BestVideo.ContentLength
+                    BytesTotal = BestFile.BestVideo.Size
                 });
             }
 
@@ -91,7 +97,7 @@ namespace EmergenceGuardian.Downloader {
                     Url = BestFile.BestAudio.Url,
                     Destination = downloadInfo.DestinationNoExt + GetAudioExtension(BestFile.BestAudio.AudioEncoding),
                     Stream = BestFile.BestAudio,
-                    BytesTotal = BestFile.BestAudio.ContentLength
+                    BytesTotal = BestFile.BestAudio.Size
                 });
             }
 
@@ -255,25 +261,30 @@ namespace EmergenceGuardian.Downloader {
         public static string[] DownloadedExtensions = new string[] { ".mp4", ".webm", ".mkv", ".flv" };
 
         public static async Task<VideoInfo> GetDownloadInfoAsync(string url) {
-            VideoInfo Result = null;
             try {
                 YoutubeClient youtube = new YoutubeClient();
-                string VideoId = null;
-                if (YoutubeClient.TryParseVideoId(url, out VideoId))
-                    Result = await youtube.GetVideoInfoAsync(VideoId);
+                if (YoutubeClient.TryParseVideoId(url, out string VideoId)) {
+                    var T1 = youtube.GetVideoAsync(VideoId);
+                    var T2 = youtube.GetVideoMediaStreamInfosAsync(VideoId);
+                    await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
+                    return new VideoInfo(T1.Result, T2.Result);
+                }
             }
             catch {
             }
-            return Result;
+            return null;
         }
 
         public static async Task<string> GetVideoTitle(string url) {
             try {
-                VideoInfo VInfo = await DownloadManager.GetDownloadInfoAsync(url);
-                if (VInfo != null)
+                YoutubeClient youtube = new YoutubeClient();
+                if (YoutubeClient.TryParseVideoId(url, out string VideoId)) {
+                    Video VInfo = await youtube.GetVideoAsync(VideoId).ConfigureAwait(false);
                     return VInfo.Title;
+                }
             }
-            catch { }
+            catch {
+            }
             return null;
         }
 
@@ -283,8 +294,8 @@ namespace EmergenceGuardian.Downloader {
         /// </summary>
         /// <param name="list">The list of videos to chose from.</param>
         /// <returns>The best format available.</returns>
-        public static BestFormatInfo SelectBestFormat(VideoInfo vinfo, DownloadOptions options) {
-            var MaxResolutionList = (from v in vinfo.VideoStreams.Cast<MediaStreamInfo>().Union(vinfo.MixedStreams)
+        public static BestFormatInfo SelectBestFormat(MediaStreamInfoSet vstream, DownloadOptions options) {
+            var MaxResolutionList = (from v in vstream.Audio.Cast<MediaStreamInfo>().Union(vstream.Video).Union(vstream.Muxed)
                                      where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
                                      orderby GetVideoHeight(v) descending
                                      orderby GetVideoFrameRate(v) descending
@@ -297,7 +308,7 @@ namespace EmergenceGuardian.Downloader {
 
             MediaStreamInfo BestVideo = (from v in MaxResolutionList
                                              // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
-                                         let Preference = (int)((GetVideoEncoding(v) == VideoEncoding.Vp9) ? v.ContentLength * 1.3 : v.ContentLength)
+                                         let Preference = (int)((GetVideoEncoding(v) == VideoEncoding.Vp9) ? v.Size * 1.3 : v.Size)
                                          where options.PreferredFormat == SelectStreamFormat.Best ||
                                             (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
                                             (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
@@ -308,8 +319,7 @@ namespace EmergenceGuardian.Downloader {
             if (BestVideo != null) {
                 BestFormatInfo Result = new BestFormatInfo {
                     BestVideo = BestVideo,
-                    BestAudio = SelectBestAudio(vinfo, options),
-                    Duration = vinfo.Duration
+                    BestAudio = SelectBestAudio(vstream, options)
                 };
                 return Result;
             } else
@@ -318,7 +328,7 @@ namespace EmergenceGuardian.Downloader {
 
         public static VideoEncoding GetVideoEncoding(MediaStreamInfo stream) {
             VideoStreamInfo VInfo = stream as VideoStreamInfo;
-            MixedStreamInfo MInfo = stream as MixedStreamInfo;
+            MuxedStreamInfo MInfo = stream as MuxedStreamInfo;
             if (VInfo == null && MInfo == null)
                 return VideoEncoding.H264;
             return VInfo?.VideoEncoding ?? MInfo.VideoEncoding;
@@ -326,10 +336,10 @@ namespace EmergenceGuardian.Downloader {
 
         public static int GetVideoHeight(MediaStreamInfo stream) {
             VideoStreamInfo VInfo = stream as VideoStreamInfo;
-            MixedStreamInfo MInfo = stream as MixedStreamInfo;
+            MuxedStreamInfo MInfo = stream as MuxedStreamInfo;
             if (VInfo != null) {
-                if (VInfo.VideoResolution != null)
-                    return VInfo.VideoResolution.Height;
+                if (VInfo.Resolution != null)
+                    return VInfo.Resolution.Height;
                 else
                     return 0;
             }
@@ -364,7 +374,7 @@ namespace EmergenceGuardian.Downloader {
         public static double GetVideoFrameRate(MediaStreamInfo stream) {
             VideoStreamInfo VInfo = stream as VideoStreamInfo;
             if (VInfo != null)
-                return VInfo.VideoFramerate;
+                return VInfo.Framerate;
             else
                 return 0;
         }
@@ -374,13 +384,13 @@ namespace EmergenceGuardian.Downloader {
         /// </summary>
         /// <param name="list">The list of available audios.</param>
         /// <returns>The audio to download.</returns>
-        public static AudioStreamInfo SelectBestAudio(VideoInfo vinfo, DownloadOptions options) {
-            if (vinfo == null || vinfo.AudioStreams.Count() == 0)
+        public static AudioStreamInfo SelectBestAudio(MediaStreamInfoSet vinfo, DownloadOptions options) {
+            if (vinfo == null || vinfo.Audio.Count() == 0)
                 return null;
 
-            var BestAudio = (from v in vinfo.AudioStreams
+            var BestAudio = (from v in vinfo.Audio
                              // Opus encodes ~20% better, Vorbis ~10% better than AAC
-                             let Preference = (int)(v.ContentLength * (v.AudioEncoding == AudioEncoding.Opus ?  1.2 : v.AudioEncoding == AudioEncoding.Vorbis ? 1.1 : 1))
+                             let Preference = (int)(v.Size * (v.AudioEncoding == AudioEncoding.Opus ?  1.2 : v.AudioEncoding == AudioEncoding.Vorbis ? 1.1 : 1))
                              where options.PreferredAudio == SelectStreamFormat.Best ||
                              (options.PreferredAudio == SelectStreamFormat.MP4 && (v.AudioEncoding == AudioEncoding.Aac || v.AudioEncoding == AudioEncoding.Mp3)) ||
                              (options.PreferredAudio == SelectStreamFormat.VP9 && (v.AudioEncoding == AudioEncoding.Opus || v.AudioEncoding == AudioEncoding.Vorbis))
@@ -430,6 +440,19 @@ namespace EmergenceGuardian.Downloader {
         }
     }
 
+    public class VideoInfo {
+        public Video Info { get; set; }
+        public MediaStreamInfoSet Streams { get; set; }
+
+        public VideoInfo() {
+        }
+
+        public VideoInfo(Video info, MediaStreamInfoSet streams) {
+            Info = info;
+            Streams = streams;
+        }
+    }
+    
     public class BestFormatInfo {
         public MediaStreamInfo BestVideo { get; set; }
         public AudioStreamInfo BestAudio { get; set; }

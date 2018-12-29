@@ -93,7 +93,7 @@
 //                Query.Append(destination);
 //                Query.Append("\"");
 //                if (silent) {
-//                    string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+//                    string LogFile = Path.Combine(PathManager.TempFilesPath, "Ffmpeg.log");
 //                    Result = RunFfmpeg(Query.ToString(), LogFile);
 //                    if (Result)
 //                        File.Delete(LogFile);
@@ -129,7 +129,7 @@
 //        public static bool ConcatenateFiles(IEnumerable<string> files, string output, bool silent) {
 //            bool Result = false;
 //            // Write temp file.
-//            string TempFile = Path.Combine(Settings.TempFilesPath, "MergeList.txt");
+//            string TempFile = Path.Combine(PathManager.TempFilesPath, "MergeList.txt");
 //            StringBuilder TempContent = new StringBuilder();
 //            foreach (string item in files) {
 //                TempContent.AppendFormat("file '{0}'", item).AppendLine();
@@ -139,7 +139,7 @@
 //            string Query = string.Format(@"-f concat -safe 0 -i ""{0}"" -c copy ""{1}""", TempFile, output);
 
 //            if (silent) {
-//                string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+//                string LogFile = Path.Combine(PathManager.TempFilesPath, "Ffmpeg.log");
 //                Result = RunFfmpeg(Query.ToString(), LogFile);
 //                if (Result)
 //                    File.Delete(LogFile);
@@ -225,7 +225,7 @@
 //            //    return true;
 //            //else {
 //            //    if (silent) {
-//            //        string LogFile = Path.Combine(Settings.TempFilesPath, "Ffmpeg.log");
+//            //        string LogFile = Path.Combine(PathManager.TempFilesPath, "Ffmpeg.log");
 //            //        File.WriteAllText(LogFile, P.StandardError.ReadToEnd());
 //            //        Run("notepad.exe", LogFile, false);
 //            //        File.Delete(LogFile);
@@ -587,9 +587,9 @@
 //        /// <param name="supports11">If true, it will instead test whether the GPU supports OpenCL 1.1</param>
 //        /// <returns>True if OpenCL is supported.</returns>
 //        private static bool GpuSupportsOpenCL(bool version12) {
-//            string TempScript = Settings.TempFilesPath + "Temp.avs";
-//            string TempResult = Settings.TempFilesPath + "Temp.txt";
-//            string TempOut = Settings.TempFilesPath + "Temp.y4m";
+//            string TempScript = PathManager.TempFilesPath + "Temp.avs";
+//            string TempResult = PathManager.TempFilesPath + "Temp.txt";
+//            string TempOut = PathManager.TempFilesPath + "Temp.y4m";
 
 //            AviSynthScriptBuilder Script = new AviSynthScriptBuilder();
 //            Script.AddPluginPath();

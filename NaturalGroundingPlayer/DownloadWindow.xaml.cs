@@ -105,18 +105,18 @@ namespace NaturalGroundingPlayer {
             DownloadButton.IsEnabled = false;
             downloadInfo = await DownloadManager.GetDownloadInfoAsync(video.DownloadUrl);
             if (downloadInfo != null) {
-                TitleTextBox.Text = downloadInfo.Title;
+                TitleTextBox.Text = downloadInfo.Info.Title;
                 options = new DownloadOptions() {
                     PreferredFormat = (SelectStreamFormat)PreferredFormatCombo.SelectedIndex,
                     PreferredAudio = (SelectStreamFormat)PreferredAudioCombo.SelectedIndex,
                     MaxQuality = (int)MaxDownloadQualityCombo.SelectedValue,
                     SimultaneousDownloads = 2
                 };
-                BestFormatInfo StreamInfo = DownloadManager.SelectBestFormat(downloadInfo, options);
+                BestFormatInfo StreamInfo = DownloadManager.SelectBestFormat(downloadInfo.Streams, options);
                 DownloadVideoText.Text = GetStreamDescription(StreamInfo.BestVideo);
                 DownloadAudioText.Text = GetStreamDescription(StreamInfo.BestAudio);
                 bestFormat = StreamInfo;
-                DownloadButton.IsEnabled = true;
+                StreamOption_Click(null, null);
             } else {
                 TitleTextBox.Text = "Invalid URL";
             }
@@ -126,13 +126,13 @@ namespace NaturalGroundingPlayer {
         private string GetStreamDescription(MediaStreamInfo stream) {
             if (stream is VideoStreamInfo) {
                 VideoStreamInfo VStream = stream as VideoStreamInfo;
-                return string.Format("{0} {1}p ({2}mb)", VStream.VideoEncoding, DownloadManager.GetVideoHeight(VStream), VStream.ContentLength / 1024 / 1024);
+                return string.Format("{0} {1}p ({2}mb)", VStream.VideoEncoding, DownloadManager.GetVideoHeight(VStream), VStream.Size / 1024 / 1024);
             } else if (stream is AudioStreamInfo) {
                 AudioStreamInfo AStream = stream as AudioStreamInfo;
-                return string.Format("{0} {1}kbps ({2}mb)", AStream.AudioEncoding, AStream.Bitrate / 1024, AStream.ContentLength / 1024 / 1024);
-            } else if (stream is MixedStreamInfo) {
-                MixedStreamInfo MStream = stream as MixedStreamInfo;
-                return string.Format("{0} {1}p ({2}mb) (with audio)", MStream.VideoEncoding, DownloadManager.GetVideoHeight(MStream), MStream.ContentLength / 1024 / 1024);
+                return string.Format("{0} {1}kbps ({2}mb)", AStream.AudioEncoding, AStream.Bitrate / 1024, AStream.Size / 1024 / 1024);
+            } else if (stream is MuxedStreamInfo) {
+                MuxedStreamInfo MStream = stream as MuxedStreamInfo;
+                return string.Format("{0} {1}p ({2}mb) (with audio)", MStream.VideoEncoding, DownloadManager.GetVideoHeight(MStream), MStream.Size / 1024 / 1024);
             } else
                 return "";
         }

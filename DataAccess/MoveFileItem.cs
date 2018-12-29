@@ -2,9 +2,8 @@
 using System.ComponentModel;
 
 namespace DataAccess {
-    public class MoveFileItem : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public class MoveFileItem {
         public Guid VideoId { get; set; }
         public MediaType MediaType { get; set; }
         public string Artist { get; set; }

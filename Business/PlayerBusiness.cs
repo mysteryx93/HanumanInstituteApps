@@ -24,7 +24,7 @@ namespace Business {
         private int lastSearchResultCount;
         public bool IsStarted { get; private set; }
         public bool IsPaused { get; private set; }
-        private DownloadBusiness downloadManager = new DownloadBusiness(Settings.SavedFile.Download);
+        private DownloadBusiness downloadManager = new DownloadBusiness(Settings.SavedFile?.Download);
         /// <summary>
         /// Contains all filter settings.
         /// </summary>

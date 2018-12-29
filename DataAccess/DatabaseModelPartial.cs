@@ -71,9 +71,8 @@ namespace DataAccess {
         }
     }
 
-    public partial class Media : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public partial class Media {
         public MediaType MediaType {
             get { return (MediaType)MediaTypeId; }
             set { MediaTypeId = (int)value; }
@@ -99,9 +98,8 @@ namespace DataAccess {
         }
     }
 
-    public partial class MediaRating : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public partial class MediaRating {
         /// <summary>
         /// Returns the computed value of Height * Depth on a scale of 11.
         /// </summary>
@@ -118,7 +116,7 @@ namespace DataAccess {
         }
     }
 
-    public partial class RatingCategory : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public partial class RatingCategory {
     }
 }

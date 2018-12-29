@@ -1,8 +1,9 @@
-﻿<Window x:Class="PowerliminalsPlayer.MainWindow"
+﻿<Window xmlns:MpvPlayerUI="clr-namespace:EmergenceGuardian.MpvPlayerUI;assembly=MpvPlayerUI"  x:Class="PowerliminalsPlayer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="clr-namespace:EmergenceGuardian.MediaPlayerUI;assembly=MediaPlayerUI"
         xmlns:local="clr-namespace:PowerliminalsPlayer"
         mc:Ignorable="d"
         Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183" Icon="App.ico" Closing="Window_Closing" Loaded="Window_Loaded">
@@ -13,7 +14,9 @@
             <ItemsControl x:Name="NowPlayingList" ItemsSource="{Binding}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <local:PlayerInstance Id="{Binding Id}" />
+                        <MpvPlayerUI:MpvMediaPlayer ui:UIProperties.IsLoopVisible="False" >
+                            <MpvPlayerUI:MpvMediaPlayerHost Source="{Binding FullPath}" Volume="{Binding Volume, Mode=TwoWay}" SpeedInt="{Binding Speed, Mode=TwoWay}" Loop="True" OnMediaUnloaded="MpvMediaPlayerHost_OnMediaUnloaded" />
+                        </MpvPlayerUI:MpvMediaPlayer>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

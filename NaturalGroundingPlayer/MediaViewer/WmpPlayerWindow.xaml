@@ -1,11 +1,14 @@
-﻿<Window xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer"  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns:mpv="clr-namespace:EmergenceGuardian.MpvPlayerUI;assembly=MpvPlayerUI"  
+        xmlns:ui="clr-namespace:EmergenceGuardian.MediaPlayerUI;assembly=MediaPlayerUI"
+        xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer"  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.WmpPlayerWindow"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
-        xmlns:ax="clr-namespace:MediaPlayer;assembly=MediaPlayer"
         Title="Media Player" Height="600" Width="800" WindowStartupLocation="CenterScreen"
         UseLayoutRounding="True" Icon="/NaturalGroundingPlayer;component/Icons/App.ico">
     <Grid>
-        <Business:WmpPlayerControl x:Name="Player" IsWindow="True" x:FieldModifier="public" />
+        <mpv:MpvMediaPlayer x:Name="Player" x:FieldModifier="public" ui:UIProperties.IsLoopVisible="False">
+            <mpv:MpvMediaPlayerHost />
+        </mpv:MpvMediaPlayer>
     </Grid>
 </Window>

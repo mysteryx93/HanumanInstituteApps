@@ -33,7 +33,7 @@ namespace Business {
                         VideoInfo VInfo = await DownloadManager.GetDownloadInfoAsync(VideoData.DownloadUrl);
                         if (VInfo != null) {
                             // Get the highest resolution format.
-                            BestFormatInfo VideoFormat = DownloadBusiness.SelectBestFormat(VInfo);
+                            BestFormatInfo VideoFormat = DownloadBusiness.SelectBestFormat(VInfo.Streams);
                             if (VideoFormat == null || VideoFormat.BestVideo == null)
                                 SetStatus(item, VideoListItemStatusEnum.Failed);
                             else
@@ -118,7 +118,7 @@ namespace Business {
             }
 
             // For server file size, estimate 4% extra for audio. Estimate 30% advantage for VP9 format. non-DASH WebM is VP8 and doesn't have that bonus.
-            long ServerFileSize = (long)(serverFile.BestVideo.ContentLength * 1.04);
+            long ServerFileSize = (long)(serverFile.BestVideo.Size * 1.04);
             if (DownloadManager.GetVideoEncoding(serverFile.BestVideo) == VideoEncoding.Vp9)
                 ServerFileSize = (long)(ServerFileSize * 1.3);
             long LocalFileSize = new FileInfo(localFile).Length;
@@ -259,7 +259,7 @@ namespace Business {
 
         public static int GetAudioBitrateMuxe(string file) {
             int Result = 0;
-            string TmpFile = Settings.TempFilesPath + "GetBitrate - " + Path.GetFileNameWithoutExtension(file) + ".aac";
+            string TmpFile = PathManager.TempFilesPath + "GetBitrate - " + Path.GetFileNameWithoutExtension(file) + ".aac";
             if (MediaMuxer.Muxe(null, file, TmpFile) == CompletionStatus.Success) {
                 FFmpegProcess InfoReader = MediaInfo.GetFileInfo(TmpFile);
                 Result = InfoReader.AudioStream?.Bitrate ?? 0;

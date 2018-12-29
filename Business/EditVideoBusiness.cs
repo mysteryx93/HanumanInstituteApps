@@ -35,12 +35,13 @@ namespace Business {
             return Result;
         }
 
-        public List<MediaCategory> GetCategories(int mediaTypeId) {
-            var Result = (from c in context.MediaCategories
+        public List<KeyValuePair<Guid?, string>> GetCategories(int mediaTypeId) {
+            var Query = (from c in context.MediaCategories
                           where c.MediaTypeId == mediaTypeId
                           orderby c.Folder
-                          select c).ToList();
-            Result.Insert(0, new MediaCategory());
+                          select new { c.MediaCategoryId, c.Name });
+            var Result = Query.AsEnumerable().Select(i => new KeyValuePair<Guid?, string>(i.MediaCategoryId, i.Name)).ToList();
+            Result.Insert(0, new KeyValuePair<Guid?, string>(null, ""));
             return Result;
         }
 

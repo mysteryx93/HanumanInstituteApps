@@ -12,9 +12,8 @@ namespace Business {
     // Full documentation of parameters here
     // http://www.guthspot.se/video/deshaker.htm
     [Serializable()]
-    public class MediaEncoderDeshakerSettings : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public class MediaEncoderDeshakerSettings {
         public int Version { get; set; } = 19;
         public int Pass { get; set; } = 1;
         public float SourcePixelAspectRatio { get; set; } = 1;
@@ -165,9 +164,8 @@ namespace Business {
     }
 
     [Serializable()]
-    public class MediaEncoderDeshakerSegmentSettings : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
+    [PropertyChanged.AddINotifyPropertyChangedInterface]
+    public class MediaEncoderDeshakerSegmentSettings {
         public int FrameStart { get; set; } = 0; // To apply settings for different segments of the clip
         public int BlockSize { get; set; } = 30;
         public int DifferentialSearchRange { get; set; } = 4;

@@ -378,13 +378,5 @@ namespace NaturalGroundingPlayer {
         private void CommandBinding_AppPowerliminalsPlayer(object sender, ExecutedRoutedEventArgs e) {
             Process.Start(new ProcessStartInfo("PowerliminalsPlayer.exe"));
         }
-
-        private void CommandBinding_AppYinMediaEncoder(object sender, ExecutedRoutedEventArgs e) {
-            Process.Start(new ProcessStartInfo("YinMediaEncoder.exe"));
-        }
-
-        private void CommandBinding_AppAudioVideoMuxer(object sender, ExecutedRoutedEventArgs e) {
-            Process.Start(new ProcessStartInfo("AudioVideoMuxer.exe"));
-        }
     }
 }

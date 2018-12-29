@@ -58,6 +58,16 @@ namespace DataAccess {
         fps120
     }
 
+    public enum FrameRatePresetEnum {
+        Faster,
+        Fast,
+        Normal,
+        Slow,
+        Slower,
+        Slowest,
+        Anime
+    }
+
     public enum VideoListItemStatusEnum {
         None,
         OK,

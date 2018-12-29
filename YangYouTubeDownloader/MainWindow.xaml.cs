@@ -61,8 +61,8 @@ namespace EmergenceGuardian.YangYouTubeDownloader {
             ContainerText.Text = "";
             Info = await DownloadManager.GetDownloadInfoAsync(VideoUrl);
             if (Info != null) {
-                TitleText.Text = Info.Title;
-                TitleText.ToolTip = Info.Title;
+                TitleText.Text = Info.Info.Title;
+                TitleText.ToolTip = Info.Info.Title;
                 GridInfo.Visibility = Visibility.Visible;
                 Options = new DownloadOptions() {
                     PreferredFormat = (SelectStreamFormat)PreferredFormatCombo.SelectedIndex,
@@ -70,7 +70,7 @@ namespace EmergenceGuardian.YangYouTubeDownloader {
                     MaxQuality = (int)MaxDownloadQualityCombo.SelectedValue,
                     SimultaneousDownloads = 2
                 };
-                BestFormatInfo StreamInfo = DownloadManager.SelectBestFormat(Info, Options);
+                BestFormatInfo StreamInfo = DownloadManager.SelectBestFormat(Info.Streams, Options);
                 VideoText.Text = GetStreamDescription(StreamInfo.BestVideo);
                 AudioText.Text = GetStreamDescription(StreamInfo.BestAudio);
                 ContainerText.Text = DownloadManager.GetFinalExtension(StreamInfo.BestVideo, StreamInfo.BestAudio);
@@ -85,13 +85,13 @@ namespace EmergenceGuardian.YangYouTubeDownloader {
         private string GetStreamDescription(MediaStreamInfo stream) {
             if (stream is VideoStreamInfo) {
                 VideoStreamInfo VStream = stream as VideoStreamInfo;
-                return string.Format("{0} {1}p ({2}mb)", VStream.VideoEncoding, DownloadManager.GetVideoHeight(VStream), VStream.ContentLength / 1024 / 1024);
+                return string.Format("{0} {1}p ({2}mb)", VStream.VideoEncoding, DownloadManager.GetVideoHeight(VStream), VStream.Size / 1024 / 1024);
             } else if (stream is AudioStreamInfo) {
                 AudioStreamInfo AStream = stream as AudioStreamInfo;
-                return string.Format("{0} {1}kbps ({2}mb)", AStream.AudioEncoding, AStream.Bitrate / 1024, AStream.ContentLength / 1024 / 1024);
-            } else if (stream is MixedStreamInfo) {
-                MixedStreamInfo MStream = stream as MixedStreamInfo;
-                return string.Format("{0} {1}p ({2}mb) (with audio)", MStream.VideoEncoding, DownloadManager.GetVideoHeight(MStream), MStream.ContentLength / 1024 / 1024);
+                return string.Format("{0} {1}kbps ({2}mb)", AStream.AudioEncoding, AStream.Bitrate / 1024, AStream.Size / 1024 / 1024);
+            } else if (stream is MuxedStreamInfo) {
+                MuxedStreamInfo MStream = stream as MuxedStreamInfo;
+                return string.Format("{0} {1}p ({2}mb) (with audio)", MStream.VideoEncoding, DownloadManager.GetVideoHeight(MStream), MStream.Size / 1024 / 1024);
             } else
                 return "";
         }

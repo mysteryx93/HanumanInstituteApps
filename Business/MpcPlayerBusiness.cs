@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using MPC_API_LIB;
 using DataAccess;
 using System.Globalization;
+using EmergenceGuardian.Avisynth;
 
 namespace Business {
     /// <summary>
@@ -321,7 +322,7 @@ namespace Business {
             get {
                 if (CurrentVideo != null && CurrentVideo.StartPos != null) {
                     if (Settings.SavedFile.ChangeAudioPitch) {
-                        if (MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynth26)
+                        if (AvisynthEnv.GetAvisynthVersion() == AvisynthVersion.AviSynth26)
                             return (double)CurrentVideo.StartPos.Value * 440 / 432 + .5; // Video slowed down
                         else
                             return CurrentVideo.StartPos.Value + .5; // Added half-second to fill buffer
@@ -339,7 +340,7 @@ namespace Business {
             get {
                 if (CurrentVideo != null && CurrentVideo.EndPos != null) {
                     if (Settings.SavedFile.ChangeAudioPitch) {
-                        if (MpcConfigBusiness.GetAviSynthVersion() == AviSynthVersion.AviSynth26)
+                        if (AvisynthEnv.GetAvisynthVersion() == AvisynthVersion.AviSynth26)
                             return (double)CurrentVideo.EndPos.Value * 440 / 432 + .5; // Video slowed down
                         else
                             return CurrentVideo.EndPos.Value + .5; // Added half-second to fill buffer

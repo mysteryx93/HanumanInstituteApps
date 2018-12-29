@@ -9,10 +9,8 @@ using System.Windows;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
 using EmergenceGuardian.Downloader;
-using YoutubeExplode;
 using YoutubeExplode.Models;
 using YoutubeExplode.Models.MediaStreams;
-using System.ComponentModel;
 
 namespace Business {
     public class DownloadBusiness : DownloadManager {
@@ -46,10 +44,10 @@ namespace Business {
                 throw new ArgumentException("Video object is null or doesn't contain a valid YouTube URL.");
 
             // Store in the Temp folder.
-            DefaultMediaPath PathCalc = new DefaultMediaPath(Settings.TempFilesPath.Substring(Settings.NaturalGroundingFolder.Length));
+            DefaultMediaPath PathCalc = new DefaultMediaPath(PathManager.TempFilesPath.Substring(Settings.NaturalGroundingFolder.Length));
             string Destination = Settings.NaturalGroundingFolder + PathCalc.GetDefaultFileName(video.Artist, video.Title, null, (MediaType)video.MediaTypeId);
             string DownloadDesc = Path.GetFileName(Destination);
-            Directory.CreateDirectory(Settings.TempFilesPath);
+            Directory.CreateDirectory(PathManager.TempFilesPath);
 
             await DownloadVideoAsync(video.DownloadUrl, Destination, DownloadDesc, callback, action, options ?? Options, new DownloadItemData(video, queuePos)).ConfigureAwait(false);
         }
@@ -130,7 +128,7 @@ namespace Business {
             return File.Exists(fileName) && new FileInfo(fileName).Length > 524288;
         }
 
-        public static BestFormatInfo SelectBestFormat(VideoInfo vinfo) {
+        public static BestFormatInfo SelectBestFormat(MediaStreamInfoSet vinfo) {
             return DownloadManager.SelectBestFormat(vinfo, Settings.SavedFile.Download);
         }
 

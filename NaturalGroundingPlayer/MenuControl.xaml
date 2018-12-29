@@ -40,8 +40,6 @@
         <RoutedUICommand x:Key="AboutAuthor" Text="About Author" />
         <RoutedUICommand x:Key="AppPlayer432hz" Text="432hz Player" />
         <RoutedUICommand x:Key="AppPowerliminalsPlayer" Text="Powerliminals Player" />
-        <RoutedUICommand x:Key="AppYinMediaEncoder" Text="Yin Media Encoder" />
-        <RoutedUICommand x:Key="AppAudioVideoMuxer" Text="Audio Video Muxer" />
     </Control.Resources>
     <Control.CommandBindings>
         <CommandBinding Command="{StaticResource StartSession}" Executed="CommandBinding_StartSession" />
@@ -78,8 +76,6 @@
         <CommandBinding Command="{StaticResource AboutAuthor}" Executed="CommandBinding_AboutAuthor" />
         <CommandBinding Command="{StaticResource AppPlayer432hz}" Executed="CommandBinding_AppPlayer432hz" />
         <CommandBinding Command="{StaticResource AppPowerliminalsPlayer}" Executed="CommandBinding_AppPowerliminalsPlayer" />
-        <CommandBinding Command="{StaticResource AppYinMediaEncoder}" Executed="CommandBinding_AppYinMediaEncoder" />
-        <CommandBinding Command="{StaticResource AppAudioVideoMuxer}" Executed="CommandBinding_AppAudioVideoMuxer" />
     </Control.CommandBindings>
     <Control.InputBindings>
         <KeyBinding Key="F5" Command="{StaticResource StartSession}" />
@@ -160,8 +156,6 @@
             <MenuItem x:Name="menuApps" Header="_Apps" KeyboardNavigation.TabNavigation="None">
                 <MenuItem x:Name="menuPlayer432hz" Header="_432hz Player..." Command="{StaticResource AppPlayer432hz}"/>
                 <MenuItem x:Name="menuPowerliminalsPlayer" Header="_Powerliminals Player..." Command="{StaticResource AppPowerliminalsPlayer}"/>
-                <MenuItem x:Name="menuYinMediaEncoder" Header="_Yin Media Encoder..." Command="{StaticResource AppYinMediaEncoder}"/>
-                <MenuItem x:Name="menuAudioVideoMuxer" Header="_Audio Video Muxer..." Command="{StaticResource AppAudioVideoMuxer}"/>
             </MenuItem>
         </Menu>
     </Grid>

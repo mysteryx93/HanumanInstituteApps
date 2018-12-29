@@ -7,6 +7,7 @@ using Business;
 using System.Windows.Input;
 using System.Diagnostics;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.MpvPlayerUI;
 
 namespace PowerliminalsPlayer {
     /// <summary>
@@ -107,11 +108,8 @@ namespace PowerliminalsPlayer {
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e) {
-            foreach (var item in NowPlayingList.FindVisualChildren<PlayerInstance>()) {
-                if (isPaused)
-                    item.WmpPlayer.Player.Play();
-                else
-                    item.WmpPlayer.Player.Pause();
+            foreach (var item in NowPlayingList.FindVisualChildren<MpvMediaPlayer>()) {
+                item.Host.IsPlaying = isPaused;
             }
             PauseButton.Content = isPaused ? "Pause All" : "Resume";
             isPaused = !isPaused;
@@ -151,6 +149,15 @@ namespace PowerliminalsPlayer {
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e) {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void MpvMediaPlayerHost_OnMediaUnloaded(object sender, EventArgs e) {
+            MpvMediaPlayerHost P = sender as MpvMediaPlayerHost;
+            FileItem binding = P.DataContext as FileItem;
+            var files = config.Current.Files;
+            FileItem Item = files.FirstOrDefault(f => f.Id == binding.Id);
+            if (Item != null)
+                files.Remove(Item);
         }
     }
 }

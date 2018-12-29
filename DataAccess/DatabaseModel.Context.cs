@@ -15,11 +15,6 @@ namespace DataAccess
     
     public partial class Entities : DbContext
     {
-        //public Entities()
-        //    : base("name=Entities")
-        //{
-        //}
-    
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();

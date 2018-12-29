@@ -7,7 +7,7 @@
         <TextBox HorizontalAlignment="Left" Height="23" Margin="117,78,0,0" VerticalAlignment="Top" Width="241" Text="{Binding Artist, Mode=TwoWay}" TabIndex="3" MaxLength="50"/>
         <TextBlock HorizontalAlignment="Left" Margin="21,109,0,0" Text="Title" VerticalAlignment="Top" Height="16" Width="65"/>
         <TextBox x:Name="TitleText" HorizontalAlignment="Left" Height="23" Margin="117,106,0,0" VerticalAlignment="Top" Width="241" Text="{Binding Title, Mode=TwoWay}" TabIndex="4" MaxLength="50"/>
-        <ComboBox x:Name="CategoryCombo" HorizontalAlignment="Left" Margin="117,133,0,0" VerticalAlignment="Top" Width="241" IsEditable="True" Height="22" SelectedValue="{Binding MediaCategoryId, Mode=TwoWay}" TabIndex="5" LostKeyboardFocus="CategoryCombo_LostKeyboardFocus" DisplayMemberPath="Name" SelectedValuePath="MediaCategoryId" />
+        <ComboBox x:Name="CategoryCombo" HorizontalAlignment="Left" Margin="117,133,0,0" VerticalAlignment="Top" Width="241" IsEditable="True" Height="22" SelectedValue="{Binding MediaCategoryId, Mode=TwoWay}" TabIndex="5" LostKeyboardFocus="CategoryCombo_LostKeyboardFocus" DisplayMemberPath="Value" SelectedValuePath="Key" />
         <TextBlock HorizontalAlignment="Left" Margin="21,136,0,0" Text="Category" VerticalAlignment="Top" Height="16" Width="65"/>
         <TextBlock HorizontalAlignment="Left" Margin="21,53,0,0" VerticalAlignment="Top" Height="16" Width="96"><Run Text="Download "/><Run Text="Name"/></TextBlock>
         <TextBox x:Name="DownloadNameText" HorizontalAlignment="Left" Height="23" Margin="117,50,0,0" VerticalAlignment="Top" Width="241" Text="{Binding DownloadName, Mode=TwoWay}" TabIndex="2" MaxLength="100"/>

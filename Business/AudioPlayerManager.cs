@@ -40,7 +40,11 @@ namespace Business {
         }
 
         private static IEnumerable<string> GetFiles(string path, string[] searchPatterns, SearchOption searchOption = SearchOption.TopDirectoryOnly) {
-            return Directory.EnumerateFiles(path, "*", searchOption).Where(f => searchPatterns.Any(s => f.EndsWith(s)));
+            try {
+                return Directory.EnumerateFiles(path, "*", searchOption).Where(f => searchPatterns.Any(s => f.EndsWith(s)));
+            } catch {
+                return new string[] { };
+            }
         }
     }
 

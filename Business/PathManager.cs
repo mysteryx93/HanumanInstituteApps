@@ -5,61 +5,74 @@ using System.Windows.Threading;
 
 namespace Business {
     public static class PathManager {
+        public static string TempFilesPath {
+            get { return Settings.SavedFile.NaturalGroundingFolder + @"Temp\"; }
+        }
+
+        public static string MPlayerPath {
+            get { return "MPlayer.exe"; }
+        }
+
+        //public static string AutoPitchFile {
+        //    get { return SavedFile.NaturalGroundingFolder + @"Player.avs"; }
+        //}
+
+
         public static string PreviewScriptFile {
-            get { return Settings.TempFilesPath + "Preview.avs"; }
+            get { return TempFilesPath + "Preview.avs"; }
         }
         public static string PreviewSettingsFile {
-            get { return Settings.TempFilesPath + "Preview.xml"; }
+            get { return TempFilesPath + "Preview.xml"; }
         }
         public static string PreviewSourceFile {
-            get { return Settings.TempFilesPath + "Preview.avi"; }
+            get { return TempFilesPath + "Preview.avi"; }
         }
         public static string PreviewDeshakerScript {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.avs"; }
+            get { return TempFilesPath + "Preview_Deshaker.avs"; }
         }
         public static string PreviewDeshakerTempOut {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.avi"; }
+            get { return TempFilesPath + "Preview_Deshaker.avi"; }
         }
         public static string PreviewDeshakerTempLog {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.txt"; }
+            get { return TempFilesPath + "Preview_Deshaker.txt"; }
         }
         public static string PreviewDeshakerLog {
-            get { return Settings.TempFilesPath + "Preview_Deshaker.log"; }
+            get { return TempFilesPath + "Preview_Deshaker.log"; }
         }
 
         public static string GetScriptFile(int jobIndex, long resumePos) {
             if (jobIndex >= 0) {
                 if (resumePos > -1)
-                    return string.Format("{0}Job{1}_Script_{2}.avs", Settings.TempFilesPath, jobIndex, resumePos);
+                    return string.Format("{0}Job{1}_Script_{2}.avs", TempFilesPath, jobIndex, resumePos);
                 else
-                    return string.Format("{0}Job{1}_Script.avs", Settings.TempFilesPath, jobIndex);
+                    return string.Format("{0}Job{1}_Script.avs", TempFilesPath, jobIndex);
             } else
                 return PreviewScriptFile;
         }
 
         public static string GetSettingsFile(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Settings.xml", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Settings.xml", TempFilesPath, jobIndex);
             else
                 return PreviewSettingsFile;
         }
 
         public static string GetInputFile(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Input.avi", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Input.avi", TempFilesPath, jobIndex);
             else
                 return PreviewSourceFile;
         }
 
         public static string GetOutputFile(int jobIndex, long resumePos, string ext) {
             if (resumePos > -1)
-                return string.Format("{0}Job{1}_Output_{2}.{3}", Settings.TempFilesPath, jobIndex, resumePos, ext);
+                return string.Format("{0}Job{1}_Output_{2}.{3}", TempFilesPath, jobIndex, resumePos, ext);
             else
-                return string.Format("{0}Job{1}_Output.{3}", Settings.TempFilesPath, jobIndex, resumePos, ext);
+                return string.Format("{0}Job{1}_Output.{3}", TempFilesPath, jobIndex, resumePos, ext);
         }
 
         public static string GetAudioFile(int jobIndex, AudioActions codec) {
-            return string.Format("{0}Job{1}_Output.{2}", Settings.TempFilesPath, jobIndex, GetAudioFileExtension(codec));
+            return string.Format("{0}Job{1}_Output.{2}", TempFilesPath, jobIndex, GetAudioFileExtension(codec));
         }
 
         public static string GetAudioFileExtension(AudioActions codec) {
@@ -74,55 +87,55 @@ namespace Business {
         }
 
         public static string GetFinalFile(int jobIndex, string container) {
-            return string.Format("{0}Job{1}_Final.{2}", Settings.TempFilesPath, jobIndex, container);
+            return string.Format("{0}Job{1}_Final.{2}", TempFilesPath, jobIndex, container);
         }
 
         public static string GetTempFile(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Temp", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Temp", TempFilesPath, jobIndex);
             else
-                return string.Format("{0}Preview_Temp", Settings.TempFilesPath);
+                return string.Format("{0}Preview_Temp", TempFilesPath);
         }
 
         public static string GetDeshakerScript(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Deshaker.avs", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Deshaker.avs", TempFilesPath, jobIndex);
             else
                 return PreviewDeshakerScript;
         }
 
         public static string GetDeshakerTempOut(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Deshaker.avi", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Deshaker.avi", TempFilesPath, jobIndex);
             else
                 return PreviewDeshakerTempOut;
         }
 
         public static string GetDeshakerTempLog(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Deshaker.txt", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Deshaker.txt", TempFilesPath, jobIndex);
             else
                 return PreviewDeshakerTempLog;
         }
 
         public static string GetDeshakerLog(int jobIndex) {
             if (jobIndex >= 0)
-                return string.Format("{0}Job{1}_Deshaker.log", Settings.TempFilesPath, jobIndex);
+                return string.Format("{0}Job{1}_Deshaker.log", TempFilesPath, jobIndex);
             else
                 return PreviewDeshakerLog;
         }
 
         public static void DeleteJobFiles(int jobIndex) {
-            foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_*", jobIndex))) {
+            foreach (string f in Directory.EnumerateFiles(TempFilesPath, string.Format("Job{0}_*", jobIndex))) {
                 File.Delete(f);
             }
         }
 
         public static void DeleteOutputFiles(int jobIndex) {
-            foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Output*", jobIndex))) {
+            foreach (string f in Directory.EnumerateFiles(TempFilesPath, string.Format("Job{0}_Output*", jobIndex))) {
                 File.Delete(f);
             }
-            foreach (string f in Directory.EnumerateFiles(Settings.TempFilesPath, string.Format("Job{0}_Final*", jobIndex))) {
+            foreach (string f in Directory.EnumerateFiles(TempFilesPath, string.Format("Job{0}_Final*", jobIndex))) {
                 File.Delete(f);
             }
         }
@@ -182,7 +195,7 @@ namespace Business {
             do {
                 DuplicateIndex++;
                 DestFile = string.Format("{0}{1}{2}",
-                    PathManager.GetPathWithoutExtension(dest),
+                    Path.ChangeExtension(dest, ""),
                     DuplicateIndex > 1 ? string.Format(" ({0})", DuplicateIndex) : "",
                     Path.GetExtension(dest));
             } while (File.Exists(DestFile));
@@ -193,11 +206,11 @@ namespace Business {
         /// Clears the temp folder (unfinished downloads) except Media Encoder files.
         /// </summary>
         public static void ClearTempFolder() {
-            if (Settings.SavedFile == null || !Directory.Exists(Settings.TempFilesPath))
+            if (Settings.SavedFile == null || !Directory.Exists(TempFilesPath))
                 return;
 
             string FileName;
-            foreach (string item in Directory.EnumerateFiles(Settings.TempFilesPath)) {
+            foreach (string item in Directory.EnumerateFiles(TempFilesPath)) {
                 FileName = Path.GetFileName(item);
                 if (!FileName.StartsWith("Preview.") && !FileName.StartsWith("Job")) {
                     try {
@@ -210,13 +223,18 @@ namespace Business {
         }
 
         /// <summary>
-        /// Returns a file path without extension. In contrast to GetFileNameWithoutExtension, this keeps the folder names.
+        /// Returns a unique temporary file with given extension.
         /// </summary>
-        /// <param name="path">A file path.</param>
-        /// <returns>The path without extension.</returns>
-        public static string GetPathWithoutExtension(string path) {
-            int Pos = path.LastIndexOf('.');
-            return Pos == -1 ? path : path.Substring(0, Pos);
+        /// <param name="extension">The extension of the temporary file to create.</param>
+        /// <returns></returns>
+        public static string GetTempFile(string extension) {
+            string FileName = Guid.NewGuid().ToString() + extension;
+            string TempPath = Path.Combine(Path.GetTempPath(), FileName);
+            if (File.Exists(TempPath))
+                return GetTempFile(extension);
+            else
+                return TempPath;
         }
+
     }
 }

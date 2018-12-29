@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.Avisynth;
 
 namespace Business {
     public static class MediaEncoderScript {
@@ -49,28 +50,38 @@ namespace Business {
                     (settings.TrimStart ?? 0) > 0 ? (int)(settings.TrimStart.Value * settings.SourceFrameRate.Value) : 0,
                     (settings.TrimEnd ?? 0) > 0 && !preview ? (int)(settings.TrimEnd.Value * settings.SourceFrameRate.Value) : 0);
             }
+
+            if (settings.Denoise) {
+                //Script.LoadPluginDll("MvTools2.dll");
+                //Script.LoadPluginDll("MaskTools2.dll");
+                //Script.LoadPluginDll("FFT3DFilter.dll");
+                //Script.LoadPluginDll("ModPlus.dll");
+                //Script.LoadPluginDll("RgTools.dll");
+                //Script.LoadPluginDll("DCTFilter.dll");
+                //Script.LoadPluginAvsi("mClean.avsi");
+                //Script.AppendLine("mClean(rn={0}{1})", 10, IsHD ? ", outbits=16" : "");
+                Script.AppendLine(@"MCTemporalDenoise(settings=""{0}""{1})", "medium", settings.Deblock ? ", deblock=true" : "");
+            } else if (settings.Deblock) {
+                Script.LoadPluginDll("MaskTools2.dll");
+                Script.LoadPluginDll("DCTFilter.dll");
+                Script.LoadPluginDll("deblock.dll");
+                Script.LoadPluginAvsi("Deblock_QED.avsi");
+                Script.AppendLine("Deblock_QED()");
+            }
+
             if (settings.CropSource.HasValue) {
                 Script.AppendLine("Crop({0}, {1}, -{2}, -{3})", settings.CropSource.Left, settings.CropSource.Top, settings.CropSource.Right, settings.CropSource.Bottom);
             }
 
             // If possible, KNLMeans will output 16-bit frames before upscaling.
-            bool IsHD = (settings.Dering || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec709 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
+            bool IsHD = (settings.Dering || settings.Deblock || settings.Degrain || settings.SourceColorMatrix != ColorMatrix.Rec709 || (settings.FrameDouble > 0 && (settings.SuperRes || settings.UpscaleMethod == UpscaleMethods.SuperXbr)));
             bool IsColorMatrixHD = IsHD;
             bool IsChromaFixed = settings.SourceChromaPlacement == ChromaPlacement.MPEG2;
             if (IsHD) {
+                //if (!settings.Denoise)
                 Script.AppendLine("ConvertBits(16)");
                 if (settings.SourceColorMatrix != ColorMatrix.Rec709)
                     Script.AppendLine("[ColorMatrixShader]"); // Placeholder that will be replaced after generating the rest.
-            }
-
-            if (settings.Denoise) {
-                Script.LoadPluginDll("MvTools2.dll");
-                Script.LoadPluginDll("MaskTools2.dll");
-                Script.LoadPluginDll("FFT3DFilter.dll");
-                Script.LoadPluginDll("ModPlus.dll");
-                Script.LoadPluginDll("RgTools.dll");
-                Script.LoadPluginAvsi("MClean.avsi");
-                Script.AppendLine("MClean(rn=10)");
             }
 
             if (settings.FixDoubleFrames) {
@@ -200,7 +211,7 @@ namespace Business {
                 // Apply color matrix
                 if (settings.SourceColorMatrix == ColorMatrix.Pc709) {
                     Script.LoadPluginDll("SmoothAdjust.dll");
-                    ColorMatrixScript = string.Format(@"SmoothLevels{0}(preset=""pc2tv"")", IsColorMatrixHD ? "16" : "");
+                    ColorMatrixScript = string.Format(@"ColorYUV(levels=""PC->TV""");
                 } else if (settings.SourceColorMatrix != ColorMatrix.Rec709) {
                     Script.LoadPluginDll("Shader.dll");
                     Script.LoadPluginAvsi("Shader.avsi");
@@ -273,7 +284,7 @@ namespace Business {
             Script.LoadPluginDll(@"VDubFilter.dll");
 
             Script.AppendLine(@"LoadVirtualDubPlugin(P+""deshaker.vdf"", ""deshaker"", preroll=0)");
-            Script.AppendLine(@"Dither_convert_yuv_to_rgb(output=""rgb32"", matrix=""709"", noring=true, lsb_in={0}, mode=6)", isLsb);
+            Script.AppendLine(@"ConvertToRGB32(matrix=""Rec709"")");
             if (multiProcess) {
                 Script.AppendLine("### prefetch: 3, 3"); // Keep 3 frames before and after for temporal filters.
                 Script.AppendLine("### ###"); // MP_Pipeline starts new process here
@@ -313,7 +324,7 @@ namespace Business {
                     NewNum = 120; // 120000;
                     NewDen = 1; // 1001;
                 }
-                Script.AppendLine(@"FrameRateConverter(NewNum={0}, NewDen={1}{2}{3})", NewNum, NewDen, settings.IncreaseFrameRateSmooth ? ", Preset=\"slower\"" : "", Prefilter);
+                Script.AppendLine(@"FrameRateConverter(NewNum={0}, NewDen={1}, Preset=""{2}""{3})", NewNum, NewDen, settings.IncreaseFrameRatePreset, Prefilter);
             }
         }
 

@@ -17,6 +17,8 @@ namespace NaturalGroundingPlayer {
             // Set the icon.
             window.Icon = SessionCore.Instance.Icon;
             window.UseLayoutRounding = true;
+            TextOptions.SetTextFormattingMode(window, TextFormattingMode.Display);
+            TextOptions.SetTextRenderingMode(window, TextRenderingMode.ClearType);
 
             // Set vertical content align for all textboxes
             window.Loaded += delegate (object sender, RoutedEventArgs e) {

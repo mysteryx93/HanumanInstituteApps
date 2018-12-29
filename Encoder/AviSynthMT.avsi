@@ -14,41 +14,11 @@
 ##################################################################################
 # Official avs+ filters. Newer versions will register themself so you should never force any of these modes
 ############################################
-#rgtools
 SetFilterMTMode("DEFAULT_MT_MODE",     MT_MULTI_INSTANCE)
-
-SetFilterMTMode("removegrain",         MT_NICE_FILTER)
-SetFilterMTMode("repair",              MT_NICE_FILTER)
-SetFilterMTMode("verticalcleaner",     MT_NICE_FILTER)
-SetFilterMTMode("clense",              MT_NICE_FILTER)
 #medianblur   
 SetFilterMTMode("medianblur",          MT_MULTI_INSTANCE)
 SetFilterMTMode("medianblurtemporal",  MT_MULTI_INSTANCE)
-#masktools   
-SetFilterMTMode("mt_invert",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_binarize",         MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_inflate",          MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_deflate",          MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_inpand",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_expand",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lut",              MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lutxy",            MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lutxyz",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_luts",             MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lutf",             MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lutsx",            MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_lutspa",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_merge",            MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_logic",            MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_convolution",      MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_mappedblur",       MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_makediff",         MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_average",          MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_adddiff",          MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_clamp",            MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_motion",           MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_edge",             MT_MULTI_INSTANCE)
-SetFilterMTMode("mt_hysteresis",       MT_MULTI_INSTANCE)
+
 SetFilterMTMode("sangnom2",            MT_SERIALIZED) #can run with 2 but you should specify threads=1 then, otherwise too many threads will get created without any benefit
 SetFilterMTMode("average",             MT_NICE_FILTER)
 SetFilterMTMode("TMaskCleaner",        MT_MULTI_INSTANCE)
@@ -179,13 +149,6 @@ SetFilterMTMode("TDeint",              MT_MULTI_INSTANCE) # Mode 1 creates artif
 SetFilterMTMode("yadifmod",            MT_NICE_FILTER)
 SetFilterMTMode("yadifmod2",           MT_NICE_FILTER)
 
-#########################################
-# Filters from MVTools v2.6.0.5 (from http://forum.doom9.org/showthread.php?p=1386559#post1386559 ) Tested On 2016/03/06
-SetFilterMTMode("MSuper",              MT_MULTI_INSTANCE)
-SetFilterMTMode("MAnalyse",            MT_MULTI_INSTANCE)
-SetFilterMTMode("MFlowFps",            MT_MULTI_INSTANCE)
-SetFilterMTMode("MRecalculate",        MT_MULTI_INSTANCE)
-#########################################
 #Filters from EEDI2 v0.9.2 (from http://forum.doom9.org/showthread.php?t=173238 ) Tested On 2016/03/06
 SetFilterMTMode("EEDI2",               MT_MULTI_INSTANCE)
 

@@ -5,10 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Globalization;
-using System.Diagnostics;
 using DataAccess;
 using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.Avisynth;
 using System.Threading;
 using System.Windows;
 
@@ -120,7 +119,7 @@ namespace Business {
                     // Encode audio stream
                     Task EncAudio = null;
                     if (settings.HasAudioOptions)
-                        EncAudio = Task.Run(() => AvisynthTools.EncodeAudio(settings));
+                        EncAudio = Task.Run(() => EncoderBusiness.EncodeAudio(settings));
 
                     // Encode video stream in segments
                     List<Task<CompletionStatus>> EncTasks = new List<Task<CompletionStatus>>();
@@ -130,7 +129,7 @@ namespace Business {
                             MediaEncoderSettings EncSettings = settings.Clone();
                             EncSettings.ResumePos = seg.Start;
                             File.Delete(EncSettings.OutputFile);
-                            EncTasks.Add(Task.Run(() => AvisynthTools.EncodeVideo(EncSettings, seg.Length, SegBusiness.TotalFrames)));
+                            EncTasks.Add(Task.Run(() => EncoderBusiness.EncodeVideo(EncSettings, seg.Length, SegBusiness.TotalFrames)));
 
                             // If there are more segments than max parallel instances, wait until some threads finish
                             if (EncTasks.Count >= settings.ParallelProcessing) {
@@ -289,7 +288,7 @@ namespace Business {
             // Auto-calculate crop settings.
             if (calcAutoCrop) {
                 if (settings.CropLeft == 0 && settings.CropTop == 0 && settings.CropRight == 0 && settings.CropBottom == 0) {
-                    Rect AutoCrop = await Task.Run(() => AvisynthTools.GetAutoCropRect(settings, null));
+                    Rect AutoCrop = await Task.Run(() => EncoderBusiness.GetAutoCropRect(settings.FilePath, settings.SourceHeight ?? 0, settings.SourceWidth ?? 0, null));
                     if (settings.CropLeft == 0)
                         settings.CropLeft = AutoCrop.Left;
                     if (settings.CropTop == 0)
@@ -406,31 +405,31 @@ namespace Business {
             settings.SourceHeight = FInfo.VideoStream.Height;
             if (settings.SourceHeight > 768)
                 settings.OutputHeight = settings.SourceHeight.Value;
-            settings.SourceAspectRatio = (float)VInfo.PixelAspectRatio;
+            settings.SourceAspectRatio = (float)(VInfo?.PixelAspectRatio ?? 1);
             // Fix last track of VCDs that is widescreen.
             if (settings.SourceHeight == 288 && settings.SourceWidth == 352 && settings.SourceAspectRatio == 1.485f)
                 settings.SourceAspectRatio = 1.092f;
-            settings.SourceFrameRate = VInfo.FrameRate;
+            settings.SourceFrameRate = VInfo?.FrameRate;
 
-            settings.SourceAudioFormat = AInfo.Format;
-            settings.SourceVideoFormat = VInfo.Format;
-            bool IsTvRange = VInfo.ColorRange != "pc";
-            if (!string.IsNullOrEmpty(VInfo.ColorMatrix)) {
+            settings.SourceAudioFormat = AInfo?.Format;
+            settings.SourceVideoFormat = VInfo?.Format;
+            bool IsTvRange = VInfo?.ColorRange != "pc";
+            if (!string.IsNullOrEmpty(VInfo?.ColorMatrix)) {
                 settings.SourceColorMatrix = VInfo.ColorMatrix.EndsWith("601") ? (IsTvRange ? ColorMatrix.Rec601 : ColorMatrix.Pc601) : (IsTvRange ? ColorMatrix.Rec709 : ColorMatrix.Pc709);
             } else
-                settings.SourceColorMatrix = VInfo.Height < 600 ? (IsTvRange ? ColorMatrix.Rec601 : ColorMatrix.Pc601) : (IsTvRange ? ColorMatrix.Rec709 : ColorMatrix.Pc709);
-            settings.SourceChromaPlacement = string.Compare(VInfo.Format, "mpeg1video", true) == 0 ? ChromaPlacement.MPEG1 : ChromaPlacement.MPEG2;
-            settings.DegrainPrefilter = VInfo.Height < 600 ? DegrainPrefilters.SD : DegrainPrefilters.HD;
+                settings.SourceColorMatrix = VInfo?.Height < 600 ? (IsTvRange ? ColorMatrix.Rec601 : ColorMatrix.Pc601) : (IsTvRange ? ColorMatrix.Rec709 : ColorMatrix.Pc709);
+            settings.SourceChromaPlacement = string.Compare(VInfo?.Format, "mpeg1video", true) == 0 ? ChromaPlacement.MPEG1 : ChromaPlacement.MPEG2;
+            settings.DegrainPrefilter = VInfo?.Height < 600 ? DegrainPrefilters.SD : DegrainPrefilters.HD;
 
             settings.SourceVideoBitrate = (int)(new FileInfo(previewFile).Length / FInfo.FileDuration.TotalSeconds / 1024 * 8);
-            settings.SourceAudioBitrate = AInfo.Bitrate;
+            settings.SourceAudioBitrate = AInfo?.Bitrate;
             if (!settings.HasAudioOptions)
-                settings.AudioQuality = AInfo.Bitrate > 0 ? AInfo.Bitrate : 256;
+                settings.AudioQuality = AInfo?.Bitrate > 0 ? AInfo.Bitrate : 256;
             if (settings.AudioQuality > 384)
                 settings.AudioQuality = 384;
             settings.SourceBitDepth = 8; // VInfo.BitDepth;
-            settings.DenoiseD = 2;
-            settings.DenoiseA = settings.SourceHeight < 720 ? 2 : 1;
+            //settings.DenoiseD = 2;
+            //settings.DenoiseA = settings.SourceHeight < 720 ? 2 : 1;
             settings.Position = FInfo.FileDuration.TotalSeconds / 2;
             settings.VideoAction = settings.SourceHeight >= 1080 ? VideoAction.x264 : VideoAction.x265;
             settings.EncodeQuality = settings.SourceHeight >= 1080 ? 23 : 22;
@@ -445,7 +444,7 @@ namespace Business {
             Media EditVideo = EditBusiness.GetVideoByFileName(RelativePath);
             System.Threading.Thread.Sleep(200); // Give MPC time to release the file.
             string OriginalPath = Path.Combine(Path.GetDirectoryName(jobInfo.OldFileName), "Original", Path.GetFileName(jobInfo.OldFileName));
-            string NewPath = PathManager.GetPathWithoutExtension(jobInfo.OldFileName) + Path.GetExtension(jobInfo.Settings.FinalFile);
+            string NewPath = Path.ChangeExtension(jobInfo.OldFileName, null) + Path.GetExtension(jobInfo.Settings.FinalFile);
             Directory.CreateDirectory(Path.GetDirectoryName(OriginalPath));
             PathManager.SafeMove(jobInfo.OldFileName, OriginalPath);
             PathManager.SafeMove(jobInfo.Settings.FinalFile, NewPath);
@@ -459,7 +458,7 @@ namespace Business {
         }
 
         public void FinalizeKeep(EncodingCompletedEventArgs jobInfo) {
-            string FinalFile = String.Format("{0} - Encoded.{1}", PathManager.GetPathWithoutExtension(jobInfo.OldFileName), jobInfo.Settings.Container);
+            string FinalFile = String.Format("{0} - Encoded.{1}", Path.ChangeExtension(jobInfo.OldFileName, null), jobInfo.Settings.Container);
             PathManager.SafeMove(jobInfo.NewFileName, FinalFile);
         }
 
@@ -508,14 +507,14 @@ namespace Business {
         /// </summary>
         public void AutoLoadJobs() {
             try {
-                if (!Directory.Exists(Settings.TempFilesPath))
-                    Directory.CreateDirectory(Settings.TempFilesPath);
+                if (!Directory.Exists(PathManager.TempFilesPath))
+                    Directory.CreateDirectory(PathManager.TempFilesPath);
             }
             catch {
                 return;
             }
 
-            var JobList = Directory.EnumerateFiles(Settings.TempFilesPath, "Job*_Settings.xml");
+            var JobList = Directory.EnumerateFiles(PathManager.TempFilesPath, "Job*_Settings.xml");
             int Index = 0;
             MediaEncoderSettings settings;
             //List<Task> TaskList = new List<Task>();

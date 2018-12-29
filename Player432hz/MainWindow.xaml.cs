@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using EmergenceGuardian.WpfCommon;
 using EmergenceGuardian.FFmpeg;
+using System.Threading.Tasks;
 
 namespace Player432hz {
     /// <summary>
@@ -16,7 +18,6 @@ namespace Player432hz {
         internal ConfigFile config;
         internal PlaylistItem currentPlaylist;
         internal ObservableCollection<string> files = new ObservableCollection<string>();
-        DispatcherTimer posTimer = new DispatcherTimer();
         internal PlayingInfo displayInfo = new PlayingInfo();
 
         AudioPlayerManager playManager = new AudioPlayerManager();
@@ -26,27 +27,28 @@ namespace Player432hz {
             AppPaths.ConfigureFFmpegPaths(this);
 
             playManager.StartPlaying += PlayManager_StartPlaying;
-            AudioPlayer.Player.MediaOpened += Player_MediaOpened;
-            AudioPlayer.Player.MediaStop += Player_MediaStop;
-            AudioPlayer.Player.PositionChanged += Player_PositionChanged;
-
             FilesList.DataContext = files;
-            GridPlaying.DataContext = displayInfo;
-
-            posTimer.Tick += PosTimer_Tick;
-            posTimer.Interval = new TimeSpan(0, 0, 1);
 
             config = ConfigFile.Load();
             if (config.Width > 0)
                 this.Width = config.Width;
             if (config.Height > 0)
                 this.Height = config.Height;
-            if (config.Volume > 0 && config.Volume <= 100)
-                AudioPlayer.Player.Volume = config.Volume;
             PlaylistsList.DataContext = config.Playlists;
             if (config.Playlists.Count == 0) {
                 AddPlaylistButton_Click(null, null);
             }
+
+            Player.MediaPlayerInitialized += (s, e) => {
+                Player.Host.Player.MediaUnloaded += Player_MediaUnloaded;
+                Player.Host.Player.MediaFinished += Player_MediaFinished;
+                if (config.Volume > 0 && config.Volume <= 100)
+                    Player.Host.Volume = config.Volume;
+            };
+        }
+
+        private void Player_MediaFinished(object sender, EventArgs e) {
+            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
@@ -57,12 +59,14 @@ namespace Player432hz {
             SplashWindow F = SplashWindow.Instance(this, Properties.Resources.AppIcon);
             F.CanClose();
             F.ShowDialog();
+
+            var a = MediaInfo.GetVersion();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             config.Width = this.Width;
             config.Height = this.Height;
-            config.Volume = AudioPlayer.Player.Volume;
+            config.Volume = Player.Host.Volume;
             config.Save();
         }
 
@@ -150,33 +154,65 @@ namespace Player432hz {
         }
 
         private void PlayManager_StartPlaying(object sender, PlayingEventArgs e) {
-            NowPlayingLabel.Text = e.FileName;
-            AudioPlayer.Player.Source = null;
-            FFmpegProcess infoReader = MediaInfo.GetFileInfo(e.FileName);
-            AutoPitchBusiness.CreateScript(e.FileName, infoReader, AppPaths.Player432hzScriptFile);
-            AudioPlayer.Player.Source = AppPaths.Player432hzScriptFile;
-            posTimer.Stop();
-            NowPlayingPos.Visibility = Visibility.Hidden;
+            if (isStartingPlay)
+                return;
+            Dispatcher.Invoke(() => {
+                if (Player.Host.IsMediaLoaded) {
+                    isStartingPlay = true;
+                    Player.Host.Player.Stop();
+                } else
+                    PlayMedia();
+                //FFmpegProcess infoReader = MediaInfo.GetFileInfo(e.FileName);
+                //AutoPitchBusiness.CreateScript(e.FileName, infoReader, AppPaths.Player432hzScriptFile);
+                //Player.Host.Player.Load(AppPaths.Player432hzScriptFile);
+                //isStartingPlay = false;
+            });
         }
 
-        private void Player_MediaOpened(object sender, EventArgs e) {
-            PosTimer_Tick(null, null);
-            posTimer.Start();
-            NowPlayingPos.Visibility = Visibility.Visible;
+        private void PlayMedia() {
+            FFmpegProcess infoReader = MediaInfo.GetFileInfo(playManager.NowPlaying);
+            AutoPitchBusiness.CreateScript(playManager.NowPlaying, infoReader, AppPaths.Player432hzScriptFile);
+            Player.Host.Source = null;
+            Player.Host.Source = AppPaths.Player432hzScriptFile;
+            Player.Host.Title = Path.GetFileName(playManager.NowPlaying);
         }
 
-        private async void Player_MediaStop(object sender, EventArgs e) {
-            await System.Threading.Tasks.Task.Delay(100);
-            playManager.PlayNext();
+        private bool isStartingPlay = false;
+        private void Player_MediaUnloaded(object sender, EventArgs e) {
+            if (isStartingPlay) {
+                Dispatcher.Invoke(() => PlayMedia());
+                isStartingPlay = false;
+            } else
+                playManager.PlayNext();
+            //playManager.PlayNext();
+            //if (!isStartingPlay)
+            //    playManager.PlayNext();
+            //else
+            //    isStartingPlay = false;
         }
 
-        private void Player_PositionChanged(object sender, EventArgs e) {
-            PosTimer_Tick(null, null);
-        }
+        //private void Player_MediaOpened(object sender, EventArgs e) {
+        //    Dispatcher.Invoke(() => {
+        //        Player_PositionChanged(null, new MplayerEvent(0));
+        //        NowPlayingPos.Visibility = Visibility.Visible;
+        //    });
+        //}
 
-        private void PosTimer_Tick(object sender, EventArgs e) {
-            displayInfo.Position = AudioPlayer.Position;
-            displayInfo.Duration = AudioPlayer.Duration;
-        }
+        //private void Player_MediaClosed(object sender, MplayerEvent e) {
+        //    // Regular file end(1) or process closed(-1)
+        //    if (e.Value == 1 || e.Value == -1) {
+        //        playManager.PlayNext();
+        //    }
+        //}
+
+        //private void Player_MediaStopped(object sender, EventArgs e) {
+        //    // Stopped manually (MediaClosed has status 4)
+        //    playManager.PlayNext();
+        //}
+
+        //private void Player_PositionChanged(object sender, MplayerEvent e) {
+        //    displayInfo.Position = e.Value;
+        //    displayInfo.Duration = Player.Duration;
+        //}
     }
 }

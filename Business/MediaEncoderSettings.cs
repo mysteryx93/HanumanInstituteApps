@@ -66,11 +66,12 @@ namespace Business {
             }
         }
         public bool Denoise { get; set; }
-        public int DenoiseStrength { get; set; }
-        public int DenoiseD { get; set; }
-        public int DenoiseA { get; set; }
+        public int DenoiseSharp { get; set; }
+        public int DenoiseRn { get; set; }
+        public bool DenoisePrescan { get; set; }
         public bool FixDoubleFrames { get; set; }
         public bool Dering { get; set; }
+        public bool Deblock { get; set; }
         public bool Degrain { get; set; }
         public int DegrainStrength { get; set; }
         public bool DegrainSharp { get; set; }
@@ -78,7 +79,8 @@ namespace Business {
         public bool Deshaker { get; set; }
         public bool IncreaseFrameRate { get; set; }
         public FrameRateModeEnum IncreaseFrameRateValue { get; set; }
-        public bool IncreaseFrameRateSmooth { get; set; }
+        public FrameRatePresetEnum IncreaseFrameRatePreset { get; set; }
+        public bool IncreaseFrameRatePrefilter { get; set; }
         public UpscaleMethods UpscaleMethod { get; set; }
         public DownscaleMethods DownscaleMethod { get; set; }
         public int SuperXbrStrength { get; set; }
@@ -221,13 +223,17 @@ namespace Business {
         [XmlIgnore()]
         public int ParallelProcessing {
             get {
-                return IncreaseFrameRate && IncreaseFrameRateSmooth ? Environment.ProcessorCount / 2 : 0;
-                // return IncreaseFrameRate && IncreaseFrameRateSmooth ? 2 : 0;
+                return RunInParallel ? Environment.ProcessorCount / 2 : 0;
             }
         }
         public int Threads {
             get {
-                return IncreaseFrameRate && IncreaseFrameRateSmooth ? 1 : Environment.ProcessorCount;
+                return RunInParallel ? 1 : Environment.ProcessorCount;
+            }
+        }
+        public bool RunInParallel {
+            get {
+                return Denoise || (IncreaseFrameRate && IncreaseFrameRatePreset >= FrameRatePresetEnum.Normal);
             }
         }
 
@@ -237,15 +243,14 @@ namespace Business {
             SourceChromaPlacement = ChromaPlacement.MPEG2;
             OutputHeight = 768;
             Denoise = true;
-            DenoiseStrength = 18;
-            DenoiseD = 2;
-            DenoiseA = 2;
+            DenoiseSharp = 13;
+            DenoiseRn = 10;
             Degrain = false;
             DegrainStrength = 10;
             DegrainSharp = true;
             IncreaseFrameRate = true;
             IncreaseFrameRateValue = FrameRateModeEnum.fps60;
-            IncreaseFrameRateSmooth = true;
+            IncreaseFrameRatePreset = FrameRatePresetEnum.Slower;
             UpscaleMethod = UpscaleMethods.SuperXbr;
             DownscaleMethod = DownscaleMethods.Bicubic;
             SuperXbrStrength = 27;

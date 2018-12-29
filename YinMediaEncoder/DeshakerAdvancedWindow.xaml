@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:Business="clr-namespace:Business;assembly=Business" x:Name="window" x:Class="YinMediaEncoder.DeshakerAdvancedWindow"
+        xmlns:WpfCommon="clr-namespace:EmergenceGuardian.WpfCommon;assembly=WpfCommon" x:Name="window" x:Class="YinMediaEncoder.DeshakerAdvancedWindow"
         mc:Ignorable="d"
         Title="Advanced Deshaker Pass 1 Settings" Height="369.045" Width="300.872" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Window.Resources>
-        <Business:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-        <Business:BooleanAndConverter x:Key="BooleanAndConverter"/>
+        <WpfCommon:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <WpfCommon:BooleanAndConverter x:Key="BooleanAndConverter"/>
         <ControlTemplate x:Key="validationTemplate">
             <DockPanel>
                 <AdornedElementPlaceholder/>
@@ -22,7 +22,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <WpfCommon:EnumToIntConverter x:Key="EnumToIntConverter"/>
     </Window.Resources>
     <Grid Style="{DynamicResource GradiantBackground}">
         <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" Margin="0,0,14,14" VerticalAlignment="Bottom" Width="75" IsDefault="True" Click="OkButton_Click"/>
@@ -31,7 +31,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="75,11,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="BlockSize" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="1" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="1" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -44,7 +44,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="125,82,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="InitialSearchRange" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="1" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="1" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -53,7 +53,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="153,105,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DifferentialSearchRange" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="1" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="1" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -63,7 +63,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="175,173,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DiscardMotionDiff" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="0" Max="255" />
+                    <WpfCommon:NumericRangeRule Min="0" Max="255" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -72,7 +72,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="139,196,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DiscardBadMotion" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="-1000" Max="1000" />
+                    <WpfCommon:NumericRangeRule Min="-1000" Max="1000" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -81,7 +81,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="75,242,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DiscardMotion" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="1" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="1" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -90,7 +90,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="75,265,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DiscardAbsoluteMotion" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="1" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="1" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -99,7 +99,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="189,219,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="DiscardBadMotion2" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="0" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="0" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
@@ -107,7 +107,7 @@
         <TextBox HorizontalAlignment="Left" Height="21" Margin="97,128,0,0" VerticalAlignment="Top" Width="50" TabIndex="29" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}">
             <Binding Path="SkipBadFrame" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
-                    <Business:NumericRangeRule Min="0" Max="100" />
+                    <WpfCommon:NumericRangeRule Min="0" Max="100" />
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>

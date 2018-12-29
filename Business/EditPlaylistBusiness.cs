@@ -111,7 +111,7 @@ namespace Business {
             var FileEnum = Directory.EnumerateFiles(Settings.NaturalGroundingFolder, "*.*", System.IO.SearchOption.AllDirectories);
             foreach (string f in FileEnum) {
                 // Exclude temp folder.
-                if (!f.StartsWith(Settings.TempFilesPath)) {
+                if (!f.StartsWith(PathManager.TempFilesPath)) {
                     ItemFile = f.Substring(Settings.NaturalGroundingFolder.Length);
                     ItemInDatabase = AllFiles.Any(d => d.Equals(ItemFile, StringComparison.OrdinalIgnoreCase));
                     files.Add(new LocalFileInfo(ItemFile, ItemInDatabase));

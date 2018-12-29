@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -106,9 +107,8 @@ namespace NaturalGroundingPlayer {
 
         private void CategoryCombo_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
             ComboBox Obj = sender as ComboBox;
-            MediaCategory ObjItem = Obj.SelectedItem as MediaCategory;
-            if (ObjItem != null)
-                Obj.Text = ObjItem.Name;
+            if (Obj.SelectedItem != null)
+                Obj.Text = ((KeyValuePair<Guid?, string>)Obj.SelectedItem).Value;
             else
                 Obj.Text = "";
         }

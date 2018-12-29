@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
-using NaturalGroundingPlayer;
 using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.MediaEncoder;
 
 namespace YinMediaEncoder {
     /// <summary>
@@ -17,7 +16,7 @@ namespace YinMediaEncoder {
             DeshakerWindow NewForm = new DeshakerWindow();
             NewForm.business = business;
             NewForm.encodeSettings = settings;
-            SessionCore.Instance.Windows.ShowDialog(NewForm);
+            NewForm.ShowDialog();
             return NewForm.Result;
         }
 

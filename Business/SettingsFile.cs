@@ -115,10 +115,10 @@ namespace Business {
                     return "Invalid SVP path";
             }
 
-            if (MediaPlayerApp == MediaPlayerApplication.Wmp) {
-                if (!MediaPlayer.WindowsMediaPlayer.IsWmpInstalled)
-                    return "Windows Media Player is not installed";
-            }
+            //if (MediaPlayerApp == MediaPlayerApplication.Wmp) {
+            //    if (!MediaPlayer.WindowsMediaPlayer.IsWmpInstalled)
+            //        return "Windows Media Player is not installed";
+            //}
 
             return null;
         }
