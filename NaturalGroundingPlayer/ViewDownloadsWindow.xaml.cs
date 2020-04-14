@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using Business;
-using DataAccess;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using EmergenceGuardian.WpfCommon;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.CommonWpf;
+using EmergenceGuardian.DownloadManager;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Business;
-using DataAccess;
 using System.Windows.Threading;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.DownloadManager;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

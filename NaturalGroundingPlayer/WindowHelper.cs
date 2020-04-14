@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls;
-using Business;
-using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.CommonWpf;
 
 namespace NaturalGroundingPlayer {
     public class WindowHelper {

@@ -11,8 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -114,33 +114,33 @@ namespace NaturalGroundingPlayer {
                 double right = left + item.ActualWidth;
                 if (Pos.X >= left && Pos.X <= right) {
                     if (item == Bar1)
-                        LoadVideos(business.bars[0]);
+                        LoadVideos(business.Bars[0]);
                     else if (item == Bar2)
-                        LoadVideos(business.bars[1]);
+                        LoadVideos(business.Bars[1]);
                     else if (item == Bar3)
-                        LoadVideos(business.bars[2]);
+                        LoadVideos(business.Bars[2]);
                     else if (item == Bar4)
-                        LoadVideos(business.bars[3]);
+                        LoadVideos(business.Bars[3]);
                     else if (item == Bar5)
-                        LoadVideos(business.bars[4]);
+                        LoadVideos(business.Bars[4]);
                     else if (item == Bar6)
-                        LoadVideos(business.bars[5]);
+                        LoadVideos(business.Bars[5]);
                     else if (item == Bar7)
-                        LoadVideos(business.bars[6]);
+                        LoadVideos(business.Bars[6]);
                     else if (item == Bar8)
-                        LoadVideos(business.bars[7]);
+                        LoadVideos(business.Bars[7]);
                     else if (item == Bar9)
-                        LoadVideos(business.bars[8]);
+                        LoadVideos(business.Bars[8]);
                     else if (item == Bar10)
-                        LoadVideos(business.bars[9]);
+                        LoadVideos(business.Bars[9]);
                     else if (item == Bar11)
-                        LoadVideos(business.bars[10]);
+                        LoadVideos(business.Bars[10]);
                     else if (item == Bar12)
-                        LoadVideos(business.bars[11]);
+                        LoadVideos(business.Bars[11]);
                     else if (item == Bar13)
-                        LoadVideos(business.bars[12]);
+                        LoadVideos(business.Bars[12]);
                     else if (item == Bar14)
-                        LoadVideos(business.bars[13]);
+                        LoadVideos(business.Bars[13]);
                 }
             }
         }

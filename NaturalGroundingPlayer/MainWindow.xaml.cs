@@ -7,10 +7,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Business;
-using DataAccess;
 using System.Windows.Media;
-using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.CommonWpf;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

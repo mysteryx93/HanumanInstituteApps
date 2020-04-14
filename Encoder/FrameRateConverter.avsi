@@ -1,5 +1,5 @@
 # Frame Rate Converter
-# Version: 1.2  (September 2nd 2017)
+# Version: 1.2.1 (May 12th 2018)
 # By Etienne Charland
 # Based on Oleg Yushko's YFRC artifact masking,
 # johnmeyer's frame interpolation code, and
@@ -73,6 +73,9 @@
 ## @ Dct         - Overrides DCT parameter for MAnalyse (default: Normal=0, Slow=4, Slowest=1)
 ##                 
 ## @ DctRe       - Overrides DCT parameter for MRecalculate (default: Fast=0, Normal=4, Slowest=1)
+##
+## @ BlendRatio  - Changes the blend ratio used to fill artifact zones. 0 = frame copy and 100 = full blend.
+##                 Other values provide a result in-between to eliminate ghost effects. Default = 40.
 ##                 
 ##
 ## Presets
@@ -85,7 +88,7 @@
 ## Anime:   Slow with BlendOver=40, SkipOver=140
 ##
 function FrameRateConverter(clip C, int "NewNum", int "NewDen", string "Preset", int "BlkSize", int "BlkSizeV", bool "FrameDouble", string "Output", bool "Debug",
-\ clip "Prefilter", int "MaskThr", int "MaskOcc", int "SkipThr", int "BlendOver", int "SkipOver", bool "Stp", int "Dct", int "DctRe")
+\ clip "Prefilter", int "MaskThr", int "MaskOcc", int "SkipThr", int "BlendOver", int "SkipOver", bool "Stp", int "Dct", int "DctRe", int "BlendRatio")
 {
     Preset = Default(Preset, "normal")
     P_SLOWEST = 0  P_SLOWER = 1  P_SLOW = 2  P_NORMAL = 3  P_FAST = 4  P_FASTER = 5  P_ANIME = 6
@@ -112,6 +115,7 @@ function FrameRateConverter(clip C, int "NewNum", int "NewDen", string "Preset",
     CalcPrefilter = Defined(Prefilter)
     Prefilter   = Default(Prefilter, C)
     Debug       = Default(Debug, false)
+    BlendRatio  = Default(BlendRatio, 40)
 
     OutFps      = OPut!=O_MASK && OPut!=O_SKIP && OPut!=O_RAW && OPut!=O_DIFF && OPut!=O_STRIPE  # Whether output has altered frame rate
     PSET        = PSET == P_ANIME ? P_SLOW : PSET
@@ -129,7 +133,7 @@ function FrameRateConverter(clip C, int "NewNum", int "NewDen", string "Preset",
     Assert(CalcDiff || OPut!=O_DIFF, "FrameRateConverter: You can only use Output='Diff' when using Preset=slower or slowest")
 
     ## "B" - Blending, "BHard" - No blending
-    B = C.ConvertFps(NewNum, NewDen)
+    B = C.ConvertFpsLimit(NewNum, NewDen, ratio=BlendRatio)
     BHard = C.ChangeFps(NewNum, NewDen)
     AvsPlus = Findstr(VersionString(), "AviSynth+") != 0 && Findstr(VersionString(), "r1576") == 0
     C_luma = C.ConvertToY8()

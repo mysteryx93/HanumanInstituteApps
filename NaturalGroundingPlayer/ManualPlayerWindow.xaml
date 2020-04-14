@@ -3,14 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:w="clr-namespace:NaturalGroundingPlayer"
         xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer" 
-        xmlns:Business="clr-namespace:Business;assembly=Business" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="NaturalGroundingPlayer.ManualPlayerWindow"
+        xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="NaturalGroundingPlayer.ManualPlayerWindow"
         x:Name="window"
         Title="Natural Grounding Player" Height="440" Width="600" Closing="window_Closing" Loaded="window_Loaded" MinWidth="510" MinHeight="300" PreviewKeyDown="window_PreviewKeyDown">
     <Window.Resources>
-        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
-        <Business:RatingConverter x:Key="RatingConverter"/>
-        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
-        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+        <CommonWpf:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <CommonWpf:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <CommonWpf:RatingToColorConverter x:Key="RatingToColorConverter"/>
         <RoutedUICommand x:Key="Play" Text="Play" />
         <RoutedUICommand x:Key="PlayNext" Text="Play Next" />
     </Window.Resources>

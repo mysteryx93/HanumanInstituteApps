@@ -1,11 +1,12 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.MoveFilesWindow"
+        xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
+        x:Class="NaturalGroundingPlayer.MoveFilesWindow"
         Title="Move Files" Height="436.466" Width="711.655" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Window.Resources>
-        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
-        <Business:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <CommonWpf:RatingConverter x:Key="RatingConverter"/>
     </Window.Resources>
     <Grid Style="{DynamicResource GradiantBackground}">
         <ListView x:Name="FilesView" Margin="10,50,10,37" SelectedValuePath="VideoId" TabIndex="3" SelectionChanged="FilesView_SelectionChanged" Background="{x:Null}">

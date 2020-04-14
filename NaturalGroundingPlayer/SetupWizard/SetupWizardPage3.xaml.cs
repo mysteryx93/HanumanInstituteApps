@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
-using DataAccess;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.DownloadManager;
 
 namespace NaturalGroundingPlayer {
     public partial class SetupWizardPage3 : Page {
@@ -22,9 +22,9 @@ namespace NaturalGroundingPlayer {
         private async void Page_Loaded(object sender, RoutedEventArgs e) {
             owner = (SetupWizard)Window.GetWindow(this);
 
-            MpcConfigBusiness.IsSvpEnabled = true;
-            MpcConfigBusiness.IsMadvrEnabled = false;
-            MpcConfigBusiness.IsWidescreenEnabled = false;
+            MpcConfiguration.IsSvpEnabled = true;
+            MpcConfiguration.IsMadvrEnabled = false;
+            MpcConfiguration.IsWidescreenEnabled = false;
 
             MediaList.Settings.IsInDatabase = true;
             await Task.Delay(100);

@@ -12,8 +12,8 @@ using System.ComponentModel;
 using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
 using System.Diagnostics;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 using System.Windows.Threading;
 
 namespace NaturalGroundingPlayer {
@@ -128,7 +128,7 @@ namespace NaturalGroundingPlayer {
 
         private void VideosView_ItemRightButtonUp(object sender, MouseButtonEventArgs e) {
             if (VideosView.SelectedItem != null) {
-                VideoListItem Item = (VideoListItem)VideosView.SelectedItem;
+                MediaListItem Item = (MediaListItem)VideosView.SelectedItem;
                 ShowEditFormPopup(Item, sender as UIElement);
             }
         }
@@ -140,23 +140,23 @@ namespace NaturalGroundingPlayer {
 
         private void EditButton_Click(object sender, RoutedEventArgs e) {
             if (VideosView.SelectedItem != null) {
-                VideoListItem Item = (VideoListItem)VideosView.SelectedItem;
+                MediaListItem Item = (MediaListItem)VideosView.SelectedItem;
                 ShowEditForm(Item);
             }
         }
 
-        private void ShowEditForm(VideoListItem item) {
+        private void ShowEditForm(MediaListItem item) {
             EditVideoWindow.Instance(item.MediaId, item.FileName, EditForm_Closed);
         }
 
 
-        private void ShowEditFormPopup(VideoListItem item, UIElement target) {
+        private void ShowEditFormPopup(MediaListItem item, UIElement target) {
             EditVideoWindow.InstancePopup(target, PlacementMode.Mouse, item.MediaId, item.FileName, EditForm_Closed);
         }
 
         private async void EditForm_Closed(Media result) {
             if (result != null) {
-                VideoListItem OldItem = (VideoListItem)VideosView.SelectedItem;
+                MediaListItem OldItem = (MediaListItem)VideosView.SelectedItem;
                 // business.RefreshPlaylist(result, OldItem != null ? OldItem.FileName : null);
                 await LoadDataAsync();
             }

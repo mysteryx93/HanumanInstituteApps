@@ -9,10 +9,10 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using Business;
-using DataAccess;
 using System.Diagnostics;
-using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.CommonWpf;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -325,7 +325,7 @@ namespace NaturalGroundingPlayer {
             if (!menuSetupWizard.IsEnabled)
                 return;
 
-            if (Settings.SavedFile.MediaPlayerApp == MediaPlayerApplication.Mpc) {
+            if (Settings.I.Data.MediaPlayerApp == MediaPlayerApplication.Mpc) {
                 PauseSession();
                 SetupWizard.Instance(null);
             } else

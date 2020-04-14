@@ -1,0 +1,129 @@
+﻿<Window xmlns:mpv="clr-namespace:HanumanInstitute.MpvPlayerUI;assembly=MpvPlayerUI"  
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Player432hz"
+        xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayerUI;assembly=MediaPlayerUI"
+        xmlns:common="clr-namespace:HanumanInstitute.CommonWpfApp;assembly=CommonWpfApp" 
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight" 
+        xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf"
+        x:Class="HanumanInstitute.Player432hz.Views.MainView"
+        mc:Ignorable="d"
+        Height="{Binding Source={StaticResource Locator}, Path=Settings.Current.Height, Mode=TwoWay}"
+        Width="{Binding Source={StaticResource Locator}, Path=Settings.Current.Width, Mode=TwoWay}" 
+        Closing="{wpf:MethodBinding {Binding Source={StaticResource Locator}, Path=Settings}, Save}"
+        x:Name="UI" Title="432hz Player" Icon="/432hzPlayer;component/App.ico" MinHeight="240" MinWidth="560"
+        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True">
+    <Window.DataContext>
+        <Binding Mode="OneWay" Path="Main" Source="{StaticResource Locator}" />
+    </Window.DataContext>
+    <Window.Resources>
+        <!--<DrawingImage x:Key="PlayIcon">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <DrawingGroup.Children>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry Figures="M4,4 L8,6 L4,8" />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup.Children>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="PauseIcon">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <DrawingGroup.Children>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup.Children>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="StopIcon">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <DrawingGroup.Children>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry />
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup.Children>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>-->
+        <wpf:HasValueConverter x:Key="HasValueConverter"/>
+        <common:MediaTimeConverter x:Key="MediaTimeConverter"/>
+    </Window.Resources>
+    <!--<Window.TaskbarItemInfo>
+        <TaskbarItemInfo>
+            <TaskbarItemInfo.ThumbButtonInfos>
+                <ThumbButtonInfo ImageSource="{StaticResource PlayIcon}"
+                             Description="Play" />
+                <ThumbButtonInfo ImageSource="{StaticResource PauseIcon}"
+                             Description="Pause" />
+                <ThumbButtonInfo ImageSource="{StaticResource StopIcon}"
+                             Description="Stop" />
+            </TaskbarItemInfo.ThumbButtonInfos>
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>-->
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <Grid Margin="174,8,10,0" DataContext="{Binding Playlists.SelectedItem}" Height="108" VerticalAlignment="Top" IsEnabled="{Binding Converter={StaticResource HasValueConverter}, Mode=OneWay}" md:DialogServiceViews.IsRegistered="True">
+            <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders.List}" TabIndex="5" Background="{x:Null}" SelectedIndex="{Binding Folders.SelectedIndex, Mode=TwoWay}" />
+            <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top" FontWeight="Bold"/>
+            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="21" Margin="80,0,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
+            <Button x:Name="AddFolderButton" Content="Add" HorizontalAlignment="Right" Margin="0,-1,80,0" VerticalAlignment="Top" Width="75" TabIndex="6" Command="{Binding AddFolderCommand, Mode=OneWay}"/>
+            <Button x:Name="RemoveFolderButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" TabIndex="7" Command="{Binding RemoveFolderCommand, Mode=OneWay}" Margin="0,-1,0,0"/>
+        </Grid>
+        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,31,0,54" Width="146" ItemsSource="{Binding Playlists.List}" SelectedValuePath="Name" TabIndex="1" Background="{x:Null}" SelectedIndex="{Binding Playlists.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}">
+                        <TextBlock.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
+                                  Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
+                        </TextBlock.InputBindings>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock HorizontalAlignment="Left" Margin="10,12,0,0" Text="Playlists" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Button x:Name="AddPlaylistButton" Content="Add" HorizontalAlignment="Left" Margin="67,7,0,0" VerticalAlignment="Top" Width="50" TabIndex="2" Command="{Binding AddPlaylistCommand}" />
+        <Button x:Name="RemovePlaylistButton" Content="Del" HorizontalAlignment="Left" Margin="122,7,0,0" VerticalAlignment="Top" Width="34" TabIndex="3" Command="{Binding DeletePlaylistCommand}" />
+        <Grid Height="43" VerticalAlignment="Bottom">
+            <Grid.DataContext>
+                <Binding Mode="OneWay" Path="Player" Source="{StaticResource Locator}" />
+            </Grid.DataContext>
+            <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False" StopCommandExecuted="{wpf:MethodBinding MediaFinished}">
+                <mpv:MpvMediaPlayerHost Source="{Binding Player.NowPlaying, Mode=TwoWay}" Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}" MediaFinished="{wpf:MethodBinding MediaFinished}"
+                    Volume="{Binding Source={StaticResource Locator}, Path=Settings.Current.Volume, Mode=TwoWay}" />
+            </ui:MediaPlayer>
+        </Grid>
+        <Grid Margin="174,120,10,54">
+            <Grid.DataContext>
+                <Binding Mode="OneWay" Path="FilesList" Source="{StaticResource Locator}" />
+            </Grid.DataContext>
+            <ListBox x:Name="FilesList" Margin="0,24,0,0" ItemsSource="{Binding Files.List}" TabIndex="8" Background="{x:Null}" SelectedIndex="{Binding Files.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}">
+                            <TextBlock.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick"
+                                  Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
+                            </TextBlock.InputBindings>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
+            <Button x:Name="PlayButton" Content="Play" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" TabIndex="9" Command="{Binding PlayCommand}"/>
+        </Grid>
+    </Grid>
+</Window>

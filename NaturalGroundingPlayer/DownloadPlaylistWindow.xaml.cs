@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 using System.Windows.Threading;
 
 namespace NaturalGroundingPlayer {

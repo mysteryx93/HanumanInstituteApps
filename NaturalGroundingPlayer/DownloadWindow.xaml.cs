@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using EmergenceGuardian.WpfCommon;
-using EmergenceGuardian.Downloader;
-using YoutubeExplode.Models;
-using YoutubeExplode.Models.MediaStreams;
-using EmergenceGuardian.FFmpeg;
-using Business;
-using DataAccess;
+using EmergenceGuardian.CommonWpf;
+using EmergenceGuardian.DownloadManager;
+using YoutubeExplode.Videos;
+using YoutubeExplode.Videos.Streams;
+using EmergenceGuardian.Encoder;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -21,7 +21,7 @@ namespace NaturalGroundingPlayer {
         private Media video;
         private VideoInfo downloadInfo;
         private BestFormatInfo bestFormat;
-        private FFmpegProcess localInfo;
+        private IProcessWorker localInfo;
         private DownloadOptions options;
         private WindowHelper helper;
 
@@ -65,10 +65,10 @@ namespace NaturalGroundingPlayer {
             if (video == null || video.FileName == null)
                 return;
 
-            string SrcFile = Settings.NaturalGroundingFolder + video.FileName;
+            string SrcFile = Settings.I.NaturalGroundingFolder + video.FileName;
             if (File.Exists(SrcFile)) {
                 DownloadPlaylistBusiness Business = new DownloadPlaylistBusiness();
-                var IsHigher = await Business.IsHigherQualityAvailable(bestFormat, Settings.NaturalGroundingFolder + video.FileName);
+                var IsHigher = await Business.IsHigherQualityAvailable(bestFormat, Settings.I.NaturalGroundingFolder + video.FileName);
                 if (Business.LastInfoReader != null) {
                     localInfo = Business.LastInfoReader;
                     long LocalFileSize = new FileInfo(SrcFile).Length;

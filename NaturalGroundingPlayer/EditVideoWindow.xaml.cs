@@ -8,11 +8,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 using Microsoft.Win32;
-using EmergenceGuardian.FFmpeg;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.Encoder;
+using EmergenceGuardian.DownloadManager;
 
 namespace NaturalGroundingPlayer {
     public delegate void ClosingCallback(Media result);
@@ -97,7 +97,7 @@ namespace NaturalGroundingPlayer {
             EditRating_LostFocus(null, null);
 
             if (video.FileName != null) {
-                if (File.Exists(Settings.NaturalGroundingFolder + video.FileName))
+                if (File.Exists(Settings.I.NaturalGroundingFolder + video.FileName))
                     await LoadMediaInfoAsync();
                 else {
                     // Try to auto-attach same path with different extension.
@@ -110,7 +110,7 @@ namespace NaturalGroundingPlayer {
         }
 
         private async Task LoadMediaInfoAsync() {
-            FFmpegProcess FileInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + video.FileName));
+            FFmpegProcess FileInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.I.NaturalGroundingFolder + video.FileName));
             DimensionText.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
             DisablePitchCheckBox.IsEnabled = FileInfo?.VideoStream?.PixelAspectRatio == 1;
             if (!DisablePitchCheckBox.IsEnabled)
@@ -260,18 +260,18 @@ namespace NaturalGroundingPlayer {
             if (!isNew) {
                 // Bind to another file.
                 Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-                dlg.InitialDirectory = Settings.NaturalGroundingFolder;
+                dlg.InitialDirectory = Settings.I.NaturalGroundingFolder;
                 if (video.MediaType == MediaType.Video)
-                    dlg.Filter = string.Format("Video Files|*{0})", string.Join(";*", AppPaths.VideoExtensions));
+                    dlg.Filter = string.Format("Video Files|*{0})", string.Join(";*", AppPathService.I.VideoExtensions));
                 else if (video.MediaType == MediaType.Audio)
-                    dlg.Filter = string.Format("Audio Files|*{0})", string.Join(";*", AppPaths.AudioExtensions));
+                    dlg.Filter = string.Format("Audio Files|*{0})", string.Join(";*", AppPathService.I.AudioExtensions));
                 else if (video.MediaType == MediaType.Image)
-                    dlg.Filter = string.Format("Image Files|*{0})", string.Join(";*", AppPaths.ImageExtensions));
+                    dlg.Filter = string.Format("Image Files|*{0})", string.Join(";*", AppPathService.I.ImageExtensions));
                 if (dlg.ShowDialog(IsLoaded ? this : Owner).Value == true) {
-                    if (!dlg.FileName.StartsWith(Settings.NaturalGroundingFolder))
+                    if (!dlg.FileName.StartsWith(Settings.I.NaturalGroundingFolder))
                         MessageBox.Show("You must select a file within your Natural Grounding folder.", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                     else {
-                        string BindFile = dlg.FileName.Substring(Settings.NaturalGroundingFolder.Length);
+                        string BindFile = dlg.FileName.Substring(Settings.I.NaturalGroundingFolder.Length);
                         if (business.GetVideoByFileName(BindFile) == null) {
                             video.FileName = BindFile;
                             video.Length = null;
@@ -316,8 +316,8 @@ namespace NaturalGroundingPlayer {
         //}
 
         private async void menuExtractAudio_Click(object sender, RoutedEventArgs e) {
-            if (video.FileName != null && File.Exists(Settings.NaturalGroundingFolder + video.FileName)) {
-                FFmpegProcess MInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.NaturalGroundingFolder + video.FileName));
+            if (video.FileName != null && File.Exists(Settings.I.NaturalGroundingFolder + video.FileName)) {
+                FFmpegProcess MInfo = await Task.Run(() => MediaInfo.GetFileInfo(Settings.I.NaturalGroundingFolder + video.FileName));
                 string Ext = null;
                 if (MInfo?.AudioStream?.Format == "MPEG Audio")
                     Ext = ".mp2";
@@ -331,14 +331,14 @@ namespace NaturalGroundingPlayer {
                     Ext = ".aac";
 
                 SaveFileDialog SaveDlg = new SaveFileDialog();
-                SaveDlg.InitialDirectory = Settings.NaturalGroundingFolder + "Audios";
+                SaveDlg.InitialDirectory = Settings.I.NaturalGroundingFolder + "Audios";
                 SaveDlg.OverwritePrompt = true;
                 SaveDlg.DefaultExt = ".mp3";
                 SaveDlg.Filter = string.Format("Audio Files|*{0})", Ext); ;
                 SaveDlg.FileName = Path.GetFileNameWithoutExtension(video.FileName) + Ext;
 
                 if (SaveDlg.ShowDialog() == true) {
-                    MediaMuxer.ExtractAudio(Settings.NaturalGroundingFolder + video.FileName, SaveDlg.FileName);
+                    MediaMuxer.ExtractAudio(Settings.I.NaturalGroundingFolder + video.FileName, SaveDlg.FileName);
                 }
             }
         }
@@ -388,7 +388,7 @@ namespace NaturalGroundingPlayer {
 
         private void menuOpenFolder_Click(object sender, RoutedEventArgs e) {
             if (video.FileName != null) {
-                string Args = "/select, \"" + Settings.NaturalGroundingFolder + video.FileName + "\"";
+                string Args = "/select, \"" + Settings.I.NaturalGroundingFolder + video.FileName + "\"";
                 Process.Start("Explorer", Args);
             }
         }

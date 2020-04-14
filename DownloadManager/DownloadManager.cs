@@ -1,403 +1,379 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using EmergenceGuardian.FFmpeg;
+using HanumanInstitute.Encoder;
+using HanumanInstitute.CommonServices;
 using YoutubeExplode;
-using YoutubeExplode.Models;
-using YoutubeExplode.Models.MediaStreams;
+using YoutubeExplode.Videos.Streams;
+using YoutubeExplode.Videos;
 
-namespace EmergenceGuardian.Downloader {
-    public class DownloadManager {
-        private YoutubeClient youtube = new YoutubeClient();
-        private ObservableCollection<DownloadItem> downloadsList = new ObservableCollection<DownloadItem>();
-        public DownloadOptions Options { get; set; } = new DownloadOptions();
+namespace HanumanInstitute.DownloadManager
+{
 
+    #region Interface
 
-        public DownloadManager() {
-        }
-
-        public ObservableCollection<DownloadItem> DownloadsList {
-            get { return downloadsList; }
-        }
-
-        public event EventHandler DownloadAdded;
-
+    /// <summary>
+    /// Manages media file downloads.
+    /// </summary>
+    public interface IDownloadManager
+    {
         /// <summary>
-        /// Downloads specified video.
+        /// Gets the list of active and pending downloads.
         /// </summary>
-        /// <param name="video">The video to download.</param>
-        /// <param name="upgradeAudio">If true, only the audio will be downloaded and it will be merged with the local video file.</param>
-        /// <param name="callback">The method to call once download is completed.</param>
-        public async Task DownloadVideoAsync(string url, string destination, string description, EventHandler<DownloadCompletedEventArgs> callback, DownloadAction action, DownloadOptions options, object data) {
-            if (IsDownloadDuplicate(url))
-                return;
-
-            Directory.CreateDirectory(Path.GetDirectoryName(destination));
-
-            // Add DownloadItem right away before doing any async work.
-            string DestinationNoExt = Path.Combine(Path.GetDirectoryName(destination), Path.GetFileNameWithoutExtension(destination));
-            DownloadItem DownloadInfo = new DownloadItem(url, destination, DestinationNoExt, description, action, callback, options, data);
-            Application.Current.Dispatcher.Invoke(() => {
-                downloadsList.Insert(0, DownloadInfo);
-                // Notify UI of new download to show window.
-                DownloadAdded?.Invoke(this, new EventArgs());
-            });
-
-            if (downloadsList.Where(d => d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing).Count() < Options.SimultaneousDownloads)
-                await StartDownloadAsync(DownloadInfo).ConfigureAwait(false);
-        }
-
-        private async Task StartDownloadAsync(DownloadItem downloadInfo) {
-            downloadInfo.Status = DownloadStatus.Initializing;
-
-            // Query the download URL for the right file.
-            string VideoId = null;
-            Video VInfo = null;
-            MediaStreamInfoSet VStream = null;
-            if (YoutubeClient.TryParseVideoId(downloadInfo.Url, out VideoId)) {
-                try {
-                    var T1 = youtube.GetVideoAsync(VideoId);
-                    var T2 = youtube.GetVideoMediaStreamInfosAsync(VideoId);
-                    await Task.WhenAll(new Task[] { T1, T2 });
-                    VInfo = T1.Result;
-                    VStream = T2.Result;
-                }
-                catch {
-                }
-            }
-
-            if (VStream == null) {
-                downloadInfo.Status = DownloadStatus.Failed;
-                RaiseCallback(downloadInfo);
-                return;
-            }
-
-            // Get the highest resolution format.
-            BestFormatInfo BestFile = DownloadManager.SelectBestFormat(VStream, downloadInfo.Options ?? Options);
-            BestFile.Duration = VInfo.Duration;
-
-            if (BestFile.BestVideo != null && (downloadInfo.Action == DownloadAction.Download || downloadInfo.Action == DownloadAction.DownloadVideo)) {
-                downloadInfo.Files.Add(new FileProgress() {
-                    Type = StreamType.Video,
-                    Url = BestFile.BestVideo.Url,
-                    Destination = downloadInfo.DestinationNoExt + GetVideoExtension(DownloadManager.GetVideoEncoding(BestFile.BestVideo)),
-                    Stream = BestFile.BestVideo,
-                    BytesTotal = BestFile.BestVideo.Size
-                });
-            }
-
-            if (BestFile.BestAudio != null && (downloadInfo.Action == DownloadAction.Download || downloadInfo.Action == DownloadAction.DownloadAudio)) {
-                downloadInfo.Files.Add(new FileProgress() {
-                    Type = StreamType.Audio,
-                    Url = BestFile.BestAudio.Url,
-                    Destination = downloadInfo.DestinationNoExt + GetAudioExtension(BestFile.BestAudio.AudioEncoding),
-                    Stream = BestFile.BestAudio,
-                    BytesTotal = BestFile.BestAudio.Size
-                });
-            }
-
-            // Add extension if Destination doesn't already include it.
-            string Ext = DownloadManager.GetFinalExtension(BestFile.BestVideo, BestFile.BestAudio);
-            if (!downloadInfo.Destination.ToLower().EndsWith(Ext))
-                downloadInfo.Destination += Ext;
-
-            await DownloadFilesAsync(downloadInfo).ConfigureAwait(false);
-        }
-
+        ObservableCollection<DownloadTaskInfo> DownloadsList { get; }
         /// <summary>
-        /// Returns the file extension for specified audio type.
+        /// Occurs when a new download task is added to the list.
         /// </summary>
-        /// <param name="audio">The audio type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-        public string GetVideoExtension(VideoEncoding video) {
-            return "." + video.ToString().ToLower();
-        }
-
+        event EventHandler DownloadAdded;
         /// <summary>
-        /// Returns the file extension for specified audio type.
+        /// Occurs before performing the muxing operation.
         /// </summary>
-        /// <param name="audio">The audio type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-        public string GetAudioExtension(AudioEncoding audio) {
-            return "." + audio.ToString().ToLower();
-        }
-
+        event DownloadTaskEventHandler BeforeMuxing;
         /// <summary>
-        /// Downloads the specified list of files.
+        /// Occurs when the download is completed.
         /// </summary>
-        /// <param name="downloadInfo">The information about the files to download.</param>
-        /// <param name="callback">The function to call when download is completed.</param>
-        private async Task DownloadFilesAsync(DownloadItem downloadInfo) {
-            if (!downloadInfo.IsCanceled) {
-                // Download all files.
-                List<Task> DownloadTasks = new List<Task>();
-                foreach (var item in downloadInfo.Files) {
-                    DownloadTasks.Add(DownloadVideoAsync(downloadInfo, item));
-                }
-                await Task.WhenAll(DownloadTasks.ToArray()).ConfigureAwait(false);
-            } else
-                RaiseCallback(downloadInfo);
-        }
-
-        private async Task DownloadVideoAsync(DownloadItem downloadInfo, FileProgress fileInfo) {
-            downloadInfo.Status = DownloadStatus.Downloading;
-            CancellationTokenSource CancelToken = new CancellationTokenSource();
-            var progressHandler = new Progress<double>(p => {
-                if (downloadInfo.IsCanceled)
-                    CancelToken.Cancel();
-                else {
-                    fileInfo.BytesDownloaded = (long)(fileInfo.BytesTotal * p);
-                    downloadInfo.UpdateProgress();
-                }
-            });
-            try {
-                await youtube.DownloadMediaStreamAsync((MediaStreamInfo)fileInfo.Stream, fileInfo.Destination, progressHandler, CancelToken.Token).ConfigureAwait(false);
-            }
-            catch {
-                downloadInfo.Status = DownloadStatus.Failed;
-            }
-
-            // Detect whether this is the last file.
-            fileInfo.Done = true;
-            if (downloadInfo.Files.Any(d => !d.Done) == false) {
-                var NextDownload = StartNextDownloadAsync().ConfigureAwait(false);
-
-                // Raise events for the last file part only.
-                if (downloadInfo.IsCompleted) {
-                    try {
-                        await DownloadCompletedAsync(downloadInfo).ConfigureAwait(false);
-                    }
-                    catch {
-                        downloadInfo.Status = DownloadStatus.Failed;
-                    }
-                } else if (downloadInfo.IsCanceled)
-                    DownloadCanceled(downloadInfo);
-                RaiseCallback(downloadInfo);
-
-                await NextDownload;
-            }
-        }
-
-        private async Task DownloadCompletedAsync(DownloadItem downloadInfo) {
-            await Task.Run(() => OnMuxing(this, new DownloadCompletedEventArgs(downloadInfo))).ConfigureAwait(false);
-
-            CompletionStatus Result = File.Exists(downloadInfo.Destination) ? CompletionStatus.Success : CompletionStatus.Error;
-            var VideoFile = downloadInfo.Files.FirstOrDefault(f => f.Type == StreamType.Video);
-            var AudioFile = downloadInfo.Files.FirstOrDefault(f => f.Type == StreamType.Audio);
-
-            // Muxe regularly unless muxing in derived class.
-            if (Result != CompletionStatus.Success)
-                Result = await Task.Run(() => MediaMuxer.Muxe(VideoFile?.Destination, AudioFile?.Destination, downloadInfo.Destination)).ConfigureAwait(false);
-            if (Result == CompletionStatus.Success)
-                Result = File.Exists(downloadInfo.Destination) ? CompletionStatus.Success : CompletionStatus.Error;
-
-            if (VideoFile != null)
-                File.Delete(VideoFile.Destination);
-            if (AudioFile != null)
-                File.Delete(AudioFile.Destination);
-            downloadInfo.Status = Result == CompletionStatus.Success ? DownloadStatus.Done : DownloadStatus.Failed;
-            if (downloadInfo.Status != DownloadStatus.Failed)
-                await Task.Run(() => OnCompleted(this, new DownloadCompletedEventArgs(downloadInfo))).ConfigureAwait(false);
-
-            if (downloadInfo.Status != DownloadStatus.Done)
-                downloadInfo.Status = DownloadStatus.Failed;
-        }
-
-        protected virtual void OnMuxing(object sender, DownloadCompletedEventArgs e) {
-        }
-
-        protected virtual void OnCompleted(object sender, DownloadCompletedEventArgs e) {
-            e.DownloadInfo.Callback?.Invoke(sender, e);
-        }
-
-        private void DownloadCanceled(DownloadItem downloadInfo) {
-            if (downloadInfo.Status == DownloadStatus.Canceled)
-                downloadInfo.Status = DownloadStatus.Canceled;
-            else if (downloadInfo.Status == DownloadStatus.Failed)
-                downloadInfo.Status = DownloadStatus.Failed;
-            Thread.Sleep(100);
-
-            // Delete partially-downloaded files.
-            foreach (var item in downloadInfo.Files) {
-                File.Delete(item.Destination);
-            }
-        }
-
-        private async Task StartNextDownloadAsync() {
-            // Start next download.
-            DownloadItem NextDownload = downloadsList.Where(d => d.Status == DownloadStatus.Waiting).LastOrDefault();
-            if (NextDownload != null)
-                await StartDownloadAsync(NextDownload).ConfigureAwait(false);
-        }
-
+        event DownloadTaskEventHandler Completed;
+        /// <summary>
+        /// Starts a new download task and add it to the list.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        Task AddDownloadAsync(DownloadTaskInfo downloadTask);
+        /// <summary>
+        /// Returns the file extensions that can be created by the downloader.
+        /// </summary>
+        string[] DownloadedExtensions { get; }
+        /// <summary>
+        /// Returns specified path without its file extension.
+        /// </summary>
+        /// <param name="path">The path to truncate extension from.</param>
+        /// <returns>A file path with no file extension.</returns>
+        string GetPathNoExt(string path);
+        /// <summary>
+        /// Returns the title for specified download URL.
+        /// </summary>
+        /// <param name="url">The download URL to get the title for.</param>
+        /// <returns>A title, or null if it failed to retrieve the title.</returns>
+        Task<string> GetVideoTitleAsync(string url);
+        /// <summary>
+        /// Returns the download info for specified URL.
+        /// </summary>
+        /// <param name="url">The URL to probe.</param>
+        /// <returns>The download information.</returns>
+        Task<VideoInfo> GetDownloadInfoAsync(string url);
+        /// <summary>
+        /// Returns whether specified URL is already being downloaded.
+        /// </summary>
+        /// <param name="url">The URL to check for.</param>
+        /// <returns>Whether the URL is already in the list of downloads.</returns>
+        bool IsDownloadDuplicate(string url);
         /// <summary>
         /// Returns whether specified file exists and contains data (at least 500KB).
         /// </summary>
         /// <param name="fileName">The path of the file to check.</param>
         /// <returns>Whether the file contains data.</returns>
-        private bool FileHasContent(string fileName) {
-            return File.Exists(fileName) && new FileInfo(fileName).Length > 524288;
+        bool FileHasContent(string fileName);
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Manages media file downloads.
+    /// </summary>
+    public class DownloadManager : IDownloadManager
+    {
+
+        #region Declarations
+
+        /// <summary>
+        /// Gets the list of active and pending downloads.
+        /// </summary>
+        public ObservableCollection<DownloadTaskInfo> DownloadsList { get; private set; } = new ObservableCollection<DownloadTaskInfo>();
+        /// <summary>
+        /// Occurs when a new download task is added to the list.
+        /// </summary>
+        public event EventHandler DownloadAdded;
+        /// <summary>
+        /// Occurs before performing the muxing operation.
+        /// </summary>
+        public event DownloadTaskEventHandler BeforeMuxing;
+        /// <summary>
+        /// Occurs when the download is completed.
+        /// </summary>
+        public event DownloadTaskEventHandler Completed;
+
+        private YoutubeClient youtube;
+        private IFileSystemService fileSystem;
+        private IMediaMuxer muxer;
+        private IYouTubeStreamSelector streamSelector;
+
+        public DownloadManager() { }
+
+        public DownloadManager(YoutubeClient youtubeClient, IFileSystemService fileSystemService, IMediaMuxer mediaMuxer, IYouTubeStreamSelector streamSelector)
+        {
+            this.youtube = youtubeClient ?? throw new ArgumentNullException(nameof(youtubeClient));
+            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+            this.muxer = mediaMuxer ?? throw new ArgumentNullException(nameof(mediaMuxer));
+            this.streamSelector = streamSelector ?? throw new ArgumentNullException(nameof(streamSelector));
         }
 
-        public bool IsDownloadDuplicate(string url) {
-            bool Result = (from d in this.downloadsList
-                           where (d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing || d.Status == DownloadStatus.Waiting) &&
-                             string.Compare(d.Url, url, true) == 0
-                           select d).Any();
-            return Result;
-        }
+        #endregion
 
-        private void RaiseCallback(DownloadItem downloadInfo) {
-            if (downloadInfo.Callback != null)
-                Application.Current.Dispatcher.Invoke(() => downloadInfo.Callback(this, new DownloadCompletedEventArgs(downloadInfo)));
-        }
+        #region Download
 
+        /// <summary>
+        /// Starts a new download task and add it to the list.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        public async Task AddDownloadAsync(DownloadTaskInfo downloadTask)
+        {
+            if (IsDownloadDuplicate(downloadTask.Url))
+                return;
 
-        public static string[] DownloadedExtensions = new string[] { ".mp4", ".webm", ".mkv", ".flv" };
+            fileSystem.EnsureDirectoryExists(downloadTask.Destination);
 
-        public static async Task<VideoInfo> GetDownloadInfoAsync(string url) {
-            try {
-                YoutubeClient youtube = new YoutubeClient();
-                if (YoutubeClient.TryParseVideoId(url, out string VideoId)) {
-                    var T1 = youtube.GetVideoAsync(VideoId);
-                    var T2 = youtube.GetVideoMediaStreamInfosAsync(VideoId);
-                    await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
-                    return new VideoInfo(T1.Result, T2.Result);
-                }
-            }
-            catch {
-            }
-            return null;
-        }
+            DownloadsList.Insert(0, downloadTask);
+            // Notify UI of new download to show window.
+            DownloadAdded?.Invoke(this, new EventArgs());
 
-        public static async Task<string> GetVideoTitle(string url) {
-            try {
-                YoutubeClient youtube = new YoutubeClient();
-                if (YoutubeClient.TryParseVideoId(url, out string VideoId)) {
-                    Video VInfo = await youtube.GetVideoAsync(VideoId).ConfigureAwait(false);
-                    return VInfo.Title;
-                }
-            }
-            catch {
-            }
-            return null;
+            if (DownloadsList.Where(d => d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing).Count() < downloadTask.Options.SimultaneousDownloads)
+                await InititalizeDownloadAsync(downloadTask).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Returns the best format from the list in this order of availability: WebM, Mp4 or Flash.
-        /// Mp4 will be chosen if WebM is over 35% smaller.
+        /// Initializes an asynchronous file download task.
         /// </summary>
-        /// <param name="list">The list of videos to chose from.</param>
-        /// <returns>The best format available.</returns>
-        public static BestFormatInfo SelectBestFormat(MediaStreamInfoSet vstream, DownloadOptions options) {
-            var MaxResolutionList = (from v in vstream.Audio.Cast<MediaStreamInfo>().Union(vstream.Video).Union(vstream.Muxed)
-                                     where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
-                                     orderby GetVideoHeight(v) descending
-                                     orderby GetVideoFrameRate(v) descending
-                                     select v).ToList();
+        /// <param name="downloadTask">The download task to start.</param>
+        private async Task InititalizeDownloadAsync(DownloadTaskInfo downloadTask)
+        {
+            downloadTask.Status = DownloadStatus.Initializing;
 
-            MaxResolutionList = MaxResolutionList.Where(v => GetVideoHeight(v) == GetVideoHeight(MaxResolutionList.First())).ToList();
-            //double Framerate = GetVideoFrameRate(MaxResolutionList.FirstOrDefault());
-            //if (Framerate > 0)
-            //    MaxResolutionList = MaxResolutionList.Where(v => GetVideoFrameRate(v) == Framerate).ToList();
+            // Query the download URL for the right file.
+            Video VInfo = null;
+            StreamManifest VStream = null;
 
-            MediaStreamInfo BestVideo = (from v in MaxResolutionList
-                                             // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
-                                         let Preference = (int)((GetVideoEncoding(v) == VideoEncoding.Vp9) ? v.Size * 1.3 : v.Size)
-                                         where options.PreferredFormat == SelectStreamFormat.Best ||
-                                            (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
-                                            (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
-                                         orderby Preference descending
-                                         select v).FirstOrDefault();
-            if (BestVideo == null)
-                BestVideo = MaxResolutionList.FirstOrDefault();
-            if (BestVideo != null) {
-                BestFormatInfo Result = new BestFormatInfo {
-                    BestVideo = BestVideo,
-                    BestAudio = SelectBestAudio(vstream, options)
-                };
-                return Result;
-            } else
-                return null;
-        }
-
-        public static VideoEncoding GetVideoEncoding(MediaStreamInfo stream) {
-            VideoStreamInfo VInfo = stream as VideoStreamInfo;
-            MuxedStreamInfo MInfo = stream as MuxedStreamInfo;
-            if (VInfo == null && MInfo == null)
-                return VideoEncoding.H264;
-            return VInfo?.VideoEncoding ?? MInfo.VideoEncoding;
-        }
-
-        public static int GetVideoHeight(MediaStreamInfo stream) {
-            VideoStreamInfo VInfo = stream as VideoStreamInfo;
-            MuxedStreamInfo MInfo = stream as MuxedStreamInfo;
-            if (VInfo != null) {
-                if (VInfo.Resolution != null)
-                    return VInfo.Resolution.Height;
-                else
-                    return 0;
+            try
+            {
+                var T1 = youtube.Videos.GetAsync(downloadTask.Url);
+                var T2 = youtube.Videos.Streams.GetManifestAsync(downloadTask.Url);
+                await Task.WhenAll(new Task[] { T1, T2 });
+                VInfo = T1.Result;
+                VStream = T2.Result;
             }
-            else if (MInfo != null) {
-                VideoQuality Q = VInfo?.VideoQuality ?? MInfo.VideoQuality;
-                if (Q == VideoQuality.High4320)
-                    return 4320;
-                else if (Q == VideoQuality.High3072)
-                    return 3072;
-                else if (Q == VideoQuality.High2160)
-                    return 2160;
-                else if (Q == VideoQuality.High1440)
-                    return 1440;
-                else if (Q == VideoQuality.High1080)
-                    return 1080;
-                else if (Q == VideoQuality.High720)
-                    return 720;
-                else if (Q == VideoQuality.Medium480)
-                    return 480;
-                else if (Q == VideoQuality.Medium360)
-                    return 360;
-                else if (Q == VideoQuality.Low240)
-                    return 240;
-                else if (Q == VideoQuality.Low144)
-                    return 144;
-                else
-                    return 0;
-            } else
-                return 0;
+            catch { }
+
+            // Make sure we could retrieve download streams.
+            if (VStream == null)
+            {
+                downloadTask.Status = DownloadStatus.Failed;
+                RaiseCallback(downloadTask);
+                return;
+            }
+
+            // Get the highest resolution format.
+            BestFormatInfo BestFile = streamSelector.SelectBestFormat(VStream, downloadTask.Options);
+            BestFile.Duration = VInfo.Duration;
+
+            // Add the best video stream.
+            if (BestFile.BestVideo != null && downloadTask.DownloadVideo)
+            {
+                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Video, BestFile.BestVideo.Url,
+                    GetPathNoExt(downloadTask.Destination) + GetVideoExtension(streamSelector.GetVideoEncoding(BestFile.BestVideo)),
+                    BestFile.BestVideo, BestFile.BestVideo.Size.TotalBytes));
+            }
+
+            // Add the best audio stream.
+            if (BestFile.BestAudio != null && downloadTask.DownloadAudio)
+            {
+                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Audio, BestFile.BestAudio.Url,
+                    GetPathNoExt(downloadTask.Destination) + GetAudioExtension(BestFile.BestAudio.AudioCodec),
+                    BestFile.BestAudio, BestFile.BestAudio.Size.TotalBytes));
+            }
+
+            // Add extension if Destination doesn't already include it.
+            string Ext = DownloadManager.GetFinalExtension(BestFile.BestVideo, BestFile.BestAudio);
+            if (!downloadTask.Destination.ToLower().EndsWith(Ext))
+                downloadTask.Destination += Ext;
+
+            await StartDownloadTaskAsync(downloadTask).ConfigureAwait(false);
         }
 
-        public static double GetVideoFrameRate(MediaStreamInfo stream) {
-            VideoStreamInfo VInfo = stream as VideoStreamInfo;
-            if (VInfo != null)
-                return VInfo.Framerate;
+        /// <summary>
+        /// Performs a file download task which can consist of several file streams.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        private async Task StartDownloadTaskAsync(DownloadTaskInfo downloadTask)
+        {
+            if (!downloadTask.IsCancelled)
+            {
+                // Download all files.
+                var DownloadTasks = downloadTask.Files.Select(f => DownloadFileAsync(downloadTask, f)).ToArray();
+                await Task.WhenAll(DownloadTasks).ConfigureAwait(false);
+            }
             else
-                return 0;
+                RaiseCallback(downloadTask);
         }
 
         /// <summary>
-        /// Selects Opus audio if available, otherwise Vorbis or AAC.
+        /// Downloads a file stream. There can be multiple streams per download.
         /// </summary>
-        /// <param name="list">The list of available audios.</param>
-        /// <returns>The audio to download.</returns>
-        public static AudioStreamInfo SelectBestAudio(MediaStreamInfoSet vinfo, DownloadOptions options) {
-            if (vinfo == null || vinfo.Audio.Count() == 0)
-                return null;
+        /// <param name="downloadTask">Information about the download task.</param>
+        /// <param name="fileInfo">Information about the specific file stream to download.</param>
+        private async Task DownloadFileAsync(DownloadTaskInfo downloadTask, DownloadFileInfo fileInfo)
+        {
+            downloadTask.Status = DownloadStatus.Downloading;
+            CancellationTokenSource CancelToken = new CancellationTokenSource();
+            var progressHandler = new Progress<double>(p =>
+            {
+                if (downloadTask.IsCancelled)
+                    CancelToken.Cancel();
+                else
+                {
+                    fileInfo.Downloaded = (long)(fileInfo.Length * p);
+                    downloadTask.UpdateProgress();
+                }
+            });
+            try
+            {
+                await youtube.Videos.Streams.DownloadAsync((IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, progressHandler, CancelToken.Token).ConfigureAwait(false);
+            }
+            catch
+            {
+                downloadTask.Status = DownloadStatus.Failed;
+            }
 
-            var BestAudio = (from v in vinfo.Audio
-                             // Opus encodes ~20% better, Vorbis ~10% better than AAC
-                             let Preference = (int)(v.Size * (v.AudioEncoding == AudioEncoding.Opus ?  1.2 : v.AudioEncoding == AudioEncoding.Vorbis ? 1.1 : 1))
-                             where options.PreferredAudio == SelectStreamFormat.Best ||
-                             (options.PreferredAudio == SelectStreamFormat.MP4 && (v.AudioEncoding == AudioEncoding.Aac || v.AudioEncoding == AudioEncoding.Mp3)) ||
-                             (options.PreferredAudio == SelectStreamFormat.VP9 && (v.AudioEncoding == AudioEncoding.Opus || v.AudioEncoding == AudioEncoding.Vorbis))
-                             orderby Preference descending
-                             select v).FirstOrDefault();
-            return BestAudio;
+            // Detect whether this is the last file.
+            fileInfo.Done = true;
+            if (downloadTask.Files.Any(d => !d.Done) == false)
+            {
+                var NextDownload = StartNextDownloadAsync().ConfigureAwait(false);
+
+                // Raise events for the last file part only.
+                if (downloadTask.IsCompleted)
+                {
+                    try
+                    {
+                        await DownloadCompletedAsync(downloadTask).ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                        downloadTask.Status = DownloadStatus.Failed;
+                    }
+                }
+                else if (downloadTask.IsCancelled)
+                    DownloadCanceled(downloadTask);
+                RaiseCallback(downloadTask);
+
+                await NextDownload;
+            }
         }
+
+        /// <summary>
+        /// Occurs when a file download is completed.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        private async Task DownloadCompletedAsync(DownloadTaskInfo downloadTask)
+        {
+            if (BeforeMuxing != null)
+                await Task.Run(() => BeforeMuxing.Invoke(this, new DownloadTaskEventArgs(downloadTask))).ConfigureAwait(false);
+
+            CompletionStatus Result = fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            var VideoFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Video);
+            var AudioFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Audio);
+
+            // Muxe regularly unless muxing in event handler.
+            if (Result != CompletionStatus.Success)
+                Result = await Task.Run(() => muxer.Muxe(VideoFile?.Destination, AudioFile?.Destination, downloadTask.Destination)).ConfigureAwait(false);
+            if (Result == CompletionStatus.Success)
+                Result = fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+
+            // Delete temp files.
+            if (VideoFile != null)
+                fileSystem.File.Delete(VideoFile.Destination);
+            if (AudioFile != null)
+                fileSystem.File.Delete(AudioFile.Destination);
+            downloadTask.Status = Result == CompletionStatus.Success ? DownloadStatus.Done : DownloadStatus.Failed;
+
+            // Ensure download and merge succeeded.
+            if (!FileHasContent(downloadTask.Destination))
+                downloadTask.Status = DownloadStatus.Failed;
+
+            if (downloadTask.Status != DownloadStatus.Failed)
+            {
+                // Invoke 2 callbacks: one on the Download Manager, one specified when adding the download.
+                var CompletedArgs = new DownloadTaskEventArgs(downloadTask);
+                await Task.Run(() =>
+                {
+                    Completed?.Invoke(this, CompletedArgs);
+                    downloadTask.Callback?.Invoke(this, CompletedArgs);
+                }).ConfigureAwait(false);
+            }
+
+            if (downloadTask.Status != DownloadStatus.Done)
+                downloadTask.Status = DownloadStatus.Failed;
+        }
+
+        /// <summary>
+        /// Occurs when a download task is cancelled.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        private void DownloadCanceled(DownloadTaskInfo downloadTask)
+        {
+            if (downloadTask.Status == DownloadStatus.Canceled)
+                downloadTask.Status = DownloadStatus.Canceled;
+            else if (downloadTask.Status == DownloadStatus.Failed)
+                downloadTask.Status = DownloadStatus.Failed;
+            Thread.Sleep(100);
+
+            // Delete partially-downloaded files.
+            foreach (var item in downloadTask.Files)
+            {
+                fileSystem.File.Delete(item.Destination);
+            }
+        }
+
+        /// <summary>
+        /// Starts the next pending download in the list.
+        /// </summary>
+        private async Task StartNextDownloadAsync()
+        {
+            // Start next download.
+            DownloadTaskInfo NextDownload = DownloadsList.Where(d => d.Status == DownloadStatus.Waiting).LastOrDefault();
+            if (NextDownload != null)
+                await InititalizeDownloadAsync(NextDownload).ConfigureAwait(false);
+        }
+
+        #endregion
+
+        #region Extensions
+
+        /// <summary>
+        /// Returns the file extensions that can be created by the downloader.
+        /// </summary>
+        public string[] DownloadedExtensions => new string[] { ".mp4", ".webm", ".mkv", ".flv" };
+
+        /// <summary>
+        /// Returns specified path without its file extension.
+        /// </summary>
+        /// <param name="path">The path to truncate extension from.</param>
+        /// <returns>A file path with no file extension.</returns>
+        public string GetPathNoExt(string path) => fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName(path), fileSystem.Path.GetFileNameWithoutExtension(path));
+
+        /// <summary>
+        /// Returns the file extension for specified audio type.
+        /// </summary>
+        /// <param name="audio">The audio type to get file extension for.</param>
+        /// <returns>The file extension.</returns>
+        private string GetVideoExtension(string codec) => "." + codec.ToString().ToLower();
+
+        /// <summary>
+        /// Returns the file extension for specified audio type.
+        /// </summary>
+        /// <param name="codec">The audio type to get file extension for.</param>
+        /// <returns>The file extension.</returns>
+        private string GetAudioExtension(string codec) => "." + codec.ToString().ToLower();
 
         /// <summary>
         /// Returns the file extension for specified video codec type.
@@ -405,14 +381,13 @@ namespace EmergenceGuardian.Downloader {
         /// </summary>
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        public static string GetCodecExtension(Container video) {
-            if (video == Container.WebM)
+        private static string GetCodecExtension(Container video)
+        {
+            if (video.Equals(Container.WebM))
                 return ".vp9";
-            else if (video == Container.Mp4)
+            else if (video.Equals(Container.Mp4))
                 return ".h264";
-            else if (video == Container.Flv)
-                return ".flv";
-            else if (video == Container.Tgpp)
+            else if (video.Equals(Container.Tgpp))
                 return ".mp4v";
             else
                 return ".avi";
@@ -424,12 +399,13 @@ namespace EmergenceGuardian.Downloader {
         /// </summary>
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        public static string GetFinalExtension(MediaStreamInfo video, AudioStreamInfo audio) {
-            if ((video == null || video.Container == Container.WebM) && (audio == null || audio.Container == Container.WebM))
+        private static string GetFinalExtension(IVideoStreamInfo video, IAudioStreamInfo audio)
+        {
+            if ((video == null || video.Container.Equals(Container.WebM)) && (audio == null || audio.Container.Equals(Container.WebM)))
                 return ".webm";
-            else if ((video == null || video.Container == Container.Mp4) && (audio == null || audio.Container == Container.Mp4 || audio.Container == Container.M4A))
+            else if ((video == null || video.Container.Equals(Container.Mp4)) && (audio == null || audio.Container.Equals(Container.Mp4)))
                 return ".mp4";
-            else if (video != null && (video.Container == Container.Mp4 || video.Container == Container.WebM))
+            else if (video != null && (video.Container.Equals(Container.Mp4) || video.Container.Equals(Container.WebM)))
                 return ".mkv";
             else if (video != null)
                 return GetCodecExtension(video.Container);
@@ -438,25 +414,83 @@ namespace EmergenceGuardian.Downloader {
             else
                 return "";
         }
-    }
 
-    public class VideoInfo {
-        public Video Info { get; set; }
-        public MediaStreamInfoSet Streams { get; set; }
+        #endregion
 
-        public VideoInfo() {
+        #region Helper Methods
+
+        /// <summary>
+        /// Returns the title for specified download URL.
+        /// </summary>
+        /// <param name="url">The download URL to get the title for.</param>
+        /// <returns>A title, or null if it failed to retrieve the title.</returns>
+        public async Task<string> GetVideoTitleAsync(string url)
+        {
+            try
+            {
+                Video VInfo = await youtube.Videos.GetAsync(url).ConfigureAwait(false);
+                return VInfo.Title;
+            }
+            catch
+            {
+            }
+            return null;
         }
 
-        public VideoInfo(Video info, MediaStreamInfoSet streams) {
-            Info = info;
-            Streams = streams;
+        /// <summary>
+        /// Returns the download info for specified URL.
+        /// </summary>
+        /// <param name="url">The URL to probe.</param>
+        /// <returns>The download information.</returns>
+        public async Task<VideoInfo> GetDownloadInfoAsync(string url)
+        {
+            try
+            {
+                var T1 = youtube.Videos.GetAsync(url);
+                var T2 = youtube.Videos.Streams.GetManifestAsync(url);
+                await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
+                return new VideoInfo(T1.Result, T2.Result);
+            }
+            catch
+            {
+            }
+            return null;
         }
-    }
-    
-    public class BestFormatInfo {
-        public MediaStreamInfo BestVideo { get; set; }
-        public AudioStreamInfo BestAudio { get; set; }
-        public TimeSpan Duration { get; set; }
-        public string StatusText { get; set; }
+
+        /// <summary>
+        /// Returns whether specified URL is already being downloaded.
+        /// </summary>
+        /// <param name="url">The URL to check for.</param>
+        /// <returns>Whether the URL is already in the list of downloads.</returns>
+        public bool IsDownloadDuplicate(string url)
+        {
+            bool Result = (from d in this.DownloadsList
+                           where (d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing || d.Status == DownloadStatus.Waiting) &&
+                             string.Compare(d.Url, url, true) == 0
+                           select d).Any();
+            return Result;
+        }
+
+        /// <summary>
+        /// Returns whether specified file exists and contains data (at least 500KB).
+        /// </summary>
+        /// <param name="fileName">The path of the file to check.</param>
+        /// <returns>Whether the file contains data.</returns>
+        public bool FileHasContent(string fileName)
+        {
+            return fileSystem.File.Exists(fileName) && fileSystem.FileInfo.FromFileName(fileName).Length > 524288;
+        }
+
+        /// <summary>
+        /// Invokes the callback specified when adding the download.
+        /// </summary>
+        /// <param name="downloadTask">Information about the download task.</param>
+        private void RaiseCallback(DownloadTaskInfo downloadTask)
+        {
+            downloadTask?.Callback(this, new DownloadTaskEventArgs(downloadTask));
+        }
+
+        #endregion
+
     }
 }

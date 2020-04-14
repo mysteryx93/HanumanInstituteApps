@@ -3,12 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.MediaGrid" 
+             xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
+            x:Class="NaturalGroundingPlayer.MediaGrid" 
              mc:Ignorable="d" Height="314" Width="590" Loaded="UserControl_Loaded">
     <UserControl.Resources>
-        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
-        <Business:RatingConverter x:Key="RatingConverter"/>
-        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+        <CommonWpf:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <CommonWpf:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:RatingToColorConverter x:Key="RatingToColorConverter"/>
         <Storyboard x:Key="StoryboardOpenDetail" Completed="Storyboard_Completed">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="VideosView">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>

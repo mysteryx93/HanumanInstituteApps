@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Business;
-using DataAccess;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.DownloadManager;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
     /// Interaction logic for AddDownload.xaml
     /// </summary>
     public partial class AddDownload : Window {
-        private EditVideoBusiness business = new EditVideoBusiness();
+        protected readonly IDownloadManager downloadManager;
+        protected readonly IMediaAccess mediaAccess;
+
+        public AddDownload(IDownloadManager downloadManager, IMediaAccess mediaAccess)
+        {
+            this.downloadManager = downloadManager ?? throw new ArgumentNullException(nameof(downloadManager));
+            this.mediaAccess = mediaAccess ?? throw new ArgumentNullException(nameof(mediaAccess));
+        }
+
         private Media video;
         private WindowHelper helper;
         protected ClosingCallback callback;
@@ -36,17 +44,17 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
-            video = business.NewVideo();
+            video = mediaAccess.NewMedia();
             this.DataContext = video;
             StartDownloadCheckBox.IsChecked = StartDownloadDefault;
-            CategoryCombo.ItemsSource = business.GetCategories(video.MediaTypeId);
+            CategoryCombo.ItemsSource = mediaAccess.GetCategories(video.MediaTypeId);
         }
 
         private async void DownloadUrlText_LostFocus(object sender, RoutedEventArgs e) {
             isUrlValid = false;
             ErrorText.Text = "";
             if (video.DownloadUrl.Length > 0) {
-                string VTitle = await DownloadManager.GetVideoTitle(video.DownloadUrl);
+                string VTitle = await downloadManager.GetVideoTitleAsync(video.DownloadUrl);
                 if (VTitle != null) {
                     video.DownloadName = VTitle;
                     isUrlValid = true;
@@ -62,7 +70,12 @@ namespace NaturalGroundingPlayer {
 
                 // Start download after closing.
                 if (StartDownloadCheckBox.IsChecked.Value)
-                    await SessionCore.Instance.Business.DownloadManager.DownloadVideoAsync(video, -1, null);
+                    await downloadManager.AddDownloadAsync(new DownloadMediaInfo()
+                    {
+                        Url = video.DownloadUrl,
+                        Media = video,
+                        QueuePos = -1
+                    });
             }
         }
 
@@ -80,7 +93,7 @@ namespace NaturalGroundingPlayer {
                 ErrorText.Text = "Title is required.";
                 return false;
             }
-            if (business.IsTitleDuplicate(video)) {
+            if (mediaAccess.IsTitleDuplicate(video)) {
                 ErrorText.Text = "Artist and title already exist in the database.";
                 return false;
             }
@@ -90,13 +103,13 @@ namespace NaturalGroundingPlayer {
                 return false;
             }
 
-            if (SessionCore.Instance.Business.DownloadManager.IsDownloadDuplicate(video.DownloadUrl)) {
+            if (downloadManager.IsDownloadDuplicate(video.DownloadUrl)) {
                 ErrorText.Text = "You are already downloading this video.";
                 return false;
             }
 
             video.EditedOn = DateTime.UtcNow;
-            business.Save();
+            mediaAccess.Save();
 
             return true;
         }

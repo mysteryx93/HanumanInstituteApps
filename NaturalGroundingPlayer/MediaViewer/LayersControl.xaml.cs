@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Business;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
 
 namespace NaturalGroundingPlayer {
     /// <summary>

@@ -14,8 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -31,8 +31,8 @@ namespace NaturalGroundingPlayer {
         private async void Page_Loaded(object sender, RoutedEventArgs e) {
             owner = (SetupWizard)Window.GetWindow(this);
 
-            MpcConfigBusiness.IsSvpEnabled = true;
-            MpcConfigBusiness.IsMadvrEnabled = false;
+            MpcConfiguration.IsSvpEnabled = true;
+            MpcConfiguration.IsMadvrEnabled = false;
             await owner.DownloadAndPlaySample("Girls' Generation", "Sexy Dance");
 
             //EditVideoBusiness FindVideoBusiness = new EditVideoBusiness();

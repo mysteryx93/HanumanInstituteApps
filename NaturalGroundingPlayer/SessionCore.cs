@@ -4,10 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
-using Business;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
 using System.Threading;
-using EmergenceGuardian.WpfCommon;
-using EmergenceGuardian.FFmpeg;
+using EmergenceGuardian.CommonWpf;
+using EmergenceGuardian.Encoder;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -36,7 +36,7 @@ namespace NaturalGroundingPlayer {
 
         public void Start(Window main, System.Drawing.Bitmap splashImage) {
             // Make sure to initialize Settings static constructor to initialize database path.
-            var a = Settings.SavedFile;
+            var a = Settings.I.Data;
 
             // Configure C# FFmpeg library.
             AppPaths.ConfigureFFmpegPaths(main);
@@ -63,9 +63,9 @@ namespace NaturalGroundingPlayer {
         }
 
         public IMediaPlayerBusiness GetNewPlayer() {
-            if (Settings.SavedFile == null)
+            if (Settings.I.Data == null)
                 return null;
-            else if (Settings.SavedFile.MediaPlayerApp == MediaPlayerApplication.Mpc)
+            else if (Settings.I.Data.MediaPlayerApp == MediaPlayerApplication.Mpc)
                 return new MpcPlayerBusiness();
             else
                 return new WmpPlayerBusiness(new WmpPlayerController(WmpPlayerWindow.Instance().Player, WmpPlayerWindow.Instance()));
@@ -91,7 +91,7 @@ namespace NaturalGroundingPlayer {
 
             await TestDatabaseConnectionAsync();
 
-            if (Settings.SavedFile == null) {
+            if (Settings.I.Data == null) {
                 AboutWindow.Instance();
                 SettingsWindow.Instance();
             }

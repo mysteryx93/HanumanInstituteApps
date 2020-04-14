@@ -4,39 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EmergenceGuardian.Downloader {
+namespace HanumanInstitute.DownloadManager {
     /// <summary>
     /// Contains options for automatic download stream selection.
     /// </summary>
     [PropertyChanged.AddINotifyPropertyChangedInterface]
     public class DownloadOptions {
-        public DownloadOptions() {
-        }
+        public DownloadOptions() { }
 
         /// <summary>
         /// Gets or sets the maximum height of the video stream to download. Useful to limit bandwidth usage.
         /// </summary>
         public int MaxQuality { get; set; } = 0;
+        /// <summary>
+        /// Gets or sets the preferred video stream type to download.
+        /// </summary>
         public SelectStreamFormat PreferredFormat { get; set; } = SelectStreamFormat.Best;
+        /// <summary>
+        /// Gets or sets the preferred audio stream type to download.
+        /// </summary>
         public SelectStreamFormat PreferredAudio { get; set; } = SelectStreamFormat.Best;
+        /// <summary>
+        /// Gets or sets the maximum amount of simultaneous downloads to allow.
+        /// </summary>
         public int SimultaneousDownloads { get; set; } = 2;
 
-        public DownloadOptions Copy() {
-            DownloadOptions Result = new DownloadOptions();
-            Result.MaxQuality = MaxQuality;
-            Result.PreferredFormat = PreferredFormat;
-            Result.PreferredAudio = PreferredAudio;
-            Result.SimultaneousDownloads = SimultaneousDownloads;
-            return Result;
+        /// <summary>
+        /// Returns a copy of this instance.
+        /// </summary>
+        public DownloadOptions Clone() {
+            return (DownloadOptions)MemberwiseClone();
         }
-    }
-
-    /// <summary>
-    /// Represents the types of video streams offered by YouTube.
-    /// </summary>
-    public enum SelectStreamFormat {
-        Best,
-        MP4,
-        VP9
     }
 }

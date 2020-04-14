@@ -13,8 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -36,7 +36,7 @@ namespace NaturalGroundingPlayer {
 
             BitmapImage NewImage = new BitmapImage();
             NewImage.BeginInit();
-            NewImage.UriSource = new Uri(Settings.NaturalGroundingFolder + item.FileName);
+            NewImage.UriSource = new Uri(Settings.I.NaturalGroundingFolder + item.FileName);
             NewImage.EndInit();
             Image NewImageControl = new Image();
             NewImageControl.Source = NewImage;

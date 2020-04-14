@@ -2,10 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:w="clr-namespace:NaturalGroundingPlayer"
-        xmlns:Business="clr-namespace:Business;assembly=Business" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Name="window" x:Class="NaturalGroundingPlayer.MainWindow"
+        xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Name="window" x:Class="NaturalGroundingPlayer.MainWindow"
         Title="Natural Grounding Player" Height="365" Width="523" Loaded="Window_Loaded" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner" Icon="Icons/App.ico" Closed="window_Closed">
     <Window.Resources>
-        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+        <CommonWpf:RatingToColorConverter x:Key="RatingToColorConverter"/>
     </Window.Resources>
     <DockPanel>
         <ContentControl x:Name="MainMenuContainer" DockPanel.Dock="Top" Focusable="False">

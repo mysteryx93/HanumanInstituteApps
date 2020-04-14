@@ -2,11 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:Business="clr-namespace:Business;assembly=Business" xmlns:local="clr-namespace:NaturalGroundingPlayer" x:Class="NaturalGroundingPlayer.DownloadPlaylistWindow"
+        xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
+        xmlns:CommonWpfApp="clr-namespace:EmergenceGuardian.CommonWpfApp;assembly=CommonWpfApp"
+        xmlns:local="clr-namespace:NaturalGroundingPlayer" x:Class="NaturalGroundingPlayer.DownloadPlaylistWindow"
         Title="Download Playlist" Height="418.421" Width="629.324" Loaded="Window_Loaded" Closing="Window_Closing" MinHeight="200" MinWidth="560">
     <Window.Resources>
-        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
-        <Business:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <CommonWpfApp:RatingConverter x:Key="RatingConverter"/>
     </Window.Resources>
     <Grid Style="{DynamicResource GradiantBackground}">
 

@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Business="clr-namespace:Business;assembly=Business" 
+             xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
              mc:Ignorable="d" Height="218" Width="176" KeyboardNavigation.TabNavigation="Local">
     <Control.Resources>
-        <Business:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:RatingConverter x:Key="RatingConverter"/>
     </Control.Resources>
     <Grid>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Physical" VerticalAlignment="Top" Width="73" Height="16" Margin="0,30,0,0"/>

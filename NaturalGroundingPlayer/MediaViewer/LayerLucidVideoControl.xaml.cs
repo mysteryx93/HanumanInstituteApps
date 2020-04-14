@@ -4,8 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -36,7 +36,7 @@ namespace NaturalGroundingPlayer {
             player.UnloadedBehavior = MediaState.Manual;
             player.MediaEnded += player_MediaEnded;
             player.IsMuted = true;
-            player.Source = new Uri(Settings.NaturalGroundingFolder + Item.FileName);
+            player.Source = new Uri(Settings.I.NaturalGroundingFolder + Item.FileName);
             player.Position = TimeSpan.FromSeconds(Item.StartPos.HasValue ? Item.StartPos.Value : 0);
             player.Play();
 

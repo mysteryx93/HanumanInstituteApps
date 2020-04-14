@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Business;
-using DataAccess;
-using EmergenceGuardian.Downloader;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using EmergenceGuardian.DownloadManager;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -76,7 +76,7 @@ namespace NaturalGroundingPlayer {
             EditVideoBusiness FindVideoBusiness = new EditVideoBusiness();
             Media sample = FindVideoBusiness.GetVideoByTitle(MediaType.Video, artist, title);
             if (sample != null) {
-                if (sample.FileName != null && File.Exists(Settings.NaturalGroundingFolder + sample.FileName)) {
+                if (sample.FileName != null && File.Exists(Settings.I.NaturalGroundingFolder + sample.FileName)) {
                     // File exists, play.
                     await PlayVideo(sample);
                 } else if (sample.DownloadUrl != null) {
@@ -102,9 +102,9 @@ namespace NaturalGroundingPlayer {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             Player.Close();
-            MpcConfigBusiness.IsSvpEnabled = Settings.SavedFile.EnableSvp;
-            MpcConfigBusiness.IsMadvrEnabled = Settings.SavedFile.EnableMadVR;
-            MpcConfigBusiness.IsWidescreenEnabled = Settings.SavedFile.Widescreen;
+            MpcConfiguration.IsSvpEnabled = Settings.I.Data.EnableSvp;
+            MpcConfiguration.IsMadvrEnabled = Settings.I.Data.EnableMadVR;
+            MpcConfiguration.IsWidescreenEnabled = Settings.I.Data.Widescreen;
             if (callback != null)
                 callback();
         }

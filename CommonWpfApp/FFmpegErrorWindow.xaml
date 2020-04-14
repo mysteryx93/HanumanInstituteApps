@@ -1,0 +1,13 @@
+﻿<Window x:Class="HanumanInstitute.CommonWpfApp.FFmpegErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.CommonWpfApp"
+        mc:Ignorable="d"
+        Title="ErrorWindow" Height="477.068" Width="578.571" ShowInTaskbar="False">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <TextBox x:Name="OutputText" Style="{DynamicResource TextBoxMultiLine}" TextWrapping="Wrap" Margin="0,0,0,25" />
+        <Button x:Name="CloseButton" Content="_Close" Margin="0,0,10,3" VerticalAlignment="Bottom" IsDefault="True" IsCancel="True" Click="CloseButton_Click" HorizontalAlignment="Right" Width="80"/>
+    </Grid>
+</Window>

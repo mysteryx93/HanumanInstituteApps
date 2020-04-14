@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Business;
-using DataAccess;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
 using EmergenceGuardian.Downloader;
 
 namespace NaturalGroundingPlayer {
@@ -21,8 +21,8 @@ namespace NaturalGroundingPlayer {
         private async void Page_Loaded(object sender, RoutedEventArgs e) {
             owner = (SetupWizard)Window.GetWindow(this);
 
-            MpcConfigBusiness.IsSvpEnabled = true;
-            MpcConfigBusiness.IsMadvrEnabled = true;
+            MpcConfiguration.IsSvpEnabled = true;
+            MpcConfiguration.IsMadvrEnabled = true;
 
             MediaList.Settings.IsInDatabase = true;
             await Task.Delay(100);
@@ -37,7 +37,7 @@ namespace NaturalGroundingPlayer {
             VideoListItem VideoInfo = MediaList.SelectedItem;
             if (VideoInfo != null) {
                 if (VideoInfo.FileName != null && VideoInfo.FileExists) {
-                    MpcConfigBusiness.IsWidescreenEnabled = WidescreenCheckBox.IsChecked.Value;
+                    MpcConfiguration.IsWidescreenEnabled = WidescreenCheckBox.IsChecked.Value;
                     // File exists, play.
                     await owner.Player.PlayVideoAsync(PlayerAccess.GetVideoByFileName(VideoInfo.FileName), false);
                 } else if (VideoInfo.HasDownloadUrl) {

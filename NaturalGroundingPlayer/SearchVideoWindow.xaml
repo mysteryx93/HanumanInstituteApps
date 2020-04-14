@@ -1,16 +1,16 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Business="clr-namespace:Business;assembly=Business"
+        xmlns:CommonWpf="clr-namespace:EmergenceGuardian.CommonWpf;assembly=CommonWpf"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:NaturalGroundingPlayer" x:Name="window" x:Class="NaturalGroundingPlayer.SearchVideoWindow"
         Title="Search Videos" Height="410" Width="611" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         MinHeight="300" MinWidth="500" Closed="window_Closed">
     <Window.Resources>
-        <Business:RatingConverter x:Key="RatingConverter"/>
-        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
-        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
-        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+        <CommonWpf:RatingConverter x:Key="RatingConverter"/>
+        <CommonWpf:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <CommonWpf:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <CommonWpf:RatingToColorConverter x:Key="RatingToColorConverter"/>
     </Window.Resources>
     <Grid Style="{DynamicResource GradiantBackground}">
         <Button x:Name="SelectButton" Content="_Select" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="SelectButton_Click" IsDefault="True" TabIndex="9"/>

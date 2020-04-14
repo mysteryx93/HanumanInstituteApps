@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using Business;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Diagnostics;
-using EmergenceGuardian.WpfCommon;
+using EmergenceGuardian.NaturalGroundingPlayer.Business;
+using EmergenceGuardian.CommonWpf;
 
 namespace NaturalGroundingPlayer {
     /// <summary>
@@ -36,8 +36,8 @@ namespace NaturalGroundingPlayer {
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             FillComboBoxes();
-            if (Settings.SavedFile != null)
-                settings = Settings.SavedFile.Copy();
+            if (Settings.I.Data != null)
+                settings = Settings.I.Data.Copy();
             else
                 settings = SettingsFile.DefaultValues();
             this.DataContext = settings;
@@ -70,14 +70,14 @@ namespace NaturalGroundingPlayer {
             string Errors = settings.Validate();
             ErrorText.Text = Errors;
             if (Errors == null) {
-                bool IsFirstRun = (Settings.SavedFile == null);
-                Settings.SavedFile = settings;
+                bool IsFirstRun = (Settings.I.Data == null);
+                Settings.I.Data = settings;
                 settings.Save();
                 SessionCore.Instance.Business.DownloadManager.Options = settings.Download;
                 this.Close();
 
                 if (settings.MediaPlayerApp == MediaPlayerApplication.Mpc) {
-                    MpcConfigBusiness.ConfigureSettings();
+                    MpcConfiguration.ConfigureSettings();
                     SessionCore.Instance.Business.ConfigurePlayer();
                 }
 
@@ -93,14 +93,14 @@ namespace NaturalGroundingPlayer {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            if (Settings.SavedFile == null)
+            if (Settings.I.Data == null)
                 Application.Current.Shutdown();
         }
 
         private void BrowseFolder_Click(object sender, RoutedEventArgs e) {
-            string Result = FileFolderDialog.ShowFolderDialog(settings.NaturalGroundingFolder);
+            string Result = FileFolderDialog.ShowFolderDialog(Settings.I.NaturalGroundingFolder);
             if (Result != null)
-                settings.NaturalGroundingFolder = Result;
+                Settings.I.NaturalGroundingFolder = Result;
         }
 
         private void BrowseMpc_Click(object sender, RoutedEventArgs e) {
