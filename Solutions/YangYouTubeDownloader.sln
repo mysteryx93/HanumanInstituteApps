@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{A28CE42D-2D9A-4BB7-A127-40BCAF95FD8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\DownloadManager\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\Downloads\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpf", "..\CommonWpf\CommonWpf.csproj", "{1C9E02BD-1D1B-4DD1-B667-CA123B7394F9}"
 EndProject

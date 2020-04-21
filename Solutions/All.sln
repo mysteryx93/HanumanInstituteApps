@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.Data
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MPC_API_LIB", "..\MPC_API_LIB\MPC_API_LIB.vbproj", "{767F8DF3-2ECC-4D54-8CD6-75FA1814A3E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager", "..\DownloadManager\DownloadManager.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\Downloads\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvisynthScriptBuilder", "..\AvisynthScriptBuilder\AvisynthScriptBuilder.csproj", "{7587E545-6030-493A-8EBC-F1AB578FD5A8}"
 EndProject
