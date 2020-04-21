@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{A28CE42D-2D9A-4BB7-A127-40BCAF95FD8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManager", "..\DownloadManager\DownloadManager.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\DownloadManager\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpf", "..\CommonWpf\CommonWpf.csproj", "{1C9E02BD-1D1B-4DD1-B667-CA123B7394F9}"
 EndProject
@@ -13,7 +13,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpfApp", "..\CommonWp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServices", "..\CommonServices\CommonServices.csproj", "{88B49434-58EE-4233-932F-625ED45D26AC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Encoder", "..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj", "{FE9F3E3F-B8A0-4C08-A512-3823290504BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg", "..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj", "{FE9F3E3F-B8A0-4C08-A512-3823290504BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{688D4054-6C85-4870-9F12-6E35D82372D0}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads.Tests", "Downloads.Tests\Downloads.Tests.csproj", "{3CCA5190-7379-46C1-A299-40DDCE55B01F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +104,18 @@ Global
 		{FE9F3E3F-B8A0-4C08-A512-3823290504BA}.Release|x64.Build.0 = Release|Any CPU
 		{FE9F3E3F-B8A0-4C08-A512-3823290504BA}.Release|x86.ActiveCfg = Release|Any CPU
 		{FE9F3E3F-B8A0-4C08-A512-3823290504BA}.Release|x86.Build.0 = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|x64.Build.0 = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Debug|x86.Build.0 = Debug|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|x64.ActiveCfg = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|x64.Build.0 = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CCA5190-7379-46C1-A299-40DDCE55B01F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

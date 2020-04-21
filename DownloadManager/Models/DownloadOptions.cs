@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HanumanInstitute.DownloadManager {
+namespace HanumanInstitute.Downloads
+{
     /// <summary>
     /// Contains options for automatic download stream selection.
     /// </summary>
     [PropertyChanged.AddINotifyPropertyChangedInterface]
-    public class DownloadOptions {
+    public class DownloadOptions
+    {
         public DownloadOptions() { }
 
         /// <summary>
@@ -32,8 +34,6 @@ namespace HanumanInstitute.DownloadManager {
         /// <summary>
         /// Returns a copy of this instance.
         /// </summary>
-        public DownloadOptions Clone() {
-            return (DownloadOptions)MemberwiseClone();
-        }
+        public DownloadOptions Clone() => (DownloadOptions)MemberwiseClone();
     }
 }

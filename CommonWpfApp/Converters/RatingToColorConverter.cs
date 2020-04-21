@@ -16,20 +16,16 @@ namespace HanumanInstitute.CommonWpfApp
             double? DecValue = value as double?;
             if (DecValue != null)
             {
-                if (DecValue > 10)
-                    DecValue = 10;
+                DecValue = Math.Min(DecValue.Value, 10);
                 double Hue = (11 - DecValue.Value) / 11 * .5f;
                 Result = HSBtoRGB(Hue, 1, .7f);
             }
-            if (targetType.GetType() == typeof(Color))
-                return Result;
-            else
-                return new SolidColorBrush(Result);
+            return targetType?.GetType() == typeof(Color) ? (object)Result : new SolidColorBrush(Result);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         public static Color HSBtoRGB(double hue, double saturation, double brightness)

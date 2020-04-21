@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 using System.Linq;
-using HanumanInstitute.Encoder;
+using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.AvisynthScriptBuilder
 {

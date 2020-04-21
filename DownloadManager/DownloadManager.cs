@@ -4,89 +4,18 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HanumanInstitute.Encoder;
-using HanumanInstitute.CommonServices;
-using YoutubeExplode;
-using YoutubeExplode.Videos.Streams;
 using YoutubeExplode.Videos;
+using YoutubeExplode.Videos.Streams;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.FFmpeg;
 
-namespace HanumanInstitute.DownloadManager
+namespace HanumanInstitute.Downloads
 {
-
-    #region Interface
-
-    /// <summary>
-    /// Manages media file downloads.
-    /// </summary>
-    public interface IDownloadManager
-    {
-        /// <summary>
-        /// Gets the list of active and pending downloads.
-        /// </summary>
-        ObservableCollection<DownloadTaskInfo> DownloadsList { get; }
-        /// <summary>
-        /// Occurs when a new download task is added to the list.
-        /// </summary>
-        event EventHandler DownloadAdded;
-        /// <summary>
-        /// Occurs before performing the muxing operation.
-        /// </summary>
-        event DownloadTaskEventHandler BeforeMuxing;
-        /// <summary>
-        /// Occurs when the download is completed.
-        /// </summary>
-        event DownloadTaskEventHandler Completed;
-        /// <summary>
-        /// Starts a new download task and add it to the list.
-        /// </summary>
-        /// <param name="downloadTask">Information about the download task.</param>
-        Task AddDownloadAsync(DownloadTaskInfo downloadTask);
-        /// <summary>
-        /// Returns the file extensions that can be created by the downloader.
-        /// </summary>
-        string[] DownloadedExtensions { get; }
-        /// <summary>
-        /// Returns specified path without its file extension.
-        /// </summary>
-        /// <param name="path">The path to truncate extension from.</param>
-        /// <returns>A file path with no file extension.</returns>
-        string GetPathNoExt(string path);
-        /// <summary>
-        /// Returns the title for specified download URL.
-        /// </summary>
-        /// <param name="url">The download URL to get the title for.</param>
-        /// <returns>A title, or null if it failed to retrieve the title.</returns>
-        Task<string> GetVideoTitleAsync(string url);
-        /// <summary>
-        /// Returns the download info for specified URL.
-        /// </summary>
-        /// <param name="url">The URL to probe.</param>
-        /// <returns>The download information.</returns>
-        Task<VideoInfo> GetDownloadInfoAsync(string url);
-        /// <summary>
-        /// Returns whether specified URL is already being downloaded.
-        /// </summary>
-        /// <param name="url">The URL to check for.</param>
-        /// <returns>Whether the URL is already in the list of downloads.</returns>
-        bool IsDownloadDuplicate(string url);
-        /// <summary>
-        /// Returns whether specified file exists and contains data (at least 500KB).
-        /// </summary>
-        /// <param name="fileName">The path of the file to check.</param>
-        /// <returns>Whether the file contains data.</returns>
-        bool FileHasContent(string fileName);
-    }
-
-    #endregion
-
     /// <summary>
     /// Manages media file downloads.
     /// </summary>
     public class DownloadManager : IDownloadManager
     {
-
-        #region Declarations
-
         /// <summary>
         /// Gets the list of active and pending downloads.
         /// </summary>
@@ -104,24 +33,21 @@ namespace HanumanInstitute.DownloadManager
         /// </summary>
         public event DownloadTaskEventHandler Completed;
 
-        private YoutubeClient youtube;
-        private IFileSystemService fileSystem;
-        private IMediaMuxer muxer;
-        private IYouTubeStreamSelector streamSelector;
+        private readonly YouTubeDownloader _youTube;
+        private readonly IFileSystemService _fileSystem;
+        private readonly IMediaMuxer _muxer;
+        private readonly IYouTubeStreamSelector _streamSelector;
 
         public DownloadManager() { }
 
-        public DownloadManager(YoutubeClient youtubeClient, IFileSystemService fileSystemService, IMediaMuxer mediaMuxer, IYouTubeStreamSelector streamSelector)
+        public DownloadManager(IFileSystemService fileSystemService, IMediaMuxer mediaMuxer, YouTubeDownloader youTube, IYouTubeStreamSelector streamSelector)
         {
-            this.youtube = youtubeClient ?? throw new ArgumentNullException(nameof(youtubeClient));
-            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
-            this.muxer = mediaMuxer ?? throw new ArgumentNullException(nameof(mediaMuxer));
-            this.streamSelector = streamSelector ?? throw new ArgumentNullException(nameof(streamSelector));
+            _fileSystem = fileSystemService.CheckNotNull(nameof(fileSystemService));
+            _muxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
+            _youTube = youTube.CheckNotNull(nameof(youTube));
+            _streamSelector = streamSelector.CheckNotNull(nameof(streamSelector));
         }
 
-        #endregion
-
-        #region Download
 
         /// <summary>
         /// Starts a new download task and add it to the list.
@@ -129,24 +55,30 @@ namespace HanumanInstitute.DownloadManager
         /// <param name="downloadTask">Information about the download task.</param>
         public async Task AddDownloadAsync(DownloadTaskInfo downloadTask)
         {
-            if (IsDownloadDuplicate(downloadTask.Url))
-                return;
+            downloadTask.CheckNotNull(nameof(downloadTask));
 
-            fileSystem.EnsureDirectoryExists(downloadTask.Destination);
+            if (IsDownloadDuplicate(downloadTask.Url))
+            {
+                return;
+            }
+
+            _fileSystem.EnsureDirectoryExists(downloadTask.Destination);
 
             DownloadsList.Insert(0, downloadTask);
             // Notify UI of new download to show window.
             DownloadAdded?.Invoke(this, new EventArgs());
 
             if (DownloadsList.Where(d => d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing).Count() < downloadTask.Options.SimultaneousDownloads)
-                await InititalizeDownloadAsync(downloadTask).ConfigureAwait(false);
+            {
+                await InititalizeYouTubeDownloadAsync(downloadTask).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
         /// Initializes an asynchronous file download task.
         /// </summary>
         /// <param name="downloadTask">The download task to start.</param>
-        private async Task InititalizeDownloadAsync(DownloadTaskInfo downloadTask)
+        private async Task InititalizeYouTubeDownloadAsync(DownloadTaskInfo downloadTask)
         {
             downloadTask.Status = DownloadStatus.Initializing;
 
@@ -156,9 +88,10 @@ namespace HanumanInstitute.DownloadManager
 
             try
             {
-                var T1 = youtube.Videos.GetAsync(downloadTask.Url);
-                var T2 = youtube.Videos.Streams.GetManifestAsync(downloadTask.Url);
-                await Task.WhenAll(new Task[] { T1, T2 });
+                VideoId id = new VideoId(downloadTask.Url.AbsoluteUri);
+                Task<Video> T1 = _youTube.QueryVideoAsync(id);
+                Task<StreamManifest> T2 = _youTube.QueryStreamInfoAsync(id);
+                await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
                 VInfo = T1.Result;
                 VStream = T2.Result;
             }
@@ -173,29 +106,31 @@ namespace HanumanInstitute.DownloadManager
             }
 
             // Get the highest resolution format.
-            BestFormatInfo BestFile = streamSelector.SelectBestFormat(VStream, downloadTask.Options);
+            BestFormatInfo BestFile = _streamSelector.SelectBestFormat(VStream, downloadTask.Options);
             BestFile.Duration = VInfo.Duration;
 
             // Add the best video stream.
             if (BestFile.BestVideo != null && downloadTask.DownloadVideo)
             {
-                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Video, BestFile.BestVideo.Url,
-                    GetPathNoExt(downloadTask.Destination) + GetVideoExtension(streamSelector.GetVideoEncoding(BestFile.BestVideo)),
+                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Video, new Uri(BestFile.BestVideo.Url),
+                    GetPathNoExt(downloadTask.Destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(BestFile.BestVideo)),
                     BestFile.BestVideo, BestFile.BestVideo.Size.TotalBytes));
             }
 
             // Add the best audio stream.
             if (BestFile.BestAudio != null && downloadTask.DownloadAudio)
             {
-                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Audio, BestFile.BestAudio.Url,
+                downloadTask.Files.Add(new DownloadFileInfo(StreamType.Audio, new Uri(BestFile.BestAudio.Url),
                     GetPathNoExt(downloadTask.Destination) + GetAudioExtension(BestFile.BestAudio.AudioCodec),
                     BestFile.BestAudio, BestFile.BestAudio.Size.TotalBytes));
             }
 
             // Add extension if Destination doesn't already include it.
             string Ext = DownloadManager.GetFinalExtension(BestFile.BestVideo, BestFile.BestAudio);
-            if (!downloadTask.Destination.ToLower().EndsWith(Ext))
+            if (!downloadTask.Destination.EndsWith(Ext, StringComparison.InvariantCultureIgnoreCase))
+            {
                 downloadTask.Destination += Ext;
+            }
 
             await StartDownloadTaskAsync(downloadTask).ConfigureAwait(false);
         }
@@ -209,11 +144,13 @@ namespace HanumanInstitute.DownloadManager
             if (!downloadTask.IsCancelled)
             {
                 // Download all files.
-                var DownloadTasks = downloadTask.Files.Select(f => DownloadFileAsync(downloadTask, f)).ToArray();
+                Task[] DownloadTasks = downloadTask.Files.Select(f => DownloadFileAsync(downloadTask, f)).ToArray();
                 await Task.WhenAll(DownloadTasks).ConfigureAwait(false);
             }
             else
+            {
                 RaiseCallback(downloadTask);
+            }
         }
 
         /// <summary>
@@ -224,31 +161,37 @@ namespace HanumanInstitute.DownloadManager
         private async Task DownloadFileAsync(DownloadTaskInfo downloadTask, DownloadFileInfo fileInfo)
         {
             downloadTask.Status = DownloadStatus.Downloading;
-            CancellationTokenSource CancelToken = new CancellationTokenSource();
-            var progressHandler = new Progress<double>(p =>
+            using (CancellationTokenSource cancelToken = new CancellationTokenSource())
             {
-                if (downloadTask.IsCancelled)
-                    CancelToken.Cancel();
-                else
+                try
                 {
-                    fileInfo.Downloaded = (long)(fileInfo.Length * p);
-                    downloadTask.UpdateProgress();
+                    await _youTube.DownloadAsync(
+                        (IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
+
+                    void ProgressHandler(double percent)
+                    {
+                        if (downloadTask.IsCancelled)
+                        {
+                            cancelToken.Cancel();
+                        }
+                        else
+                        {
+                            fileInfo.Downloaded = (long)(fileInfo.Length * percent);
+                            downloadTask.UpdateProgress();
+                        }
+                    }
                 }
-            });
-            try
-            {
-                await youtube.Videos.Streams.DownloadAsync((IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, progressHandler, CancelToken.Token).ConfigureAwait(false);
-            }
-            catch
-            {
-                downloadTask.Status = DownloadStatus.Failed;
+                catch
+                {
+                    downloadTask.Status = DownloadStatus.Failed;
+                }
             }
 
             // Detect whether this is the last file.
             fileInfo.Done = true;
             if (downloadTask.Files.Any(d => !d.Done) == false)
             {
-                var NextDownload = StartNextDownloadAsync().ConfigureAwait(false);
+                System.Runtime.CompilerServices.ConfiguredTaskAwaitable NextDownload = StartNextDownloadAsync().ConfigureAwait(false);
 
                 // Raise events for the last file part only.
                 if (downloadTask.IsCompleted)
@@ -263,7 +206,10 @@ namespace HanumanInstitute.DownloadManager
                     }
                 }
                 else if (downloadTask.IsCancelled)
+                {
                     DownloadCanceled(downloadTask);
+                }
+
                 RaiseCallback(downloadTask);
 
                 await NextDownload;
@@ -277,33 +223,48 @@ namespace HanumanInstitute.DownloadManager
         private async Task DownloadCompletedAsync(DownloadTaskInfo downloadTask)
         {
             if (BeforeMuxing != null)
+            {
                 await Task.Run(() => BeforeMuxing.Invoke(this, new DownloadTaskEventArgs(downloadTask))).ConfigureAwait(false);
+            }
 
-            CompletionStatus Result = fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
-            var VideoFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Video);
-            var AudioFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Audio);
+            CompletionStatus Result = _fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            DownloadFileInfo VideoFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Video);
+            DownloadFileInfo AudioFile = downloadTask.Files.FirstOrDefault(f => f.Type == StreamType.Audio);
 
             // Muxe regularly unless muxing in event handler.
             if (Result != CompletionStatus.Success)
-                Result = await Task.Run(() => muxer.Muxe(VideoFile?.Destination, AudioFile?.Destination, downloadTask.Destination)).ConfigureAwait(false);
+            {
+                Result = await Task.Run(() => _muxer.Muxe(VideoFile?.Destination, AudioFile?.Destination, downloadTask.Destination)).ConfigureAwait(false);
+            }
+
             if (Result == CompletionStatus.Success)
-                Result = fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            {
+                Result = _fileSystem.File.Exists(downloadTask.Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            }
 
             // Delete temp files.
             if (VideoFile != null)
-                fileSystem.File.Delete(VideoFile.Destination);
+            {
+                _fileSystem.File.Delete(VideoFile.Destination);
+            }
+
             if (AudioFile != null)
-                fileSystem.File.Delete(AudioFile.Destination);
+            {
+                _fileSystem.File.Delete(AudioFile.Destination);
+            }
+
             downloadTask.Status = Result == CompletionStatus.Success ? DownloadStatus.Done : DownloadStatus.Failed;
 
             // Ensure download and merge succeeded.
             if (!FileHasContent(downloadTask.Destination))
+            {
                 downloadTask.Status = DownloadStatus.Failed;
+            }
 
             if (downloadTask.Status != DownloadStatus.Failed)
             {
                 // Invoke 2 callbacks: one on the Download Manager, one specified when adding the download.
-                var CompletedArgs = new DownloadTaskEventArgs(downloadTask);
+                DownloadTaskEventArgs CompletedArgs = new DownloadTaskEventArgs(downloadTask);
                 await Task.Run(() =>
                 {
                     Completed?.Invoke(this, CompletedArgs);
@@ -312,7 +273,9 @@ namespace HanumanInstitute.DownloadManager
             }
 
             if (downloadTask.Status != DownloadStatus.Done)
+            {
                 downloadTask.Status = DownloadStatus.Failed;
+            }
         }
 
         /// <summary>
@@ -321,16 +284,21 @@ namespace HanumanInstitute.DownloadManager
         /// <param name="downloadTask">Information about the download task.</param>
         private void DownloadCanceled(DownloadTaskInfo downloadTask)
         {
-            if (downloadTask.Status == DownloadStatus.Canceled)
-                downloadTask.Status = DownloadStatus.Canceled;
-            else if (downloadTask.Status == DownloadStatus.Failed)
-                downloadTask.Status = DownloadStatus.Failed;
+            //if (downloadTask.Status == DownloadStatus.Canceled)
+            //{
+            //    downloadTask.Status = DownloadStatus.Canceled;
+            //}
+            //else if (downloadTask.Status == DownloadStatus.Failed)
+            //{
+            //    downloadTask.Status = DownloadStatus.Failed;
+            //}
+
             Thread.Sleep(100);
 
             // Delete partially-downloaded files.
-            foreach (var item in downloadTask.Files)
+            foreach (DownloadFileInfo item in downloadTask.Files)
             {
-                fileSystem.File.Delete(item.Destination);
+                _fileSystem.File.Delete(item.Destination);
             }
         }
 
@@ -342,38 +310,59 @@ namespace HanumanInstitute.DownloadManager
             // Start next download.
             DownloadTaskInfo NextDownload = DownloadsList.Where(d => d.Status == DownloadStatus.Waiting).LastOrDefault();
             if (NextDownload != null)
-                await InititalizeDownloadAsync(NextDownload).ConfigureAwait(false);
+            {
+                await InititalizeYouTubeDownloadAsync(NextDownload).ConfigureAwait(false);
+            }
         }
 
-        #endregion
-
-        #region Extensions
 
         /// <summary>
         /// Returns the file extensions that can be created by the downloader.
         /// </summary>
-        public string[] DownloadedExtensions => new string[] { ".mp4", ".webm", ".mkv", ".flv" };
+        public IList<string> DownloadedExtensions => _downloadedExtensions ?? (_downloadedExtensions = new List<string> { ".mp4", ".webm", ".mkv", ".flv" });
+        private IList<string> _downloadedExtensions;
 
         /// <summary>
         /// Returns specified path without its file extension.
         /// </summary>
         /// <param name="path">The path to truncate extension from.</param>
         /// <returns>A file path with no file extension.</returns>
-        public string GetPathNoExt(string path) => fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName(path), fileSystem.Path.GetFileNameWithoutExtension(path));
+        public string GetPathNoExt(string path)
+        {
+            path.CheckNotNullOrEmpty(nameof(path));
+            return _fileSystem.Path.Combine(_fileSystem.Path.GetDirectoryName(path), _fileSystem.Path.GetFileNameWithoutExtension(path));
+        }
 
         /// <summary>
         /// Returns the file extension for specified audio type.
         /// </summary>
         /// <param name="audio">The audio type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        private string GetVideoExtension(string codec) => "." + codec.ToString().ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+        private static string GetVideoExtension(string codec)
+        {
+            codec.CheckNotNullOrEmpty(nameof(codec));
+            return "." + codec.ToLowerInvariant();
+        }
+
+        public static string FileWithExt(string file, string ext)
+        {
+            file.CheckNotNullOrEmpty(nameof(file));
+            ext.CheckNotNullOrEmpty(nameof(ext));
+            return file + "." + ext.ToLowerInvariant();
+        }
 
         /// <summary>
         /// Returns the file extension for specified audio type.
         /// </summary>
         /// <param name="codec">The audio type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        private string GetAudioExtension(string codec) => "." + codec.ToString().ToLower();
+        private static string GetAudioExtension(string codec)
+        {
+            codec.CheckNotNullOrEmpty(nameof(codec));
+            return "." + codec.ToLowerInvariant();
+        }
+#pragma warning restore CA1308 // Normalize strings to uppercase
 
         /// <summary>
         /// Returns the file extension for specified video codec type.
@@ -384,13 +373,21 @@ namespace HanumanInstitute.DownloadManager
         private static string GetCodecExtension(Container video)
         {
             if (video.Equals(Container.WebM))
+            {
                 return ".vp9";
+            }
             else if (video.Equals(Container.Mp4))
+            {
                 return ".h264";
+            }
             else if (video.Equals(Container.Tgpp))
+            {
                 return ".mp4v";
+            }
             else
+            {
                 return ".avi";
+            }
         }
 
         /// <summary>
@@ -402,33 +399,43 @@ namespace HanumanInstitute.DownloadManager
         private static string GetFinalExtension(IVideoStreamInfo video, IAudioStreamInfo audio)
         {
             if ((video == null || video.Container.Equals(Container.WebM)) && (audio == null || audio.Container.Equals(Container.WebM)))
+            {
                 return ".webm";
+            }
             else if ((video == null || video.Container.Equals(Container.Mp4)) && (audio == null || audio.Container.Equals(Container.Mp4)))
+            {
                 return ".mp4";
+            }
             else if (video != null && (video.Container.Equals(Container.Mp4) || video.Container.Equals(Container.WebM)))
+            {
                 return ".mkv";
+            }
             else if (video != null)
+            {
                 return GetCodecExtension(video.Container);
+            }
             else if (audio != null)
+            {
                 return GetCodecExtension(audio.Container);
+            }
             else
+            {
                 return "";
+            }
         }
 
-        #endregion
-
-        #region Helper Methods
 
         /// <summary>
         /// Returns the title for specified download URL.
         /// </summary>
         /// <param name="url">The download URL to get the title for.</param>
         /// <returns>A title, or null if it failed to retrieve the title.</returns>
-        public async Task<string> GetVideoTitleAsync(string url)
+        public async Task<string> GetVideoTitleAsync(Uri url)
         {
+            url.CheckNotNull(nameof(url));
             try
             {
-                Video VInfo = await youtube.Videos.GetAsync(url).ConfigureAwait(false);
+                Video VInfo = await _youTube.QueryVideoAsync(url).ConfigureAwait(false);
                 return VInfo.Title;
             }
             catch
@@ -442,12 +449,13 @@ namespace HanumanInstitute.DownloadManager
         /// </summary>
         /// <param name="url">The URL to probe.</param>
         /// <returns>The download information.</returns>
-        public async Task<VideoInfo> GetDownloadInfoAsync(string url)
+        public async Task<VideoInfo> GetDownloadInfoAsync(Uri url)
         {
+            url.CheckNotNull(nameof(url));
             try
             {
-                var T1 = youtube.Videos.GetAsync(url);
-                var T2 = youtube.Videos.Streams.GetManifestAsync(url);
+                Task<Video> T1 = _youTube.QueryVideoAsync(url);
+                Task<StreamManifest> T2 = _youTube.QueryStreamInfoAsync(url);
                 await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
                 return new VideoInfo(T1.Result, T2.Result);
             }
@@ -462,11 +470,11 @@ namespace HanumanInstitute.DownloadManager
         /// </summary>
         /// <param name="url">The URL to check for.</param>
         /// <returns>Whether the URL is already in the list of downloads.</returns>
-        public bool IsDownloadDuplicate(string url)
+        public bool IsDownloadDuplicate(Uri url)
         {
-            bool Result = (from d in this.DownloadsList
+            bool Result = (from d in DownloadsList
                            where (d.Status == DownloadStatus.Downloading || d.Status == DownloadStatus.Initializing || d.Status == DownloadStatus.Waiting) &&
-                             string.Compare(d.Url, url, true) == 0
+                             Uri.Compare(d.Url, url, UriComponents.Host | UriComponents.PathAndQuery, UriFormat.SafeUnescaped, StringComparison.InvariantCultureIgnoreCase) == 0
                            select d).Any();
             return Result;
         }
@@ -478,7 +486,7 @@ namespace HanumanInstitute.DownloadManager
         /// <returns>Whether the file contains data.</returns>
         public bool FileHasContent(string fileName)
         {
-            return fileSystem.File.Exists(fileName) && fileSystem.FileInfo.FromFileName(fileName).Length > 524288;
+            return _fileSystem.File.Exists(fileName) && _fileSystem.FileInfo.FromFileName(fileName).Length > 524288;
         }
 
         /// <summary>
@@ -489,8 +497,5 @@ namespace HanumanInstitute.DownloadManager
         {
             downloadTask?.Callback(this, new DownloadTaskEventArgs(downloadTask));
         }
-
-        #endregion
-
     }
 }

@@ -101,13 +101,7 @@
     <Compile Include="Converters\RatingConverter.cs" />
     <Compile Include="Converters\RatingToColorConverter.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="FFmpegErrorWindow.xaml.cs">
-      <DependentUpon>FFmpegErrorWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="FFmpegUserInterfaceManager.cs" />
-    <Compile Include="FFmpegWindow.xaml.cs">
-      <DependentUpon>FFmpegWindow.xaml</DependentUpon>
-    </Compile>
+    <None Include="_FFmpegUserInterfaceManager.cs" />
     <Compile Include="FileFolderDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -139,23 +133,15 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="FFmpegErrorWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="FFmpegWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="SplashWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj">
-      <Project>{63f65e56-aa64-4f3f-9aff-4679f435c34e}</Project>
-      <Name>Encoder</Name>
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj">
+      <Project>{324a2b9f-af4f-43b1-a6c3-53fc16f8006b}</Project>
+      <Name>FFmpeg</Name>
     </ProjectReference>
     <ProjectReference Include="..\CommonUI\CommonUI.csproj">
       <Project>{e602c22f-4686-45e2-8cd0-c85873167c9c}</Project>

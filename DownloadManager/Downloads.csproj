@@ -14,8 +14,8 @@
     <ProjectGuid>{103ACD13-888B-49FB-BBE7-B34FC14F4152}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmergenceGuardian.DownloadManager</RootNamespace>
-    <AssemblyName>DownloadManager</AssemblyName>
+    <RootNamespace>HanumanInstitute.Downloads</RootNamespace>
+    <AssemblyName>Downloads</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -38,6 +38,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.14.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
@@ -65,7 +68,7 @@
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Abstractions, Version=10.0.0.0, Culture=neutral, PublicKeyToken=96bf224d23c43e59, processorArchitecture=MSIL">
-      <HintPath>..\Solutions\packages\System.IO.Abstractions.10.0.8\lib\net461\System.IO.Abstractions.dll</HintPath>
+      <HintPath>..\Solutions\packages\System.IO.Abstractions.10.0.9\lib\net461\System.IO.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\Solutions\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
@@ -104,18 +107,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BestFormatInfo.cs" />
+    <Compile Include="Models\BestFormatInfo.cs" />
+    <Compile Include="IDownloadManager.cs" />
+    <Compile Include="IDownloadTaskFactory.cs" />
+    <Compile Include="IYouTubeDownloader.cs" />
+    <Compile Include="IYouTubeStreamSelector.cs" />
+    <Compile Include="Models\DownloadStatus.cs" />
+    <Compile Include="Models\SelectStreamFormat.cs" />
+    <Compile Include="Models\StreamType.cs" />
+    <Compile Include="_Preconditions.cs" />
+    <Compile Include="YouTubeDownloader.cs" />
     <Compile Include="YouTubeStreamSelector.cs" />
-    <Compile Include="DownloadTaskEventHandler.cs" />
+    <Compile Include="Models\DownloadTaskEventHandler.cs" />
     <Compile Include="DownloadTaskFactory.cs" />
     <Compile Include="DownloadTaskInfo.cs" />
     <Compile Include="DownloadManager.cs" />
-    <Compile Include="DownloadOptions.cs" />
-    <Compile Include="Enumerations.cs" />
-    <Compile Include="DownloadFileInfo.cs" />
+    <Compile Include="Models\DownloadOptions.cs" />
+    <Compile Include="Models\DownloadFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VideoInfo.cs" />
-    <Compile Include="YouTubeVideoEncoding.cs" />
+    <Compile Include="Models\VideoInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -123,9 +133,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj">
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj">
       <Project>{fe9f3e3f-b8a0-4c08-a512-3823290504ba}</Project>
-      <Name>Encoder</Name>
+      <Name>FFmpeg</Name>
     </ProjectReference>
     <ProjectReference Include="..\CommonServices\CommonServices.csproj">
       <Project>{88b49434-58ee-4233-932f-625ed45d26ac}</Project>

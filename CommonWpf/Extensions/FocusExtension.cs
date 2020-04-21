@@ -7,20 +7,26 @@ using System.Windows.Input;
 // License: Attribution-ShareAlike 3.0 Unported https://creativecommons.org/licenses/by-sa/3.0/
 // Did some code layout refactoring.
 
-namespace HanumanInstitute.CommonWpf {
+namespace HanumanInstitute.CommonWpf
+{
     /// <summary>
     /// Allows setting focus via binding.
     /// </summary>
-    public static class FocusExtensions {
+    public static class FocusExtensions
+    {
+#pragma warning disable CA1062 // Validate arguments of public methods
 
         // IsFocused
         public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.RegisterAttached("IsFocused", typeof(bool),
             typeof(FocusExtensions), new UIPropertyMetadata(false, OnIsFocusedPropertyChanged));
         public static bool GetIsFocused(DependencyObject d) => (bool)d.GetValue(IsFocusedProperty);
         public static void SetIsFocused(DependencyObject d, bool value) => d.SetValue(IsFocusedProperty, value);
-        private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is Control P) {
-                if ((bool)e.NewValue) {
+        private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Control P)
+            {
+                if ((bool)e.NewValue)
+                {
                     // To set false value to get focus on control. if we don't set value to False then we have to set all binding
                     //property to first False then True to set focus on control.
                     SetIsFocused(P, false);
@@ -35,13 +41,12 @@ namespace HanumanInstitute.CommonWpf {
         public static bool GetFocusFirst(Control control) => (bool)control.GetValue(FocusFirstProperty);
         public static void SetFocusFirst(Control control, bool value) => control.SetValue(FocusFirstProperty, value);
         static void OnFocusFirstPropertyChanged(
-            DependencyObject obj, DependencyPropertyChangedEventArgs args) {
-            Control control = obj as Control;
-            if (control == null || !(args.NewValue is bool)) {
-                return;
-            }
+            DependencyObject d, DependencyPropertyChangedEventArgs args)
+        {
+            if (!(d is Control control) || !(args.NewValue is bool)) { return; }
 
-            if ((bool)args.NewValue) {
+            if ((bool)args.NewValue)
+            {
                 control.Loaded += (sender, e) =>
                     control.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
             }
@@ -52,9 +57,10 @@ namespace HanumanInstitute.CommonWpf {
             "FocusOnLoaded", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnFocusOnLoadedChanged));
         public static bool GetFocusOnLoaded(DependencyObject d) => (bool)d.GetValue(FocusOnLoadedProperty);
         public static void SetFocusOnLoaded(DependencyObject d, bool value) => d.SetValue(FocusOnLoadedProperty, value);
-        private static void OnFocusOnLoadedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            FrameworkElement element = d as FrameworkElement;
-            if (element != null && (bool)e.NewValue == true) {
+        private static void OnFocusOnLoadedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is FrameworkElement element && (bool)e.NewValue == true)
+            {
                 element.Loaded += (s, a) => element.Focus();
             }
         }
@@ -65,9 +71,10 @@ namespace HanumanInstitute.CommonWpf {
 
         public static bool GetFocusOnHover(DependencyObject d) => (bool)d.GetValue(FocusOnHoverProperty);
         public static void SetFocusOnHover(DependencyObject d, bool value) => d.SetValue(FocusOnHoverProperty, value);
-        private static void OnFocusOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            UIElement element = d as UIElement;
-            if (element != null && (bool)e.NewValue == true) {
+        private static void OnFocusOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement element && (bool)e.NewValue == true)
+            {
                 element.Focus();
             }
         }
@@ -77,9 +84,10 @@ namespace HanumanInstitute.CommonWpf {
             "SelectOnHover", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnSelectOnHoverChanged));
         public static bool GetSelectOnHover(DependencyObject d) => (bool)d.GetValue(SelectOnHoverProperty);
         public static void SetSelectOnHover(DependencyObject d, bool value) => d.SetValue(SelectOnHoverProperty, value);
-        private static void OnSelectOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            UIElement element = d as UIElement;
-            if (element != null && (bool)e.NewValue == true) {
+        private static void OnSelectOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement element && (bool)e.NewValue == true)
+            {
                 Selector.SetIsSelected(element, true);
             }
         }
@@ -89,17 +97,24 @@ namespace HanumanInstitute.CommonWpf {
             "SelectAllOnFocus", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnSelectAllOnFocusChanged));
         public static bool GetSelectAllOnFocus(DependencyObject d) => (bool)d.GetValue(SelectOnHoverProperty);
         public static void SetSelectAllOnFocus(DependencyObject d, bool value) => d.SetValue(SelectOnHoverProperty, value);
-        private static void OnSelectAllOnFocusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            UIElement element = d as UIElement;
-            if (element != null && (bool)e.NewValue == true) {
-                element.GotFocus += (sender, args) => {
-                    if (sender is TextBox) {
+        private static void OnSelectAllOnFocusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement element && (bool)e.NewValue == true)
+            {
+                element.GotFocus += (sender, args) =>
+                {
+                    if (sender is TextBox)
+                    {
                         ((TextBox)sender).SelectAll();
-                    } else if (sender is PasswordBox) {
+                    }
+                    else if (sender is PasswordBox)
+                    {
                         ((PasswordBox)sender).SelectAll();
                     }
                 };
             }
         }
+
+#pragma warning restore CA1062 // Validate arguments of public methods
     }
 }

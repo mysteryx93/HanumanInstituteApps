@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace HanumanInstitute.DownloadManager {
+namespace HanumanInstitute.Downloads
+{
     /// <summary>
     /// Represents the method that will handle a download task event.
     /// </summary>
@@ -10,11 +11,13 @@ namespace HanumanInstitute.DownloadManager {
     /// <summary>
     /// Contains data for download task event.
     /// </summary>
-    public class DownloadTaskEventArgs : EventArgs {
+    public class DownloadTaskEventArgs : EventArgs
+    {
         public DownloadTaskEventArgs() { }
 
-        public DownloadTaskEventArgs(DownloadTaskInfo downloadInfo) {
-            this.DownloadTask = downloadInfo;
+        public DownloadTaskEventArgs(DownloadTaskInfo downloadInfo)
+        {
+            DownloadTask = downloadInfo;
         }
 
         /// <summary>

@@ -14,16 +14,12 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Returns the combined validation results.
         /// </summary>
-        public IEnumerable<ValidationResult> Results
-        {
-            get
-            {
-                return _results;
-            }
-        }
+        public IEnumerable<ValidationResult> Results => _results;
 
         public CompositeValidationResult(string errorMessage) : base(errorMessage) { }
+
         public CompositeValidationResult(string errorMessage, IEnumerable<string> memberNames) : base(errorMessage, memberNames) { }
+        
         protected CompositeValidationResult(ValidationResult validationResult) : base(validationResult) { }
 
         /// <summary>

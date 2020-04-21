@@ -12,23 +12,23 @@ namespace HanumanInstitute.CommonServices.Validation
         /// <summary>
         /// Validates an object based on its DataAnnotations and throws an exception if the object is not valid.
         /// </summary>
-        /// <param name="obj">The object to validate.</param>
-        public static T ValidateAndThrow<T>(this T obj)
+        /// <param name="v">The object to validate.</param>
+        public static T ValidateAndThrow<T>(this T v)
         {
-            Validator.ValidateObject(obj, new ValidationContext(obj), true);
-            return obj;
+            Validator.ValidateObject(v, new ValidationContext(v), true);
+            return v;
         }
 
         /// <summary>
         /// Validates an object based on its DataAnnotations and returns a list of validation errors.
         /// </summary>
-        /// <param name="obj">The object to validate.</param>
+        /// <param name="v">The object to validate.</param>
         /// <returns>A list of validation errors.</returns>
-        public static ICollection<ValidationResult> Validate<T>(this T obj)
+        public static ICollection<ValidationResult> Validate<T>(this T v)
         {
             var results = new List<ValidationResult>();
-            var context = new ValidationContext(obj);
-            if (!Validator.TryValidateObject(obj, context, results, true))
+            var context = new ValidationContext(v);
+            if (!Validator.TryValidateObject(v, context, results, true))
             {
                 return results;
             }

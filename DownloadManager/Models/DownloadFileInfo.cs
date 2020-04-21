@@ -1,12 +1,16 @@
-﻿
-namespace HanumanInstitute.DownloadManager {
+﻿using System;
+
+namespace HanumanInstitute.Downloads
+{
     /// <summary>
     /// Contains information about a file download operation.
     /// </summary>
-    public class DownloadFileInfo {
+    public class DownloadFileInfo
+    {
         public DownloadFileInfo() { }
 
-        public DownloadFileInfo(StreamType type, string url, string destination, object stream, long length) {
+        public DownloadFileInfo(StreamType type, Uri url, string destination, object stream, long length)
+        {
             this.Type = type;
             this.Url = url;
             this.Destination = destination;
@@ -21,7 +25,7 @@ namespace HanumanInstitute.DownloadManager {
         /// <summary>
         /// Gets or sets the URL to download from.
         /// </summary>
-        public string Url { get; set; }
+        public Uri Url { get; set; }
         /// <summary>
         /// Gets or sets the destination path to store the file locally.
         /// </summary>

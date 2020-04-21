@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using HanumanInstitute.AvisynthScriptBuilder;
-using HanumanInstitute.Encoder;
+using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.Player432hz.Business
 {

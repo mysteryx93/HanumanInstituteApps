@@ -11,7 +11,7 @@ namespace HanumanInstitute.CommonServices
     /// </summary>
     public class ProcessWrapper : IProcess, IDisposable
     {
-        private Process process;
+        private readonly Process process;
 
         public ProcessWrapper()
         {

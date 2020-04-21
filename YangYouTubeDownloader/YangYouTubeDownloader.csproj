@@ -222,9 +222,9 @@
       <Project>{1c9e02bd-1d1b-4dd1-b667-ca123b7394f9}</Project>
       <Name>CommonWpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DownloadManager\DownloadManager.csproj">
+    <ProjectReference Include="..\DownloadManager\Downloads.csproj">
       <Project>{103acd13-888b-49fb-bbe7-b34fc14f4152}</Project>
-      <Name>DownloadManager</Name>
+      <Name>Downloads</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

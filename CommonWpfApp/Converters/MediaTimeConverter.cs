@@ -17,40 +17,48 @@ namespace HanumanInstitute.CommonWpfApp
             {
                 TimeSpan TimeValue;
                 if (value.GetType() != typeof(TimeSpan))
-                    TimeValue = new TimeSpan(0, 0, 0, System.Convert.ToInt32(value));
+                {
+                    TimeValue = new TimeSpan(0, 0, 0, System.Convert.ToInt32(value, CultureInfo.InvariantCulture));
+                }
                 else
+                {
                     TimeValue = (TimeSpan)value;
+                }
+
                 if (TimeValue.TotalHours < 1)
-                    return TimeValue.ToString("m\\:ss");
+                {
+                    return TimeValue.ToString("m\\:ss", CultureInfo.InvariantCulture);
+                }
                 else
-                    return TimeValue.ToString("h\\:mm\\:ss");
+                {
+                    return TimeValue.ToString("h\\:mm\\:ss", CultureInfo.InvariantCulture);
+                }
             }
-            else
-                return "";
+            return String.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string strValue = value as string;
-            if (string.IsNullOrEmpty(strValue))
-                return null;
-            else
+            if (!string.IsNullOrEmpty(strValue))
             {
                 try
                 {
                     int SepCount = strValue.Count(x => x == ':');
                     DateTime ResultDate;
                     if (SepCount > 1)
+                    {
                         ResultDate = DateTime.ParseExact(strValue, "h\\:mm\\:ss", CultureInfo.InvariantCulture);
+                    }
                     else
+                    {
                         ResultDate = DateTime.ParseExact(strValue, "m\\:ss", CultureInfo.InvariantCulture);
+                    }
                     return (short)ResultDate.TimeOfDay.TotalSeconds;
                 }
-                catch
-                {
-                    return null;
-                }
+                catch (FormatException) { }
             }
+            return null;
         }
     }
 }

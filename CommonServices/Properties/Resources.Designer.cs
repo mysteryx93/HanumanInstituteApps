@@ -70,6 +70,15 @@ namespace HanumanInstitute.CommonServices.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} cannot be null or empty..
+        /// </summary>
+        internal static string ArgumentNullOrEmpty {
+            get {
+                return ResourceManager.GetString("ArgumentNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BooleanAndConverter is a OneWay converter..
         /// </summary>
         internal static string BooleanAndConverterConvertBackNotSupported {
@@ -138,6 +147,15 @@ namespace HanumanInstitute.CommonServices.Properties {
         internal static string NumericRangeRuleOutOfRange {
             get {
                 return ResourceManager.GetString("NumericRangeRuleOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation for {0} failed!.
+        /// </summary>
+        internal static string ValidationFailed {
+            get {
+                return ResourceManager.GetString("ValidationFailed", resourceCulture);
             }
         }
         

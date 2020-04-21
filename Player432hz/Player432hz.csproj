@@ -14,7 +14,7 @@
     <ProjectGuid>{9F149234-2CEE-426A-8763-0764216CE696}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmergenceGuardian.Player432hz</RootNamespace>
+    <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
     <AssemblyName>432hzPlayer</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -229,7 +229,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj">
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj">
       <Project>{63f65e56-aa64-4f3f-9aff-4679f435c34e}</Project>
       <Name>Encoder</Name>
     </ProjectReference>

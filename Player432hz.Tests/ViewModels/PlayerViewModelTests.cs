@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HanumanInstitute.AvisynthScriptBuilder;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp.Tests;
-using HanumanInstitute.Encoder;
+using HanumanInstitute.FFmpeg;
 using HanumanInstitute.Player432hz.ViewModels;
 using HanumanInstitute.Player432hz.Business;
 using Xunit;

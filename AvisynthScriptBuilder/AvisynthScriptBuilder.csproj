@@ -86,7 +86,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj">
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj">
       <Project>{63f65e56-aa64-4f3f-9aff-4679f435c34e}</Project>
       <Name>Encoder</Name>
     </ProjectReference>

@@ -27,7 +27,7 @@ namespace HanumanInstitute.CommonWpfApp {
 
         private async void CloseMethod(object sender, EventArgs e) {
             while (!canClose) {
-                await System.Threading.Tasks.Task.Delay(100);
+                await System.Threading.Tasks.Task.Delay(100).ConfigureAwait(true);
             }
 
             this.Topmost = false;

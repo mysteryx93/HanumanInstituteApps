@@ -11,6 +11,8 @@ namespace HanumanInstitute.CommonWpfApp
     {
         public Type Locate(INotifyPropertyChanged viewModel)
         {
+            if (viewModel == null) { throw new ArgumentNullException(nameof(viewModel)); }
+
             Type viewModelType = viewModel.GetType();
             string dialogTypeName = viewModelType.FullName;
 
@@ -20,7 +22,7 @@ namespace HanumanInstitute.CommonWpfApp
             // Replace sufix from ViewModel to View.
             const string OldSufix = "ViewModel";
             const string NewSufix = "View";
-            if (dialogTypeName.EndsWith(OldSufix))
+            if (dialogTypeName.EndsWith(OldSufix, StringComparison.InvariantCulture))
             {
                 dialogTypeName = dialogTypeName.Substring(0, dialogTypeName.Length - OldSufix.Length) + NewSufix;
             }

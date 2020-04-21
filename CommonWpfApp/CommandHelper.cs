@@ -10,18 +10,14 @@ namespace HanumanInstitute.CommonWpfApp
 
         public static ICommand InitCommand(ref ICommand cmd, Action execute, Func<bool> canExecute)
         {
-            if (cmd == null)
-                cmd = new RelayCommand(execute, canExecute);
-            return cmd;
+            return cmd ?? (cmd = new RelayCommand(execute, canExecute));
         }
 
         public static ICommand InitCommand<T>(ref ICommand cmd, Action<T> execute) => InitCommand<T>(ref cmd, execute, (t) => true);
 
         public static ICommand InitCommand<T>(ref ICommand cmd, Action<T> execute, Func<T, bool> canExecute)
         {
-            if (cmd == null)
-                cmd = new RelayCommand<T>(execute, canExecute);
-            return cmd;
+            return cmd ?? (cmd = new RelayCommand<T>(execute, canExecute));
         }
     }
 }

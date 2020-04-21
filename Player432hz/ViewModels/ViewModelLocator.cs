@@ -22,7 +22,7 @@ using CommonServiceLocator.WindsorAdapter;
 using HanumanInstitute.AvisynthScriptBuilder;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.Encoder;
+using HanumanInstitute.FFmpeg;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.Views;
 using GalaSoft.MvvmLight;
@@ -64,7 +64,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
             // FFmpeg
             container.Register(Component.For<IMediaInfoReader>().ImplementedBy<MediaInfoReader>().LifeStyle.Transient);
             container.Register(Component.For<IProcessWorkerFactory>().ImplementedBy<ProcessWorkerFactory>().LifeStyle.Transient);
-            // HanumanInstitute.Encoder.IProcessWorkerFactory
+            // HanumanInstitute.FFmpeg.IProcessWorkerFactory
 
             // ViewModels
             container.Register(Component.For<MainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);

@@ -88,9 +88,9 @@ namespace HanumanInstitute.CommonServices
         /// <param name="path">Location of directory or file to recycle.</param>
         public void MoveToRecycleBin(string path, bool displayWarning)
         {
-            var flags = ApiFileOperationFlags.FOF_ALLOWUNDO | ApiFileOperationFlags.FOF_NOCONFIRMATION;
-            flags |= displayWarning ? ApiFileOperationFlags.FOF_WANTNUKEWARNING : ApiFileOperationFlags.FOF_NOERRORUI | ApiFileOperationFlags.FOF_SILENT;
-            _windowsApi.SHFileOperation(ApiFileOperationType.FO_DELETE, path, flags);
+            var flags = ApiFileOperationFlags.AllowUndo | ApiFileOperationFlags.NoConfirmation;
+            flags |= displayWarning ? ApiFileOperationFlags.WantNukeWarning : ApiFileOperationFlags.NoErrorUI | ApiFileOperationFlags.Silent;
+            _windowsApi.SHFileOperation(ApiFileOperationType.Delete, path, flags);
             if (File.Exists(path))
                 throw new IOException(FormattableString.Invariant($@"Cannot delete file ""{path}"""));
         }

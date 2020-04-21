@@ -120,6 +120,9 @@
   <data name="ApiInvocationError" xml:space="preserve">
     <value>API method {0} failed and returned HRESULT {1}</value>
   </data>
+  <data name="ArgumentNullOrEmpty" xml:space="preserve">
+    <value>{0} cannot be null or empty.</value>
+  </data>
   <data name="BooleanAndConverterConvertBackNotSupported" xml:space="preserve">
     <value>BooleanAndConverter is a OneWay converter.</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="NumericRangeRuleOutOfRange" xml:space="preserve">
     <value>Please enter a value in the range: {0} - {1}</value>
+  </data>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Validation for {0} failed!</value>
   </data>
   <data name="ValueIsNullOrWhiteSpace" xml:space="preserve">
     <value>The passed value may not be empty or whithespace.</value>

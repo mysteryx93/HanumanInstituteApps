@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using HanumanInstitute.CommonServices.Properties;
 
 namespace HanumanInstitute.CommonServices
 {
@@ -17,20 +19,20 @@ namespace HanumanInstitute.CommonServices
         /// <returns></returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value != null)
+            Preconditions.CheckNotNull(value, nameof(value));
+            Preconditions.CheckNotNull(validationContext, nameof(validationContext));
+
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(value, null, null);
+
+            Validator.TryValidateObject(value, context, results, true);
+
+            if (results.Count != 0)
             {
-                var results = new List<ValidationResult>();
-                var context = new ValidationContext(value, null, null);
+                var compositeResults = new CompositeValidationResult(string.Format(CultureInfo.InvariantCulture, Resources.ValidationFailed, validationContext.DisplayName));
+                results.ForEach(compositeResults.AddResult);
 
-                Validator.TryValidateObject(value, context, results, true);
-
-                if (results.Count != 0)
-                {
-                    var compositeResults = new CompositeValidationResult(string.Format("Validation for {0} failed!", validationContext.DisplayName));
-                    results.ForEach(compositeResults.AddResult);
-
-                    return compositeResults;
-                }
+                return compositeResults;
             }
             return ValidationResult.Success;
         }

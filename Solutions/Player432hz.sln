@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpfApp.Tests", "..\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvisynthScriptBuilder.Tests", "..\AvisynthScriptBuilder.Tests\AvisynthScriptBuilder.Tests.csproj", "{F7A66EFB-F2D0-45FD-8BAE-7A6781717C1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Encoder", "..\..\HanumanInstitute.Encoder\Encoder\Encoder.csproj", "{63F65E56-AA64-4F3F-9AFF-4679F435C34E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg", "..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj", "{63F65E56-AA64-4F3F-9AFF-4679F435C34E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

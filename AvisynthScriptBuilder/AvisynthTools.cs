@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
-using HanumanInstitute.Encoder;
+using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.AvisynthScriptBuilder
 {
