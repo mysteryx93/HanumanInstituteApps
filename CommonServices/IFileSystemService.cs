@@ -29,6 +29,12 @@ namespace HanumanInstitute.CommonServices
         /// <returns>A list of files paths matching search conditions.</returns>
         IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly);
         /// <summary>
+        /// Returns specified path without its file extension.
+        /// </summary>
+        /// <param name="path">The path to truncate extension from.</param>
+        /// <returns>A file path with no file extension.</returns>
+        string GetPathWithoutExtension(string path);
+        /// <summary>
         /// Send a file or path silently to the recycle bin. Surpress dialog, surpress errors, delete if too large.
         /// </summary>
         /// <param name="path">Location of directory or file to recycle.</param>

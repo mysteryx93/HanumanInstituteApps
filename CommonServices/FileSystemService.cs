@@ -76,6 +76,17 @@ namespace HanumanInstitute.CommonServices
         }
 
         /// <summary>
+        /// Returns specified path without its file extension.
+        /// </summary>
+        /// <param name="path">The path to truncate extension from.</param>
+        /// <returns>A file path with no file extension.</returns>
+        public string GetPathWithoutExtension(string path)
+        {
+            path.CheckNotNullOrEmpty(nameof(path));
+            return Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+        }
+
+        /// <summary>
         /// Send a file or path silently to the recycle bin. Surpress dialog, surpress errors, delete if too large.
         /// </summary>
         /// <param name="path">Location of directory or file to recycle.</param>

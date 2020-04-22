@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HanumanInstitute.CommonServices;
+using HanumanInstitute.FFmpeg;
+using System;
 
 namespace HanumanInstitute.Downloads
 {
@@ -7,26 +9,34 @@ namespace HanumanInstitute.Downloads
     /// </summary>
     public class DownloadTaskFactory : IDownloadTaskFactory
     {
-        /// <summary>
-        /// Creates a new IDownloadTaskInfo with default values.
-        /// </summary>
-        /// <returns>The new IDownloadTaskInfo instance.</returns>
-        public DownloadTaskInfo Create() => new DownloadTaskInfo();
+        private readonly IYouTubeDownloader _youTube;
+        private readonly IYouTubeStreamSelector _streamSelector;
+        private readonly IFileSystemService _fileSystem;
+        private readonly IMediaMuxer _mediaMuxer;
+
+
+        public DownloadTaskFactory(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer)
+        {
+            _youTube = youTube.CheckNotNull(nameof(youTube));
+            _streamSelector = streamSelector.CheckNotNull(nameof(streamSelector));
+            _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
+            _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
+        }
 
         /// <summary>
         /// Creates a new IDownloadTaskInfo initialized with specified values.
         /// </summary>
-        /// <param name="url">The URL to download.</param>
+        /// <param name="url">The URL of the media to download.</param>
         /// <param name="destination">The destination path to store the file locally.</param>
-        /// <param name="title">The title of the downloaded file.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to download the audio stream.</param>
-        /// <param name="callback">The function to be called once download is completed.</param>
+        /// <param name="taskStatus">An object containing download status information.</param>
         /// <param name="options">The download options.</param>
-        /// <returns>The new IDownloadTaskInfo instance.</returns>
-        public DownloadTaskInfo Create(Uri url, string destination, string title, bool downloadVideo, bool downloadAudio, DownloadTaskEventHandler callback, DownloadOptions options)
+        /// <returns>The new IDownloadTask instance.</returns>
+        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options)
         {
-            return new DownloadTaskInfo(url, destination, title, downloadVideo, downloadAudio, callback, options);
+            return new DownloadTask(_youTube, _streamSelector, _fileSystem, _mediaMuxer, 
+                url, destination, downloadVideo, downloadAudio, taskStatus, options);
         }
     }
 }

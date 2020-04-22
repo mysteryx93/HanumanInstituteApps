@@ -15,7 +15,7 @@ namespace HanumanInstitute.Downloads
     {
         public DownloadTaskEventArgs() { }
 
-        public DownloadTaskEventArgs(DownloadTaskInfo downloadInfo)
+        public DownloadTaskEventArgs(IDownloadTask downloadInfo)
         {
             DownloadTask = downloadInfo;
         }
@@ -23,6 +23,6 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns information about the file being downloaded.
         /// </summary>
-        public DownloadTaskInfo DownloadTask { get; set; }
+        public IDownloadTask DownloadTask { get; set; }
     }
 }

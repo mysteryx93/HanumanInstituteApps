@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit;
+using Moq;
 
-namespace Downloads.Tests
+namespace HanumanInstitute.Downloads.Tests
 {
-    class DownloadManagerTests
+    public class DownloadManagerTests
     {
     }
 }

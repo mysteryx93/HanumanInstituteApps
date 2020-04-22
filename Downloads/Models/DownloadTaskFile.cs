@@ -5,17 +5,17 @@ namespace HanumanInstitute.Downloads
     /// <summary>
     /// Contains information about a file download operation.
     /// </summary>
-    public class DownloadFileInfo
+    internal class DownloadTaskFile
     {
-        public DownloadFileInfo() { }
+        public DownloadTaskFile() { }
 
-        public DownloadFileInfo(StreamType type, Uri url, string destination, object stream, long length)
+        public DownloadTaskFile(StreamType type, Uri url, string destination, object stream, long length)
         {
-            this.Type = type;
-            this.Url = url;
-            this.Destination = destination;
-            this.Stream = stream;
-            this.Length = length;
+            Type = type;
+            Url = url;
+            Destination = destination;
+            Stream = stream;
+            Length = length;
         }
 
         /// <summary>
