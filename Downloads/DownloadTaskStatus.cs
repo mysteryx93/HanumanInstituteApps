@@ -13,11 +13,11 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs before performing the muxing operation.
         /// </summary>
-        public event DownloadTaskEventHandler BeforeMuxing;
+        public event DownloadTaskEventHandler? BeforeMuxing;
         /// <summary>
         /// Gets or sets the title of the downloaded media.
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the progress of all streams as percentage.
         /// </summary>
@@ -25,7 +25,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the progress of all streams as a string representation.
         /// </summary>
-        public string ProgressText { get; set; }
+        public string ProgressText { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the download status.
         /// </summary>

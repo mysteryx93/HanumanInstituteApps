@@ -20,6 +20,8 @@ namespace HanumanInstitute.CommonWpfApp.Tests
 
         public IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly) => null;
 
+        public string GetPathWithoutExtension(string path) => null;
+
         public void MoveToRecycleBin(string path) { }
 
         public void MoveToRecycleBin(string path, bool displayWarning) { }

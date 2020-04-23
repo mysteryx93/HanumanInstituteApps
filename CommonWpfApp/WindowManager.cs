@@ -12,8 +12,8 @@ namespace HanumanInstitute.CommonWpfApp
     /// </summary>
     public class WindowManager
     {
-        private readonly List<Window> windowStack = new List<Window>();
-        private readonly List<Window> toolboxes = new List<Window>();
+        private readonly List<Window> _windowStack = new List<Window>();
+        private readonly List<Window> _toolboxes = new List<Window>();
 
         /// <summary>
         /// Initializes a new instance of the WindowManager class.
@@ -23,13 +23,13 @@ namespace HanumanInstitute.CommonWpfApp
         {
             if (rootWindow == null) { throw new ArgumentNullException(nameof(rootWindow)); }
 
-            windowStack.Add(rootWindow);
+            _windowStack.Add(rootWindow);
         }
 
         /// <summary>
         /// Returns the currently active window.
         /// </summary>
-        public Window Current => windowStack.LastOrDefault();
+        public Window Current => _windowStack.LastOrDefault();
 
         /// <summary>
         /// Shows specified window while hiding the currently active window.
@@ -39,16 +39,16 @@ namespace HanumanInstitute.CommonWpfApp
         {
             if (newWindow == null) { throw new ArgumentNullException(nameof(newWindow)); }
 
-            Window PreviousWindow = windowStack.Last();
-            if (PreviousWindow != null)
+            var previousWindow = _windowStack.Last();
+            if (previousWindow != null)
             {
-                newWindow.Owner = PreviousWindow; // To position based on parent window.
+                newWindow.Owner = previousWindow; // To position based on parent window.
             }
             newWindow.Show();
-            windowStack.Add(newWindow);
-            if (PreviousWindow != null)
+            _windowStack.Add(newWindow);
+            if (previousWindow != null)
             {
-                PreviousWindow.Hide();
+                previousWindow.Hide();
             }
             SetToolboxOwner(newWindow);
             newWindow.Closing += NewWindow_Closed;
@@ -71,7 +71,7 @@ namespace HanumanInstitute.CommonWpfApp
         /// </summary>
         public void CloseToMain()
         {
-            while (windowStack.Count > 1)
+            while (_windowStack.Count > 1)
             {
                 Current.Close();
             }
@@ -82,12 +82,12 @@ namespace HanumanInstitute.CommonWpfApp
         /// </summary>
         private void NewWindow_Closed(object sender, EventArgs e)
         {
-            windowStack.RemoveAt(windowStack.Count - 1);
-            Window PreviousWindow = windowStack.LastOrDefault();
-            if (PreviousWindow != null)
+            _windowStack.RemoveAt(_windowStack.Count - 1);
+            var previousWindow = _windowStack.LastOrDefault();
+            if (previousWindow != null)
             {
-                SetToolboxOwner(PreviousWindow);
-                PreviousWindow.Show();
+                SetToolboxOwner(previousWindow);
+                previousWindow.Show();
             }
         }
 
@@ -112,9 +112,9 @@ namespace HanumanInstitute.CommonWpfApp
                 newToolbox.Top = Current.Top + Current.Height;
             }
             newToolbox.Show();
-            if (!toolboxes.Contains(newToolbox))
+            if (!_toolboxes.Contains(newToolbox))
             {
-                toolboxes.Add(newToolbox);
+                _toolboxes.Add(newToolbox);
             }
         }
 
@@ -124,7 +124,7 @@ namespace HanumanInstitute.CommonWpfApp
         /// <param name="owner">The window that will own all toolbox windows.</param>
         private void SetToolboxOwner(Window owner)
         {
-            foreach (Window item in toolboxes)
+            foreach (var item in _toolboxes)
             {
                 item.Owner = owner;
             }

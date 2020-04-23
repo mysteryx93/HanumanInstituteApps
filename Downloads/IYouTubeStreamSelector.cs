@@ -15,14 +15,14 @@ namespace HanumanInstitute.Downloads
         /// <param name="vstream">The list of video streams to chose from.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The best format available.</returns>
-        BestFormatInfo SelectBestFormat(StreamManifest vstream, DownloadOptions options);
+        BestFormatInfo? SelectBestFormat(StreamManifest vstream, DownloadOptions options);
         /// <summary>
         /// Selects Opus audio if available, otherwise Vorbis or AAC.
         /// </summary>
         /// <param name="vinfo">The list of available audio streams.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The audio to download.</returns>
-        IAudioStreamInfo SelectBestAudio(StreamManifest vinfo, DownloadOptions options);
+        IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options);
         /// <summary>
         /// Returns the encoding format of specified download stream.
         /// </summary>

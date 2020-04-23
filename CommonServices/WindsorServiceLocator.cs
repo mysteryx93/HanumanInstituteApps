@@ -10,7 +10,7 @@ namespace CommonServiceLocator.WindsorAdapter
     /// </summary>
     public class WindsorServiceLocator : ServiceLocatorImplBase
     {
-        private readonly IWindsorContainer container;
+        private readonly IWindsorContainer _container;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindsorServiceLocator"/> class.
@@ -18,7 +18,7 @@ namespace CommonServiceLocator.WindsorAdapter
         /// <param name="container">The container.</param>
         public WindsorServiceLocator(IWindsorContainer container)
         {
-            this.container = container;
+            _container = container;
         }
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace CommonServiceLocator.WindsorAdapter
         /// </returns>
         protected override object DoGetInstance(Type serviceType, string key)
         {
-            if (key != null)
-                return container.Resolve(key, serviceType);
-            return container.Resolve(serviceType);
+            return key != null ?
+                _container.Resolve(key, serviceType) :
+                _container.Resolve(serviceType);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace CommonServiceLocator.WindsorAdapter
         /// </returns>
         protected override IEnumerable<object> DoGetAllInstances(Type serviceType)
         {
-            return (object[])container.ResolveAll(serviceType);
+            return (object[])_container.ResolveAll(serviceType);
         }
     }
 }

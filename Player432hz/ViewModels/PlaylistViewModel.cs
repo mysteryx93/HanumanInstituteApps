@@ -58,7 +58,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
                 if (!string.IsNullOrEmpty(folderSettings.SelectedPath))
                 {
                     Folders.List.Add(folderSettings.SelectedPath);
-                    Folders.Select(Folders.List.Count - 1);
+                    Folders.ForceSelect(Folders.List.Count - 1);
                     _fileListViewModel.SetPaths(Folders.List);
                 }
             }
@@ -76,7 +76,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
             {
                 var selection = Folders.SelectedIndex;
                 Folders.List.RemoveAt(Folders.SelectedIndex);
-                Folders.Select(selection, true);
+                Folders.ForceSelect(selection);
                 _fileListViewModel.SetPaths(Folders.List);
             }
         }

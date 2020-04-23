@@ -7,7 +7,7 @@ namespace HanumanInstitute.Downloads
     /// </summary>
     internal class DownloadTaskFile
     {
-        public DownloadTaskFile() { }
+        //public DownloadTaskFile() { }
 
         public DownloadTaskFile(StreamType type, Uri url, string destination, object stream, long length)
         {

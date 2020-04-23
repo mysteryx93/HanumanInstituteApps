@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using YoutubeExplode.Videos.Streams;
-using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.Downloads
 {
@@ -19,37 +18,35 @@ namespace HanumanInstitute.Downloads
         /// <param name="vstream">The list of video streams to chose from.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The best format available.</returns>
-        public BestFormatInfo SelectBestFormat(StreamManifest vstream, DownloadOptions options)
+        public BestFormatInfo? SelectBestFormat(StreamManifest vstream, DownloadOptions options)
         {
-            Preconditions.CheckNotNull(vstream, nameof(vstream));
+            var maxResolutionList = (from v in vstream.GetAudio().Cast<IStreamInfo>().Union(vstream.GetVideo()).Union(vstream.GetMuxed())
+                                     where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
+                                     orderby GetVideoHeight(v) descending
+                                     orderby GetVideoFrameRate(v) descending
+                                     select v).ToList();
 
-            System.Collections.Generic.List<IStreamInfo> MaxResolutionList = (from v in vstream.GetAudio().Cast<IStreamInfo>().Union(vstream.GetVideo()).Union(vstream.GetMuxed())
-                                                                              where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
-                                                                              orderby GetVideoHeight(v) descending
-                                                                              orderby GetVideoFrameRate(v) descending
-                                                                              select v).ToList();
+            maxResolutionList = maxResolutionList.Where(v => GetVideoHeight(v) == GetVideoHeight(maxResolutionList.First())).ToList();
 
-            MaxResolutionList = MaxResolutionList.Where(v => GetVideoHeight(v) == GetVideoHeight(MaxResolutionList.First())).ToList();
+            var bestVideo = (from v in maxResolutionList
+                                 // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
+                             let Preference = (int)(GetVideoEncoding(v) == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
+                             where options.PreferredFormat == SelectStreamFormat.Best ||
+                                (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
+                                (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
+                             orderby Preference descending
+                             select v).FirstOrDefault();
 
-            IStreamInfo BestVideo = (from v in MaxResolutionList
-                                         // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
-                                     let Preference = (int)(GetVideoEncoding(v) == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
-                                     where options.PreferredFormat == SelectStreamFormat.Best ||
-                                        (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
-                                        (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
-                                     orderby Preference descending
-                                     select v).FirstOrDefault();
+            bestVideo ??= maxResolutionList.FirstOrDefault();
 
-            BestVideo = BestVideo ?? MaxResolutionList.FirstOrDefault();
-
-            if (BestVideo != null)
+            if (bestVideo != null)
             {
-                BestFormatInfo Result = new BestFormatInfo
+                var result = new BestFormatInfo
                 {
-                    BestVideo = BestVideo as IVideoStreamInfo,
+                    BestVideo = bestVideo as IVideoStreamInfo,
                     BestAudio = SelectBestAudio(vstream, options)
                 };
-                return Result;
+                return result;
             }
             return null;
         }
@@ -60,22 +57,22 @@ namespace HanumanInstitute.Downloads
         /// <param name="vinfo">The list of available audio streams.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The audio to download.</returns>
-        public IAudioStreamInfo SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
+        public IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
         {
             if (vinfo == null || !vinfo.GetAudio().Any())
             {
                 return null;
             }
 
-            IAudioStreamInfo BestAudio = (from v in vinfo.GetAudio()
-                                              // Opus encodes ~20% better, Vorbis ~10% better than AAC
-                                          let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
-                                          where options.PreferredAudio == SelectStreamFormat.Best ||
-                                          (options.PreferredAudio == SelectStreamFormat.MP4 && (v.AudioCodec == AudioEncoding.Aac)) ||
-                                          (options.PreferredAudio == SelectStreamFormat.VP9 && (v.AudioCodec == AudioEncoding.Opus || v.AudioCodec == AudioEncoding.Vorbis))
-                                          orderby Preference descending
-                                          select v).FirstOrDefault();
-            return BestAudio;
+            var bestAudio = (from v in vinfo.GetAudio()
+                                 // Opus encodes ~20% better, Vorbis ~10% better than AAC
+                             let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
+                             where options.PreferredAudio == SelectStreamFormat.Best ||
+                             (options.PreferredAudio == SelectStreamFormat.MP4 && (v.AudioCodec == AudioEncoding.Aac)) ||
+                             (options.PreferredAudio == SelectStreamFormat.VP9 && (v.AudioCodec == AudioEncoding.Opus || v.AudioCodec == AudioEncoding.Vorbis))
+                             orderby Preference descending
+                             select v).FirstOrDefault();
+            return bestAudio;
         }
 
         /// <summary>
@@ -85,14 +82,14 @@ namespace HanumanInstitute.Downloads
         /// <returns>The video encoding format.</returns>
         public string GetVideoEncoding(IStreamInfo stream)
         {
-            IVideoStreamInfo VInfo = stream as IVideoStreamInfo;
-            MuxedStreamInfo MInfo = stream as MuxedStreamInfo;
-            if (VInfo == null && MInfo == null)
+            var vInfo = stream as IVideoStreamInfo;
+            var mInfo = stream as MuxedStreamInfo;
+            if (vInfo == null && mInfo == null)
             {
                 return VideoEncoding.H264;
             }
 
-            return VInfo?.VideoCodec ?? MInfo.VideoCodec;
+            return vInfo?.VideoCodec ?? mInfo?.VideoCodec ?? string.Empty;
         }
 
         /// <summary>
@@ -102,51 +99,51 @@ namespace HanumanInstitute.Downloads
         /// <returns>The video height.</returns>
         public int GetVideoHeight(IStreamInfo stream)
         {
-            IVideoStreamInfo vInfo = stream as IVideoStreamInfo;
+            var vInfo = stream as IVideoStreamInfo;
             if (vInfo != null)
             {
                 return vInfo.Resolution.Height;
             }
             else if (stream is MuxedStreamInfo mInfo)
             {
-                VideoQuality Q = vInfo?.VideoQuality ?? mInfo.VideoQuality;
-                if (Q == VideoQuality.High4320)
+                var q = vInfo?.VideoQuality ?? mInfo.VideoQuality;
+                if (q == VideoQuality.High4320)
                 {
                     return 4320;
                 }
-                else if (Q == VideoQuality.High3072)
+                else if (q == VideoQuality.High3072)
                 {
                     return 3072;
                 }
-                else if (Q == VideoQuality.High2160)
+                else if (q == VideoQuality.High2160)
                 {
                     return 2160;
                 }
-                else if (Q == VideoQuality.High1440)
+                else if (q == VideoQuality.High1440)
                 {
                     return 1440;
                 }
-                else if (Q == VideoQuality.High1080)
+                else if (q == VideoQuality.High1080)
                 {
                     return 1080;
                 }
-                else if (Q == VideoQuality.High720)
+                else if (q == VideoQuality.High720)
                 {
                     return 720;
                 }
-                else if (Q == VideoQuality.Medium480)
+                else if (q == VideoQuality.Medium480)
                 {
                     return 480;
                 }
-                else if (Q == VideoQuality.Medium360)
+                else if (q == VideoQuality.Medium360)
                 {
                     return 360;
                 }
-                else if (Q == VideoQuality.Low240)
+                else if (q == VideoQuality.Low240)
                 {
                     return 240;
                 }
-                else if (Q == VideoQuality.Low144)
+                else if (q == VideoQuality.Low144)
                 {
                     return 144;
                 }
@@ -168,7 +165,7 @@ namespace HanumanInstitute.Downloads
         /// <returns>The video frame rate.</returns>
         public double GetVideoFrameRate(IStreamInfo stream)
         {
-            IVideoStreamInfo vInfo = stream as IVideoStreamInfo;
+            var vInfo = stream as IVideoStreamInfo;
             return vInfo?.Framerate.FramesPerSecond ?? 0;
         }
 

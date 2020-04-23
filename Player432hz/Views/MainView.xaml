@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Player432hz"
+        xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayerUI;assembly=MediaPlayerUI"
         xmlns:common="clr-namespace:HanumanInstitute.CommonWpfApp;assembly=CommonWpfApp" 
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
@@ -14,7 +14,7 @@
         Height="{Binding Source={StaticResource Locator}, Path=Settings.Current.Height, Mode=TwoWay}"
         Width="{Binding Source={StaticResource Locator}, Path=Settings.Current.Width, Mode=TwoWay}" 
         Closing="{wpf:MethodBinding {Binding Source={StaticResource Locator}, Path=Settings}, Save}"
-        x:Name="UI" Title="432hz Player" Icon="/432hzPlayer;component/App.ico" MinHeight="240" MinWidth="560"
+        x:Name="UI" Title="432hz Player" Icon="/Icons/App.ico" MinHeight="240" MinWidth="560"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True">
     <Window.DataContext>
         <Binding Mode="OneWay" Path="Main" Source="{StaticResource Locator}" />
@@ -75,14 +75,18 @@
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>-->
     <Grid Style="{DynamicResource GradiantBackground}">
-        <Grid Margin="174,8,10,0" DataContext="{Binding Playlists.SelectedItem}" Height="108" VerticalAlignment="Top" IsEnabled="{Binding Converter={StaticResource HasValueConverter}, Mode=OneWay}" md:DialogServiceViews.IsRegistered="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="37*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="132,8,10,0" DataContext="{Binding Playlists.SelectedItem}" Height="108" VerticalAlignment="Top" IsEnabled="{Binding Converter={StaticResource HasValueConverter}, Mode=OneWay}" md:DialogServiceViews.IsRegistered="True" Grid.Column="1">
             <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders.List}" TabIndex="5" Background="{x:Null}" SelectedIndex="{Binding Folders.SelectedIndex, Mode=TwoWay}" />
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top" FontWeight="Bold"/>
             <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="21" Margin="80,0,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
             <Button x:Name="AddFolderButton" Content="Add" HorizontalAlignment="Right" Margin="0,-1,80,0" VerticalAlignment="Top" Width="75" TabIndex="6" Command="{Binding AddFolderCommand, Mode=OneWay}"/>
             <Button x:Name="RemoveFolderButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" TabIndex="7" Command="{Binding RemoveFolderCommand, Mode=OneWay}" Margin="0,-1,0,0"/>
         </Grid>
-        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,31,0,54" Width="146" ItemsSource="{Binding Playlists.List}" SelectedValuePath="Name" TabIndex="1" Background="{x:Null}" SelectedIndex="{Binding Playlists.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" >
+        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,31,0,54" Width="146" ItemsSource="{Binding Playlists.List}" SelectedValuePath="Name" TabIndex="1" Background="{x:Null}" SelectedIndex="{Binding Playlists.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}">
@@ -94,10 +98,10 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <TextBlock HorizontalAlignment="Left" Margin="10,12,0,0" Text="Playlists" VerticalAlignment="Top" FontWeight="Bold"/>
-        <Button x:Name="AddPlaylistButton" Content="Add" HorizontalAlignment="Left" Margin="67,7,0,0" VerticalAlignment="Top" Width="50" TabIndex="2" Command="{Binding AddPlaylistCommand}" />
-        <Button x:Name="RemovePlaylistButton" Content="Del" HorizontalAlignment="Left" Margin="122,7,0,0" VerticalAlignment="Top" Width="34" TabIndex="3" Command="{Binding DeletePlaylistCommand}" />
-        <Grid Height="43" VerticalAlignment="Bottom">
+        <TextBlock HorizontalAlignment="Left" Margin="10,12,0,0" Text="Playlists" VerticalAlignment="Top" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Button x:Name="AddPlaylistButton" Content="Add" HorizontalAlignment="Left" Margin="25,7,0,0" VerticalAlignment="Top" Width="50" TabIndex="2" Command="{Binding AddPlaylistCommand}" Grid.Column="1" />
+        <Button x:Name="RemovePlaylistButton" Content="Del" HorizontalAlignment="Left" Margin="80,7,0,0" VerticalAlignment="Top" Width="34" TabIndex="3" Command="{Binding DeletePlaylistCommand}" Grid.Column="1" />
+        <Grid Height="43" VerticalAlignment="Bottom" Grid.ColumnSpan="2">
             <Grid.DataContext>
                 <Binding Mode="OneWay" Path="Player" Source="{StaticResource Locator}" />
             </Grid.DataContext>
@@ -106,7 +110,7 @@
                     Volume="{Binding Source={StaticResource Locator}, Path=Settings.Current.Volume, Mode=TwoWay}" />
             </ui:MediaPlayer>
         </Grid>
-        <Grid Margin="174,120,10,54">
+        <Grid Margin="132,120,10,54" Grid.Column="1">
             <Grid.DataContext>
                 <Binding Mode="OneWay" Path="FilesList" Source="{StaticResource Locator}" />
             </Grid.DataContext>

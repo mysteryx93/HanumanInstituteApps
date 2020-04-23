@@ -15,7 +15,7 @@ namespace HanumanInstitute.CommonServices
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.Register(Component.For<SettingsProvider>().ImplementedBy<SettingsProvider>().LifeStyle.Singleton);
+            //services.Register(Component.For<SettingsProvider>().ImplementedBy<SettingsProvider>().LifeStyle.Singleton);
             services.Register(Component.For<ISerializationService>().ImplementedBy<SerializationService>().LifeStyle.Transient);
             services.Register(Component.For<IFileSystemService>().ImplementedBy<FileSystemService>().LifeStyle.Transient);
             services.Register(Component.For<IProcessService>().ImplementedBy<ProcessService>().LifeStyle.Transient);

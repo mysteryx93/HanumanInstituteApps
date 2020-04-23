@@ -18,134 +18,146 @@ namespace HanumanInstitute.CommonWpf
     {
         #region Properties
 
-        private Binding _binding;
-        protected Binding Binding {
-            get {
-                if (_binding == null)
-                {
-                    _binding = new Binding();
-                }
-                return _binding;
-            }
-        }
+        private Binding? _binding;
+        protected Binding Binding => _binding ?? (_binding = new Binding());
 
         [DefaultValue(null)]
-        public object AsyncState {
+        public object AsyncState
+        {
             get => Binding.AsyncState;
             set => Binding.AsyncState = value;
         }
 
         [DefaultValue(false)]
-        public bool BindsDirectlyToSource {
+        public bool BindsDirectlyToSource
+        {
             get => Binding.BindsDirectlyToSource;
             set => Binding.BindsDirectlyToSource = value;
         }
 
         [DefaultValue(null)]
-        public IValueConverter Converter {
+        public IValueConverter Converter
+        {
             get => Binding.Converter;
             set => Binding.Converter = value;
         }
 
         [TypeConverter(typeof(CultureInfoIetfLanguageTagConverter)), DefaultValue(null)]
-        public CultureInfo ConverterCulture {
+        public CultureInfo ConverterCulture
+        {
             get => Binding.ConverterCulture;
             set => Binding.ConverterCulture = value;
         }
 
         [DefaultValue(null)]
 
-        public object ConverterParameter {
+        public object ConverterParameter
+        {
             get => Binding.ConverterParameter;
             set => Binding.ConverterParameter = value;
         }
 
         [DefaultValue(null)]
-        public string ElementName {
+        public string ElementName
+        {
             get => Binding.ElementName;
             set => Binding.ElementName = value;
         }
 
         [DefaultValue(null)]
-        public object FallbackValue {
+        public object FallbackValue
+        {
             get => Binding.FallbackValue;
             set => Binding.FallbackValue = value;
         }
 
         [DefaultValue(false)]
-        public bool IsAsync {
+        public bool IsAsync
+        {
             get => Binding.IsAsync;
             set => Binding.IsAsync = value;
         }
 
         [DefaultValue(BindingMode.Default)]
-        public BindingMode Mode {
+        public BindingMode Mode
+        {
             get => Binding.Mode;
             set => Binding.Mode = value;
         }
 
         [DefaultValue(false)]
-        public bool NotifyOnSourceUpdated {
+        public bool NotifyOnSourceUpdated
+        {
             get => Binding.NotifyOnSourceUpdated;
             set => Binding.NotifyOnSourceUpdated = value;
         }
 
         [DefaultValue(false)]
-        public bool NotifyOnTargetUpdated {
+        public bool NotifyOnTargetUpdated
+        {
             get => Binding.NotifyOnTargetUpdated;
             set => Binding.NotifyOnTargetUpdated = value;
         }
 
         [DefaultValue(false)]
-        public bool NotifyOnValidationError {
+        public bool NotifyOnValidationError
+        {
             get => Binding.NotifyOnValidationError;
             set => Binding.NotifyOnValidationError = value;
         }
 
         [DefaultValue(null)]
-        public PropertyPath Path {
+        public PropertyPath Path
+        {
             get => Binding.Path;
             set => Binding.Path = value;
         }
 
         [DefaultValue(null)]
-        public RelativeSource RelativeSource {
+        public RelativeSource RelativeSource
+        {
             get => Binding.RelativeSource;
             set => Binding.RelativeSource = value;
         }
 
         [DefaultValue(null)]
-        public object Source {
+        public object Source
+        {
             get => Binding.Source;
             set => Binding.Source = value;
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public UpdateSourceExceptionFilterCallback UpdateSourceExceptionFilter {
+        public UpdateSourceExceptionFilterCallback UpdateSourceExceptionFilter
+        {
             get => Binding.UpdateSourceExceptionFilter;
             set => Binding.UpdateSourceExceptionFilter = value;
         }
 
         [DefaultValue(UpdateSourceTrigger.PropertyChanged)]
-        public UpdateSourceTrigger UpdateSourceTrigger {
+        public UpdateSourceTrigger UpdateSourceTrigger
+        {
             get => Binding.UpdateSourceTrigger;
             set => Binding.UpdateSourceTrigger = value;
         }
 
         [DefaultValue(false)]
-        public bool ValidatesOnDataErrors {
+        public bool ValidatesOnDataErrors
+        {
             get => Binding.ValidatesOnDataErrors;
             set => Binding.ValidatesOnDataErrors = value;
         }
 
         [DefaultValue(false)]
-        public bool ValidatesOnExceptions {
+        public bool ValidatesOnExceptions
+        {
             get => Binding.ValidatesOnExceptions;
             set => Binding.ValidatesOnExceptions = value;
         }
 
         [DefaultValue(null)]
-        public string XPath {
+        public string XPath
+        {
             get => Binding.XPath;
             set => Binding.XPath = value;
         }
@@ -159,9 +171,8 @@ namespace HanumanInstitute.CommonWpf
 
         protected override void CloneCore(Freezable sourceFreezable)
         {
-            if (sourceFreezable == null) { throw new ArgumentNullException(nameof(sourceFreezable)); }
+            if (!(sourceFreezable is FreezableBinding clone)) { throw new ArgumentNullException(nameof(sourceFreezable)); }
 
-            FreezableBinding clone = sourceFreezable as FreezableBinding;
             if (clone.ElementName != null)
             {
                 ElementName = clone.ElementName;
@@ -191,7 +202,7 @@ namespace HanumanInstitute.CommonWpf
             ValidatesOnDataErrors = clone.ValidatesOnDataErrors;
             ValidatesOnExceptions = clone.ValidatesOnExceptions;
             XPath = clone.XPath;
-            foreach (ValidationRule validationRule in clone.ValidationRules)
+            foreach (var validationRule in clone.ValidationRules)
             {
                 ValidationRules.Add(validationRule);
             }
@@ -224,8 +235,10 @@ namespace HanumanInstitute.CommonWpf
 
         private static void OnTargetPropertyListenerChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            PushBinding pushBinding = sender as PushBinding;
-            pushBinding.TargetPropertyValueChanged();
+            if (sender is PushBinding pushBinding)
+            {
+                pushBinding.TargetPropertyValueChanged();
+            }
         }
 
         #endregion // Dependency Properties
@@ -241,32 +254,28 @@ namespace HanumanInstitute.CommonWpf
 
         #region Properties
 
-        public object TargetPropertyMirror {
+        public object TargetPropertyMirror
+        {
             get => GetValue(TargetPropertyMirrorProperty);
             set => SetValue(TargetPropertyMirrorProperty, value);
         }
-        public object TargetPropertyListener {
+        public object TargetPropertyListener
+        {
             get => GetValue(TargetPropertyListenerProperty);
             set => SetValue(TargetPropertyListenerProperty, value);
         }
 
         [DefaultValue(null)]
-        public string TargetProperty {
-            get;
-            set;
-        }
+        public string? TargetProperty { get; set; }
 
         [DefaultValue(null)]
-        public DependencyProperty TargetDependencyProperty {
-            get;
-            set;
-        }
+        public DependencyProperty? TargetDependencyProperty { get; set; }
 
         #endregion // Properties
 
         #region Public Methods
 
-        public void SetupTargetBinding(DependencyObject targetObject)
+        public void SetupTargetBinding(DependencyObject? targetObject)
         {
             if (targetObject == null)
             {
@@ -282,7 +291,7 @@ namespace HanumanInstitute.CommonWpf
 
             // Bind to the selected TargetProperty, e.g. ActualHeight and get
             // notified about changes in OnTargetPropertyListenerChanged
-            Binding listenerBinding = new Binding
+            var listenerBinding = new Binding
             {
                 Source = targetObject,
                 Mode = BindingMode.OneWay
@@ -319,7 +328,7 @@ namespace HanumanInstitute.CommonWpf
 
         private void TargetPropertyValueChanged()
         {
-            object targetPropertyValue = GetValue(TargetPropertyListenerProperty);
+            var targetPropertyValue = GetValue(TargetPropertyListenerProperty);
             SetValue(TargetPropertyMirrorProperty, targetPropertyValue);
         }
 
@@ -331,9 +340,11 @@ namespace HanumanInstitute.CommonWpf
         {
             if (sourceFreezable == null) { throw new ArgumentNullException(nameof(sourceFreezable)); }
 
-            PushBinding pushBinding = sourceFreezable as PushBinding;
-            TargetProperty = pushBinding.TargetProperty;
-            TargetDependencyProperty = pushBinding.TargetDependencyProperty;
+            if (sourceFreezable is PushBinding pushBinding)
+            {
+                TargetProperty = pushBinding.TargetProperty;
+                TargetDependencyProperty = pushBinding.TargetDependencyProperty;
+            }
             base.CloneCore(sourceFreezable);
         }
 
@@ -390,14 +401,13 @@ namespace HanumanInstitute.CommonWpf
 
         public static void StylePushBindingsChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            if (target != null)
+            if (target != null && e.NewValue is PushBindingCollection stylePushBindings)
             {
-                PushBindingCollection stylePushBindings = e.NewValue as PushBindingCollection;
-                PushBindingCollection pushBindingCollection = GetPushBindings(target);
-                foreach (PushBinding pushBinding in stylePushBindings)
+                var pushBindingCollection = GetPushBindings(target);
+                foreach (var pushBinding in stylePushBindings)
                 {
-                    PushBinding pushBindingClone = pushBinding.Clone() as PushBinding;
-                    pushBindingCollection.Add(pushBindingClone);
+                    var pushBindingClone = pushBinding.Clone() as PushBinding;
+                    pushBindingCollection.Add(pushBindingClone!);
                 }
             }
         }
@@ -420,16 +430,13 @@ namespace HanumanInstitute.CommonWpf
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (PushBinding pushBinding in e.NewItems)
+                foreach (PushBinding? pushBinding in e.NewItems)
                 {
-                    pushBinding.SetupTargetBinding(TargetObject);
+                    pushBinding?.SetupTargetBinding(TargetObject);
                 }
             }
         }
 
-        public DependencyObject TargetObject {
-            get;
-            private set;
-        }
+        public DependencyObject? TargetObject { get; private set; }
     }
 }

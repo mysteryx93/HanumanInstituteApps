@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.YangYouTubeDownloader"
         xmlns:CommonWpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf" x:Name="window" x:Class="HanumanInstitute.YangYouTubeDownloader.Views.MainView"
         mc:Ignorable="d"
-        Title="Yang YouTube Downloader" Height="346" Width="506" Icon="/YangYouTubeDownloader;component/Icons/App.ico" ResizeMode="CanMinimize"
+        Title="Yang YouTube Downloader" Height="346" Width="506" Icon="/Icons/App.ico" ResizeMode="CanMinimize"
         >
     <Window.Resources>
         <CommonWpf:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

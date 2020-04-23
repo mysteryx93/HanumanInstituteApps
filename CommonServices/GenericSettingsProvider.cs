@@ -8,14 +8,14 @@ namespace HanumanInstitute.CommonServices
     /// Handles generic settings features such as loading, saving and validating data.
     /// </summary>
     /// <typeparam name="T">The type of data in which to store settings.</typeparam>
-    public class GenericSettingsProvider<T> : IGenericSettingsProvider<T> 
+    public class GenericSettingsProvider<T> : IGenericSettingsProvider<T>
         where T : class, new()
     {
-        private readonly ISerializationService serialization;
+        private readonly ISerializationService _serialization;
 
         public GenericSettingsProvider(ISerializationService serializationService)
         {
-            this.serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
+            _serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
         }
 
         /// <summary>
@@ -46,11 +46,9 @@ namespace HanumanInstitute.CommonServices
             T result = null;
             try
             {
-                result = serialization.DeserializeFromFile<T>(path);
+                result = _serialization.DeserializeFromFile<T>(path);
             }
-            catch (InvalidOperationException)
-            {
-            }
+            catch (InvalidOperationException) { }
             Current = (result != null && result.Validate() == null) ? result : GetDefault();
             Loaded?.Invoke(this, new EventArgs());
             return Current;
@@ -66,7 +64,7 @@ namespace HanumanInstitute.CommonServices
             if (Current == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
             if (Current.Validate() != null) { throw new Exception(Resources.GenericSettingsProviderValidationErrors); }
 
-            serialization.SerializeToFile<T>(Current, path);
+            _serialization.SerializeToFile<T>(Current, path);
             Saved?.Invoke(this, new EventArgs());
         }
 

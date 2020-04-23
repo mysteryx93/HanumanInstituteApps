@@ -28,12 +28,7 @@ namespace HanumanInstitute.CommonUI
         /// </summary>
         int SelectedIndex { get; set; }
 
-        /// <summary>
-        /// Selects the item at specific index and populates SelectedItem property.
-        /// </summary>
-        /// <param name="index">The index of the item to select.</param>
-        /// <param name="force">If true, an item will be selected when index is out of range, otherwise, it will be set to -1.</param>
-        void Select(int index, bool force = false);
+        void ForceSelect(int index);
 
         /// <summary>
         /// Gets the item currently selected in the list.

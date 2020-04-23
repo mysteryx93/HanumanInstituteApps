@@ -13,8 +13,8 @@ namespace HanumanInstitute.CommonWpfApp
         {
             if (viewModel == null) { throw new ArgumentNullException(nameof(viewModel)); }
 
-            Type viewModelType = viewModel.GetType();
-            string dialogTypeName = viewModelType.FullName;
+            var viewModelType = viewModel.GetType();
+            var dialogTypeName = viewModelType.FullName;
 
             // Replace namespace from ViewModels to Views.
             dialogTypeName = dialogTypeName.Replace("ViewModels.", "Views.");

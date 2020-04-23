@@ -4,11 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using YoutubeExplode.Videos;
-using YoutubeExplode.Videos.Streams;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.Downloads.Properties;
 using HanumanInstitute.FFmpeg;
+using YoutubeExplode.Videos;
+using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
 {
@@ -66,7 +66,7 @@ namespace HanumanInstitute.Downloads
         /// Returns an object containing download status information.
         /// </summary>
         public DownloadTaskStatus TaskStatus { get; private set; } = new DownloadTaskStatus();
-        private bool isCalled = false;
+        private bool _isCalled = false;
 
         /// <summary>
         /// Starts the download.
@@ -74,8 +74,8 @@ namespace HanumanInstitute.Downloads
         public async Task DownloadAsync()
         {
             // Ensure this method is called only once.
-            if (isCalled) { throw new InvalidOperationException(Resources.DownloadTaskCallOnce); }
-            isCalled = true;
+            if (_isCalled) { throw new InvalidOperationException(Resources.DownloadTaskCallOnce); }
+            _isCalled = true;
 
             // The task might have been cancelled while waiting in queue.
             if (IsCancelled) { return; }
@@ -85,59 +85,61 @@ namespace HanumanInstitute.Downloads
             _fileSystem.EnsureDirectoryExists(_destination);
 
             // Query the download URL for the right file.
-            Video VInfo = null;
-            StreamManifest VStream = null;
+            Video? vInfo = null;
+            StreamManifest? vStream = null;
 
             try
             {
-                VideoId id = new VideoId(_url.AbsoluteUri);
-                Task<Video> T1 = _youTube.QueryVideoAsync(id);
-                Task<StreamManifest> T2 = _youTube.QueryStreamInfoAsync(id);
-                await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
-                VInfo = T1.Result;
-                VStream = T2.Result;
+                var id = new VideoId(_url.AbsoluteUri);
+                var t1 = _youTube.QueryVideoAsync(id);
+                var t2 = _youTube.QueryStreamInfoAsync(id);
+                await Task.WhenAll(new Task[] { t1, t2 }).ConfigureAwait(false);
+                vInfo = t1.Result;
+                vStream = t2.Result;
             }
             catch { }
 
+            // Get the highest resolution format.
+            var bestFileNullable = vStream != null ? _streamSelector.SelectBestFormat(vStream, _options) : null;
+
             // Make sure we could retrieve download streams.
-            if (VStream == null)
+            if (bestFileNullable == null)
             {
-                Status = DownloadStatus.Failed;
+                TaskStatus.Status = DownloadStatus.Failed;
                 return;
             }
 
-            // Get the highest resolution format.
-            BestFormatInfo BestFile = _streamSelector.SelectBestFormat(VStream, _options);
-            BestFile.Duration = VInfo.Duration;
+            var bestFile = bestFileNullable.Value;
+            bestFile.Duration = vInfo?.Duration ?? TimeSpan.Zero;
 
             // Add the best video stream.
-            if (BestFile.BestVideo != null && _downloadVideo)
+            if (bestFile.BestVideo != null && _downloadVideo)
             {
-                _files.Add(new DownloadTaskFile(StreamType.Video, new Uri(BestFile.BestVideo.Url),
-                    _fileSystem.GetPathWithoutExtension(_destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(BestFile.BestVideo)),
-                    BestFile.BestVideo, BestFile.BestVideo.Size.TotalBytes));
+                _files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestFile.BestVideo.Url),
+                    _fileSystem.GetPathWithoutExtension(_destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(bestFile.BestVideo)),
+                    bestFile.BestVideo, bestFile.BestVideo.Size.TotalBytes));
             }
 
             // Add the best audio stream.
-            if (BestFile.BestAudio != null && _downloadAudio)
+            if (bestFile.BestAudio != null && _downloadAudio)
             {
-                _files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(BestFile.BestAudio.Url),
-                    _fileSystem.GetPathWithoutExtension(_destination) + GetAudioExtension(BestFile.BestAudio.AudioCodec),
-                    BestFile.BestAudio, BestFile.BestAudio.Size.TotalBytes));
+                _files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestFile.BestAudio.Url),
+                    _fileSystem.GetPathWithoutExtension(_destination) + GetAudioExtension(bestFile.BestAudio.AudioCodec),
+                    bestFile.BestAudio, bestFile.BestAudio.Size.TotalBytes));
             }
 
             // Add extension if Destination doesn't already include it.
-            string Ext = GetFinalExtension(BestFile.BestVideo, BestFile.BestAudio);
-            if (!_destination.EndsWith(Ext, StringComparison.InvariantCultureIgnoreCase))
+            var ext = GetFinalExtension(bestFile.BestVideo, bestFile.BestAudio);
+            if (!_destination.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
             {
-                _destination += Ext;
+                _destination += ext;
             }
 
             if (!IsCancelled)
             {
                 // Download all files.
-                Task[] DownloadTasks = _files.Select(f => DownloadFileAsync(, f)).ToArray();
-                await Task.WhenAll(DownloadTasks).ConfigureAwait(false);
+                var downloadTasks = _files.Select(f => DownloadFileAsync(f)).ToArray();
+                await Task.WhenAll(downloadTasks).ConfigureAwait(false);
             }
         }
 
@@ -146,10 +148,10 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="">Information about the download task.</param>
         /// <param name="fileInfo">Information about the specific file stream to download.</param>
-        private async Task DownloadFileAsync(, DownloadTaskFile fileInfo)
+        private async Task DownloadFileAsync(DownloadTaskFile fileInfo)
         {
             Status = DownloadStatus.Downloading;
-            using (CancellationTokenSource cancelToken = new CancellationTokenSource())
+            using (var cancelToken = new CancellationTokenSource())
             {
                 try
                 {
@@ -204,16 +206,16 @@ namespace HanumanInstitute.Downloads
         /// <param name="">Information about the download task.</param>
         private async Task DownloadCompletedAsync()
         {
-            await TaskStatus.OnBeforeMuxingAsync(this, new DownloadTaskEventArgs()).ConfigureAwait(false);
+            await TaskStatus.OnBeforeMuxingAsync(this, new DownloadTaskEventArgs(this)).ConfigureAwait(false);
 
-            CompletionStatus result = _fileSystem.File.Exists(_destination) ? CompletionStatus.Success : CompletionStatus.Failed;
-            DownloadTaskFile videoFile = _files.FirstOrDefault(f => f.Type == StreamType.Video);
-            DownloadTaskFile audioFile = _files.FirstOrDefault(f => f.Type == StreamType.Audio);
+            var result = _fileSystem.File.Exists(_destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            var videoFile = _files.FirstOrDefault(f => f.Type == StreamType.Video);
+            var audioFile = _files.FirstOrDefault(f => f.Type == StreamType.Audio);
 
             // Muxe regularly unless muxing in event handler.
             if (result != CompletionStatus.Success)
             {
-                result = await Task.Run(() => _muxer.Muxe(videoFile?.Destination, audioFile?.Destination, _destination)).ConfigureAwait(false);
+                result = await Task.Run(() => _mediaMuxer.Muxe(videoFile?.Destination, audioFile?.Destination, _destination)).ConfigureAwait(false);
             }
 
             if (result == CompletionStatus.Success)
@@ -261,7 +263,7 @@ namespace HanumanInstitute.Downloads
             Thread.Sleep(100);
 
             // Delete partially-downloaded files.
-            foreach (DownloadTaskFile item in _files)
+            foreach (var item in _files)
             {
                 _fileSystem.File.Delete(item.Destination);
             }
@@ -272,13 +274,15 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="download">The download task to update.</param>
         /// <param name="status">The new download status.</param>
-        private DownloadStatus Status {
+        private DownloadStatus Status
+        {
             get => TaskStatus.Status;
-            set {
+            set
+            {
                 TaskStatus.Status = value;
                 TaskStatus.ProgressText = GetStatusText(value);
 
-                string GetStatusText(DownloadStatus status)
+                static string GetStatusText(DownloadStatus status)
                 {
                     switch (status)
                     {
@@ -309,8 +313,8 @@ namespace HanumanInstitute.Downloads
 
             long totalBytes = 0;
             long downloaded = 0;
-            bool bytesTotalLoaded = true;
-            foreach (DownloadTaskFile item in _files)
+            var bytesTotalLoaded = true;
+            foreach (var item in _files)
             {
                 if (item.Length > 0)
                 {
@@ -335,12 +339,14 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns whether all files are finished downloading.
         /// </summary>
-        private bool IsCompleted {
-            get {
+        private bool IsCompleted
+        {
+            get
+            {
                 if (_files.Count > 0)
                 {
-                    bool result = true;
-                    foreach (DownloadTaskFile item in _files)
+                    var result = true;
+                    foreach (var item in _files)
                     {
                         if (item.Length == 0 || item.Downloaded < item.Length)
                         {
@@ -428,7 +434,7 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        private static string GetFinalExtension(IVideoStreamInfo video, IAudioStreamInfo audio)
+        private static string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
         {
             if ((video == null || video.Container.Equals(Container.WebM)) && (audio == null || audio.Container.Equals(Container.WebM)))
             {

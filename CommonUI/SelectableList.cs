@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace HanumanInstitute.CommonUI
 {
@@ -12,9 +12,15 @@ namespace HanumanInstitute.CommonUI
     /// <typeparam name="T">The type of item being shown in the list.</typeparam>
     public class SelectableList<T> : INotifyPropertyChanged, ISelectableList<T> where T : class
     {
-#pragma warning disable 67
         public event PropertyChangedEventHandler PropertyChanged;
-#pragma warning restore 67
+
+        protected bool SetField<TF>(ref TF field, TF value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<TF>.Default.Equals(field, value)) { return false; }
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return true;
+        }
 
         /// <summary>
         /// Gets or sets the list of items to display.
@@ -37,12 +43,14 @@ namespace HanumanInstitute.CommonUI
             }
         }
 
+        public void ForceSelect(int index) => SetSelection(index, true);
+
         /// <summary>
         /// Selects the item at specific index and populates SelectedItem property.
         /// </summary>
         /// <param name="index">The index of the item to select.</param>
         /// <param name="force">If true, an item will be selected when index is out of range, otherwise, it will be set to -1.</param>
-        public void Select(int index, bool force = false)
+        private void SetSelection(int index, bool force = false)
         {
             if (force && List.Any())
             {
@@ -51,12 +59,12 @@ namespace HanumanInstitute.CommonUI
 
             if (index < 0 || index >= List.Count)
             {
-                selectedIndex = -1;
+                SetField(ref _selectedIndex, -1);
                 SelectedItem = null;
             }
             else
             {
-                selectedIndex = index;
+                SetField(ref _selectedIndex, index);
                 SelectedItem = List[index];
             }
             HasSelection = SelectedItem != null;
@@ -65,20 +73,31 @@ namespace HanumanInstitute.CommonUI
         /// <summary>
         /// Gets or sets the selected index in the list. Set to -1 for no selection. Settings this property will also set SelectedItem to the corresponding value.
         /// </summary>
-        public int SelectedIndex {
-            get => selectedIndex;
-            set => Select(value, false);
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set => SetSelection(value, false);
         }
-        private int selectedIndex = -1;
+        private int _selectedIndex = -1;
 
         /// <summary>
         /// Gets the item currently selected in the list.
         /// </summary>
-        public T SelectedItem { get; private set; }
+        public T SelectedItem
+        {
+            get => _selectedItem;
+            set => SetField(ref _selectedItem, value);
+        }
+        private T _selectedItem;
 
         /// <summary>
         /// Gets whether the list has an item selected.
         /// </summary>
-        public bool HasSelection { get; private set; }
+        public bool HasSelection
+        {
+            get => _hasSelection;
+            private set => SetField(ref _hasSelection, value);
+        }
+        private bool _hasSelection;
     }
 }

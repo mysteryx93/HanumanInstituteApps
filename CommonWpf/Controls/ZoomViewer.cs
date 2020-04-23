@@ -8,12 +8,15 @@ using System.Windows.Media;
 // License: Attribution-ShareAlike 3.0 Unported https://creativecommons.org/licenses/by-sa/3.0/
 // Enhanced to support scrollbars.
 
-namespace HanumanInstitute.CommonWpf {
+namespace HanumanInstitute.CommonWpf
+{
     [TemplatePart(Name = ZoomViewer.PartScrollName, Type = typeof(ScrollViewer))]
     [TemplatePart(Name = ZoomViewer.PartContentName, Type = typeof(FrameworkElement))]
-    public class ZoomViewer : ContentControl, IDisposable {
+    public class ZoomViewer : ContentControl, IDisposable
+    {
 
-        static ZoomViewer() {
+        static ZoomViewer()
+        {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ZoomViewer), new FrameworkPropertyMetadata(typeof(ZoomViewer)));
             FocusableProperty.OverrideMetadata(typeof(ZoomViewer), new FrameworkPropertyMetadata(false));
         }
@@ -26,29 +29,30 @@ namespace HanumanInstitute.CommonWpf {
         /// <summary>
         ///     The origin of the transform at the start of capture
         /// </summary>
-        private Point origin;
+        private Point _origin;
 
         /// <summary>
         ///     The mouse position at the start of capture
         /// </summary>
-        private Point start;
+        private Point _start;
 
         /// <summary>
         /// Tracks changes to ActualWidth to update ZoomWidth.
         /// </summary>
-        private PropertyChangeNotifier ActualWidthObserver;
+        private PropertyChangeNotifier _actualWidthObserver;
         /// <summary>
         /// Tracks changes to ActualHeight to update ZoomHeight.
         /// </summary>
-        private PropertyChangeNotifier ActualHeightObserver;
+        private PropertyChangeNotifier _actualHeightObserver;
 
-        public override void OnApplyTemplate() {
+        public override void OnApplyTemplate()
+        {
             base.OnApplyTemplate();
-            ActualWidthObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualWidthProperty);
-            ActualWidthObserver.ValueChanged += delegate { UpdateZoomWidth(); };
+            _actualWidthObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualWidthProperty);
+            _actualWidthObserver.ValueChanged += delegate { UpdateZoomWidth(); };
             UpdateZoomWidth();
-            ActualHeightObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualHeightProperty);
-            ActualHeightObserver.ValueChanged += delegate { UpdateZoomHeight(); };
+            _actualHeightObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualHeightProperty);
+            _actualHeightObserver.ValueChanged += delegate { UpdateZoomHeight(); };
             UpdateZoomHeight();
         }
 
@@ -116,10 +120,11 @@ namespace HanumanInstitute.CommonWpf {
             new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure, ZoomChanged, CoerceZoom), ValidateZoom);
         private static bool ValidateZoom(object value) => (double)value > 0;
         public double Zoom { get => (double)GetValue(ZoomProperty); set => SetValue(ZoomProperty, value); }
-        private static void ZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            ZoomViewer P = d as ZoomViewer;
-            P.UpdateZoomWidth();
-            P.UpdateZoomHeight();
+        private static void ZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var p = d as ZoomViewer;
+            p.UpdateZoomWidth();
+            p.UpdateZoomHeight();
 
             // Trying to find right equation to zoom from center, or zoom from mouse position. Haven't found the formula yet.
             //double Width = P.PartContent.ActualWidth;
@@ -133,17 +138,24 @@ namespace HanumanInstitute.CommonWpf {
             //P.ScrollVerticalOffset = P.ScrollVerticalOffset * ZoomDiff + RatioY;
 
             // Adjust scrollbars to maintain position.
-            P.ScrollHorizontalOffset = P.ScrollHorizontalOffset / (double)e.OldValue * (double)e.NewValue;
-            P.ScrollVerticalOffset = P.ScrollVerticalOffset / (double)e.OldValue * (double)e.NewValue;
+            p.ScrollHorizontalOffset = p.ScrollHorizontalOffset / (double)e.OldValue * (double)e.NewValue;
+            p.ScrollVerticalOffset = p.ScrollVerticalOffset / (double)e.OldValue * (double)e.NewValue;
         }
-        private static object CoerceZoom(DependencyObject d, object baseValue) {
-            ZoomViewer P = d as ZoomViewer;
-            double Value = (double)baseValue;
-            if (P.MinZoom > 0)
-                Value = Math.Max(Value, P.MinZoom);
-            if (P.MaxZoom > 0)
-                Value = Math.Min(Value, P.MaxZoom);
-            return Value;
+        private static object CoerceZoom(DependencyObject d, object baseValue)
+        {
+            var p = d as ZoomViewer;
+            var value = (double)baseValue;
+            if (p.MinZoom > 0)
+            {
+                value = Math.Max(value, p.MinZoom);
+            }
+
+            if (p.MaxZoom > 0)
+            {
+                value = Math.Min(value, p.MaxZoom);
+            }
+
+            return value;
         }
 
         // BitmapScalingMode
@@ -152,29 +164,34 @@ namespace HanumanInstitute.CommonWpf {
         public BitmapScalingMode BitmapScalingMode { get => (BitmapScalingMode)GetValue(BitmapScalingModeProperty); set => SetValue(BitmapScalingModeProperty, value); }
 
 
-        protected override void OnMouseLeave(MouseEventArgs e) {
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
             base.OnMouseLeave(e);
             Cursor = Cursors.Arrow;
         }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
             if (e == null) { throw new ArgumentNullException(nameof(e)); }
 
             base.OnMouseLeftButtonDown(e);
-            if (AllowPan) {
-                start = e.GetPosition(this);
-                origin = new Point(ScrollHorizontalOffset, ScrollVerticalOffset);
+            if (AllowPan)
+            {
+                _start = e.GetPosition(this);
+                _origin = new Point(ScrollHorizontalOffset, ScrollVerticalOffset);
                 Cursor = Cursors.Hand;
                 CaptureMouse();
                 e.Handled = true;
             }
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e) {
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
             if (e == null) { throw new ArgumentNullException(nameof(e)); }
 
             base.OnMouseLeftButtonUp(e);
-            if (AllowPan) {
+            if (AllowPan)
+            {
                 Cursor = Cursors.Arrow;
                 ReleaseMouseCapture();
 
@@ -183,57 +200,64 @@ namespace HanumanInstitute.CommonWpf {
             }
         }
 
-        protected override void OnMouseMove(MouseEventArgs e) {
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
             if (e == null) { throw new ArgumentNullException(nameof(e)); }
 
             base.OnMouseMove(e);
-            if (IsMouseCaptured && AllowPan) {
+            if (IsMouseCaptured && AllowPan)
+            {
                 var position = e.GetPosition(this);
-                var Pos = start - position;
-                ScrollHorizontalOffset = origin.X + Pos.X;
-                ScrollVerticalOffset = origin.Y + Pos.Y;
+                var pos = _start - position;
+                ScrollHorizontalOffset = _origin.X + pos.X;
+                ScrollVerticalOffset = _origin.Y + pos.Y;
             }
         }
 
-        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e) {
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
             if (e == null) { throw new ArgumentNullException(nameof(e)); }
 
             base.OnMouseLeftButtonDown(e);
             if (AllowReset)
+            {
                 Reset();
+            }
         }
 
-        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e) {
+        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
+        {
             if (e == null) { throw new ArgumentNullException(nameof(e)); }
 
             base.OnPreviewMouseWheel(e);
-            if (AllowZoom) {
+            if (AllowZoom)
+            {
                 // Set new zoom, enforcing MinZoom/MaxZoom.
-                double NewZoom = e.Delta > 0 ? Zoom * ZoomIncrement : Zoom / ZoomIncrement;
-                Zoom = (double)CoerceZoom(this, NewZoom);
+                var newZoom = e.Delta > 0 ? Zoom * ZoomIncrement : Zoom / ZoomIncrement;
+                Zoom = (double)CoerceZoom(this, newZoom);
 
                 e.Handled = true;
             }
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             Zoom = 1;
             ScrollHorizontalOffset = 0;
             ScrollVerticalOffset = 0;
         }
 
-        private bool disposedValue = false;
-
+        private bool _disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
-                    ActualWidthObserver.Dispose();
-                    ActualHeightObserver.Dispose();
+                    _actualWidthObserver.Dispose();
+                    _actualHeightObserver.Dispose();
                 }
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

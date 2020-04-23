@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using YoutubeExplode.Videos;
-using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
 {
@@ -15,8 +13,6 @@ namespace HanumanInstitute.Downloads
         private readonly IDownloadTaskFactory _taskFactory;
         private readonly IOptions<DownloadOptions> _options;
         private readonly IYouTubeDownloader _youTube;
-
-        public DownloadManager() { }
 
         public DownloadManager(IDownloadTaskFactory taskFactory, IYouTubeDownloader youTube, IOptions<DownloadOptions> options)
         {
@@ -30,9 +26,9 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs when a new download task is added to the list.
         /// </summary>
-        public event DownloadTaskEventHandler DownloadAdded;
+        public event DownloadTaskEventHandler? DownloadAdded;
 
-        private SemaphoreSlim _pool;
+        private readonly SemaphoreSlim _pool;
 
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.
@@ -42,11 +38,11 @@ namespace HanumanInstitute.Downloads
         /// <param name="taskStatus">An object that will receive status updates for this download.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
-        public async Task<DownloadTaskStatus> DownloadAsync(Uri url, string destination, DownloadTaskStatus taskStatus, bool downloadVideo = true, bool downloadAudio = true)
+        public async Task<DownloadTaskStatus> DownloadAsync(Uri url, string destination, DownloadTaskStatus? taskStatus = null, bool downloadVideo = true, bool downloadAudio = true)
         {
             url.CheckNotNull(nameof(url));
             destination.CheckNotNullOrEmpty(nameof(destination));
-            taskStatus = taskStatus ?? new DownloadTaskStatus();
+            taskStatus ??= new DownloadTaskStatus();
 
             var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, taskStatus, _options.Value.Clone());
 
@@ -70,13 +66,13 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="url">The download URL to get the title for.</param>
         /// <returns>A title, or null if it failed to retrieve the title.</returns>
-        public async Task<string> GetVideoTitleAsync(Uri url)
+        public async Task<string?> GetVideoTitleAsync(Uri url)
         {
             url.CheckNotNull(nameof(url));
             try
             {
-                Video VInfo = await _youTube.QueryVideoAsync(url).ConfigureAwait(false);
-                return VInfo.Title;
+                var vInfo = await _youTube.QueryVideoAsync(url).ConfigureAwait(false);
+                return vInfo.Title;
             }
             catch
             {
@@ -89,15 +85,15 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="url">The URL to probe.</param>
         /// <returns>The download information.</returns>
-        public async Task<VideoInfo> GetDownloadInfoAsync(Uri url)
+        public async Task<VideoInfo?> GetDownloadInfoAsync(Uri url)
         {
             url.CheckNotNull(nameof(url));
             try
             {
-                Task<Video> T1 = _youTube.QueryVideoAsync(url);
-                Task<StreamManifest> T2 = _youTube.QueryStreamInfoAsync(url);
-                await Task.WhenAll(new Task[] { T1, T2 }).ConfigureAwait(false);
-                return new VideoInfo(T1.Result, T2.Result);
+                var t1 = _youTube.QueryVideoAsync(url);
+                var t2 = _youTube.QueryStreamInfoAsync(url);
+                await Task.WhenAll(new Task[] { t1, t2 }).ConfigureAwait(false);
+                return new VideoInfo(t1.Result, t2.Result);
             }
             catch
             {
@@ -105,16 +101,16 @@ namespace HanumanInstitute.Downloads
             return null;
         }
 
-        private bool disposedValue = false;
+        private bool _disposedValue = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
                     _pool.Dispose();
                 }
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

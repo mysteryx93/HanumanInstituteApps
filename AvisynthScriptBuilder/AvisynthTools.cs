@@ -1,6 +1,6 @@
-﻿using System;
+﻿using HanumanInstitute.FFmpeg;
+using System;
 using System.IO.Abstractions;
-using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.AvisynthScriptBuilder
 {
@@ -9,21 +9,21 @@ namespace HanumanInstitute.AvisynthScriptBuilder
     /// </summary>
     public class AvisynthTools : IAvisynthTools
     {
-        private readonly IScriptPathService scriptPath;
-        private readonly IScriptFactory scriptFactory;
-        private readonly IFileSystem fileSystem;
-        private readonly IProcessWorkerFactory ffmpegFactory;
-        private readonly IMediaScript mediaScript;
+        private readonly IScriptPathService _scriptPath;
+        private readonly IScriptFactory _scriptFactory;
+        private readonly IFileSystem _fileSystem;
+        private readonly IProcessWorkerFactory _ffmpegFactory;
+        private readonly IMediaScript _mediaScript;
 
         public AvisynthTools() { }
 
-        public AvisynthTools(IScriptPathService scriptPathService, IFileSystem fileSystemService, IProcessWorkerFactory ffmpegFactory, IMediaScript mediaScript)
+        public AvisynthTools(IScriptPathService scriptPathService, IScriptFactory scriptFactory, IFileSystem fileSystemService, IProcessWorkerFactory ffmpegFactory, IMediaScript mediaScript)
         {
-            this.scriptPath = scriptPathService ?? throw new ArgumentNullException(nameof(scriptPathService));
-            this.scriptFactory = scriptFactory ?? throw new ArgumentNullException(nameof(scriptFactory));
-            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
-            this.ffmpegFactory = ffmpegFactory ?? throw new ArgumentNullException(nameof(ffmpegFactory));
-            this.mediaScript = mediaScript ?? throw new ArgumentNullException(nameof(mediaScript));
+            _scriptPath = scriptPathService ?? throw new ArgumentNullException(nameof(scriptPathService));
+            _scriptFactory = scriptFactory ?? throw new ArgumentNullException(nameof(scriptFactory));
+            _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+            _ffmpegFactory = ffmpegFactory ?? throw new ArgumentNullException(nameof(ffmpegFactory));
+            _mediaScript = mediaScript ?? throw new ArgumentNullException(nameof(mediaScript));
         }
 
         /// <summary>
@@ -34,26 +34,29 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <returns>The frame count.</returns>
         public long GetFrameCount(string source, ProcessOptionsEncoder options)
         {
-            if (!fileSystem.File.Exists(source))
+            if (!_fileSystem.File.Exists(source))
+            {
                 return 0;
-            string TempScriptBase = fileSystem.Path.ChangeExtension(source, null);
-            string TempScript = scriptPath.GetTempFile("avs");
-            string TempResult = fileSystem.Path.ChangeExtension(TempScript, "txt");
+            }
+
+            string TempScriptBase = _fileSystem.Path.ChangeExtension(source, null);
+            string TempScript = _scriptPath.GetTempFile("avs");
+            string TempResult = _fileSystem.Path.ChangeExtension(TempScript, "txt");
 
             IScriptBuilderAvisynth Script;
-            if (source.ToLower().EndsWith(".avs"))
+            if (source.EndsWith(".avs", StringComparison.InvariantCultureIgnoreCase))
             {
                 // Read source script and remove MT. Also remove Deshaker if present.
-                string FileContent = fileSystem.File.ReadAllText(source);
-                FileContent.Replace(scriptPath.NewLine + "Deshaker", scriptPath.NewLine + "#Deshaker");
-                Script = scriptFactory.CreateAvisynthScript();
+                string FileContent = _fileSystem.File.ReadAllText(source);
+                FileContent.Replace(_scriptPath.NewLine + "Deshaker", _scriptPath.NewLine + "#Deshaker");
+                Script = _scriptFactory.CreateAvisynthScript();
                 Script.Script = FileContent;
                 Script.RemoveMT();
             }
             else
             {
                 // Generate script to read media file.
-                Script = scriptFactory.CreateAvisynthScript();
+                Script = _scriptFactory.CreateAvisynthScript();
                 Script.AddPluginPath();
                 Script.OpenDirect(source, false);
             }
@@ -64,13 +67,13 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             Script.WriteToFile(TempScript);
 
             // Run script.
-            mediaScript.RunAvisynth(TempScript, options);
+            _mediaScript.RunAvisynth(TempScript, options);
 
             // Read frame count
             long Result = 0;
-            if (fileSystem.File.Exists(TempResult))
+            if (_fileSystem.File.Exists(TempResult))
             {
-                string FileString = fileSystem.File.ReadAllText(TempResult);
+                string FileString = _fileSystem.File.ReadAllText(TempResult);
                 string[] FileValues = FileString.Split(',');
                 try
                 {
@@ -83,8 +86,8 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             }
 
             // Delete temp files.
-            fileSystem.File.Delete(TempScript);
-            fileSystem.File.Delete(TempResult);
+            _fileSystem.File.Delete(TempScript);
+            _fileSystem.File.Delete(TempResult);
 
             return Result;
         }
@@ -97,7 +100,7 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
         public float? GetAudioGain(string filePath, ProcessOptionsEncoder options)
         {
-            IProcessWorkerEncoder Worker = ffmpegFactory.CreateEncoder(options);
+            IProcessWorkerEncoder Worker = _ffmpegFactory.CreateEncoder(options);
             string Args = string.Format(@"-i ""{0}"" -af ""volumedetect"" -f null NUL", filePath);
             Worker.RunEncoder(Args, EncoderApp.FFmpeg);
             float? Result = null;
@@ -117,9 +120,10 @@ namespace HanumanInstitute.AvisynthScriptBuilder
                     {
                         // Remove ' dB'
                         MaxVolString = MaxVolString.Substring(0, MaxVolString.Length - 3);
-                        float MaxVol = 0;
-                        if (float.TryParse(MaxVolString, out MaxVol))
+                        if (float.TryParse(MaxVolString, out float MaxVol))
+                        {
                             Result = Math.Abs(MaxVol);
+                        }
                     }
                 }
             }

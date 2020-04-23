@@ -126,6 +126,9 @@
   <data name="BooleanAndConverterConvertBackNotSupported" xml:space="preserve">
     <value>BooleanAndConverter is a OneWay converter.</value>
   </data>
+  <data name="CannotDeleteFile" xml:space="preserve">
+    <value>Cannot delete file "{0}".</value>
+  </data>
   <data name="GenericSettingsProviderCurrentNull" xml:space="preserve">
     <value>The Current property is null.</value>
   </data>

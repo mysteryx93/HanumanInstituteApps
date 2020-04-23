@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.Data
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MPC_API_LIB", "..\MPC_API_LIB\MPC_API_LIB.vbproj", "{767F8DF3-2ECC-4D54-8CD6-75FA1814A3E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\Downloads\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloads", "..\Downloads\Downloads.csproj", "{103ACD13-888B-49FB-BBE7-B34FC14F4152}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvisynthScriptBuilder", "..\AvisynthScriptBuilder\AvisynthScriptBuilder.csproj", "{7587E545-6030-493A-8EBC-F1AB578FD5A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvisynthScriptBuilder", "..\AvisynthScriptBuilder\AvisynthScriptBuilder.csproj", "{7587E545-6030-493A-8EBC-F1AB578FD5A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaPlayerUI", "..\..\MediaPlayerUI.NET\MediaPlayerUI\MediaPlayerUI.csproj", "{7BF6711C-D3EA-48CF-BD5D-4B201AA788B5}"
 EndProject
@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MpvPlayerUI", "..\..\MediaP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mpv.NET", "..\..\Mpv.NET\src\Mpv.NET\Mpv.NET.csproj", "{C4A0BDA7-84BE-4D94-9FAF-A8CC68AA639A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonServices", "..\CommonServices\CommonServices.csproj", "{88B49434-58EE-4233-932F-625ED45D26AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonServices", "..\CommonServices\CommonServices.csproj", "{88B49434-58EE-4233-932F-625ED45D26AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.UnitTests", "..\NaturalGroundingPlayer.UnitTests\NaturalGroundingPlayer.UnitTests.csproj", "{B21620AF-2A0B-4187-BC6D-0489A14A26BB}"
 EndProject
@@ -28,11 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpf", "..\CommonWpf\CommonWpf.csproj", "{1C9E02BD-1D1B-4DD1-B667-CA123B7394F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonWpf", "..\CommonWpf\CommonWpf.csproj", "{1C9E02BD-1D1B-4DD1-B667-CA123B7394F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpfApp", "..\CommonWpfApp\CommonWpfApp.csproj", "{44727313-5673-4089-B664-894CD3AE7C2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonWpfApp", "..\CommonWpfApp\CommonWpfApp.csproj", "{44727313-5673-4089-B664-894CD3AE7C2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWpfApp.Tests", "..\CommonWpfApp.Tests\CommonWpfApp.Tests.csproj", "{DD71CA86-37D5-4131-9333-9F5911AD7A89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonWpfApp.Tests", "..\CommonWpfApp.Tests\CommonWpfApp.Tests.csproj", "{DD71CA86-37D5-4131-9333-9F5911AD7A89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg", "..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj", "{CE4F5D09-E358-4316-8F92-B82F70A1ABF6}"
 EndProject
@@ -40,17 +40,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioVideoMuxer", "..\AudioVideoMuxer\AudioVideoMuxer.csproj", "{3575B8A3-DFCE-41B3-A7A4-6AC05AE59557}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvisynthScriptBuilder.Tests", "..\AvisynthScriptBuilder.Tests\AvisynthScriptBuilder.Tests.csproj", "{F7A66EFB-F2D0-45FD-8BAE-7A6781717C1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvisynthScriptBuilder.Tests", "..\AvisynthScriptBuilder.Tests\AvisynthScriptBuilder.Tests.csproj", "{F7A66EFB-F2D0-45FD-8BAE-7A6781717C1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YinMediaEncoder.Business", "..\EncoderBusiness\YinMediaEncoder.Business.csproj", "{58F4D838-8B4F-4519-AA3A-E7A678800EE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432hz", "..\Player432hz\Player432hz.csproj", "{9F149234-2CEE-426A-8763-0764216CE696}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Player432hz", "..\Player432hz\Player432hz.csproj", "{9F149234-2CEE-426A-8763-0764216CE696}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432hz.Tests", "..\Player432hz.Tests\Player432hz.Tests.csproj", "{D1E7E654-B126-4A39-941D-9B24438F26A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Player432hz.Tests", "..\Player432hz.Tests\Player432hz.Tests.csproj", "{D1E7E654-B126-4A39-941D-9B24438F26A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{A28CE42D-2D9A-4BB7-A127-40BCAF95FD8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{A28CE42D-2D9A-4BB7-A127-40BCAF95FD8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerliminalsPlayer", "..\PowerliminalsPlayer\PowerliminalsPlayer.csproj", "{288C3275-2E43-45D1-A72D-7330417AD0FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerliminalsPlayer", "..\PowerliminalsPlayer\PowerliminalsPlayer.csproj", "{288C3275-2E43-45D1-A72D-7330417AD0FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YinMediaEncoder", "..\YinMediaEncoder\YinMediaEncoder.csproj", "{947D138C-22AD-43B6-817F-CD8050A620E7}"
 EndProject
@@ -353,20 +353,20 @@ Global
 		{58F4D838-8B4F-4519-AA3A-E7A678800EE5}.Release|x86.Build.0 = Release|Any CPU
 		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x64.ActiveCfg = Debug|x64
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x64.Build.0 = Debug|x64
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x86.ActiveCfg = Debug|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x86.Build.0 = Debug|x86
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Debug|x86.Build.0 = Debug|Any CPU
 		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Mixed Platforms.Build.0 = Release|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x64.ActiveCfg = Release|x64
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x64.Build.0 = Release|x64
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x86.ActiveCfg = Release|x86
-		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x86.Build.0 = Release|x86
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x64.Build.0 = Release|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F149234-2CEE-426A-8763-0764216CE696}.Release|x86.Build.0 = Release|Any CPU
 		{D1E7E654-B126-4A39-941D-9B24438F26A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1E7E654-B126-4A39-941D-9B24438F26A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1E7E654-B126-4A39-941D-9B24438F26A8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

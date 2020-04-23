@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using HanumanInstitute.Player432hz.Business;
 using MvvmDialogs;
+using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.Player432hz.Properties;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -23,7 +24,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Returns a new instance of PlaylistViewModel with default playlist name.
         /// </summary>
         /// <returns>A new PlaylistViewModel instance.</returns>
-        public IPlaylistViewModel Create() => Create(Properties.Resources.NewPlaylistName);
+        public IPlaylistViewModel Create() => Create(Resources.NewPlaylistName);
 
         /// <summary>
         /// Returns a new instance of PlaylistViewModel with specified playlist name.

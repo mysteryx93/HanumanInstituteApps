@@ -88,6 +88,15 @@ namespace HanumanInstitute.CommonServices.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot delete file &quot;{0}&quot;..
+        /// </summary>
+        internal static string CannotDeleteFile {
+            get {
+                return ResourceManager.GetString("CannotDeleteFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Current property is null..
         /// </summary>
         internal static string GenericSettingsProviderCurrentNull {

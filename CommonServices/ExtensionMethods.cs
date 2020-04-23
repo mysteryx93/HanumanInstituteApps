@@ -123,8 +123,8 @@ namespace HanumanInstitute.CommonServices
         {
             try
             {
-                var Result = TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(input);
-                return (T)Result;
+                var result = TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(input);
+                return (T)result;
             }
             catch (NotSupportedException)
             {

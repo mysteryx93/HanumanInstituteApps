@@ -6,7 +6,7 @@ namespace HanumanInstitute.CommonServices
     /// Handles generic settings features such as loading, saving and validating data.
     /// </summary>
     /// <typeparam name="T">The type of data in which to store settings.</typeparam>
-    public interface IGenericSettingsProvider<T> 
+    public interface IGenericSettingsProvider<T>
         where T : class, new()
     {
         /// <summary>

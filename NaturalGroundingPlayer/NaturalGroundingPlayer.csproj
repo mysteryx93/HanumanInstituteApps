@@ -555,7 +555,7 @@
       <Project>{9633a650-3ffc-4029-bd90-f9fa4e93cc55}</Project>
       <Name>NaturalGroundingPlayer.DataAccess</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DownloadManager\DownloadManager.csproj">
+    <ProjectReference Include="..\Downloads\Downloads.csproj">
       <Project>{103acd13-888b-49fb-bbe7-b34fc14f4152}</Project>
       <Name>DownloadManager</Name>
     </ProjectReference>

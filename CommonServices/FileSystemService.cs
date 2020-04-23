@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -48,7 +49,9 @@ namespace HanumanInstitute.CommonServices
         public void DeleteFileSilent(string path)
         {
             if (File.Exists(path))
+            {
                 File.Delete(path);
+            }
         }
 
         /// <summary>
@@ -103,7 +106,9 @@ namespace HanumanInstitute.CommonServices
             flags |= displayWarning ? ApiFileOperationFlags.WantNukeWarning : ApiFileOperationFlags.NoErrorUI | ApiFileOperationFlags.Silent;
             _windowsApi.SHFileOperation(ApiFileOperationType.Delete, path, flags);
             if (File.Exists(path))
-                throw new IOException(FormattableString.Invariant($@"Cannot delete file ""{path}"""));
+            {
+                throw new IOException(string.Format(CultureInfo.InvariantCulture, Resources.CannotDeleteFile, path));
+            }
         }
     }
 }

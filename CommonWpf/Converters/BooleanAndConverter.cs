@@ -11,7 +11,7 @@ namespace HanumanInstitute.CommonWpf
         {
             if (values == null) { throw new ArgumentNullException(nameof(values)); }
 
-            foreach (object value in values)
+            foreach (var value in values)
             {
                 if ((value is bool) && (bool)value == false)
                 {

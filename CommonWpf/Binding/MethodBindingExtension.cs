@@ -1,8 +1,8 @@
-﻿// Updated Ultimate WPF Event Method Binding implementation by Mike Marynowski
+﻿#nullable enable
+// Updated Ultimate WPF Event Method Binding implementation by Mike Marynowski
 // View the article here: http://www.singulink.com/CodeIndex/post/updated-ultimate-wpf-event-method-binding
 
 // Licensed under the Code Project Open License: http://www.codeproject.com/info/cpol10.aspx
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +18,7 @@ namespace HanumanInstitute.CommonWpf
 {
     public class MethodBindingExtension : MarkupExtension
     {
-        private static readonly List<DependencyProperty> StorageProperties = new List<DependencyProperty>();
+        private static readonly List<DependencyProperty> s_storageProperties = new List<DependencyProperty>();
 
         private readonly object[] _arguments;
         private readonly List<DependencyProperty> _argumentProperties = new List<DependencyProperty>();
@@ -42,9 +42,9 @@ namespace HanumanInstitute.CommonWpf
         {
             if (serviceProvider == null) { throw new ArgumentNullException(nameof(serviceProvider)); }
 
-            IProvideValueTarget provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
-            FrameworkElement target = provideValueTarget.TargetObject as FrameworkElement;
-            Type eventHandlerType = null;
+            var provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
+            var target = provideValueTarget.TargetObject as FrameworkElement;
+            Type? eventHandlerType = null;
 
             if (provideValueTarget.TargetProperty is EventInfo eventInfo)
             {
@@ -65,7 +65,7 @@ namespace HanumanInstitute.CommonWpf
                 return this;
             }
 
-            foreach (object argument in _arguments)
+            foreach (var argument in _arguments)
             {
                 var argumentProperty = SetUnusedStorageProperty(target, argument);
                 _argumentProperties.Add(argumentProperty);
@@ -78,7 +78,7 @@ namespace HanumanInstitute.CommonWpf
         {
             EventHandler handler = (sender, eventArgs) =>
             {
-                object arg0 = element.GetValue(_argumentProperties[0]);
+                var arg0 = element.GetValue(_argumentProperties[0]);
 
                 if (arg0 == null)
                 {
@@ -102,7 +102,7 @@ namespace HanumanInstitute.CommonWpf
                     methodTarget = arg0;
                     methodArgsStart = 2;
 
-                    object arg1 = element.GetValue(_argumentProperties[1]);
+                    var arg1 = element.GetValue(_argumentProperties[1]);
 
                     if (arg1 == null)
                     {
@@ -110,9 +110,11 @@ namespace HanumanInstitute.CommonWpf
                         return;
                     }
 
-                    methodName = arg1 as string;
-
-                    if (methodName == null)
+                    if (arg1 is string arg1Str)
+                    {
+                        methodName = arg1Str;
+                    }
+                    else
                     {
                         Debug.WriteLine($"[MethodBinding] First argument resolved as a method target object of type '{methodTarget.GetType()}', second argument (method name) must resolve to a '{typeof(string)}' (actual type: '{arg1.GetType()}').");
                         return;
@@ -124,11 +126,11 @@ namespace HanumanInstitute.CommonWpf
                     return;
                 }
 
-                var arguments = new object[_argumentProperties.Count - methodArgsStart];
+                var arguments = new object?[_argumentProperties.Count - methodArgsStart];
 
-                for (int i = methodArgsStart; i < _argumentProperties.Count; i++)
+                for (var i = methodArgsStart; i < _argumentProperties.Count; i++)
                 {
-                    object argValue = element.GetValue(_argumentProperties[i]);
+                    object? argValue = element.GetValue(_argumentProperties[i]);
 
                     if (argValue is EventSenderExtension)
                     {
@@ -156,13 +158,13 @@ namespace HanumanInstitute.CommonWpf
                 // Couldn't match a method with the raw arguments, so check if we can find a method with the same name
                 // and parameter count and try to convert any XAML string arguments to match the method parameter types
 
-                var method = methodTargetType.GetMethods().SingleOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Length);
+                MethodInfo? method = methodTargetType.GetMethods().SingleOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Length);
 
                 if (method != null)
                 {
                     var parameters = method.GetParameters();
 
-                    for (int i = 0; i < _arguments.Length; i++)
+                    for (var i = 0; i < _arguments.Length; i++)
                     {
                         if (arguments[i] == null)
                         {
@@ -198,12 +200,12 @@ namespace HanumanInstitute.CommonWpf
 
         private DependencyProperty SetUnusedStorageProperty(DependencyObject obj, object value)
         {
-            var property = StorageProperties.FirstOrDefault(p => obj.ReadLocalValue(p) == DependencyProperty.UnsetValue);
+            var property = s_storageProperties.FirstOrDefault(p => obj.ReadLocalValue(p) == DependencyProperty.UnsetValue);
 
             if (property == null)
             {
-                property = DependencyProperty.RegisterAttached("Storage" + StorageProperties.Count, typeof(object), typeof(MethodBindingExtension), new PropertyMetadata());
-                StorageProperties.Add(property);
+                property = DependencyProperty.RegisterAttached("Storage" + s_storageProperties.Count, typeof(object), typeof(MethodBindingExtension), new PropertyMetadata());
+                s_storageProperties.Add(property);
             }
 
             if (value is MarkupExtension markupExtension)
@@ -230,7 +232,7 @@ namespace HanumanInstitute.CommonWpf
                 TargetProperty = targetProperty;
             }
 
-            public object GetService(Type serviceType)
+            public object? GetService(Type serviceType)
             {
                 return serviceType.IsInstanceOfType(this) ? this : null;
             }
@@ -244,14 +246,14 @@ namespace HanumanInstitute.CommonWpf
 
     public class EventArgsExtension : MarkupExtension
     {
-        public PropertyPath Path { get; set; }
+        public PropertyPath? Path { get; set; }
 
-        public IValueConverter Converter { get; set; }
-        public object ConverterParameter { get; set; }
-        public Type ConverterTargetType { get; set; }
+        public IValueConverter? Converter { get; set; }
+        public object? ConverterParameter { get; set; }
+        public Type? ConverterTargetType { get; set; }
 
         [TypeConverter(typeof(CultureInfoIetfLanguageTagConverter))]
-        public CultureInfo ConverterCulture { get; set; }
+        public CultureInfo? ConverterCulture { get; set; }
 
         public EventArgsExtension()
         {
@@ -274,7 +276,7 @@ namespace HanumanInstitute.CommonWpf
                 return eventArgs;
             }
 
-            object value = PropertyPathHelpers.Evaluate(Path, eventArgs);
+            var value = PropertyPathHelpers.Evaluate(Path, eventArgs);
 
             if (Converter != null)
             {
@@ -300,7 +302,8 @@ namespace HanumanInstitute.CommonWpf
         {
             public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(DependencyTarget));
 
-            public object Value {
+            public object Value
+            {
                 get => GetValue(ValueProperty);
                 set => SetValue(ValueProperty, value);
             }

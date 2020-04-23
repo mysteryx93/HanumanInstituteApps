@@ -33,18 +33,18 @@ namespace HanumanInstitute.CommonWpf
                 }
             }
 
-            if (!double.TryParse((String)value, NumberStyles.Number, CultureInfo.CurrentCulture, out double NumValue))
+            if (!double.TryParse((string)value, NumberStyles.Number, CultureInfo.CurrentCulture, out var numValue))
             {
                 return new ValidationResult(false, Resources.NumericRangeRuleInvalid);
             }
 
-            if ((Min.HasValue && NumValue < Min) || (Max.HasValue && NumValue > Max))
+            if ((Min.HasValue && numValue < Min) || (Max.HasValue && numValue > Max))
             {
                 return new ValidationResult(false, string.Format(CultureInfo.CurrentCulture, Resources.NumericRangeRuleOutOfRange, Min, Max));
             }
-            else if (Mod.HasValue && NumValue % Mod != 0)
+            else if (Mod.HasValue && numValue % Mod != 0)
             {
-                return new ValidationResult(false, String.Format(CultureInfo.CurrentCulture, Resources.NumericRangeRuleNotMultiple, Mod));
+                return new ValidationResult(false, string.Format(CultureInfo.CurrentCulture, Resources.NumericRangeRuleNotMultiple, Mod));
             }
             else
             {

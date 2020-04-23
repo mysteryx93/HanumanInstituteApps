@@ -13,7 +13,7 @@ namespace HanumanInstitute.Downloads
     /// </summary>
     public class DownloadTaskEventArgs : EventArgs
     {
-        public DownloadTaskEventArgs() { }
+        //public DownloadTaskEventArgs() { }
 
         public DownloadTaskEventArgs(IDownloadTask downloadInfo)
         {

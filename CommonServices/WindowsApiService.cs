@@ -36,9 +36,9 @@ namespace HanumanInstitute.CommonServices
         public string GetShortPathName(string path)
         {
             const int MaxPathLenth = 255;
-            StringBuilder Result = new StringBuilder(MaxPathLenth);
-            ValidateHResult(NativeMethods.GetShortPathName(path, Result, MaxPathLenth), "GetShortPathName");
-            return Result.ToString();
+            var result = new StringBuilder(MaxPathLenth);
+            ValidateHResult(NativeMethods.GetShortPathName(path, result, MaxPathLenth), "GetShortPathName");
+            return result.ToString();
         }
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace HanumanInstitute.CommonServices
         {
             var fs = new NativeMethods.SHFILEOPSTRUCT
             {
-                wFunc = ApiFileOperationType.Delete,
-                pFrom = path + '\0' + '\0',
-                fFlags = flags
+                _func = ApiFileOperationType.Delete,
+                _from = path + '\0' + '\0',
+                _flags = flags
             };
             ValidateHResult(NativeMethods.SHFileOperation(ref fs), "SHFileOperation");
         }
@@ -64,7 +64,7 @@ namespace HanumanInstitute.CommonServices
             if (hresult != ResultOK)
             {
                 throw new ExternalException(
-                    string.Format(CultureInfo.CurrentCulture, Resources.ApiInvocationError, apiName, hresult), 
+                    string.Format(CultureInfo.CurrentCulture, Resources.ApiInvocationError, apiName, hresult),
                     hresult);
             }
         }
@@ -85,7 +85,7 @@ namespace HanumanInstitute.CommonServices
             internal static extern int GetShortPathName([MarshalAs(UnmanagedType.LPWStr)] string path, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder shortPath, int shortPathLength);
 
             [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-            internal static extern int SHFileOperation(ref SHFILEOPSTRUCT FileOp);
+            internal static extern int SHFileOperation(ref SHFILEOPSTRUCT fileOp);
 
             /// <summary>
             /// SHFILEOPSTRUCT for SHFileOperation from COM
@@ -93,16 +93,16 @@ namespace HanumanInstitute.CommonServices
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
             internal struct SHFILEOPSTRUCT
             {
-                public IntPtr hwnd;
+                public IntPtr _hwnd;
                 [MarshalAs(UnmanagedType.U4)]
-                public ApiFileOperationType wFunc;
-                public string pFrom;
-                public string pTo;
-                public ApiFileOperationFlags fFlags;
+                public ApiFileOperationType _func;
+                public string _from;
+                public string _to;
+                public ApiFileOperationFlags _flags;
                 [MarshalAs(UnmanagedType.Bool)]
-                public bool fAnyOperationsAborted;
-                public IntPtr hNameMappings;
-                public string lpszProgressTitle;
+                public bool _anyOperationsAborted;
+                public IntPtr _nameMappings;
+                public string _progressTitle;
             }
         }
     }

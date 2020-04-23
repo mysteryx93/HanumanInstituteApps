@@ -8,7 +8,7 @@
         xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf"
         mc:Ignorable="d" x:Name="UI"
         Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183" 
-        Icon="/PowerliminalsPlayer;component/Icons/App.ico" Loaded="{wpf:MethodBinding Load}" 
+        Icon="/Icons/App.ico" Loaded="{wpf:MethodBinding Load}" 
         DataContext="{Binding Main, Mode=OneWay, Source={StaticResource Locator}}"
         Closing="{wpf:MethodBinding Save}"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True">

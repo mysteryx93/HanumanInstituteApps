@@ -11,228 +11,195 @@ namespace HanumanInstitute.CommonServices
     /// </summary>
     public class ProcessWrapper : IProcess, IDisposable
     {
-        private readonly Process process;
+        private readonly Process _process;
 
         public ProcessWrapper()
         {
-            process = new Process();
+            _process = new Process();
         }
 
         public ProcessWrapper(Process process)
         {
-            this.process = process;
+            _process = process;
         }
 
-        public ProcessPriorityClass PriorityClass {
-            get => process.PriorityClass;
-            set => process.PriorityClass = value;
-        }
-
-        public bool PriorityBoostEnabled {
-            get => process.PriorityBoostEnabled;
-            set => process.PriorityBoostEnabled = value;
-        }
-
-        public long PeakVirtualMemorySize64 => process.PeakVirtualMemorySize64;
-
-        public long PeakWorkingSet64 => process.PeakWorkingSet64;
-
-        public long PeakPagedMemorySize64 => process.PeakPagedMemorySize64;
-
-        public long PagedMemorySize64 => process.PagedMemorySize64;
-
-        public long NonpagedSystemMemorySize64 => process.NonpagedSystemMemorySize64;
-
-        public ProcessModuleCollection Modules => process.Modules;
-
-        public IntPtr MinWorkingSet {
-            get => process.MinWorkingSet;
-            set => process.MinWorkingSet = value;
-        }
-
-        public long PagedSystemMemorySize64 => process.PagedSystemMemorySize64;
-
-        public long PrivateMemorySize64 => process.PrivateMemorySize64;
-
-        public TimeSpan PrivilegedProcessorTime => process.PrivilegedProcessorTime;
-
-        public string ProcessName => process.ProcessName;
-
-        public long WorkingSet64 => process.WorkingSet64;
-
-        public StreamReader StandardError => process.StandardError;
-
-        public StreamReader StandardOutput => process.StandardOutput;
-
-        public StreamWriter StandardInput => process.StandardInput;
-
-        public bool EnableRaisingEvents {
-            get => process.EnableRaisingEvents;
-            set => process.EnableRaisingEvents = value;
-        }
-
-        public long VirtualMemorySize64 => process.VirtualMemorySize64;
-
-        public TimeSpan UserProcessorTime => process.UserProcessorTime;
-
-        public TimeSpan TotalProcessorTime => process.TotalProcessorTime;
-
-        public ProcessThreadCollection Threads => process.Threads;
-
-        public ISynchronizeInvoke SynchronizingObject {
-            get => process.SynchronizingObject;
-            set => process.SynchronizingObject = value;
-        }
-
-        public DateTime StartTime => process.StartTime;
-
-        public ProcessStartInfo StartInfo {
-            get => process.StartInfo;
-            set => process.StartInfo = value;
-        }
-
-        public int SessionId => process.SessionId;
-
-        public bool Responding => process.Responding;
-
-        public IntPtr ProcessorAffinity {
-            get => process.ProcessorAffinity;
-            set => process.ProcessorAffinity = value;
-        }
-
-        public IntPtr MaxWorkingSet {
-            get => process.MaxWorkingSet;
-            set => process.MaxWorkingSet = value;
-        }
-
-        public ProcessModule MainModule => process.MainModule;
-
-        public string MainWindowTitle => process.MainWindowTitle;
-
-        public string MachineName => process.MachineName;
-
-        public int Id => process.Id;
-
-        public int HandleCount => process.HandleCount;
-
-        public SafeProcessHandle SafeHandle => process.SafeHandle;
-
-        public IntPtr Handle => process.Handle;
-
-        public DateTime ExitTime => process.ExitTime;
-
-        public bool HasExited => process.HasExited;
-
-        public int ExitCode => process.ExitCode;
-
-        public int BasePriority => process.BasePriority;
-
-        public IntPtr MainWindowHandle => process.MainWindowHandle;
-
-        public event DataReceivedEventHandler ErrorDataReceived {
-            add => process.ErrorDataReceived += value;
-            remove => process.ErrorDataReceived -= value;
-        }
-
-        public event DataReceivedEventHandler OutputDataReceived {
-            add => process.OutputDataReceived += value;
-            remove => process.OutputDataReceived -= value;
-        }
-
-        public event EventHandler Exited {
-            add => process.Exited += value;
-            remove => process.Exited -= value;
-        }
-
-        public void BeginErrorReadLine()
+        public ProcessPriorityClass PriorityClass
         {
-            process.BeginErrorReadLine();
+            get => _process.PriorityClass;
+            set => _process.PriorityClass = value;
         }
 
-        public void BeginOutputReadLine()
+        public bool PriorityBoostEnabled
         {
-            process.BeginOutputReadLine();
+            get => _process.PriorityBoostEnabled;
+            set => _process.PriorityBoostEnabled = value;
         }
 
-        public void CancelErrorRead()
+        public long PeakVirtualMemorySize64 => _process.PeakVirtualMemorySize64;
+
+        public long PeakWorkingSet64 => _process.PeakWorkingSet64;
+
+        public long PeakPagedMemorySize64 => _process.PeakPagedMemorySize64;
+
+        public long PagedMemorySize64 => _process.PagedMemorySize64;
+
+        public long NonpagedSystemMemorySize64 => _process.NonpagedSystemMemorySize64;
+
+        public ProcessModuleCollection Modules => _process.Modules;
+
+        public IntPtr MinWorkingSet
         {
-            process.CancelErrorRead();
+            get => _process.MinWorkingSet;
+            set => _process.MinWorkingSet = value;
         }
 
-        public void CancelOutputRead()
+        public long PagedSystemMemorySize64 => _process.PagedSystemMemorySize64;
+
+        public long PrivateMemorySize64 => _process.PrivateMemorySize64;
+
+        public TimeSpan PrivilegedProcessorTime => _process.PrivilegedProcessorTime;
+
+        public string ProcessName => _process.ProcessName;
+
+        public long WorkingSet64 => _process.WorkingSet64;
+
+        public StreamReader StandardError => _process.StandardError;
+
+        public StreamReader StandardOutput => _process.StandardOutput;
+
+        public StreamWriter StandardInput => _process.StandardInput;
+
+        public bool EnableRaisingEvents
         {
-            process.CancelOutputRead();
+            get => _process.EnableRaisingEvents;
+            set => _process.EnableRaisingEvents = value;
         }
 
-        public void Close()
+        public long VirtualMemorySize64 => _process.VirtualMemorySize64;
+
+        public TimeSpan UserProcessorTime => _process.UserProcessorTime;
+
+        public TimeSpan TotalProcessorTime => _process.TotalProcessorTime;
+
+        public ProcessThreadCollection Threads => _process.Threads;
+
+        public ISynchronizeInvoke SynchronizingObject
         {
-            process.Close();
+            get => _process.SynchronizingObject;
+            set => _process.SynchronizingObject = value;
         }
 
-        public bool CloseMainWindow()
+        public DateTime StartTime => _process.StartTime;
+
+        public ProcessStartInfo StartInfo
         {
-            return process.CloseMainWindow();
+            get => _process.StartInfo;
+            set => _process.StartInfo = value;
         }
 
-        public void Kill()
+        public int SessionId => _process.SessionId;
+
+        public bool Responding => _process.Responding;
+
+        public IntPtr ProcessorAffinity
         {
-            process.Kill();
+            get => _process.ProcessorAffinity;
+            set => _process.ProcessorAffinity = value;
         }
 
-        public void Refresh()
+        public IntPtr MaxWorkingSet
         {
-            throw new NotImplementedException();
+            get => _process.MaxWorkingSet;
+            set => _process.MaxWorkingSet = value;
         }
 
-        public bool Start()
+        public ProcessModule MainModule => _process.MainModule;
+
+        public string MainWindowTitle => _process.MainWindowTitle;
+
+        public string MachineName => _process.MachineName;
+
+        public int Id => _process.Id;
+
+        public int HandleCount => _process.HandleCount;
+
+        public SafeProcessHandle SafeHandle => _process.SafeHandle;
+
+        public IntPtr Handle => _process.Handle;
+
+        public DateTime ExitTime => _process.ExitTime;
+
+        public bool HasExited => _process.HasExited;
+
+        public int ExitCode => _process.ExitCode;
+
+        public int BasePriority => _process.BasePriority;
+
+        public IntPtr MainWindowHandle => _process.MainWindowHandle;
+
+        public event DataReceivedEventHandler ErrorDataReceived
         {
-            return process.Start();
+            add => _process.ErrorDataReceived += value;
+            remove => _process.ErrorDataReceived -= value;
         }
 
-        public bool WaitForExit(int milliseconds)
+        public event DataReceivedEventHandler OutputDataReceived
         {
-            return process.WaitForExit(milliseconds);
+            add => _process.OutputDataReceived += value;
+            remove => _process.OutputDataReceived -= value;
         }
 
-        public void WaitForExit()
+        public event EventHandler Exited
         {
-            process.WaitForExit();
+            add => _process.Exited += value;
+            remove => _process.Exited -= value;
         }
 
-        public bool WaitForInputIdle(int milliseconds)
+        public void BeginErrorReadLine() => _process.BeginErrorReadLine();
+
+        public void BeginOutputReadLine() => _process.BeginOutputReadLine();
+
+        public void CancelErrorRead() => _process.CancelErrorRead();
+
+        public void CancelOutputRead() => _process.CancelOutputRead();
+
+        public void Close() => _process.Close();
+
+        public bool CloseMainWindow() => _process.CloseMainWindow();
+
+        public void Kill() => _process.Kill();
+
+        public void Refresh() => throw new NotImplementedException();
+
+        public bool Start() => _process.Start();
+
+        public bool WaitForExit(int milliseconds) => _process.WaitForExit(milliseconds);
+
+        public void WaitForExit() => _process.WaitForExit();
+
+        public bool WaitForInputIdle(int milliseconds) => _process.WaitForInputIdle(milliseconds);
+
+        public bool WaitForInputIdle() => _process.WaitForInputIdle();
+
+        public override string ToString() => _process.ToString();
+
+        private bool _disposedValue = false;
+        protected virtual void Dispose(bool disposing)
         {
-            return process.WaitForInputIdle(milliseconds);
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _process.Dispose();
+                }
+                _disposedValue = true;
+            }
         }
-
-        public bool WaitForInputIdle()
-        {
-            return process.WaitForInputIdle();
-        }
-
-        public override string ToString()
-        {
-            return process.ToString();
-        }
-
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        private bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed) 
-                return;
-
-            if (disposing)
-            {
-                process.Dispose();
-            }
-
-            disposed = true;
         }
     }
 }

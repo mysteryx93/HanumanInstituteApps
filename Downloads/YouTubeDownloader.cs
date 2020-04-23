@@ -62,11 +62,11 @@ namespace HanumanInstitute.Downloads
         /// <param name="filePath">The file path where to save the download.</param>
         /// <param name="progressCallback">A method to call when progress is updated.</param>
         /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
-        public async Task DownloadAsync(IStreamInfo streamInfo, string filePath, Action<double> progressCallback = null, CancellationToken cancellationToken = default)
+        public async Task DownloadAsync(IStreamInfo streamInfo, string filePath, Action<double>? progressCallback = null, CancellationToken cancellationToken = default)
         {
-            await _youTube.Videos.Streams.DownloadAsync(streamInfo, 
-                filePath, 
-                progressCallback != null ? new Progress<double>(progressCallback) : null, 
+            await _youTube.Videos.Streams.DownloadAsync(streamInfo,
+                filePath,
+                progressCallback != null ? new Progress<double>(progressCallback) : null,
                 cancellationToken).ConfigureAwait(false);
         }
 

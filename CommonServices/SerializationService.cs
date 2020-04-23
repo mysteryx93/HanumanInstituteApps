@@ -10,13 +10,13 @@ namespace HanumanInstitute.CommonServices
     /// </summary>
     public class SerializationService : ISerializationService
     {
-        private readonly IFileSystemService fileSystem;
+        private readonly IFileSystemService _fileSystem;
 
         public SerializationService() : this(new FileSystemService()) { }
 
         public SerializationService(IFileSystemService fileSystemService)
         {
-            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+            _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
         }
 
         /// <summary>
@@ -28,14 +28,12 @@ namespace HanumanInstitute.CommonServices
         /// <returns>An XML string containing serialized data.</returns>
         public string Serialize<T>(T dataToSerialize)
         {
-            using (var stringWriter = new StringWriter())
-            {
-                var serializer = new XmlSerializer(typeof(T));
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                serializer.Serialize(stringWriter, dataToSerialize, ns);
-                return stringWriter.ToString();
-            }
+            using var stringWriter = new StringWriter();
+            var serializer = new XmlSerializer(typeof(T));
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            serializer.Serialize(stringWriter, dataToSerialize, ns);
+            return stringWriter.ToString();
         }
 
         /// <summary>
@@ -48,15 +46,11 @@ namespace HanumanInstitute.CommonServices
         /// <returns>The deserialized object.</returns>
         public T Deserialize<T>(string xmlText) where T : class, new()
         {
-            using (var stringReader = new StringReader(xmlText))
-            {
-                using (var xmlReader = XmlReader.Create(stringReader, 
-                    new XmlReaderSettings() { XmlResolver = null }))
-                {
-                    var serializer = new XmlSerializer(typeof(T));
-                    return (T)serializer.Deserialize(xmlReader);
-                }
-            }
+            using var stringReader = new StringReader(xmlText);
+            using var xmlReader = XmlReader.Create(stringReader,
+                new XmlReaderSettings() { XmlResolver = null });
+            var serializer = new XmlSerializer(typeof(T));
+            return (T)serializer.Deserialize(xmlReader);
         }
 
         /// <summary>
@@ -68,13 +62,11 @@ namespace HanumanInstitute.CommonServices
         /// <returns>The object created from the file<./returns>
         public T DeserializeFromFile<T>(string path)
         {
-            using (var reader = XmlReader.Create(path, 
-                new XmlReaderSettings() { XmlResolver = null }))
-            {
-                var serializer = new XmlSerializer(typeof(T));
-                T Result = (T)serializer.Deserialize(reader);
-                return Result;
-            }
+            using var reader = XmlReader.Create(path,
+                new XmlReaderSettings() { XmlResolver = null });
+            var serializer = new XmlSerializer(typeof(T));
+            var result = (T)serializer.Deserialize(reader);
+            return result;
         }
 
         /// <summary>
@@ -85,15 +77,13 @@ namespace HanumanInstitute.CommonServices
         /// <param name="path">The path of the file in which to output the XML data.</param>
         public void SerializeToFile<T>(T dataToSerialize, string path)
         {
-            fileSystem.EnsureDirectoryExists(path);
-            using (var writer = fileSystem.FileStream.Create(path, System.IO.FileMode.Create))
-            {
-                var serializer = new XmlSerializer(typeof(T));
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                serializer.Serialize(writer, dataToSerialize, ns);
-                writer.Flush();
-            }
+            _fileSystem.EnsureDirectoryExists(path);
+            using var writer = _fileSystem.FileStream.Create(path, System.IO.FileMode.Create);
+            var serializer = new XmlSerializer(typeof(T));
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            serializer.Serialize(writer, dataToSerialize, ns);
+            writer.Flush();
         }
     }
 }

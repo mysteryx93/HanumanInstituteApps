@@ -14,7 +14,6 @@ namespace HanumanInstitute.Downloads
         private readonly IFileSystemService _fileSystem;
         private readonly IMediaMuxer _mediaMuxer;
 
-
         public DownloadTaskFactory(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer)
         {
             _youTube = youTube.CheckNotNull(nameof(youTube));
@@ -35,7 +34,7 @@ namespace HanumanInstitute.Downloads
         /// <returns>The new IDownloadTask instance.</returns>
         public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options)
         {
-            return new DownloadTask(_youTube, _streamSelector, _fileSystem, _mediaMuxer, 
+            return new DownloadTask(_youTube, _streamSelector, _fileSystem, _mediaMuxer,
                 url, destination, downloadVideo, downloadAudio, taskStatus, options);
         }
     }

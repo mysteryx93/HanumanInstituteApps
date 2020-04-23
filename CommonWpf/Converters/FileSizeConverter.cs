@@ -14,7 +14,7 @@ namespace HanumanInstitute.CommonWpf
         {
             string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
             double size = (long)value;
-            int unit = 0;
+            var unit = 0;
 
             while (size >= 1024)
             {
@@ -22,7 +22,7 @@ namespace HanumanInstitute.CommonWpf
                 ++unit;
             }
 
-            return String.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", size, units[unit]);
+            return string.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", size, units[unit]);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
