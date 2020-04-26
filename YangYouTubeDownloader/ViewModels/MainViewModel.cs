@@ -25,7 +25,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             this.downloadManager = downloadManager;
         }
 
-        public ObservableCollection<DownloadTaskInfo> ActiveDownloads => downloadManager.DownloadsList;
+        //public ObservableCollection<DownloadTaskInfo> ActiveDownloads => downloadManager.DownloadsList;
 
         public bool IsGridInfoVisible { get; private set; } = true;
 

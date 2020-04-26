@@ -120,6 +120,9 @@
   <data name="DownloadTaskCallOnce" xml:space="preserve">
     <value>DownloadTask.DownloadAsync can only be called once.</value>
   </data>
+  <data name="InvalidYouTubeId" xml:space="preserve">
+    <value>Uri does not contain a valid YouTube video ID: {0}</value>
+  </data>
   <data name="StatusCanceled" xml:space="preserve">
     <value>Canceled</value>
   </data>

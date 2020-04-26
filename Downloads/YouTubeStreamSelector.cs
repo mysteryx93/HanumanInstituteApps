@@ -20,6 +20,8 @@ namespace HanumanInstitute.Downloads
         /// <returns>The best format available.</returns>
         public BestFormatInfo? SelectBestFormat(StreamManifest vstream, DownloadOptions options)
         {
+            vstream.CheckNotNull(nameof(vstream));
+
             var maxResolutionList = (from v in vstream.GetAudio().Cast<IStreamInfo>().Union(vstream.GetVideo()).Union(vstream.GetMuxed())
                                      where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
                                      orderby GetVideoHeight(v) descending

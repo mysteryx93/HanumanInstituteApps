@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HanumanInstitute.CommonServices;
@@ -30,10 +31,10 @@ namespace HanumanInstitute.Downloads
             _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
             _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
 
-            _url = url.CheckNotNull(nameof(url));
-            _destination = destination.CheckNotNullOrEmpty(nameof(destination));
-            _downloadVideo = downloadVideo;
-            _downloadAudio = downloadAudio;
+            Url = url.CheckNotNull(nameof(url));
+            Destination = destination.CheckNotNullOrEmpty(nameof(destination));
+            DownloadVideo = downloadVideo;
+            DownloadAudio = downloadAudio;
             TaskStatus = taskStatus.CheckNotNull(nameof(taskStatus));
             _options = options.CheckNotNull(nameof(options));
         }
@@ -41,19 +42,19 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the URL to download from.
         /// </summary>
-        private readonly Uri _url;
+        public Uri Url { get; private set; }
         /// <summary>
         /// Gets or sets the destination path to store the file locally.
         /// </summary>
-        private string _destination;
+        public string Destination { get; private set; }
         /// <summary>
         /// Gets or sets whether to download the video stream.
         /// </summary>
-        private readonly bool _downloadVideo;
+        public bool DownloadVideo { get; private set; }
         /// <summary>
         /// Gets or sets whether to download the audio stream.
         /// </summary>
-        private readonly bool _downloadAudio;
+        public bool DownloadAudio { get; private set; }
         /// <summary>
         /// Gets or sets the download options.
         /// </summary>
@@ -82,7 +83,7 @@ namespace HanumanInstitute.Downloads
 
             // Start download.
             Status = DownloadStatus.Initializing;
-            _fileSystem.EnsureDirectoryExists(_destination);
+            _fileSystem.EnsureDirectoryExists(Destination);
 
             // Query the download URL for the right file.
             Video? vInfo = null;
@@ -90,14 +91,15 @@ namespace HanumanInstitute.Downloads
 
             try
             {
-                var id = new VideoId(_url.AbsoluteUri);
+                var id = new VideoId(Url.AbsoluteUri);
                 var t1 = _youTube.QueryVideoAsync(id);
                 var t2 = _youTube.QueryStreamInfoAsync(id);
                 await Task.WhenAll(new Task[] { t1, t2 }).ConfigureAwait(false);
                 vInfo = t1.Result;
                 vStream = t2.Result;
             }
-            catch { }
+            catch (HttpRequestException) { }
+            catch (TaskCanceledException) { }
 
             // Get the highest resolution format.
             var bestFileNullable = vStream != null ? _streamSelector.SelectBestFormat(vStream, _options) : null;
@@ -109,30 +111,30 @@ namespace HanumanInstitute.Downloads
                 return;
             }
 
-            var bestFile = bestFileNullable.Value;
+            var bestFile = bestFileNullable;
             bestFile.Duration = vInfo?.Duration ?? TimeSpan.Zero;
 
             // Add the best video stream.
-            if (bestFile.BestVideo != null && _downloadVideo)
+            if (bestFile.BestVideo != null && DownloadVideo)
             {
                 _files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestFile.BestVideo.Url),
-                    _fileSystem.GetPathWithoutExtension(_destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(bestFile.BestVideo)),
+                    _fileSystem.GetPathWithoutExtension(Destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(bestFile.BestVideo)),
                     bestFile.BestVideo, bestFile.BestVideo.Size.TotalBytes));
             }
 
             // Add the best audio stream.
-            if (bestFile.BestAudio != null && _downloadAudio)
+            if (bestFile.BestAudio != null && DownloadAudio)
             {
                 _files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestFile.BestAudio.Url),
-                    _fileSystem.GetPathWithoutExtension(_destination) + GetAudioExtension(bestFile.BestAudio.AudioCodec),
+                    _fileSystem.GetPathWithoutExtension(Destination) + GetAudioExtension(bestFile.BestAudio.AudioCodec),
                     bestFile.BestAudio, bestFile.BestAudio.Size.TotalBytes));
             }
 
             // Add extension if Destination doesn't already include it.
             var ext = GetFinalExtension(bestFile.BestVideo, bestFile.BestAudio);
-            if (!_destination.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
+            if (!Destination.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
             {
-                _destination += ext;
+                Destination += ext;
             }
 
             if (!IsCancelled)
@@ -146,36 +148,31 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Downloads a file stream. There can be multiple streams per download.
         /// </summary>
-        /// <param name="">Information about the download task.</param>
         /// <param name="fileInfo">Information about the specific file stream to download.</param>
         private async Task DownloadFileAsync(DownloadTaskFile fileInfo)
         {
             Status = DownloadStatus.Downloading;
-            using (var cancelToken = new CancellationTokenSource())
+            using var cancelToken = new CancellationTokenSource();
+            try
             {
-                try
-                {
-                    await _youTube.DownloadAsync(
-                        (IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
+                await _youTube.DownloadAsync(
+                    (IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
 
-                    void ProgressHandler(double percent)
+                void ProgressHandler(double percent)
+                {
+                    if (IsCancelled)
                     {
-                        if (IsCancelled)
-                        {
-                            cancelToken.Cancel();
-                        }
-                        else
-                        {
-                            fileInfo.Downloaded = (long)(fileInfo.Length * percent);
-                            UpdateProgress();
-                        }
+                        cancelToken.Cancel();
+                    }
+                    else
+                    {
+                        fileInfo.Downloaded = (long)(fileInfo.Length * percent);
+                        UpdateProgress();
                     }
                 }
-                catch
-                {
-                    Status = DownloadStatus.Failed;
-                }
             }
+            catch (HttpRequestException) { Status = DownloadStatus.Failed; }
+            catch (TaskCanceledException) { Status = DownloadStatus.Failed; }
 
             // Detect whether this is the last file.
             fileInfo.Done = true;
@@ -184,14 +181,7 @@ namespace HanumanInstitute.Downloads
                 // Raise events for the last file part only.
                 if (IsCompleted)
                 {
-                    try
-                    {
-                        await DownloadCompletedAsync().ConfigureAwait(false);
-                    }
-                    catch
-                    {
-                        Status = DownloadStatus.Failed;
-                    }
+                    await DownloadCompletedAsync().ConfigureAwait(false);
                 }
                 else if (IsCancelled)
                 {
@@ -203,24 +193,23 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs when a file download is completed.
         /// </summary>
-        /// <param name="">Information about the download task.</param>
         private async Task DownloadCompletedAsync()
         {
             await TaskStatus.OnBeforeMuxingAsync(this, new DownloadTaskEventArgs(this)).ConfigureAwait(false);
 
-            var result = _fileSystem.File.Exists(_destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+            var result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
             var videoFile = _files.FirstOrDefault(f => f.Type == StreamType.Video);
             var audioFile = _files.FirstOrDefault(f => f.Type == StreamType.Audio);
 
             // Muxe regularly unless muxing in event handler.
             if (result != CompletionStatus.Success)
             {
-                result = await Task.Run(() => _mediaMuxer.Muxe(videoFile?.Destination, audioFile?.Destination, _destination)).ConfigureAwait(false);
+                result = await Task.Run(() => _mediaMuxer.Muxe(videoFile?.Destination, audioFile?.Destination, Destination)).ConfigureAwait(false);
             }
 
             if (result == CompletionStatus.Success)
             {
-                result = _fileSystem.File.Exists(_destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+                result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
             }
 
             // Delete temp files.
@@ -237,7 +226,7 @@ namespace HanumanInstitute.Downloads
             Status = result == CompletionStatus.Success ? DownloadStatus.Done : DownloadStatus.Failed;
 
             // Ensure download and merge succeeded.
-            if (!FileHasContent(_destination))
+            if (!FileHasContent(Destination))
             {
                 Status = DownloadStatus.Failed;
             }
@@ -257,7 +246,6 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs when a download task is cancelled.
         /// </summary>
-        /// <param name="">Information about the download task.</param>
         private void DownloadCanceled()
         {
             Thread.Sleep(100);

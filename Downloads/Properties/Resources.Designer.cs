@@ -70,6 +70,15 @@ namespace HanumanInstitute.Downloads.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Uri does not contain a valid YouTube video ID: {0}.
+        /// </summary>
+        internal static string InvalidYouTubeId {
+            get {
+                return ResourceManager.GetString("InvalidYouTubeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Canceled.
         /// </summary>
         internal static string StatusCanceled {

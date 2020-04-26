@@ -45,7 +45,7 @@ namespace HanumanInstitute.CommonServices
         /// </summary>
         /// <param name="value">The value to validate.</param>
         /// <param name="name">The name of the parameter.</param>
-        public static IEnumerable<T> ValidateListNotNullOrEmpty<T>(this IEnumerable<T> value, string name)
+        public static IEnumerable<T> CheckNotNullOrEmpty<T>(this IEnumerable<T> value, string name)
         {
             CheckNotNull(value, name);
             if (!value.Any())

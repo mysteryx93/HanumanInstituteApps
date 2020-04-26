@@ -25,7 +25,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the maximum amount of simultaneous downloads to allow.
         /// </summary>
-        public int SimultaneousDownloads { get; set; } = 2;
+        public int ConcurrentDownloads { get; set; } = 2;
 
         /// <summary>
         /// Returns a copy of this instance.

@@ -1,6 +1,7 @@
-﻿using HanumanInstitute.CommonServices;
+﻿using System;
+using YoutubeExplode;
+using HanumanInstitute.CommonServices;
 using HanumanInstitute.FFmpeg;
-using System;
 
 namespace HanumanInstitute.Downloads
 {
@@ -13,6 +14,9 @@ namespace HanumanInstitute.Downloads
         private readonly IYouTubeStreamSelector _streamSelector;
         private readonly IFileSystemService _fileSystem;
         private readonly IMediaMuxer _mediaMuxer;
+
+        public DownloadTaskFactory() : this(new YouTubeDownloader(new YoutubeClient()), new YouTubeStreamSelector(), new FileSystemService(), new MediaMuxer(new ProcessWorkerFactory()))
+        { }
 
         public DownloadTaskFactory(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer)
         {

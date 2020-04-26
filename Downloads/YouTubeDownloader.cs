@@ -22,13 +22,6 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns information about specified YouTube video.
         /// </summary>
-        /// <param name="url">The url of the video.</param>
-        /// <returns>The video info.</returns>
-        public async Task<Video> QueryVideoAsync(Uri url) => await QueryVideoAsync(GetVideoId(url)).ConfigureAwait(false);
-
-        /// <summary>
-        /// Returns information about specified YouTube video.
-        /// </summary>
         /// <param name="id">The id of the video.</param>
         /// <returns>The video info.</returns>
         public async Task<Video> QueryVideoAsync(VideoId videoId)
@@ -36,13 +29,6 @@ namespace HanumanInstitute.Downloads
             videoId.Value.CheckNotNullOrEmpty(nameof(videoId));
             return await _youTube.Videos.GetAsync(videoId).ConfigureAwait(false);
         }
-
-        /// <summary>
-        /// Returns streams information for specified YouTube video.
-        /// </summary>
-        /// <param name="url">The url of the video.</param>
-        /// <returns>Information about available streams.</returns>
-        public async Task<StreamManifest> QueryStreamInfoAsync(Uri url) => await QueryStreamInfoAsync(GetVideoId(url)).ConfigureAwait(false);
 
         /// <summary>
         /// Returns streams information for specified YouTube video.
@@ -68,17 +54,6 @@ namespace HanumanInstitute.Downloads
                 filePath,
                 progressCallback != null ? new Progress<double>(progressCallback) : null,
                 cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Returns the VideoId for specified URL. You can use this method to avoid parsing the id several times.
-        /// </summary>
-        /// <param name="url">The video URL to parse.</param>
-        /// <returns>The video id.</returns>
-        public VideoId GetVideoId(Uri url)
-        {
-            url.CheckNotNull(nameof(url));
-            return new VideoId(url.AbsoluteUri);
         }
     }
 }

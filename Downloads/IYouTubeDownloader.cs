@@ -14,21 +14,9 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns information about specified YouTube video.
         /// </summary>
-        /// <param name="url">The url of the video.</param>
-        /// <returns>The video info.</returns>
-        Task<Video> QueryVideoAsync(Uri url);
-        /// <summary>
-        /// Returns information about specified YouTube video.
-        /// </summary>
         /// <param name="id">The id of the video.</param>
         /// <returns>The video info.</returns>
         Task<Video> QueryVideoAsync(VideoId videoId);
-        /// <summary>
-        /// Returns streams information for specified YouTube video.
-        /// </summary>
-        /// <param name="url">The url of the video.</param>
-        /// <returns>Information about available streams.</returns>
-        Task<StreamManifest> QueryStreamInfoAsync(Uri url);
         /// <summary>
         /// Returns streams information for specified YouTube video.
         /// </summary>
@@ -43,11 +31,5 @@ namespace HanumanInstitute.Downloads
         /// <param name="progressCallback">A method to call when progress is updated.</param>
         /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
         Task DownloadAsync(IStreamInfo streamInfo, string filePath, Action<double>? progressCallback = null, CancellationToken cancellationToken = default);
-        /// <summary>
-        /// Returns the VideoId for specified URL. You can use this method to avoid parsing the id several times.
-        /// </summary>
-        /// <param name="url">The video URL to parse.</param>
-        /// <returns>The video id.</returns>
-        VideoId GetVideoId(Uri url);
     }
 }

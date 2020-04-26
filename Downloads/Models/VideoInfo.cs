@@ -3,7 +3,7 @@ using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
 {
-    public struct VideoInfo
+    public class VideoInfo
     {
         public Video Info { get; set; }
         public StreamManifest Streams { get; set; }

@@ -16,11 +16,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads", "..\Downloads\Downloads.csproj", "{256BC2DE-D3A9-4181-A653-FAE1E5D0FB43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloads", "..\Downloads\Downloads.csproj", "{256BC2DE-D3A9-4181-A653-FAE1E5D0FB43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloads.Tests", "..\Downloads.Tests\Downloads.Tests.csproj", "{9F5718D5-7D96-491B-8949-E891744997B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloads.Tests", "..\Downloads.Tests\Downloads.Tests.csproj", "{9F5718D5-7D96-491B-8949-E891744997B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{AC01746A-1E23-4345-9867-216741F50E41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YangYouTubeDownloader", "..\YangYouTubeDownloader\YangYouTubeDownloader.csproj", "{AC01746A-1E23-4345-9867-216741F50E41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "..\CommonTests\CommonTests.csproj", "{9D75423F-E755-41E5-94F1-FB2E2E4AE013}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +118,18 @@ Global
 		{AC01746A-1E23-4345-9867-216741F50E41}.Release|x64.Build.0 = Release|Any CPU
 		{AC01746A-1E23-4345-9867-216741F50E41}.Release|x86.ActiveCfg = Release|Any CPU
 		{AC01746A-1E23-4345-9867-216741F50E41}.Release|x86.Build.0 = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|x64.Build.0 = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Debug|x86.Build.0 = Debug|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|x64.ActiveCfg = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|x64.Build.0 = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|x86.ActiveCfg = Release|Any CPU
+		{9D75423F-E755-41E5-94F1-FB2E2E4AE013}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
