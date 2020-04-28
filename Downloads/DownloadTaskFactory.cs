@@ -15,8 +15,8 @@ namespace HanumanInstitute.Downloads
         private readonly IFileSystemService _fileSystem;
         private readonly IMediaMuxer _mediaMuxer;
 
-        public DownloadTaskFactory() : this(new YouTubeDownloader(new YoutubeClient()), new YouTubeStreamSelector(), new FileSystemService(), new MediaMuxer(new ProcessWorkerFactory()))
-        { }
+        //public DownloadTaskFactory() : this(new YouTubeDownloader(new YoutubeClient()), new YouTubeStreamSelector(), new FileSystemService(), new MediaMuxer(new ProcessWorkerFactory()))
+        //{ }
 
         public DownloadTaskFactory(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer)
         {
@@ -36,10 +36,10 @@ namespace HanumanInstitute.Downloads
         /// <param name="taskStatus">An object containing download status information.</param>
         /// <param name="options">The download options.</param>
         /// <returns>The new IDownloadTask instance.</returns>
-        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options)
+        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options)
         {
             return new DownloadTask(_youTube, _streamSelector, _fileSystem, _mediaMuxer,
-                url, destination, downloadVideo, downloadAudio, taskStatus, options);
+                url, destination, downloadVideo, downloadAudio, options);
         }
     }
 }

@@ -79,6 +79,15 @@ namespace HanumanInstitute.Downloads.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must set either downloadVideo or downloadAudio to True..
+        /// </summary>
+        internal static string NoVideoNoAudio {
+            get {
+                return ResourceManager.GetString("NoVideoNoAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Canceled.
         /// </summary>
         internal static string StatusCanceled {
@@ -102,6 +111,15 @@ namespace HanumanInstitute.Downloads.Properties {
         internal static string StatusFailed {
             get {
                 return ResourceManager.GetString("StatusFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finalizing....
+        /// </summary>
+        internal static string StatusFinalizing {
+            get {
+                return ResourceManager.GetString("StatusFinalizing", resourceCulture);
             }
         }
         

@@ -16,7 +16,7 @@ namespace HanumanInstitute.CommonServices
         private readonly IFileSystem _fileSystem;
         private readonly IWindowsApiService _windowsApi;
 
-        public FileSystemService() : this(new FileSystem(), new WindowsApiService()) { }
+        //public FileSystemService() : this(new FileSystem(), new WindowsApiService()) { }
 
         public FileSystemService(IFileSystem fileSystemService, IWindowsApiService windowsApiService)
         {

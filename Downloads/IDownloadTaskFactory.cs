@@ -17,6 +17,6 @@ namespace HanumanInstitute.Downloads
         /// <param name="taskStatus">An object containing download status information.</param>
         /// <param name="options">The download options.</param>
         /// <returns>The new IDownloadTask instance.</returns>
-        IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options);
+        IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options);
     }
 }

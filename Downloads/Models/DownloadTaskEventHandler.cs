@@ -15,14 +15,14 @@ namespace HanumanInstitute.Downloads
     {
         //public DownloadTaskEventArgs() { }
 
-        public DownloadTaskEventArgs(IDownloadTask downloadInfo)
+        public DownloadTaskEventArgs(IDownloadTask downloadTask)
         {
-            DownloadTask = downloadInfo;
+            Download = downloadTask.CheckNotNull(nameof(downloadTask));
         }
 
         /// <summary>
         /// Returns information about the file being downloaded.
         /// </summary>
-        public IDownloadTask DownloadTask { get; set; }
+        public IDownloadTask Download { get; set; }
     }
 }

@@ -41,36 +41,38 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="url">The URL of the video to download</param>
         /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskStatus">An object that will receive status updates for this download.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadTaskStatus> DownloadAsync(string url, string destination, DownloadTaskStatus? taskStatus = null, bool downloadVideo = true, bool downloadAudio = true) =>
-            await DownloadAsync(new Uri(url), destination, taskStatus, downloadVideo, downloadAudio).ConfigureAwait(false);
+        public async Task<DownloadStatus> DownloadAsync(string url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true) =>
+            await DownloadAsync(new Uri(url), destination, taskCreatedCallback, downloadVideo, downloadAudio).ConfigureAwait(false);
 
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.
         /// </summary>
         /// <param name="url">The URL of the video to download</param>
         /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskStatus">An object that will receive status updates for this download.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadTaskStatus> DownloadAsync(Uri url, string destination, DownloadTaskStatus? taskStatus = null, bool downloadVideo = true, bool downloadAudio = true)
+        public async Task<DownloadStatus> DownloadAsync(Uri url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true)
         {
             url.CheckNotNull(nameof(url));
             destination.CheckNotNullOrEmpty(nameof(destination));
-            taskStatus ??= new DownloadTaskStatus();
+            if (!downloadVideo && !downloadAudio) { throw new ArgumentException(Resources.NoVideoNoAudio); }
 
-            var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, taskStatus, _options.Value.Clone());
+            var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, _options.Value.Clone());
 
             // Notify UI of new download to show window.
-            DownloadAdded?.Invoke(this, new DownloadTaskEventArgs(task));
+            var e = new DownloadTaskEventArgs(task);
+            taskCreatedCallback?.Invoke(this, e);
+            DownloadAdded?.Invoke(this, e);
 
             // Adjust pool size if ConcurrentDownloads settings changed.
             _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
@@ -82,10 +84,10 @@ namespace HanumanInstitute.Downloads
             await task.DownloadAsync().ConfigureAwait(false);
 
             // Release the pool and allow next download to start.
-            _pool.Release();
+            _pool.TryRelease();
             _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
 
-            return taskStatus;
+            return task.Status;
         }
 
         /// <summary>

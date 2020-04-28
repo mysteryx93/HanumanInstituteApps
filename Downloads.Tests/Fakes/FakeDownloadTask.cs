@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,9 +11,28 @@ namespace HanumanInstitute.Downloads.Tests
         public string Destination => string.Empty;
         public bool DownloadVideo => true;
         public bool DownloadAudio => true;
-        public DownloadTaskStatus TaskStatus => new DownloadTaskStatus();
 
         public FakeStatus Status { get; set; } = FakeStatus.Waiting;
+
+        public IList<DownloadTaskFile> Files => new List<DownloadTaskFile>();
+
+        public string Title { get; set; } = string.Empty;
+
+        public double ProgressValue => 0;
+
+        public string ProgressText { get; set; } = string.Empty;
+
+        DownloadStatus IDownloadTask.Status => DownloadStatus.Success;
+
+        public event DownloadTaskEventHandler? BeforeMuxing;
+        public event DownloadTaskEventHandler? ProgressUpdated;
+
+        public void Cancel()
+        { }
+
+        public void Fail()
+        { }
+
         public void Done()
         {
             Status = FakeStatus.Done;

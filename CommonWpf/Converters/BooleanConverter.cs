@@ -22,13 +22,11 @@ namespace HanumanInstitute.CommonWpf
 
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
             return value is bool && ((bool)value) ? TrueValue : FalseValue;
         }
 
         public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
             return value is T && EqualityComparer<T>.Default.Equals((T)value, TrueValue);
         }
     }

@@ -5,7 +5,7 @@ namespace HanumanInstitute.Downloads
     /// <summary>
     /// Contains information about a file download operation.
     /// </summary>
-    internal class DownloadTaskFile
+    public class DownloadTaskFile
     {
         //public DownloadTaskFile() { }
 
@@ -19,31 +19,31 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
-        /// Gets or sets the type of data stream being downloaded.
+        /// Gets the type of data stream being downloaded.
         /// </summary>
-        public StreamType Type { get; set; }
+        public StreamType Type { get; }
         /// <summary>
-        /// Gets or sets the URL to download from.
+        /// Gets the URL to download from.
         /// </summary>
-        public Uri Url { get; set; }
+        public Uri Url { get; }
         /// <summary>
-        /// Gets or sets the destination path to store the file locally.
+        /// Gets the destination path to store the file locally.
         /// </summary>
-        public string Destination { get; set; }
+        public string Destination { get; }
         /// <summary>
-        /// Gets or sets the download stream.
+        /// Gets the download stream.
         /// </summary>
-        public object Stream { get; set; }
+        public object Stream { get; }
         /// <summary>
-        /// Gets or sets the stream total length in bytes.
+        /// Gets the stream total length in bytes.
         /// </summary>
-        public long Length { get; set; }
+        public long Length { get; }
         /// <summary>
-        /// Gets or sets the amount of bytes downloaded so far.
+        /// Gets the approximate amount of bytes downloaded so far.
         /// </summary>
-        public long Downloaded { get; set; }
+        internal long Downloaded { get; set; }
         /// <summary>
-        /// Gets or sets whether the file download is completed.
+        /// Gets whether the file download is completed.
         /// </summary>
         public bool Done { get; set; }
     }

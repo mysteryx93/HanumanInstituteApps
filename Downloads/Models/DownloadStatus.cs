@@ -10,7 +10,8 @@ namespace HanumanInstitute.Downloads
         Waiting,
         Initializing,
         Downloading,
-        Done,
+        Finalizing,
+        Success,
         Canceled,
         Failed
     }

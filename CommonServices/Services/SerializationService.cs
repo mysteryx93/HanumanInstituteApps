@@ -12,7 +12,7 @@ namespace HanumanInstitute.CommonServices
     {
         private readonly IFileSystemService _fileSystem;
 
-        public SerializationService() : this(new FileSystemService()) { }
+        //public SerializationService() : this(new FileSystemService()) { }
 
         public SerializationService(IFileSystemService fileSystemService)
         {

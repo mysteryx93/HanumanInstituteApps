@@ -8,7 +8,7 @@ namespace HanumanInstitute.Downloads.Tests
     {
         public ConcurrentBag<FakeDownloadTask> Instances { get; private set; } = new ConcurrentBag<FakeDownloadTask>();
 
-        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options)
+        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options)
         {
             var result = new FakeDownloadTask();
             Instances.Add(result);

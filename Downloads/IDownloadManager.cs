@@ -18,25 +18,25 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="url">The URL of the video to download</param>
         /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskStatus">An object that will receive status updates for this download.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        Task<DownloadTaskStatus> DownloadAsync(Uri url, string destination, DownloadTaskStatus? taskStatus = null, bool downloadVideo = true, bool downloadAudio = true);
+        Task<DownloadStatus> DownloadAsync(Uri url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true);
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.
         /// </summary>
         /// <param name="url">The URL of the video to download</param>
         /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskStatus">An object that will receive status updates for this download.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
         /// <param name="downloadVideo">Whether to download the video stream.</param>
         /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        Task<DownloadTaskStatus> DownloadAsync(string url, string destination, DownloadTaskStatus? taskStatus = null, bool downloadVideo = true, bool downloadAudio = true);
+        Task<DownloadStatus> DownloadAsync(string url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true);
         /// <summary>
         /// Returns the title for specified download URL.
         /// </summary>

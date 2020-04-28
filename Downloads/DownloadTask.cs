@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using HanumanInstitute.CommonServices;
@@ -24,8 +25,10 @@ namespace HanumanInstitute.Downloads
         private readonly IMediaMuxer _mediaMuxer;
 
         public DownloadTask(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer,
-            Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadTaskStatus taskStatus, DownloadOptions options)
+            Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options)
         {
+            if (!downloadVideo && !downloadAudio) { throw new ArgumentException(Resources.NoVideoNoAudio); }
+
             _youTube = youTube.CheckNotNull(nameof(youTube));
             _streamSelector = streamSelector.CheckNotNull(nameof(streamSelector));
             _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
@@ -35,7 +38,6 @@ namespace HanumanInstitute.Downloads
             Destination = destination.CheckNotNullOrEmpty(nameof(destination));
             DownloadVideo = downloadVideo;
             DownloadAudio = downloadAudio;
-            TaskStatus = taskStatus.CheckNotNull(nameof(taskStatus));
             _options = options.CheckNotNull(nameof(options));
         }
 
@@ -60,14 +62,32 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         private readonly DownloadOptions _options;
         /// <summary>
-        /// Gets or sets the list of file streams being downloaded.
+        /// Gets the list of file streams being downloaded.
         /// </summary>
-        private readonly List<DownloadTaskFile> _files = new List<DownloadTaskFile>();
-        /// <summary>
-        /// Returns an object containing download status information.
-        /// </summary>
-        public DownloadTaskStatus TaskStatus { get; private set; } = new DownloadTaskStatus();
+        public IList<DownloadTaskFile> Files { get; } = new List<DownloadTaskFile>();
+        private DownloadStatus _status = DownloadStatus.Waiting;
         private bool _isCalled = false;
+
+        /// <summary>
+        /// Occurs before performing the muxing operation.
+        /// </summary>
+        public event DownloadTaskEventHandler? BeforeMuxing;
+        /// <summary>
+        /// Occurus when progress information is updated.
+        /// </summary>
+        public event DownloadTaskEventHandler? ProgressUpdated;
+        /// <summary>
+        /// Gets or sets the title of the downloaded media.
+        /// </summary>
+        public string Title { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the progress of all streams as percentage.
+        /// </summary>
+        public double ProgressValue { get; internal set; }
+        /// <summary>
+        /// Gets or sets the progress of all streams as a string representation.
+        /// </summary>
+        public string ProgressText { get; set; } = string.Empty;
 
         /// <summary>
         /// Starts the download.
@@ -107,7 +127,7 @@ namespace HanumanInstitute.Downloads
             // Make sure we could retrieve download streams.
             if (bestFileNullable == null)
             {
-                TaskStatus.Status = DownloadStatus.Failed;
+                Status = DownloadStatus.Failed;
                 return;
             }
 
@@ -117,7 +137,7 @@ namespace HanumanInstitute.Downloads
             // Add the best video stream.
             if (bestFile.BestVideo != null && DownloadVideo)
             {
-                _files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestFile.BestVideo.Url),
+                Files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestFile.BestVideo.Url),
                     _fileSystem.GetPathWithoutExtension(Destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(bestFile.BestVideo)),
                     bestFile.BestVideo, bestFile.BestVideo.Size.TotalBytes));
             }
@@ -125,7 +145,7 @@ namespace HanumanInstitute.Downloads
             // Add the best audio stream.
             if (bestFile.BestAudio != null && DownloadAudio)
             {
-                _files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestFile.BestAudio.Url),
+                Files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestFile.BestAudio.Url),
                     _fileSystem.GetPathWithoutExtension(Destination) + GetAudioExtension(bestFile.BestAudio.AudioCodec),
                     bestFile.BestAudio, bestFile.BestAudio.Size.TotalBytes));
             }
@@ -140,9 +160,39 @@ namespace HanumanInstitute.Downloads
             if (!IsCancelled)
             {
                 // Download all files.
-                var downloadTasks = _files.Select(f => DownloadFileAsync(f)).ToArray();
+                var downloadTasks = Files.Select(f => DownloadFileAsync(f)).ToArray();
                 await Task.WhenAll(downloadTasks).ConfigureAwait(false);
+
+                if (IsCompleted())
+                {
+                    await DownloadCompletedAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    await Task.Delay(100).ConfigureAwait(false);
+                    DeleteTempFiles();
+                }
             }
+        }
+
+        /// <summary>
+        /// Returns whether all files are finished downloading.
+        /// </summary>
+        private bool IsCompleted()
+        {
+            if (!IsCancelled && Files.Count > 0)
+            {
+                var result = true;
+                foreach (var item in Files)
+                {
+                    if (!_fileSystem.File.Exists(item.Destination) || _fileSystem.FileInfo.FromFileName(item.Destination).Length < item.Length)
+                    {
+                        result = false;
+                    }
+                }
+                return result;
+            }
+            return false;
         }
 
         /// <summary>
@@ -153,41 +203,29 @@ namespace HanumanInstitute.Downloads
         {
             Status = DownloadStatus.Downloading;
             using var cancelToken = new CancellationTokenSource();
+
             try
             {
                 await _youTube.DownloadAsync(
-                    (IVideoStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
+                    (IStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
 
                 void ProgressHandler(double percent)
                 {
+                    fileInfo.Downloaded = (long)(fileInfo.Length * percent);
+                    UpdateProgress();
+
                     if (IsCancelled)
                     {
-                        cancelToken.Cancel();
-                    }
-                    else
-                    {
-                        fileInfo.Downloaded = (long)(fileInfo.Length * percent);
-                        UpdateProgress();
+                        try
+                        {
+                            cancelToken.Cancel();
+                        }
+                        catch (ObjectDisposedException) { } // In case task is already done.
                     }
                 }
             }
             catch (HttpRequestException) { Status = DownloadStatus.Failed; }
             catch (TaskCanceledException) { Status = DownloadStatus.Failed; }
-
-            // Detect whether this is the last file.
-            fileInfo.Done = true;
-            if (IsDone)
-            {
-                // Raise events for the last file part only.
-                if (IsCompleted)
-                {
-                    await DownloadCompletedAsync().ConfigureAwait(false);
-                }
-                else if (IsCancelled)
-                {
-                    DownloadCanceled();
-                }
-            }
         }
 
         /// <summary>
@@ -195,11 +233,30 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         private async Task DownloadCompletedAsync()
         {
-            await TaskStatus.OnBeforeMuxingAsync(this, new DownloadTaskEventArgs(this)).ConfigureAwait(false);
+            Status = DownloadStatus.Finalizing;
+            if (BeforeMuxing != null)
+            {
+                try
+                {
+                    BeforeMuxing?.Invoke(this, new DownloadTaskEventArgs(this));
+                    // await Task.Run(() => BeforeMuxing?.Invoke(this, new DownloadTaskEventArgs(this))).ConfigureAwait(false);
+                }
+                catch
+                {
+                    Status = DownloadStatus.Failed;
+                    throw;
+                }
+            }
+
+            if (IsCancelled)
+            {
+                DeleteTempFiles();
+                return;
+            }
 
             var result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
-            var videoFile = _files.FirstOrDefault(f => f.Type == StreamType.Video);
-            var audioFile = _files.FirstOrDefault(f => f.Type == StreamType.Audio);
+            var videoFile = Files.FirstOrDefault(f => f.Type == StreamType.Video);
+            var audioFile = Files.FirstOrDefault(f => f.Type == StreamType.Audio);
 
             // Muxe regularly unless muxing in event handler.
             if (result != CompletionStatus.Success)
@@ -212,63 +269,44 @@ namespace HanumanInstitute.Downloads
                 result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
             }
 
-            // Delete temp files.
-            if (videoFile != null)
-            {
-                _fileSystem.File.Delete(videoFile.Destination);
-            }
+            DeleteTempFiles();
 
-            if (audioFile != null)
-            {
-                _fileSystem.File.Delete(audioFile.Destination);
-            }
-
-            Status = result == CompletionStatus.Success ? DownloadStatus.Done : DownloadStatus.Failed;
+            Status = result == CompletionStatus.Success ? DownloadStatus.Success : DownloadStatus.Failed;
 
             // Ensure download and merge succeeded.
-            if (!FileHasContent(Destination))
+            if (!_fileSystem.File.Exists(Destination))
             {
                 Status = DownloadStatus.Failed;
             }
 
-            //if (Status != DownloadStatus.Failed)
-            //{
-            //    DownloadTaskEventArgs CompletedArgs = new DownloadTaskEventArgs();
-            //    await TaskStatus.OnCompletedAsync(this, CompletedArgs).ConfigureAwait(false);
-            //}
-
-            if (Status != DownloadStatus.Done)
+            if (Status != DownloadStatus.Success)
             {
                 Status = DownloadStatus.Failed;
             }
         }
 
         /// <summary>
-        /// Occurs when a download task is cancelled.
+        /// Delete partially-downloaded files.
         /// </summary>
-        private void DownloadCanceled()
+        private void DeleteTempFiles()
         {
-            Thread.Sleep(100);
-
-            // Delete partially-downloaded files.
-            foreach (var item in _files)
+            foreach (var item in Files)
             {
                 _fileSystem.File.Delete(item.Destination);
             }
         }
 
         /// <summary>
-        /// Sets the download status for specified download task and updates the progress text.
+        /// Gets the download status.
         /// </summary>
-        /// <param name="download">The download task to update.</param>
-        /// <param name="status">The new download status.</param>
-        private DownloadStatus Status
+        public DownloadStatus Status
         {
-            get => TaskStatus.Status;
-            set
+            get => _status;
+            private set
             {
-                TaskStatus.Status = value;
-                TaskStatus.ProgressText = GetStatusText(value);
+                // Updates the status information.
+                _status = value;
+                ProgressText = GetStatusText(value);
 
                 static string GetStatusText(DownloadStatus status)
                 {
@@ -279,8 +317,10 @@ namespace HanumanInstitute.Downloads
                         case DownloadStatus.Initializing:
                         case DownloadStatus.Downloading:
                             return Resources.StatusInitializing;
-                        case DownloadStatus.Done:
+                        case DownloadStatus.Success:
                             return Resources.StatusDone;
+                        case DownloadStatus.Finalizing:
+                            return Resources.StatusFinalizing;
                         case DownloadStatus.Canceled:
                             return Resources.StatusCanceled;
                         case DownloadStatus.Failed:
@@ -302,7 +342,7 @@ namespace HanumanInstitute.Downloads
             long totalBytes = 0;
             long downloaded = 0;
             var bytesTotalLoaded = true;
-            foreach (var item in _files)
+            foreach (var item in Files)
             {
                 if (item.Length > 0)
                 {
@@ -317,40 +357,46 @@ namespace HanumanInstitute.Downloads
             }
             if (bytesTotalLoaded)
             {
-                TaskStatus.ProgressValue = ((double)downloaded / totalBytes) * 100;
-                TaskStatus.ProgressText = TaskStatus.ProgressValue.ToString("p1", CultureInfo.CurrentCulture);
+                ProgressValue = (double)downloaded / totalBytes;
+                ProgressText = ProgressValue.ToString("p1", CultureInfo.CurrentCulture);
+            }
+            try
+            {
+                ProgressUpdated?.Invoke(this, new DownloadTaskEventArgs(this));
+            }
+            catch
+            {
+                Status = DownloadStatus.Failed;
+                throw;
             }
         }
 
-        private bool IsDone => !_files.Any(d => !d.Done);
+        /// <summary>
+        /// Cancels the download operation.
+        /// </summary>
+        public void Cancel()
+        {
+            if (Status != DownloadStatus.Success && Status != DownloadStatus.Failed)
+            {
+                Status = DownloadStatus.Canceled;
+            }
+        }
 
         /// <summary>
-        /// Returns whether all files are finished downloading.
+        /// Marks the download operation as failed.
         /// </summary>
-        private bool IsCompleted
+        public void Fail()
         {
-            get
+            if (Status != DownloadStatus.Success)
             {
-                if (_files.Count > 0)
-                {
-                    var result = true;
-                    foreach (var item in _files)
-                    {
-                        if (item.Length == 0 || item.Downloaded < item.Length)
-                        {
-                            result = false;
-                        }
-                    }
-                    return result;
-                }
-                return false;
+                Status = DownloadStatus.Failed;
             }
         }
 
         /// <summary>
         /// Returns whether the download was canceled or failed.
         /// </summary>
-        private bool IsCancelled => (TaskStatus.Status == DownloadStatus.Canceled || TaskStatus.Status == DownloadStatus.Failed);
+        private bool IsCancelled => (Status == DownloadStatus.Canceled || Status == DownloadStatus.Failed);
 
 
         /// <summary>
@@ -448,16 +494,6 @@ namespace HanumanInstitute.Downloads
             {
                 return "";
             }
-        }
-
-        /// <summary>
-        /// Returns whether specified file exists and contains data (at least 500KB).
-        /// </summary>
-        /// <param name="fileName">The path of the file to check.</param>
-        /// <returns>Whether the file contains data.</returns>
-        private bool FileHasContent(string fileName)
-        {
-            return _fileSystem.File.Exists(fileName) && _fileSystem.FileInfo.FromFileName(fileName).Length > 524288;
         }
     }
 }

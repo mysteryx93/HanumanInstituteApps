@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HanumanInstitute.Downloads
@@ -29,8 +30,40 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         bool DownloadAudio { get; }
         /// <summary>
-        /// Gets the download status information.
+        /// Gets the list of file streams being downloaded.
         /// </summary>
-        DownloadTaskStatus TaskStatus { get; }
+        IList<DownloadTaskFile> Files { get; }
+        /// <summary>
+        /// Gets the download status.
+        /// </summary>
+        DownloadStatus Status { get; }
+        /// <summary>
+        /// Cancels the download operation.
+        /// </summary>
+        void Cancel();
+        /// <summary>
+        /// Marks the download operation as failed.
+        /// </summary>
+        void Fail();
+        /// <summary>
+        /// Occurs before performing the muxing operation.
+        /// </summary>
+        event DownloadTaskEventHandler? BeforeMuxing;
+        /// <summary>
+        /// Occurus when progress information is updated.
+        /// </summary>
+        event DownloadTaskEventHandler? ProgressUpdated;
+        /// <summary>
+        /// Gets or sets the title of the downloaded media.
+        /// </summary>
+        string Title { get; set; }
+        /// <summary>
+        /// Gets or sets the progress of all streams as percentage.
+        /// </summary>
+        double ProgressValue { get; }
+        /// <summary>
+        /// Gets or sets the progress of all streams as a string representation.
+        /// </summary>
+        string ProgressText { get; set; }
     }
 }

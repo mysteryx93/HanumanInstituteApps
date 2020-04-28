@@ -13,7 +13,7 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Gets the current capacity of the Semaphore.
         /// </summary>
-        public int CurrentSize { get; private set; }
+        public int Capacity { get; private set; }
 
         /// <summary>
         /// Gets the absolute maximum capacity of the Semaphore.
@@ -26,7 +26,7 @@ namespace HanumanInstitute.CommonServices
         /// <param name="initialCount">The initial number of slots.</param>
         /// <param name="maxCount">The maximum number of slots.</param>
         public SemaphoreSlimDynamic(int initialCount, int maxCount)
-            : base(initialCount, maxCount * 2)
+            : base(initialCount, maxCount)
         {
             // Note: Reducing capacity is done by invoking Wait() which may only complete when a semaphore is released.
             // This means that increasing it again may cause an overflow. To avoid this, we set the hard maximum to twice maxCount.
@@ -35,7 +35,7 @@ namespace HanumanInstitute.CommonServices
 
             _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
-            CurrentSize = initialCount;
+            Capacity = initialCount;
             MaximumCapacity = maxCount;
         }
 
@@ -48,24 +48,48 @@ namespace HanumanInstitute.CommonServices
             if (newSize < 1 || newSize > MaximumCapacity) { throw new ArgumentOutOfRangeException(nameof(newSize)); }
 
             var adjust = 0;
-            if (newSize != CurrentSize)
+            if (newSize != Capacity)
             {
                 _lock.EnterWriteLock();
-                adjust = newSize - CurrentSize;
-                CurrentSize = newSize;
+                adjust = newSize - Capacity;
+                Capacity = newSize;
                 _lock.ExitWriteLock();
             }
 
             if (adjust > 0)
             {
-                Release(adjust);
+                for (var i = 0; i < adjust; i++)
+                {
+                    TryRelease();
+                }
             }
             else if (adjust < 0)
             {
-                for (var i = 0; i < adjust; i++)
+                for (var i = 0; i > adjust; i--)
                 {
                     _ = WaitAsync();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tries to release a semaphore. This may fail in some rare cases if ChangeCapacity was called several time, in which case, it will return false and decrease CurrentSize.
+        /// </summary>
+        /// <returns>Whether the semaphore was successfully released.</returns>
+        public bool TryRelease()
+        {
+            try
+            {
+                Release();
+                return true;
+            }
+            catch (SemaphoreFullException)
+            {
+                // The semaphore size doesn't seem to be reduced in such case?
+                //_lock.EnterWriteLock();
+                //CurrentSize--;
+                //_lock.ExitWriteLock();
+                return false;
             }
         }
     }
