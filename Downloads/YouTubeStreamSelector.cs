@@ -12,86 +12,65 @@ namespace HanumanInstitute.Downloads
         public YouTubeStreamSelector() { }
 
         /// <summary>
-        /// Returns the best format from the list in this order of availability: WebM, Mp4 or Flash.
-        /// Mp4 will be chosen if WebM is over 35% smaller.
+        /// Selects the best video stream available according to options.
         /// </summary>
-        /// <param name="vstream">The list of video streams to chose from.</param>
+        /// <param name="vinfo">The list of available streams.</param>
         /// <param name="options">Options for stream selection.</param>
-        /// <returns>The best format available.</returns>
-        public BestFormatInfo? SelectBestFormat(StreamManifest vstream, DownloadOptions options)
+        /// <returns>The video to download.</returns>
+        public IVideoStreamInfo? SelectBestVideo(StreamManifest vinfo, DownloadOptions options)
         {
-            vstream.CheckNotNull(nameof(vstream));
+            vinfo.CheckNotNull(nameof(vinfo));
+            options.CheckNotNull(nameof(options));
 
-            var maxResolutionList = (from v in vstream.GetAudio().Cast<IStreamInfo>().Union(vstream.GetVideo()).Union(vstream.GetMuxed())
-                                     where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
-                                     orderby GetVideoHeight(v) descending
-                                     orderby GetVideoFrameRate(v) descending
-                                     select v).ToList();
-
-            maxResolutionList = maxResolutionList.Where(v => GetVideoHeight(v) == GetVideoHeight(maxResolutionList.First())).ToList();
-
-            var bestVideo = (from v in maxResolutionList
-                                 // WebM VP9 encodes ~30% better. non-DASH is VP8 and isn't better than MP4.
-                             let Preference = (int)(GetVideoEncoding(v) == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
-                             where options.PreferredFormat == SelectStreamFormat.Best ||
-                                (options.PreferredFormat == SelectStreamFormat.MP4 && GetVideoEncoding(v) == VideoEncoding.H264) ||
-                                (options.PreferredFormat == SelectStreamFormat.VP9 && GetVideoEncoding(v) == VideoEncoding.Vp9)
-                             orderby Preference descending
-                             select v).FirstOrDefault();
-
-            bestVideo ??= maxResolutionList.FirstOrDefault();
-
-            if (bestVideo != null)
-            {
-                var result = new BestFormatInfo
-                {
-                    BestVideo = bestVideo as IVideoStreamInfo,
-                    BestAudio = SelectBestAudio(vstream, options)
-                };
-                return result;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Selects Opus audio if available, otherwise Vorbis or AAC.
-        /// </summary>
-        /// <param name="vinfo">The list of available audio streams.</param>
-        /// <param name="options">Options for stream selection.</param>
-        /// <returns>The audio to download.</returns>
-        public IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
-        {
-            if (vinfo == null || !vinfo.GetAudio().Any())
+            if (options.PreferredVideo == SelectStreamFormat.None)
             {
                 return null;
             }
 
-            var bestAudio = (from v in vinfo.GetAudio()
-                                 // Opus encodes ~20% better, Vorbis ~10% better than AAC
-                             let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
-                             where options.PreferredAudio == SelectStreamFormat.Best ||
-                             (options.PreferredAudio == SelectStreamFormat.MP4 && (v.AudioCodec == AudioEncoding.Aac)) ||
-                             (options.PreferredAudio == SelectStreamFormat.VP9 && (v.AudioCodec == AudioEncoding.Opus || v.AudioCodec == AudioEncoding.Vorbis))
-                             orderby Preference descending
-                             select v).FirstOrDefault();
-            return bestAudio;
+            var orderedList = (from v in vinfo.GetVideo()
+                               where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
+                               orderby GetVideoHeight(v) descending
+                               orderby (v as IVideoStreamInfo)?.Framerate.FramesPerSecond ?? 0 descending
+                               select v).ToList();
+
+            var maxRes = GetVideoHeight(orderedList.First());
+            var maxResList = orderedList.Where(v => GetVideoHeight(v) == maxRes).ToList();
+
+            return (from v in maxResList
+                        // WebM VP9 encodes ~30% better. VP8 isn't better than MP4.
+                    let Preference = (int)(v.VideoCodec == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
+                    where options.PreferredVideo == SelectStreamFormat.Best || ContainerEquals(options.PreferredVideo, v)
+                    orderby Preference descending
+                    select v).FirstOrDefault();
         }
 
         /// <summary>
-        /// Returns the encoding format of specified download stream.
+        /// Selects the best audio stream available according to options.
         /// </summary>
-        /// <param name="stream">The download stream for which to get the encoding.</param>
-        /// <returns>The video encoding format.</returns>
-        public string GetVideoEncoding(IStreamInfo stream)
+        /// <param name="vinfo">The list of available streams.</param>
+        /// <param name="options">Options for stream selection.</param>
+        /// <returns>The audio to download.</returns>
+        public IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
         {
-            var vInfo = stream as IVideoStreamInfo;
-            var mInfo = stream as MuxedStreamInfo;
-            if (vInfo == null && mInfo == null)
+            vinfo.CheckNotNull(nameof(vinfo));
+            options.CheckNotNull(nameof(options));
+
+            if (options.PreferredAudio == SelectStreamFormat.None)
             {
-                return VideoEncoding.H264;
+                return null;
             }
 
-            return vInfo?.VideoCodec ?? mInfo?.VideoCodec ?? string.Empty;
+            return (from v in vinfo.GetAudio()
+                        // Opus encodes ~20% better, Vorbis ~10% better than AAC
+                    let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
+                    where options.PreferredAudio == SelectStreamFormat.Best || ContainerEquals(options.PreferredAudio, v)
+                    orderby Preference descending
+                    select v).FirstOrDefault();
+        }
+
+        private bool ContainerEquals(SelectStreamFormat option, IStreamInfo streamInfo)
+        {
+            return string.Equals(option.ToString(), streamInfo.Container.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -161,28 +140,82 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
-        /// Returns the frame rate of specified video stream.
+        /// Returns the file extension for specified video type.
+        /// To avoid conflicting file names, the codec extension must be different than the final extension.
         /// </summary>
-        /// <param name="stream">The stream to get information for.</param>
-        /// <returns>The video frame rate.</returns>
-        public double GetVideoFrameRate(IStreamInfo stream)
+        /// <param name="video">The video type to get file extension for.</param>
+        /// <returns>The file extension.</returns>
+        public string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
         {
-            var vInfo = stream as IVideoStreamInfo;
-            return vInfo?.Framerate.FramesPerSecond ?? 0;
+            if (video != null && audio == null)
+            {
+                // Video-only
+                if (video.Container == Container.WebM)
+                {
+                    return "webm";
+                }
+                else if (video.Container == Container.Mp4)
+                {
+                    return "mp4";
+                }
+                else if (video.Container == Container.Tgpp)
+                {
+                    return "mp4"; // ?
+                }
+            }
+            else if (audio != null && video == null)
+            {
+                // Audio-only
+                if (audio.Container == Container.Mp4)
+                {
+                    return "m4a";
+                }
+                else if (audio.Container == Container.Tgpp)
+                {
+                    return "mp4v"; // ?
+                }
+                else if (audio.AudioCodec == AudioEncoding.Opus)
+                {
+                    return "opus";
+                }
+                else if (audio.AudioCodec == AudioEncoding.Vorbis)
+                {
+                    return "ogg";
+                }
+            }
+            else if (audio != null && video != null)
+            {
+                // Both
+                if (video.Container == Container.WebM && audio.Container == Container.WebM)
+                {
+                    return "webm";
+                }
+                else if (video.Container == Container.Mp4 && audio.Container == Container.Mp4)
+                {
+                    return "mp4";
+                }
+                else if (video.Container == Container.Tgpp && audio.Container == Container.Tgpp)
+                {
+                    return "mp4"; // ?
+                }
+                else
+                {
+                    return "mkv";
+                }
+            }
+            return "mkv";
         }
 
         private static class VideoEncoding
         {
-            public const string H264 = "H264";
-            public const string Vp9 = "Vp9";
-            public const string Vp8 = "Vp8";
+            public const string Vp9 = "vp9";
+            public const string Vp8 = "vp8";
         }
 
         private static class AudioEncoding
         {
-            public const string Aac = "Aac";
-            public const string Opus = "Opus";
-            public const string Vorbis = "Vorbis";
+            public const string Opus = "opus";
+            public const string Vorbis = "vorbis";
         }
     }
 }

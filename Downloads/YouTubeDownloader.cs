@@ -22,7 +22,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns information about specified YouTube video.
         /// </summary>
-        /// <param name="id">The id of the video.</param>
+        /// <param name="videoId">The id of the video.</param>
         /// <returns>The video info.</returns>
         public async Task<Video> QueryVideoAsync(VideoId videoId)
         {
@@ -33,7 +33,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns streams information for specified YouTube video.
         /// </summary>
-        /// <param name="id">The id of the video.</param>
+        /// <param name="videoId">The id of the video.</param>
         /// <returns>Information about available streams.</returns>
         public async Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId)
         {

@@ -9,6 +9,8 @@ namespace HanumanInstitute.Downloads
     {
         Best,
         MP4,
-        VP9
+        WebM,
+        Tgpp,
+        None
     }
 }

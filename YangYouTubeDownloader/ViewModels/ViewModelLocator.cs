@@ -13,13 +13,17 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommonServiceLocator;
 using CommonServiceLocator.WindsorAdapter;
+using GalaSoft.MvvmLight;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
+using HanumanInstitute.Downloads;
+using HanumanInstitute.FFmpeg;
 //using HanumanInstitute.YangYouTubeDownloader.Business;
 //using HanumanInstitute.YangYouTubeDownloader.Views;
 using MvvmDialogs;
@@ -32,16 +36,16 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
     /// </summary>
     public class ViewModelLocator
     {
-        private static ViewModelLocator s_instance;
-        public static ViewModelLocator Instance => s_instance ?? (s_instance = (ViewModelLocator)Application.Current.FindResource("Locator"));
+        private readonly IServiceLocator _locator;
 
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
         public ViewModelLocator()
         {
-            var container = new WindsorContainer();
-            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
+            using var container = new WindsorContainer();
+            _locator = new WindsorServiceLocator(container);
+            ServiceLocator.SetLocatorProvider(() => _locator);
 
             ////if (ViewModelBase.IsInDesignModeStatic)
             ////{
@@ -55,18 +59,28 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             ////}
 
             container.AddCommonServices();
-
-            container.Register(Component.For<MainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);
-            //container.Register(Component.For<SelectPresetViewModel>().ImplementedBy<SelectPresetViewModel>()
-            //    .DependsOn().LifeStyle.Transient);
+            container.AddDownloads();
+            container.AddFFmpeg();
 
             container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
                 .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
+
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModelDesign>().LifeStyle.Transient);
+            }
+            else
+            {
+                container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);
+            }
+            //container.Register(Component.For<SelectPresetViewModel>().ImplementedBy<SelectPresetViewModel>()
+            //    .DependsOn().LifeStyle.Transient);
+
             //container.Register(Component.For<AppSettingsProvider>().ImplementedBy<AppSettingsProvider>().LifeStyle.Singleton);
             //container.Register(Component.For<IAppPathService>().ImplementedBy<AppPathService>().LifeStyle.Singleton);
         }
 
-        public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
+        public IMainViewModel Main => _locator.GetInstance<IMainViewModel>();
 
         //public SelectPresetViewModel SelectPreset => ServiceLocator.Current.GetInstance<SelectPresetViewModel>();
 

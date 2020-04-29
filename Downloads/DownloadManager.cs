@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using YoutubeExplode.Videos;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.Downloads.Properties;
+using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
 {
@@ -47,8 +48,9 @@ namespace HanumanInstitute.Downloads
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadStatus> DownloadAsync(string url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true) =>
-            await DownloadAsync(new Uri(url), destination, taskCreatedCallback, downloadVideo, downloadAudio).ConfigureAwait(false);
+        public async Task<DownloadStatus> DownloadAsync(string url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null,
+            bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null) =>
+                await DownloadAsync(new Uri(url), destination, taskCreatedCallback, downloadVideo, downloadAudio, options).ConfigureAwait(false);
 
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.
@@ -61,13 +63,14 @@ namespace HanumanInstitute.Downloads
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadStatus> DownloadAsync(Uri url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null, bool downloadVideo = true, bool downloadAudio = true)
+        public async Task<DownloadStatus> DownloadAsync(Uri url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null,
+            bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null)
         {
             url.CheckNotNull(nameof(url));
             destination.CheckNotNullOrEmpty(nameof(destination));
             if (!downloadVideo && !downloadAudio) { throw new ArgumentException(Resources.NoVideoNoAudio); }
 
-            var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, _options.Value.Clone());
+            var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, options ?? _options.Value.Clone());
 
             // Notify UI of new download to show window.
             var e = new DownloadTaskEventArgs(task);
@@ -91,59 +94,47 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
-        /// Returns the title for specified download URL.
+        /// Returns information about specified video.
         /// </summary>
-        /// <param name="url">The download URL to get the title for.</param>
-        /// <returns>A title, or null if it failed to retrieve the title.</returns>
+        /// <param name="url">The URL to probe.</param>
+        /// <returns>The download information.</returns>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<string> GetVideoTitleAsync(string url) =>
-            await GetVideoTitleAsync(new Uri(url)).ConfigureAwait(false);
+        public async Task<Video> QueryVideoAsync(string url) =>
+            await QueryVideoAsync(new Uri(url)).ConfigureAwait(false);
 
         /// <summary>
-        /// Returns the title for specified download URL.
+        /// Returns information about specified video.
         /// </summary>
-        /// <param name="url">The download URL to get the title for.</param>
-        /// <returns>A title, or null if it failed to retrieve the title.</returns>
+        /// <param name="url">The URL to probe.</param>
+        /// <returns>The download information.</returns>
         /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
         /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
         /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<string> GetVideoTitleAsync(Uri url)
+        public async Task<Video> QueryVideoAsync(Uri url)
         {
             var id = ParseVideoId(url.CheckNotNull(nameof(url)));
-
-            var vInfo = await _youTube.QueryVideoAsync(id).ConfigureAwait(false);
-            return vInfo.Title;
+            return await _youTube.QueryVideoAsync(id).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Returns the download info for specified URL.
+        /// Returns streams information for specified video.
         /// </summary>
         /// <param name="url">The URL to probe.</param>
-        /// <returns>The download information.</returns>
-        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
-        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
-        /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<VideoInfo?> GetDownloadInfoAsync(string url) =>
-            await GetDownloadInfoAsync(new Uri(url)).ConfigureAwait(false);
+        /// <returns>Information about available streams.</returns>
+        public async Task<StreamManifest> QueryStreamInfoAsync(string url) =>
+            await QueryStreamInfoAsync(new Uri(url)).ConfigureAwait(false);
 
         /// <summary>
-        /// Returns the download info for specified URL.
+        /// Returns streams information for specified video.
         /// </summary>
         /// <param name="url">The URL to probe.</param>
-        /// <returns>The download information.</returns>
-        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
-        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
-        /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<VideoInfo?> GetDownloadInfoAsync(Uri url)
+        /// <returns>Information about available streams.</returns>
+        public async Task<StreamManifest> QueryStreamInfoAsync(Uri url)
         {
             var id = ParseVideoId(url.CheckNotNull(nameof(url)));
-
-            var t1 = _youTube.QueryVideoAsync(id);
-            var t2 = _youTube.QueryStreamInfoAsync(id);
-            await Task.WhenAll(new Task[] { t1, t2 }).ConfigureAwait(false);
-            return new VideoInfo(t1.Result, t2.Result);
+            return await _youTube.QueryStreamInfoAsync(id).ConfigureAwait(false);
         }
 
         /// <summary>

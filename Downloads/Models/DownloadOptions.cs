@@ -17,7 +17,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the preferred video stream type to download.
         /// </summary>
-        public SelectStreamFormat PreferredFormat { get; set; } = SelectStreamFormat.Best;
+        public SelectStreamFormat PreferredVideo { get; set; } = SelectStreamFormat.Best;
         /// <summary>
         /// Gets or sets the preferred audio stream type to download.
         /// </summary>

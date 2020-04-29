@@ -7,6 +7,7 @@
     <RootNamespace>HanumanInstitute.YangYouTubeDownloader</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,6 +21,10 @@
   <ItemGroup>
     <Compile Remove="Views\MainWindow.xaml.cs" />
     <Compile Remove="Views\_MainWindow.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\App.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,13 +44,34 @@
     </PackageReference>
     <PackageReference Include="MvvmDialogs" Version="7.0.0" />
     <PackageReference Include="MvvmLight" Version="5.4.1.1" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg.Windsor\FFmpeg.Windsor.csproj" />
     <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
     <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
     <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
     <ProjectReference Include="..\Downloads\Downloads.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\App.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

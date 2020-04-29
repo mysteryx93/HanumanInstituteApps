@@ -54,10 +54,6 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         event DownloadTaskEventHandler? ProgressUpdated;
         /// <summary>
-        /// Gets or sets the title of the downloaded media.
-        /// </summary>
-        string Title { get; set; }
-        /// <summary>
         /// Gets or sets the progress of all streams as percentage.
         /// </summary>
         double ProgressValue { get; }

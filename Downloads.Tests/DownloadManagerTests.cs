@@ -8,6 +8,7 @@ using HanumanInstitute.FFmpeg;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads.Tests
@@ -62,23 +63,23 @@ namespace HanumanInstitute.Downloads.Tests
         }
 
         [Fact]
-        public async void GetVideoTitleAsync_ValidUrl_ReturnsTitle()
+        public async void QueryVideoAsync_ValidUrl_ReturnsTitle()
         {
             using var model = SetupModel();
 
-            var result = await model.GetVideoTitleAsync(new Uri(VideoUrl));
+            var result = await model.QueryVideoAsync(new Uri(VideoUrl));
 
-            Assert.Equal(VideoTitle, result);
+            Assert.Equal(VideoTitle, result.Title);
         }
 
         [Fact]
-        public async void GetVideoTitleAsync_ValidString_ReturnsTitle()
+        public async void QueryVideoAsync_ValidString_ReturnsTitle()
         {
             using var model = SetupModel();
 
-            var result = await model.GetVideoTitleAsync(VideoUrl);
+            var result = await model.QueryVideoAsync(VideoUrl);
 
-            Assert.Equal(VideoTitle, result);
+            Assert.Equal(VideoTitle, result.Title);
         }
 
         [Theory]
@@ -86,38 +87,16 @@ namespace HanumanInstitute.Downloads.Tests
         [InlineData("abc")]
         [InlineData("https://")]
         [InlineData("https://www.youtube.com/watch")]
-        public async void GetVideoTitleAsync_InvalidString_ThrowsUriFormatException(string url)
+        public async void QueryVideoAsync_InvalidString_ThrowsUriFormatException(string url)
         {
             using var model = SetupModel();
 
-            async Task<string> Act()
+            async Task<Video> Act()
             {
-                return await model.GetVideoTitleAsync(url);
+                return await model.QueryVideoAsync(url);
             }
 
             await Assert.ThrowsAsync<UriFormatException>(Act);
-        }
-
-        [Fact]
-        public async void GetDownloadInfoAsync_ValidUrl_ReturnsTitle()
-        {
-            using var model = SetupModel();
-
-            var result = await model.GetDownloadInfoAsync(new Uri(VideoUrl));
-
-            Assert.Equal(VideoTitle, result?.Info.Title);
-            Assert.NotNull(result?.Streams);
-        }
-
-        [Fact]
-        public async void GetDownloadInfoAsync_ValidString_ReturnsTitle()
-        {
-            using var model = SetupModel();
-
-            var result = await model.GetDownloadInfoAsync(VideoUrl);
-
-            Assert.Equal(VideoTitle, result?.Info.Title);
-            Assert.NotNull(result?.Streams);
         }
 
         [Theory]
@@ -130,9 +109,9 @@ namespace HanumanInstitute.Downloads.Tests
             using var model = SetupModel();
             _mockYouTube.Configure(url, string.Empty);
 
-            async Task<VideoInfo?> Act()
+            async Task<Video> Act()
             {
-                return await model.GetDownloadInfoAsync(url);
+                return await model.QueryVideoAsync(url);
             }
 
             await Assert.ThrowsAsync<UriFormatException>(Act);

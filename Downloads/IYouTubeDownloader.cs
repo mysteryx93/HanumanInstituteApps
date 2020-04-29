@@ -14,13 +14,13 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Returns information about specified YouTube video.
         /// </summary>
-        /// <param name="id">The id of the video.</param>
+        /// <param name="videoId">The id of the video.</param>
         /// <returns>The video info.</returns>
         Task<Video> QueryVideoAsync(VideoId videoId);
         /// <summary>
         /// Returns streams information for specified YouTube video.
         /// </summary>
-        /// <param name="id">The id of the video.</param>
+        /// <param name="videoId">The id of the video.</param>
         /// <returns>Information about available streams.</returns>
         Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId);
         /// <summary>

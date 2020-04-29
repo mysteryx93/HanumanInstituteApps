@@ -77,10 +77,6 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         public event DownloadTaskEventHandler? ProgressUpdated;
         /// <summary>
-        /// Gets or sets the title of the downloaded media.
-        /// </summary>
-        public string Title { get; set; } = string.Empty;
-        /// <summary>
         /// Gets or sets the progress of all streams as percentage.
         /// </summary>
         public double ProgressValue { get; internal set; }
@@ -106,52 +102,48 @@ namespace HanumanInstitute.Downloads
             _fileSystem.EnsureDirectoryExists(Destination);
 
             // Query the download URL for the right file.
-            Video? vInfo = null;
-            StreamManifest? vStream = null;
-
+            StreamManifest? streams = null;
             try
             {
-                var id = new VideoId(Url.AbsoluteUri);
-                var t1 = _youTube.QueryVideoAsync(id);
-                var t2 = _youTube.QueryStreamInfoAsync(id);
-                await Task.WhenAll(new Task[] { t1, t2 }).ConfigureAwait(false);
-                vInfo = t1.Result;
-                vStream = t2.Result;
+                streams = await _youTube.QueryStreamInfoAsync(Url.AbsoluteUri).ConfigureAwait(false);
             }
             catch (HttpRequestException) { }
             catch (TaskCanceledException) { }
 
             // Get the highest resolution format.
-            var bestFileNullable = vStream != null ? _streamSelector.SelectBestFormat(vStream, _options) : null;
+            IVideoStreamInfo? bestVideo = null;
+            IAudioStreamInfo? bestAudio = null;
+            if (streams != null)
+            {
+                bestVideo = _streamSelector.SelectBestVideo(streams, _options);
+                bestAudio = _streamSelector.SelectBestAudio(streams, _options);
+            }
 
             // Make sure we could retrieve download streams.
-            if (bestFileNullable == null)
+            if (bestVideo == null && bestAudio == null)
             {
                 Status = DownloadStatus.Failed;
                 return;
             }
 
-            var bestFile = bestFileNullable;
-            bestFile.Duration = vInfo?.Duration ?? TimeSpan.Zero;
-
             // Add the best video stream.
-            if (bestFile.BestVideo != null && DownloadVideo)
+            if (bestVideo != null && DownloadVideo)
             {
-                Files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestFile.BestVideo.Url),
-                    _fileSystem.GetPathWithoutExtension(Destination) + GetVideoExtension(_streamSelector.GetVideoEncoding(bestFile.BestVideo)),
-                    bestFile.BestVideo, bestFile.BestVideo.Size.TotalBytes));
+                Files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestVideo.Url),
+                    _fileSystem.GetPathWithoutExtension(Destination) + ".video",
+                    bestVideo, bestVideo.Size.TotalBytes));
             }
 
             // Add the best audio stream.
-            if (bestFile.BestAudio != null && DownloadAudio)
+            if (bestAudio != null && DownloadAudio)
             {
-                Files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestFile.BestAudio.Url),
-                    _fileSystem.GetPathWithoutExtension(Destination) + GetAudioExtension(bestFile.BestAudio.AudioCodec),
-                    bestFile.BestAudio, bestFile.BestAudio.Size.TotalBytes));
+                Files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestAudio.Url),
+                    _fileSystem.GetPathWithoutExtension(Destination) + ".audio",
+                    bestAudio, bestAudio.Size.TotalBytes));
             }
 
             // Add extension if Destination doesn't already include it.
-            var ext = GetFinalExtension(bestFile.BestVideo, bestFile.BestAudio);
+            var ext = "." + _streamSelector.GetFinalExtension(bestVideo, bestAudio);
             if (!Destination.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
             {
                 Destination += ext;
@@ -234,6 +226,7 @@ namespace HanumanInstitute.Downloads
         private async Task DownloadCompletedAsync()
         {
             Status = DownloadStatus.Finalizing;
+            _fileSystem.DeleteFileSilent(Destination);
             if (BeforeMuxing != null)
             {
                 try
@@ -307,6 +300,7 @@ namespace HanumanInstitute.Downloads
                 // Updates the status information.
                 _status = value;
                 ProgressText = GetStatusText(value);
+                ProgressUpdated?.Invoke(this, new DownloadTaskEventArgs(this));
 
                 static string GetStatusText(DownloadStatus status)
                 {
@@ -337,7 +331,7 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         private void UpdateProgress()
         {
-            if (Status != DownloadStatus.Downloading) { throw new InvalidOperationException(Resources.UpdateProgressInvalidStatus); }
+            if (Status != DownloadStatus.Downloading) { return; }
 
             long totalBytes = 0;
             long downloaded = 0;
@@ -397,103 +391,5 @@ namespace HanumanInstitute.Downloads
         /// Returns whether the download was canceled or failed.
         /// </summary>
         private bool IsCancelled => (Status == DownloadStatus.Canceled || Status == DownloadStatus.Failed);
-
-
-        /// <summary>
-        /// Returns the file extensions that can be created by the downloader.
-        /// </summary>
-        //public IList<string> DownloadedExtensions => _downloadedExtensions ?? (_downloadedExtensions = new List<string> { ".mp4", ".webm", ".mkv", ".flv" });
-        //private IList<string> _downloadedExtensions;
-
-        /// <summary>
-        /// Returns the file extension for specified audio type.
-        /// </summary>
-        /// <param name="audio">The audio type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-#pragma warning disable CA1308 // Normalize strings to uppercase
-        private static string GetVideoExtension(string codec)
-        {
-            codec.CheckNotNullOrEmpty(nameof(codec));
-            return "." + codec.ToLowerInvariant();
-        }
-
-        public static string FileWithExt(string file, string ext)
-        {
-            file.CheckNotNullOrEmpty(nameof(file));
-            ext.CheckNotNullOrEmpty(nameof(ext));
-            return file + "." + ext.ToLowerInvariant();
-        }
-
-        /// <summary>
-        /// Returns the file extension for specified audio type.
-        /// </summary>
-        /// <param name="codec">The audio type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-        private static string GetAudioExtension(string codec)
-        {
-            codec.CheckNotNullOrEmpty(nameof(codec));
-            return "." + codec.ToLowerInvariant();
-        }
-#pragma warning restore CA1308 // Normalize strings to uppercase
-
-        /// <summary>
-        /// Returns the file extension for specified video codec type.
-        /// To avoid conflicting file names, the codec extension must be different than the final extension.
-        /// </summary>
-        /// <param name="video">The video type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-        private static string GetCodecExtension(Container video)
-        {
-            if (video.Equals(Container.WebM))
-            {
-                return ".vp9";
-            }
-            else if (video.Equals(Container.Mp4))
-            {
-                return ".h264";
-            }
-            else if (video.Equals(Container.Tgpp))
-            {
-                return ".mp4v";
-            }
-            else
-            {
-                return ".avi";
-            }
-        }
-
-        /// <summary>
-        /// Returns the file extension for specified video type.
-        /// To avoid conflicting file names, the codec extension must be different than the final extension.
-        /// </summary>
-        /// <param name="video">The video type to get file extension for.</param>
-        /// <returns>The file extension.</returns>
-        private static string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
-        {
-            if ((video == null || video.Container.Equals(Container.WebM)) && (audio == null || audio.Container.Equals(Container.WebM)))
-            {
-                return ".webm";
-            }
-            else if ((video == null || video.Container.Equals(Container.Mp4)) && (audio == null || audio.Container.Equals(Container.Mp4)))
-            {
-                return ".mp4";
-            }
-            else if (video != null && (video.Container.Equals(Container.Mp4) || video.Container.Equals(Container.WebM)))
-            {
-                return ".mkv";
-            }
-            else if (video != null)
-            {
-                return GetCodecExtension(video.Container);
-            }
-            else if (audio != null)
-            {
-                return GetCodecExtension(audio.Container);
-            }
-            else
-            {
-                return "";
-            }
-        }
     }
 }
