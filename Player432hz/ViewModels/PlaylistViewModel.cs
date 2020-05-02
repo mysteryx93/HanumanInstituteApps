@@ -6,6 +6,7 @@ using MvvmDialogs.FrameworkDialogs.FolderBrowser;
 using HanumanInstitute.CommonUI;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Player432hz.Business;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -47,7 +48,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Shows a folder picker and adds selected folder to the list.
         /// </summary>
         public ICommand AddFolderCommand => CommandHelper.InitCommand(ref addFolderCommand, OnAddFolder, () => CanAddFolder);
-        private ICommand addFolderCommand;
+        private RelayCommand addFolderCommand;
         private static bool CanAddFolder => true;
         private void OnAddFolder()
         {
@@ -68,7 +69,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Removes selected folder from the list.
         /// </summary>
         public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
-        private ICommand removeFolderCommand;
+        private RelayCommand removeFolderCommand;
         private bool CanRemoveFolder => Folders.SelectedIndex > -1 && Folders.SelectedIndex < Folders.List.Count;
         private void OnRemoveFolder()
         {

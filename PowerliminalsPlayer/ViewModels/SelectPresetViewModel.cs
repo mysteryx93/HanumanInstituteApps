@@ -7,6 +7,7 @@ using HanumanInstitute.CommonWpfApp;
 using GalaSoft.MvvmLight;
 using MvvmDialogs;
 using PropertyChanged;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 {
@@ -51,7 +52,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand confirmCommand;
+        private RelayCommand confirmCommand;
         public ICommand ConfirmCommand => CommandHelper.InitCommand(ref confirmCommand, OnConfirm, () => CanConfirm);
         private bool CanConfirm => ModeSave ? !string.IsNullOrWhiteSpace(PresetName) : SelectedItem != null;
         private void OnConfirm()
@@ -63,7 +64,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand deleteCommand;
+        private RelayCommand deleteCommand;
         public ICommand DeleteCommand => CommandHelper.InitCommand(ref deleteCommand, OnDelete, () => CanDelete);
         private bool CanDelete => SelectedItem != null;
         private void OnDelete()

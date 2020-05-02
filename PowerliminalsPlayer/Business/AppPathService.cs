@@ -12,7 +12,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         protected readonly IEnvironmentService environment;
         protected readonly IFileSystemService fileSystem;
 
-        public AppPathService() : this(new EnvironmentService(), new FileSystemService()) { }
+        // public AppPathService() : this(new EnvironmentService(), new FileSystemService()) { }
 
         public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService)
         {

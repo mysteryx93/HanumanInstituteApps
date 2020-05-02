@@ -20,7 +20,6 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             services.Register(Component.For<IScriptFactory>().ImplementedBy<ScriptFactory>().LifeStyle.Transient);
             services.Register(Component.For<IScriptPathService>().ImplementedBy<ScriptPathService>().LifeStyle.Transient);
             services.Register(Component.For<IShortFileNameService>().ImplementedBy<ShortFileNameService>().LifeStyle.Transient);
-            services.Register(Component.For<IFileSystem>().ImplementedBy<FileSystem>().LifeStyle.Transient);
 
             return services;
         }

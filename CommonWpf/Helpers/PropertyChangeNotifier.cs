@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using HanumanInstitute.CommonServices;
 
 // PropertyDescriptor AddValueChanged Alternative
 // https://agsmith.wordpress.com/2008/04/07/propertydescriptor-addvaluechanged-alternative/
@@ -19,35 +20,38 @@ namespace HanumanInstitute.CommonWpf
 
         public PropertyChangeNotifier(DependencyObject propertySource, string path)
         : this(propertySource, new PropertyPath(path))
-        {
-        }
+        { }
+
         public PropertyChangeNotifier(DependencyObject propertySource, DependencyProperty property)
         : this(propertySource, new PropertyPath(property))
-        {
-        }
+        { }
+
         public PropertyChangeNotifier(DependencyObject propertySource, PropertyPath property)
         {
-            if (null == propertySource)
-                throw new ArgumentNullException(nameof(propertySource));
-            if (null == property)
-                throw new ArgumentNullException(nameof(property));
-            this._propertySource = new WeakReference(propertySource);
-            Binding binding = new Binding();
-            binding.Path = property;
-            binding.Mode = BindingMode.OneWay;
-            binding.Source = propertySource;
+            propertySource.CheckNotNull(nameof(propertySource));
+            property.CheckNotNull(nameof(property));
+
+            _propertySource = new WeakReference(propertySource);
+            var binding = new Binding
+            {
+                Path = property,
+                Mode = BindingMode.OneWay,
+                Source = propertySource
+            };
             BindingOperations.SetBinding(this, ValueProperty, binding);
         }
 
-        public DependencyObject PropertySource {
-            get {
+        public DependencyObject? PropertySource
+        {
+            get
+            {
                 try
                 {
                     // note, it is possible that accessing the target property
                     // will result in an exception so i’ve wrapped this check
                     // in a try catch
-                    return this._propertySource.IsAlive
-                    ? this._propertySource.Target as DependencyObject
+                    return _propertySource.IsAlive
+                    ? _propertySource.Target as DependencyObject
                     : null;
                 }
                 catch
@@ -65,9 +69,8 @@ namespace HanumanInstitute.CommonWpf
 
         private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            PropertyChangeNotifier notifier = (PropertyChangeNotifier)d;
-            if (null != notifier.ValueChanged)
-                notifier.ValueChanged(notifier.PropertySource, EventArgs.Empty);
+            var notifier = (PropertyChangeNotifier)d.CheckNotNull(nameof(d));
+            notifier.ValueChanged?.Invoke(notifier.PropertySource, EventArgs.Empty);
         }
 
         /// <summary>
@@ -77,28 +80,31 @@ namespace HanumanInstitute.CommonWpf
         [Description("Returns / sets the value of the property")]
         [Category("Behavior")]
         [Bindable(true)]
-        public object Value {
-            get {
-                return (object)this.GetValue(PropertyChangeNotifier.ValueProperty);
+        public object Value
+        {
+            get
+            {
+                return (object)GetValue(PropertyChangeNotifier.ValueProperty);
             }
-            set {
-                this.SetValue(PropertyChangeNotifier.ValueProperty, value);
+            set
+            {
+                SetValue(PropertyChangeNotifier.ValueProperty, value);
             }
         }
 
-        public event EventHandler ValueChanged;
+        public event EventHandler? ValueChanged;
 
-        private bool disposedValue = false;
+        private bool _disposedValue = false;
 
         void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
                     BindingOperations.ClearBinding(this, ValueProperty);
                 }
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

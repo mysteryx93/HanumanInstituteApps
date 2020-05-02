@@ -44,6 +44,7 @@
     </PackageReference>
     <PackageReference Include="MvvmDialogs" Version="7.0.0" />
     <PackageReference Include="MvvmLight" Version="5.4.1.1" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
   </ItemGroup>
 

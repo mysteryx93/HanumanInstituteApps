@@ -1,6 +1,7 @@
-﻿using HanumanInstitute.FFmpeg;
-using System;
+﻿using System;
 using System.IO.Abstractions;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.AvisynthScriptBuilder
 {
@@ -34,20 +35,21 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <returns>The frame count.</returns>
         public long GetFrameCount(string source, ProcessOptionsEncoder options)
         {
+            source.CheckNotNullOrEmpty(nameof(source));
             if (!_fileSystem.File.Exists(source))
             {
                 return 0;
             }
 
-            string TempScriptBase = _fileSystem.Path.ChangeExtension(source, null);
-            string TempScript = _scriptPath.GetTempFile("avs");
-            string TempResult = _fileSystem.Path.ChangeExtension(TempScript, "txt");
+            var TempScriptBase = _fileSystem.Path.ChangeExtension(source, null);
+            var TempScript = _scriptPath.GetTempFile("avs");
+            var TempResult = _fileSystem.Path.ChangeExtension(TempScript, "txt");
 
             IScriptBuilderAvisynth Script;
             if (source.EndsWith(".avs", StringComparison.InvariantCultureIgnoreCase))
             {
                 // Read source script and remove MT. Also remove Deshaker if present.
-                string FileContent = _fileSystem.File.ReadAllText(source);
+                var FileContent = _fileSystem.File.ReadAllText(source);
                 FileContent.Replace(_scriptPath.NewLine + "Deshaker", _scriptPath.NewLine + "#Deshaker");
                 Script = _scriptFactory.CreateAvisynthScript();
                 Script.Script = FileContent;
@@ -73,8 +75,8 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             long Result = 0;
             if (_fileSystem.File.Exists(TempResult))
             {
-                string FileString = _fileSystem.File.ReadAllText(TempResult);
-                string[] FileValues = FileString.Split(',');
+                var FileString = _fileSystem.File.ReadAllText(TempResult);
+                var FileValues = FileString.Split(',');
                 try
                 {
                     //Result.FrameRate = float.Parse(FileValues[0], CultureInfo.InvariantCulture);
@@ -100,27 +102,27 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <returns>A float value representing the audio gain that can be applied, or null if it failed.</returns>
         public float? GetAudioGain(string filePath, ProcessOptionsEncoder options)
         {
-            IProcessWorkerEncoder Worker = _ffmpegFactory.CreateEncoder(options);
-            string Args = string.Format(@"-i ""{0}"" -af ""volumedetect"" -f null NUL", filePath);
+            var Worker = _ffmpegFactory.CreateEncoder(options);
+            var Args = string.Format(@"-i ""{0}"" -af ""volumedetect"" -f null NUL", filePath);
             Worker.RunEncoder(Args, EncoderApp.FFmpeg);
             float? Result = null;
-            string FileString = Worker.Output;
+            var FileString = Worker.Output;
             // Find max_volume.
-            string SearchVal = "max_volume: ";
-            int Pos1 = FileString.IndexOf(SearchVal);
+            var SearchVal = "max_volume: ";
+            var Pos1 = FileString.IndexOf(SearchVal);
             if (Pos1 >= 0)
             {
                 Pos1 += SearchVal.Length;
                 // Find end of line.
-                int Pos2 = FileString.IndexOf('\r', Pos1);
+                var Pos2 = FileString.IndexOf('\r', Pos1);
                 if (Pos2 >= 0)
                 {
-                    string MaxVolString = FileString.Substring(Pos1, Pos2 - Pos1);
+                    var MaxVolString = FileString.Substring(Pos1, Pos2 - Pos1);
                     if (MaxVolString.Length > 3)
                     {
                         // Remove ' dB'
                         MaxVolString = MaxVolString.Substring(0, MaxVolString.Length - 3);
-                        if (float.TryParse(MaxVolString, out float MaxVol))
+                        if (float.TryParse(MaxVolString, out var MaxVol))
                         {
                             Result = Math.Abs(MaxVol);
                         }

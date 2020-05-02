@@ -1,4 +1,4 @@
-/*
+﻿/*
   In App.xaml:
   <Application.Resources>
       <vm:ViewModelLocator xmlns:vm="clr-namespace:HanumanInstitute.Player432hz"
@@ -13,20 +13,14 @@
 */
 
 using System;
-using System.ComponentModel;
-using System.Windows;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommonServiceLocator;
 using CommonServiceLocator.WindsorAdapter;
-using HanumanInstitute.AvisynthScriptBuilder;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.FFmpeg;
 using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.Player432hz.Views;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Ioc;
 using MvvmDialogs;
 using Component = Castle.MicroKernel.Registration.Component;
 
@@ -57,14 +51,8 @@ namespace HanumanInstitute.Player432hz.ViewModels
 
             // Services
             container.AddCommonServices();
-            container.AddAvisynthScriptBuilder();
             container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
                 .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
-
-            // FFmpeg
-            container.Register(Component.For<IMediaInfoReader>().ImplementedBy<MediaInfoReader>().LifeStyle.Transient);
-            container.Register(Component.For<IProcessWorkerFactory>().ImplementedBy<ProcessWorkerFactory>().LifeStyle.Transient);
-            // HanumanInstitute.FFmpeg.IProcessWorkerFactory
 
             // ViewModels
             container.Register(Component.For<MainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);
@@ -75,8 +63,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
             // Business
             container.Register(Component.For<IAppPathService>().ImplementedBy<AppPathService>().LifeStyle.Singleton);
             container.Register(Component.For<IFileLocator>().ImplementedBy<FileLocator>().LifeStyle.Transient);
-            container.Register(Component.For<PlaylistPlayer>().LifeStyle.Transient);
-            container.Register(Component.For<IPlaylistPlayer>().ImplementedBy<PlaylistPlayer432hz>().LifeStyle.Singleton);
+            container.Register(Component.For<IPlaylistPlayer>().ImplementedBy<PlaylistPlayer>().LifeStyle.Singleton);
 
             container.Dispose();
         }

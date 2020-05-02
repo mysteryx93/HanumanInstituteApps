@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using HanumanInstitute.CommonUI;
+using HanumanInstitute.CommonWpf;
 using Xunit;
 
 namespace HanumanInstitute.CommonWpfApp.Tests.CommonUI

@@ -7,6 +7,7 @@ using GalaSoft.MvvmLight;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.CommonUI;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -43,7 +44,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Adds a new playlist to the list.
         /// </summary>
         public ICommand AddPlaylistCommand => CommandHelper.InitCommand(ref addPlaylistCommand, OnAddPlaylist, () => CanAddPlaylist);
-        private ICommand addPlaylistCommand;
+        private RelayCommand addPlaylistCommand;
         private bool CanAddPlaylist => Playlists.List != null;
         private void OnAddPlaylist()
         {
@@ -59,7 +60,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Deletes selected playlist from the list.
         /// </summary>
         public ICommand DeletePlaylistCommand => CommandHelper.InitCommand(ref deletePlaylistCommand, OnDeletePlaylist, () => CanDeletePlaylist);
-        private ICommand deletePlaylistCommand;
+        private RelayCommand deletePlaylistCommand;
         private bool CanDeletePlaylist => Playlists.HasSelection;
         private void OnDeletePlaylist()
         {

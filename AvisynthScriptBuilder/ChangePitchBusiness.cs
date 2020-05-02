@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using HanumanInstitute.FFmpeg;
@@ -16,9 +17,9 @@ namespace HanumanInstitute.AvisynthScriptBuilder
 
         public ChangePitchBusiness(IScriptPathService scriptPathService, IScriptFactory scriptFactory, IFileSystem fileSystemService)
         {
-            this.scriptPath = scriptPathService ?? throw new ArgumentNullException(nameof(scriptPathService));
+            scriptPath = scriptPathService ?? throw new ArgumentNullException(nameof(scriptPathService));
             this.scriptFactory = scriptFactory ?? throw new ArgumentNullException(nameof(scriptFactory));
-            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+            fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
         }
 
         /// <summary>
@@ -26,23 +27,26 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         /// <param name="inputFile">The video to play.</param>
         /// <param name="fileInfo">An object containing media file information.</param>
-        public void GenerateScript(string inputFile, IFileInfoFFmpeg fileInfo, string scriptLocation)
+        public void GenerateScript(string inputFile, FileInfoFFmpeg fileInfo, string scriptLocation)
         {
-            IScriptBuilderAvisynth Script = scriptFactory.CreateAvisynthScript();
+            var Script = scriptFactory.CreateAvisynthScript();
             Script.AddPluginPath();
 
             //Script.AppendLine(@"SetFilterMTMode(""DEFAULT_MT_MODE"",2)");
             //Script.AppendLine(@"SetFilterMTMode(""LWLibavVideoSource"",3)");
             //Script.AppendLine(@"SetFilterMTMode(""LWLibavAudioSource"",3)");
-            bool IsAudio = scriptPath.AudioExtensions.Contains(fileSystem.Path.GetExtension(inputFile).ToLower());
+            var IsAudio = scriptPath.AudioExtensions.Contains(fileSystem.Path.GetExtension(inputFile).ToLower());
             Script.OpenDirect(inputFile, fileInfo.AudioStream != null, !IsAudio && fileInfo.VideoStream != null);
             if (IsAudio)
-                Script.AppendLine("AudioDub(BlankClip(Last, width=8, height=8), Last)");
-            Script.AppendLine("Preroll(int(FrameRate*3))");
+            {
+                Script.AppendLine(CultureInfo.InvariantCulture, "AudioDub(BlankClip(Last, width=8, height=8), Last)");
+            }
+
+            Script.AppendLine(CultureInfo.InvariantCulture, "Preroll(int(FrameRate*3))");
             // This causes a slight audio delay in AviSynth 2.6
             Script.LoadPluginDll("TimeStretch.dll");
-            Script.AppendLine("ResampleAudio(48000)");
-            Script.AppendLine("TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
+            Script.AppendLine(CultureInfo.InvariantCulture, "ResampleAudio(48000)");
+            Script.AppendLine(CultureInfo.InvariantCulture, "TimeStretchPlugin(pitch = 100.0 * 0.98181819915771484)");
             //Script.AppendLine("Prefetch({0})", CPU);
 
             Script.Cleanup();

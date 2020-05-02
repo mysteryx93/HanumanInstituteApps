@@ -5,13 +5,12 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using HanumanInstitute.CommonServices;
-using HanumanInstitute.MpvPlayerUI;
 using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
 using GalaSoft.MvvmLight;
 using MvvmDialogs;
 using PropertyChanged;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 {
@@ -114,7 +113,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand addFolderCommand;
+        private RelayCommand addFolderCommand;
         public ICommand AddFolderCommand => CommandHelper.InitCommand(ref addFolderCommand, OnAddFolder);
         private void OnAddFolder()
         {
@@ -126,7 +125,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand removeFolderCommand;
+        private RelayCommand removeFolderCommand;
         public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
         private bool CanRemoveFolder => SelectedFolderIndex > -1;
         private void OnRemoveFolder()
@@ -147,7 +146,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand playCommand;
+        private RelayCommand playCommand;
         public ICommand PlayCommand => CommandHelper.InitCommand(ref playCommand, OnPlay, () => CanPlay);
         private bool CanPlay => (SelectedFileIndex > -1);
 
@@ -160,7 +159,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand loadPresetCommand;
+        private RelayCommand loadPresetCommand;
         public ICommand LoadPresetCommand => CommandHelper.InitCommand(ref loadPresetCommand, OnLoadPreset, () => CanLoadPreset);
         private bool CanLoadPreset => AppData?.Presets?.Any() == true;
         private void OnLoadPreset()
@@ -179,7 +178,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private ICommand savePresetCommand;
+        private RelayCommand savePresetCommand;
         public ICommand SavePresetCommand => CommandHelper.InitCommand(ref savePresetCommand, OnSavePreset, () => CanSavePreset);
         private bool CanSavePreset => Playlist?.Files?.Any() == true;
         private void OnSavePreset()
@@ -212,7 +211,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
                 return null;
         }
 
-        private ICommand pauseCommand;
+        private RelayCommand pauseCommand;
         public ICommand PauseCommand => CommandHelper.InitCommand(ref pauseCommand, OnPause, () => CanPause);
         private bool CanPause => Playlist.Files?.Any() == true;
         private void OnPause()

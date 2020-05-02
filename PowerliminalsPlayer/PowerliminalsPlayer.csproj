@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -17,28 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\_MainWindow.xaml.cs" />
-    <Compile Remove="Views\_SelectPresetWindow.xaml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Icons\App.ico" />
     <None Remove="Icons\App.png" />
     <None Remove="Icons\delete.png" />
     <None Remove="Icons\pause.png" />
     <None Remove="Icons\play.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Remove="Views\_MainWindow.xaml" />
-    <Page Remove="Views\_SelectPresetWindow.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\_MainWindow.xaml" />
-    <None Include="Views\_MainWindow.xaml.cs" />
-    <None Include="Views\_SelectPresetWindow.xaml" />
-    <None Include="Views\_SelectPresetWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,9 +38,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MediaPlayerUI.NET\MediaPlayerUI\MediaPlayerUI.csproj" />
-    <ProjectReference Include="..\..\MediaPlayerUI.NET\MpvPlayerUI\MpvPlayerUI.csproj" />
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\NAudioPlayerUI\NAudioPlayerUI.csproj" />
     <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
-    <ProjectReference Include="..\CommonUI\CommonUI.csproj" />
     <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
     <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
   </ItemGroup>
@@ -75,9 +57,5 @@
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y /D $(SolutionDir)\..\DLL\mpv-1.dll $(ProjectDir)$(OutDir)" />
-  </Target>
 
 </Project>

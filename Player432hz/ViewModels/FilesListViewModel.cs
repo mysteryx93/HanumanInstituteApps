@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.CommonUI;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -70,7 +71,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
         /// </summary>
         public ICommand PlayCommand => CommandHelper.InitCommand(ref playCommand, OnPlay, CanPlay);
-        private ICommand playCommand;
+        private RelayCommand playCommand;
         private bool CanPlay() => Files?.List?.Any() == true;
         private void OnPlay()
         {

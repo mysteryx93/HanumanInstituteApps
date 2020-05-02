@@ -1,12 +1,11 @@
-﻿<Window xmlns:mpv="clr-namespace:HanumanInstitute.MpvPlayerUI;assembly=MpvPlayerUI"  
+﻿<Window xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
+        xmlns:naudio="clr-namespace:HanumanInstitute.NAudioPlayerUI;assembly=NAudioPlayerUI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayerUI;assembly=MediaPlayerUI"
         xmlns:common="clr-namespace:HanumanInstitute.CommonWpfApp;assembly=CommonWpfApp" 
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:cmd="http://www.galasoft.ch/mvvmlight" 
         xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf"
         x:Class="HanumanInstitute.Player432hz.Views.MainView"
@@ -106,8 +105,8 @@
                 <Binding Mode="OneWay" Path="Player" Source="{StaticResource Locator}" />
             </Grid.DataContext>
             <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False" StopCommandExecuted="{wpf:MethodBinding MediaFinished}">
-                <mpv:MpvMediaPlayerHost Source="{Binding Player.NowPlaying, Mode=TwoWay}" Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}" MediaFinished="{wpf:MethodBinding MediaFinished}"
-                    Volume="{Binding Source={StaticResource Locator}, Path=Settings.Current.Volume, Mode=TwoWay}" />
+                <naudio:NAudioPlayerHost Source="{Binding Player.NowPlaying, Mode=TwoWay}" Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}" MediaFinished="{wpf:MethodBinding MediaFinished}"
+                    Volume="{Binding Source={StaticResource Locator}, Path=Settings.Current.Volume, Mode=TwoWay}" Pitch="0.98181818181818181" />
             </ui:MediaPlayer>
         </Grid>
         <Grid Margin="132,120,10,54" Grid.Column="1">

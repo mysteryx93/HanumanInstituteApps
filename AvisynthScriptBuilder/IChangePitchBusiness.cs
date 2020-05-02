@@ -15,6 +15,6 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         /// <param name="inputFile">The video to play.</param>
         /// <param name="infoReader">An object to read media information.</param>
-        void GenerateScript(string inputFile, IFileInfoFFmpeg fileInfo, string scriptLocation);
+        void GenerateScript(string inputFile, FileInfoFFmpeg fileInfo, string scriptLocation);
     }
 }

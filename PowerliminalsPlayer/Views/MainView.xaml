@@ -1,4 +1,4 @@
-﻿<Window xmlns:mpv="clr-namespace:HanumanInstitute.MpvPlayerUI;assembly=MpvPlayerUI"  
+﻿<Window xmlns:naudio="clr-namespace:HanumanInstitute.NAudioPlayerUI;assembly=NAudioPlayerUI"
         x:Class="HanumanInstitute.PowerliminalsPlayer.Views.MainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -24,7 +24,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <ui:MediaPlayer IsLoopVisible="False">
-                            <mpv:MpvMediaPlayerHost Source="{Binding FullPath, Mode=TwoWay}" Volume="{Binding Volume, Mode=TwoWay}" SpeedInt="{Binding Speed, Mode=TwoWay}" IsPlaying="{Binding IsPlaying, Mode=TwoWay}" Loop="True" MediaUnloaded="{wpf:MethodBinding {Binding ViewModel, ElementName=UI}, MediaUnloaded, {Binding}}" />
+                            <naudio:NAudioPlayerHost Source="{Binding FullPath, Mode=TwoWay}" Volume="{Binding Volume, Mode=TwoWay}" SpeedInt="{Binding Speed, Mode=TwoWay}" IsPlaying="{Binding IsPlaying, Mode=TwoWay}" Loop="True" MediaUnloaded="{wpf:MethodBinding {Binding ViewModel, ElementName=UI}, MediaUnloaded, {Binding}}" PositionRefreshMilliseconds="500" />
                         </ui:MediaPlayer>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

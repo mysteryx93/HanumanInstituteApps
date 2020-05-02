@@ -90,6 +90,7 @@ namespace HanumanInstitute.CommonServices
             /// <summary>
             /// SHFILEOPSTRUCT for SHFileOperation from COM
             /// </summary>
+            [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "We must use fields instead of properties for API calls.")]
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
             internal struct SHFILEOPSTRUCT
             {
