@@ -52,9 +52,9 @@ namespace HanumanInstitute.CommonServices
         {
             var fs = new NativeMethods.SHFILEOPSTRUCT
             {
-                _func = ApiFileOperationType.Delete,
-                _from = path + '\0' + '\0',
-                _flags = flags
+                Func = ApiFileOperationType.Delete,
+                From = path + '\0' + '\0',
+                Flags = flags
             };
             ValidateHResult(NativeMethods.SHFileOperation(ref fs), "SHFileOperation");
         }
@@ -94,16 +94,16 @@ namespace HanumanInstitute.CommonServices
             [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
             internal struct SHFILEOPSTRUCT
             {
-                public IntPtr _hwnd;
+                public IntPtr Hwnd;
                 [MarshalAs(UnmanagedType.U4)]
-                public ApiFileOperationType _func;
-                public string _from;
-                public string _to;
-                public ApiFileOperationFlags _flags;
+                public ApiFileOperationType Func;
+                public string From;
+                public string To;
+                public ApiFileOperationFlags Flags;
                 [MarshalAs(UnmanagedType.Bool)]
-                public bool _anyOperationsAborted;
-                public IntPtr _nameMappings;
-                public string _progressTitle;
+                public bool AnyOperationsAborted;
+                public IntPtr NameMappings;
+                public string ProgressTitle;
             }
         }
     }

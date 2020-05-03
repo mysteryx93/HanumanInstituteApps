@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HanumanInstitute.CommonWpf.Properties {
+namespace HanumanInstitute.CommonWpfApp.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace HanumanInstitute.CommonWpf.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HanumanInstitute.CommonWpf.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HanumanInstitute.CommonWpfApp.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,65 +61,11 @@ namespace HanumanInstitute.CommonWpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BooleanAndConverter is a OneWay converter..
+        ///   Looks up a localized string similar to Could not find View &apos;{0}&apos; for ViewModel &apos;{1}&apos;..
         /// </summary>
-        internal static string BooleanAndConverterConvertBackNotSupported {
+        internal static string DialogLocatorViewNotFound {
             get {
-                return ResourceManager.GetString("BooleanAndConverterConvertBackNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The target property must be a boolean..
-        /// </summary>
-        internal static string InverseBooleanConverterTargetTypeNotBoolean {
-            get {
-                return ResourceManager.GetString("InverseBooleanConverterTargetTypeNotBoolean", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value is invalid.
-        /// </summary>
-        internal static string NumericRangeRuleInvalid {
-            get {
-                return ResourceManager.GetString("NumericRangeRuleInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value must be a multiple of {0}.
-        /// </summary>
-        internal static string NumericRangeRuleNotMultiple {
-            get {
-                return ResourceManager.GetString("NumericRangeRuleNotMultiple", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value cannot be null.
-        /// </summary>
-        internal static string NumericRangeRuleNull {
-            get {
-                return ResourceManager.GetString("NumericRangeRuleNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please enter a value in the range: {0} - {1}.
-        /// </summary>
-        internal static string NumericRangeRuleOutOfRange {
-            get {
-                return ResourceManager.GetString("NumericRangeRuleOutOfRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find template element &apos;{0}&apos; of type &apos;{1}&apos;..
-        /// </summary>
-        internal static string TemplateElementNotFound {
-            get {
-                return ResourceManager.GetString("TemplateElementNotFound", resourceCulture);
+                return ResourceManager.GetString("DialogLocatorViewNotFound", resourceCulture);
             }
         }
     }

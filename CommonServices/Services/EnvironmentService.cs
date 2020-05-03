@@ -17,7 +17,7 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Returns the version of executing assembly.
         /// </summary>
-        public Version AppVersion => Assembly.GetEntryAssembly().GetName().Version;
+        public Version AppVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version();
         /// <summary>
         /// Returns the friendly name of this application.
         /// </summary>
@@ -29,11 +29,11 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Returns the directory from which the application is run.
         /// </summary>
-        public string AppDirectory => System.AppDomain.CurrentDomain.BaseDirectory;
+        public string AppDirectory => System.AppDomain.CurrentDomain?.BaseDirectory ?? string.Empty;
         /// <summary>
         /// Returns the root of the drive where the operating system is installed.
         /// </summary>
-        public string SystemRootDirectory => Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System));
+        public string SystemRootDirectory => Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) ?? string.Empty;
         /// <summary>
         /// Returns the path where x86 Program Files are installed.
         /// </summary>

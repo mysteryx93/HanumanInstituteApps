@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Collections.ObjectModel;
+using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.CommonWpf
 {
@@ -16,6 +17,8 @@ namespace HanumanInstitute.CommonWpf
         /// <returns>The newly-created ListItem.</returns>
         public static ListItem<T> Add<T>(this ObservableCollection<ListItem<T>> list, T value, string text)
         {
+            list.CheckNotNull(nameof(list));
+
             var item = new ListItem<T>(text, value);
             list.Add(item);
             return item;
@@ -28,6 +31,6 @@ namespace HanumanInstitute.CommonWpf
         /// <param name="list">The list to add the ListItem to.</param>
         /// <param name="value">The value of the new ListItem.</param>
         /// <returns>The newly-created ListItem.</returns>
-        public static ListItem<T> Add<T>(this ObservableCollection<ListItem<T>> list, T value) => Add(list, value, Convert.ToString(value, CultureInfo.InvariantCulture));
+        public static ListItem<T> Add<T>(this ObservableCollection<ListItem<T>> list, T value) => Add(list, value, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
     }
 }

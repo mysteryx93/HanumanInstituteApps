@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using MvvmDialogs.DialogTypeLocators;
+using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.CommonWpfApp
 {
@@ -11,23 +13,24 @@ namespace HanumanInstitute.CommonWpfApp
     {
         public Type Locate(INotifyPropertyChanged viewModel)
         {
-            if (viewModel == null) { throw new ArgumentNullException(nameof(viewModel)); }
+            viewModel.CheckNotNull(nameof(viewModel));
 
             var viewModelType = viewModel.GetType();
-            var dialogTypeName = viewModelType.FullName;
+            var viewModelTypeName = viewModelType.FullName ?? string.Empty;
 
             // Replace namespace from ViewModels to Views.
-            dialogTypeName = dialogTypeName.Replace("ViewModels.", "Views.");
+            var viewTypeName = viewModelTypeName.Replace("ViewModels.", "Views.");
 
             // Replace sufix from ViewModel to View.
             const string OldSufix = "ViewModel";
             const string NewSufix = "View";
-            if (dialogTypeName.EndsWith(OldSufix, StringComparison.InvariantCulture))
+            if (viewTypeName.EndsWith(OldSufix, StringComparison.InvariantCulture))
             {
-                dialogTypeName = dialogTypeName.Substring(0, dialogTypeName.Length - OldSufix.Length) + NewSufix;
+                viewTypeName = viewTypeName.Substring(0, viewTypeName.Length - OldSufix.Length) + NewSufix;
             }
 
-            return viewModelType.Assembly.GetType(dialogTypeName);
+            return viewModelType.Assembly.GetType(viewTypeName) ??
+                throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.DialogLocatorViewNotFound, viewTypeName, viewModelTypeName));
         }
     }
 }

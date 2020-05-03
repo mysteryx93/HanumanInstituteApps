@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using HanumanInstitute.CommonServices.Properties;
 using HanumanInstitute.CommonServices.Validation;
 
@@ -21,29 +22,29 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Gets or sets the current settings.
         /// </summary>
-        public T Current { get; set; }
+        public T Current { get; set; } = new T();
 
         /// <summary>
         /// Occurs after settings are loaded.
         /// </summary>
-        public event EventHandler Loaded;
+        public event EventHandler? Loaded;
 
         /// <summary>
         /// Occurs before settings are saved.
         /// </summary>
-        public event EventHandler Saving;
+        public event EventHandler? Saving;
 
         /// <summary>
         /// Occurs after settings are saved.
         /// </summary>
-        public event EventHandler Saved;
+        public event EventHandler? Saved;
 
         /// <summary>
         /// Loads settings file if present, or creates a new object with default values.
         /// </summary>
         public T Load(string path)
         {
-            T result = null;
+            T? result = null;
             try
             {
                 result = _serialization.DeserializeFromFile<T>(path);
@@ -58,11 +59,13 @@ namespace HanumanInstitute.CommonServices
         /// Saves settings into an XML file.
         /// </summary>
         /// <param name="path">The file path to save the serialized settings object to.</param>
+        /// <exception cref="NullReferenceException">Current property is null.</exception>
+        /// <exception cref="ValidationException">Settings contain validation errors.</exception>
         public void Save(string path)
         {
             Saving?.Invoke(this, new EventArgs());
             if (Current == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
-            if (Current.Validate() != null) { throw new Exception(Resources.GenericSettingsProviderValidationErrors); }
+            if (Current.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
             _serialization.SerializeToFile<T>(Current, path);
             Saved?.Invoke(this, new EventArgs());

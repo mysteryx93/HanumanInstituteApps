@@ -10,8 +10,8 @@ namespace HanumanInstitute.CommonWpf
         public string Text { get; set; } = "";
         public T Value { get; set; }
 
-        public ListItem()
-        { }
+        //public ListItem()
+        //{ }
 
         public ListItem(string text, T value)
         {

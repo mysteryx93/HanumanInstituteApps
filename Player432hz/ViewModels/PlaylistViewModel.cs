@@ -3,7 +3,7 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.FolderBrowser;
-using HanumanInstitute.CommonUI;
+using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Player432hz.Business;
 using GalaSoft.MvvmLight.CommandWpf;

@@ -2,11 +2,11 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using HanumanInstitute.CommonServices;
 
 // https://stackoverflow.com/a/31272370/3960200
 // License: Attribution-ShareAlike 3.0 Unported https://creativecommons.org/licenses/by-sa/3.0/
 // Did some code layout refactoring.
-
 namespace HanumanInstitute.CommonWpf
 {
     /// <summary>
@@ -14,23 +14,21 @@ namespace HanumanInstitute.CommonWpf
     /// </summary>
     public static class FocusExtensions
     {
-#pragma warning disable CA1062 // Validate arguments of public methods
-
         // IsFocused
         public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.RegisterAttached("IsFocused", typeof(bool),
             typeof(FocusExtensions), new UIPropertyMetadata(false, OnIsFocusedPropertyChanged));
-        public static bool GetIsFocused(DependencyObject d) => (bool)d.GetValue(IsFocusedProperty);
-        public static void SetIsFocused(DependencyObject d, bool value) => d.SetValue(IsFocusedProperty, value);
+        public static bool GetIsFocused(DependencyObject d) => (bool)d.CheckNotNull(nameof(d)).GetValue(IsFocusedProperty);
+        public static void SetIsFocused(DependencyObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(IsFocusedProperty, value);
         private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is Control P)
+            if (d is Control p)
             {
                 if ((bool)e.NewValue)
                 {
                     // To set false value to get focus on control. if we don't set value to False then we have to set all binding
                     //property to first False then True to set focus on control.
-                    SetIsFocused(P, false);
-                    P.Focus(); // Don't care about false values.
+                    SetIsFocused(p, false);
+                    p.Focus(); // Don't care about false values.
                 }
             }
         }
@@ -38,8 +36,8 @@ namespace HanumanInstitute.CommonWpf
         // FocusFirst, activates the first control when window loads.
         public static readonly DependencyProperty FocusFirstProperty = DependencyProperty.RegisterAttached("FocusFirst", typeof(bool),
             typeof(FocusExtensions), new PropertyMetadata(false, OnFocusFirstPropertyChanged));
-        public static bool GetFocusFirst(Control control) => (bool)control.GetValue(FocusFirstProperty);
-        public static void SetFocusFirst(Control control, bool value) => control.SetValue(FocusFirstProperty, value);
+        public static bool GetFocusFirst(Control control) => (bool)control.CheckNotNull(nameof(control)).GetValue(FocusFirstProperty);
+        public static void SetFocusFirst(Control control, bool value) => control.CheckNotNull(nameof(control)).SetValue(FocusFirstProperty, value);
         static void OnFocusFirstPropertyChanged(
             DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
@@ -55,8 +53,8 @@ namespace HanumanInstitute.CommonWpf
 
         public static readonly DependencyProperty FocusOnLoadedProperty = DependencyProperty.RegisterAttached(
             "FocusOnLoaded", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnFocusOnLoadedChanged));
-        public static bool GetFocusOnLoaded(DependencyObject d) => (bool)d.GetValue(FocusOnLoadedProperty);
-        public static void SetFocusOnLoaded(DependencyObject d, bool value) => d.SetValue(FocusOnLoadedProperty, value);
+        public static bool GetFocusOnLoaded(DependencyObject d) => (bool)d.CheckNotNull(nameof(d)).GetValue(FocusOnLoadedProperty);
+        public static void SetFocusOnLoaded(DependencyObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(FocusOnLoadedProperty, value);
         private static void OnFocusOnLoadedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is FrameworkElement element && (bool)e.NewValue == true)
@@ -69,8 +67,8 @@ namespace HanumanInstitute.CommonWpf
         public static readonly DependencyProperty FocusOnHoverProperty = DependencyProperty.RegisterAttached(
             "FocusOnHover", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnFocusOnHoverChanged));
 
-        public static bool GetFocusOnHover(DependencyObject d) => (bool)d.GetValue(FocusOnHoverProperty);
-        public static void SetFocusOnHover(DependencyObject d, bool value) => d.SetValue(FocusOnHoverProperty, value);
+        public static bool GetFocusOnHover(DependencyObject d) => (bool)d.CheckNotNull(nameof(d)).GetValue(FocusOnHoverProperty);
+        public static void SetFocusOnHover(DependencyObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(FocusOnHoverProperty, value);
         private static void OnFocusOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is UIElement element && (bool)e.NewValue == true)
@@ -82,8 +80,8 @@ namespace HanumanInstitute.CommonWpf
 
         public static readonly DependencyProperty SelectOnHoverProperty = DependencyProperty.RegisterAttached(
             "SelectOnHover", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnSelectOnHoverChanged));
-        public static bool GetSelectOnHover(DependencyObject d) => (bool)d.GetValue(SelectOnHoverProperty);
-        public static void SetSelectOnHover(DependencyObject d, bool value) => d.SetValue(SelectOnHoverProperty, value);
+        public static bool GetSelectOnHover(DependencyObject d) => (bool)d.CheckNotNull(nameof(d)).GetValue(SelectOnHoverProperty);
+        public static void SetSelectOnHover(DependencyObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(SelectOnHoverProperty, value);
         private static void OnSelectOnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is UIElement element && (bool)e.NewValue == true)
@@ -95,8 +93,8 @@ namespace HanumanInstitute.CommonWpf
 
         public static readonly DependencyProperty SelectAllOnFocusProperty = DependencyProperty.RegisterAttached(
             "SelectAllOnFocus", typeof(bool), typeof(FocusExtensions), new PropertyMetadata(false, OnSelectAllOnFocusChanged));
-        public static bool GetSelectAllOnFocus(DependencyObject d) => (bool)d.GetValue(SelectOnHoverProperty);
-        public static void SetSelectAllOnFocus(DependencyObject d, bool value) => d.SetValue(SelectOnHoverProperty, value);
+        public static bool GetSelectAllOnFocus(DependencyObject d) => (bool)d.CheckNotNull(nameof(d)).GetValue(SelectOnHoverProperty);
+        public static void SetSelectAllOnFocus(DependencyObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(SelectOnHoverProperty, value);
         private static void OnSelectAllOnFocusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is UIElement element && (bool)e.NewValue == true)
@@ -114,7 +112,5 @@ namespace HanumanInstitute.CommonWpf
                 };
             }
         }
-
-#pragma warning restore CA1062 // Validate arguments of public methods
     }
 }

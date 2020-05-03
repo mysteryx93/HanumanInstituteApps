@@ -32,7 +32,7 @@ namespace HanumanInstitute.CommonWpfApp
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var strValue = value as string;
             if (!string.IsNullOrEmpty(strValue))

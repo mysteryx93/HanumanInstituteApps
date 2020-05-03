@@ -33,7 +33,7 @@ namespace HanumanInstitute.CommonWpf
         /// <summary>
         /// Gets the item currently selected in the list.
         /// </summary>
-        T SelectedItem { get; }
+        T? SelectedItem { get; }
 
         /// <summary>
         /// Gets whether the list has an item selected.

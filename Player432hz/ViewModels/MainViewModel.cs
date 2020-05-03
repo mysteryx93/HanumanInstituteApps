@@ -5,8 +5,8 @@ using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.CommonUI;
 using GalaSoft.MvvmLight.CommandWpf;
 
 namespace HanumanInstitute.Player432hz.ViewModels

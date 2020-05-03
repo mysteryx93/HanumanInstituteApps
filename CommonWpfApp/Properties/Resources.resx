@@ -117,25 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BooleanAndConverterConvertBackNotSupported" xml:space="preserve">
-    <value>BooleanAndConverter is a OneWay converter.</value>
-  </data>
-  <data name="InverseBooleanConverterTargetTypeNotBoolean" xml:space="preserve">
-    <value>The target property must be a boolean.</value>
-  </data>
-  <data name="NumericRangeRuleInvalid" xml:space="preserve">
-    <value>Value is invalid</value>
-  </data>
-  <data name="NumericRangeRuleNotMultiple" xml:space="preserve">
-    <value>Value must be a multiple of {0}</value>
-  </data>
-  <data name="NumericRangeRuleNull" xml:space="preserve">
-    <value>Value cannot be null</value>
-  </data>
-  <data name="NumericRangeRuleOutOfRange" xml:space="preserve">
-    <value>Please enter a value in the range: {0} - {1}</value>
-  </data>
-  <data name="TemplateElementNotFound" xml:space="preserve">
-    <value>Could not find template element '{0}' of type '{1}'.</value>
+  <data name="DialogLocatorViewNotFound" xml:space="preserve">
+    <value>Could not find View '{0}' for ViewModel '{1}'.</value>
   </data>
 </root>

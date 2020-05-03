@@ -31,7 +31,7 @@ namespace HanumanInstitute.CommonServices
             using var stringWriter = new StringWriter();
             var serializer = new XmlSerializer(typeof(T));
             var ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
+            ns.Add(string.Empty, string.Empty);
             serializer.Serialize(stringWriter, dataToSerialize, ns);
             return stringWriter.ToString();
         }
@@ -81,7 +81,7 @@ namespace HanumanInstitute.CommonServices
             using var writer = _fileSystem.FileStream.Create(path, System.IO.FileMode.Create);
             var serializer = new XmlSerializer(typeof(T));
             var ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
+            ns.Add(string.Empty, string.Empty);
             serializer.Serialize(writer, dataToSerialize, ns);
             writer.Flush();
         }

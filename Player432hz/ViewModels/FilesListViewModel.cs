@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
-using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.CommonUI;
 using GalaSoft.MvvmLight.CommandWpf;
+using HanumanInstitute.CommonWpf;
+using HanumanInstitute.CommonWpfApp;
+using HanumanInstitute.Player432hz.Business;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -27,8 +26,10 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets the list of files and selection properties.
         /// </summary>
-        public SelectableList<string> Files {
-            get {
+        public SelectableList<string> Files
+        {
+            get
+            {
                 if (!_loaded)
                 {
                     Load();

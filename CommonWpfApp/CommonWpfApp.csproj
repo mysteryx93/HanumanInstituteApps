@@ -6,11 +6,13 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <NeutralLanguage>en</NeutralLanguage>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="SplashWindow.xaml.cs" />
     <Compile Remove="_FFmpegUserInterfaceManager.cs" />
+    <Compile Remove="_FileFolderDialog.cs" />
     <Compile Remove="_SplashWindow.xaml.cs" />
   </ItemGroup>
 
@@ -20,6 +22,7 @@
 
   <ItemGroup>
     <None Include="_FFmpegUserInterfaceManager.cs" />
+    <None Include="_FileFolderDialog.cs" />
     <None Include="_SplashWindow.xaml" />
     <None Include="_SplashWindow.xaml.cs" />
   </ItemGroup>
@@ -32,6 +35,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

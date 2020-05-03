@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace HanumanInstitute.CommonServices
@@ -16,11 +15,14 @@ namespace HanumanInstitute.CommonServices
         /// </summary>
         public IEnumerable<ValidationResult> Results => _results;
 
-        public CompositeValidationResult(string errorMessage) : base(errorMessage) { }
+        public CompositeValidationResult(string errorMessage) : base(errorMessage)
+        { }
 
-        public CompositeValidationResult(string errorMessage, IEnumerable<string> memberNames) : base(errorMessage, memberNames) { }
+        public CompositeValidationResult(string errorMessage, IEnumerable<string> memberNames) : base(errorMessage, memberNames)
+        { }
 
-        protected CompositeValidationResult(ValidationResult validationResult) : base(validationResult) { }
+        protected CompositeValidationResult(ValidationResult validationResult) : base(validationResult)
+        { }
 
         /// <summary>
         /// Adds validation results to the merged list.

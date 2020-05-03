@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using HanumanInstitute.CommonServices;
 
 // Based on https://stackoverflow.com/a/45101665/3960200
 // License: Attribution-ShareAlike 3.0 Unported https://creativecommons.org/licenses/by-sa/3.0/
@@ -10,8 +12,8 @@ using System.Windows.Media;
 
 namespace HanumanInstitute.CommonWpf
 {
-    [TemplatePart(Name = ZoomViewer.PartScrollName, Type = typeof(ScrollViewer))]
-    [TemplatePart(Name = ZoomViewer.PartContentName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ZoomViewer.ScrollPartName, Type = typeof(ScrollViewer))]
+    [TemplatePart(Name = ZoomViewer.ContentPartName, Type = typeof(FrameworkElement))]
     public class ZoomViewer : ContentControl, IDisposable
     {
 
@@ -21,10 +23,13 @@ namespace HanumanInstitute.CommonWpf
             FocusableProperty.OverrideMetadata(typeof(ZoomViewer), new FrameworkPropertyMetadata(false));
         }
 
-        public const string PartScrollName = "PART_Scroll";
-        public ScrollViewer PartScroll => GetTemplateChild(PartScrollName) as ScrollViewer;
-        public const string PartContentName = "PART_Content";
-        public FrameworkElement PartContent => GetTemplateChild(PartContentName) as FrameworkElement;
+        public const string ScrollPartName = "PART_Scroll";
+        public ScrollViewer? ScrollPart => _scrollPart ?? (_scrollPart = GetTemplateChild(ScrollPartName) as ScrollViewer);
+        private ScrollViewer? _scrollPart;
+
+        public const string ContentPartName = "PART_Content";
+        public FrameworkElement? ContentPart => _contentPart ?? (_contentPart = GetTemplateChild(ContentPartName) as FrameworkElement);
+        private FrameworkElement? _contentPart;
 
         /// <summary>
         ///     The origin of the transform at the start of capture
@@ -39,25 +44,31 @@ namespace HanumanInstitute.CommonWpf
         /// <summary>
         /// Tracks changes to ActualWidth to update ZoomWidth.
         /// </summary>
-        private PropertyChangeNotifier _actualWidthObserver;
+        private PropertyChangeNotifier? _actualWidthObserver;
         /// <summary>
         /// Tracks changes to ActualHeight to update ZoomHeight.
         /// </summary>
-        private PropertyChangeNotifier _actualHeightObserver;
+        private PropertyChangeNotifier? _actualHeightObserver;
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _actualWidthObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualWidthProperty);
+
+            if (ContentPart == null)
+            {
+                throw new InvalidCastException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.TemplateElementNotFound, ContentPartName, typeof(FrameworkElement).Name));
+            }
+
+            _actualWidthObserver = new PropertyChangeNotifier(ContentPart, FrameworkElement.ActualWidthProperty);
             _actualWidthObserver.ValueChanged += delegate { UpdateZoomWidth(); };
             UpdateZoomWidth();
-            _actualHeightObserver = new PropertyChangeNotifier(PartContent, FrameworkElement.ActualHeightProperty);
+            _actualHeightObserver = new PropertyChangeNotifier(ContentPart, FrameworkElement.ActualHeightProperty);
             _actualHeightObserver.ValueChanged += delegate { UpdateZoomHeight(); };
             UpdateZoomHeight();
         }
 
-        private void UpdateZoomWidth() => ZoomWidth = PartContent != null ? PartContent.ActualWidth * Zoom : 0.0;
-        private void UpdateZoomHeight() => ZoomHeight = PartContent != null ? PartContent.ActualHeight * Zoom : 0.0;
+        private void UpdateZoomWidth() => ZoomWidth = ContentPart != null ? ContentPart.ActualWidth * Zoom : 0.0;
+        private void UpdateZoomHeight() => ZoomHeight = ContentPart != null ? ContentPart.ActualHeight * Zoom : 0.0;
 
 
         // AllowPan (left click)
@@ -122,7 +133,7 @@ namespace HanumanInstitute.CommonWpf
         public double Zoom { get => (double)GetValue(ZoomProperty); set => SetValue(ZoomProperty, value); }
         private static void ZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var p = d as ZoomViewer;
+            var p = (ZoomViewer)d;
             p.UpdateZoomWidth();
             p.UpdateZoomHeight();
 
@@ -143,7 +154,7 @@ namespace HanumanInstitute.CommonWpf
         }
         private static object CoerceZoom(DependencyObject d, object baseValue)
         {
-            var p = d as ZoomViewer;
+            var p = (ZoomViewer)d;
             var value = (double)baseValue;
             if (p.MinZoom > 0)
             {
@@ -172,10 +183,10 @@ namespace HanumanInstitute.CommonWpf
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            if (e == null) { throw new ArgumentNullException(nameof(e)); }
+            e.CheckNotNull(nameof(e));
 
             base.OnMouseLeftButtonDown(e);
-            if (AllowPan)
+            if (AllowPan && ScrollPart != null)
             {
                 _start = e.GetPosition(this);
                 _origin = new Point(ScrollHorizontalOffset, ScrollVerticalOffset);
@@ -187,16 +198,16 @@ namespace HanumanInstitute.CommonWpf
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            if (e == null) { throw new ArgumentNullException(nameof(e)); }
+            e.CheckNotNull(nameof(e));
 
             base.OnMouseLeftButtonUp(e);
-            if (AllowPan)
+            if (AllowPan && ScrollPart != null)
             {
                 Cursor = Cursors.Arrow;
                 ReleaseMouseCapture();
 
                 // Clamp overflow panning here.
-                ScrollViewerBinding.CoerceOffset(PartScroll);
+                ScrollViewerBinding.CoerceOffset(ScrollPart);
             }
         }
 
@@ -254,8 +265,8 @@ namespace HanumanInstitute.CommonWpf
             {
                 if (disposing)
                 {
-                    _actualWidthObserver.Dispose();
-                    _actualHeightObserver.Dispose();
+                    _actualWidthObserver?.Dispose();
+                    _actualHeightObserver?.Dispose();
                 }
                 _disposedValue = true;
             }

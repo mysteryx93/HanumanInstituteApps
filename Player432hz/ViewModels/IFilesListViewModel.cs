@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-using HanumanInstitute.CommonUI;
+using HanumanInstitute.CommonWpf;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {

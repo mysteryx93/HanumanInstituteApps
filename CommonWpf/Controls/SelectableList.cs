@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace HanumanInstitute.CommonWpf
     /// <typeparam name="T">The type of item being shown in the list.</typeparam>
     public class SelectableList<T> : INotifyPropertyChanged, ISelectableList<T> where T : class
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected bool SetField<TF>(ref TF field, TF value, [CallerMemberName] string propertyName = null)
+        protected bool SetField<TF>(ref TF field, TF value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<TF>.Default.Equals(field, value)) { return false; }
             field = value;
@@ -84,12 +85,12 @@ namespace HanumanInstitute.CommonWpf
         /// <summary>
         /// Gets the item currently selected in the list.
         /// </summary>
-        public T SelectedItem
+        public T? SelectedItem
         {
             get => _selectedItem;
             set => SetField(ref _selectedItem, value);
         }
-        private T _selectedItem;
+        private T? _selectedItem;
 
         /// <summary>
         /// Gets whether the list has an item selected.

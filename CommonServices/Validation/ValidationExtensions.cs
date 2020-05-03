@@ -24,7 +24,7 @@ namespace HanumanInstitute.CommonServices.Validation
         /// </summary>
         /// <param name="v">The object to validate.</param>
         /// <returns>A list of validation errors.</returns>
-        public static ICollection<ValidationResult> Validate<T>(this T v)
+        public static ICollection<ValidationResult>? Validate<T>(this T v)
         {
             var results = new List<ValidationResult>();
             var context = new ValidationContext(v);

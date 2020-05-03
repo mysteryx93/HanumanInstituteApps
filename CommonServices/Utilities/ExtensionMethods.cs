@@ -19,9 +19,9 @@ namespace HanumanInstitute.CommonServices
         /// <param name="maxDegreeOfParallelism">The maximum amount of concurrent threads to use for looping.</param>
         /// <param name="scheduler">The task schedule to use for creating threads.</param>
         /// <returns></returns>
-        public static Task AsyncParallelForEach<T>(this IEnumerable<T> source, Func<T, Task> body, int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, TaskScheduler scheduler = null)
+        public static Task AsyncParallelForEach<T>(this IEnumerable<T> source, Func<T, Task> body, int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, TaskScheduler? scheduler = null)
         {
-            if (source == null) { throw new ArgumentNullException(nameof(source)); }
+            source.CheckNotNull(nameof(source));
 
             var options = new ExecutionDataflowBlockOptions
             {
@@ -79,13 +79,15 @@ namespace HanumanInstitute.CommonServices
             foreach (var sourceProperty in type.GetProperties())
             {
                 var targetProperty = type.GetProperty(sourceProperty.Name);
-                if (targetProperty.SetMethod != null)
+                if (targetProperty?.SetMethod != null)
+                {
                     targetProperty.SetValue(target, sourceProperty.GetValue(source, null), null);
+                }
             }
             foreach (var sourceField in type.GetFields())
             {
                 var targetField = type.GetField(sourceField.Name);
-                targetField.SetValue(target, sourceField.GetValue(source));
+                targetField?.SetValue(target, sourceField.GetValue(source));
             }
         }
 
@@ -97,8 +99,8 @@ namespace HanumanInstitute.CommonServices
         /// <param name="items">The collection whose elements should be added to the end of the IList.</param>
         public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
         {
-            if (list == null) throw new ArgumentNullException(nameof(list));
-            if (items == null) throw new ArgumentNullException(nameof(items));
+            list.CheckNotNull(nameof(list));
+            items.CheckNotNull(nameof(items));
 
             if (list is List<T> castedList)
             {
@@ -139,10 +141,9 @@ namespace HanumanInstitute.CommonServices
         /// <returns>A string representation of the value.</returns>
         public static string FormatTimeSpan(this decimal? value)
         {
-            if (value != null)
-                return new TimeSpan(0, 0, 0, 0, (int)(value * 1000)).ToString("g", CultureInfo.InvariantCulture);
-            else
-                return "";
+            return value.HasValue ?
+                new TimeSpan(0, 0, 0, 0, (int)(value * 1000)).ToString("g", CultureInfo.InvariantCulture) :
+                string.Empty;
         }
 
         /// <summary>
@@ -153,7 +154,9 @@ namespace HanumanInstitute.CommonServices
         public static decimal? ParseTimeSpan(this string value)
         {
             if (string.IsNullOrEmpty(value))
+            {
                 return null;
+            }
             else
             {
                 try

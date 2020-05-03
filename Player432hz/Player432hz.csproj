@@ -8,6 +8,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <StartupObject></StartupObject>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -55,7 +56,6 @@
     <ProjectReference Include="..\..\MediaPlayerUI.NET\MediaPlayerUI\MediaPlayerUI.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\NAudioPlayerUI\NAudioPlayerUI.csproj" />
     <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
-    <ProjectReference Include="..\CommonUI\CommonUI.csproj" />
     <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
     <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
   </ItemGroup>

@@ -37,7 +37,7 @@ namespace HanumanInstitute.CommonWpf
 
         private static void Control_LostFocus(object sender, RoutedEventArgs e)
         {
-            SetHasCapture(sender as Control, false);
+            SetHasCapture((Control)sender, false);
         }
     }
 }

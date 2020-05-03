@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using LinqToVisualTree;
+using HanumanInstitute.CommonServices;
 
 // https://stackoverflow.com/a/40069088/3960200
 // License: Attribution-ShareAlike 3.0 Unported https://creativecommons.org/licenses/by-sa/3.0/
@@ -14,9 +12,10 @@ namespace HanumanInstitute.CommonWpf
     /// </summary>
     public static class ViewboxExtensions
     {
-        public static readonly DependencyProperty MaxZoomFactorProperty =
-            DependencyProperty.RegisterAttached("MaxZoomFactor", typeof(double), typeof(ViewboxExtensions), new PropertyMetadata(1.0, OnMaxZoomFactorChanged));
-
+        public static readonly DependencyProperty MaxZoomFactorProperty = DependencyProperty.RegisterAttached("MaxZoomFactor", typeof(double), typeof(ViewboxExtensions),
+            new PropertyMetadata(1.0, OnMaxZoomFactorChanged));
+        public static void SetMaxZoomFactor(DependencyObject d, double value) => d.CheckNotNull(nameof(d)).SetValue(MaxZoomFactorProperty, value);
+        public static double GetMaxZoomFactor(DependencyObject d) => (double)d.CheckNotNull(nameof(d)).GetValue(MaxZoomFactorProperty);
         private static void OnMaxZoomFactorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is Viewbox viewbox)
@@ -27,27 +26,21 @@ namespace HanumanInstitute.CommonWpf
 
         private static void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var viewbox = sender as Viewbox;
-            var child = viewbox?.Child as FrameworkElement;
-            if (child == null)
-                return;
-
-            child.SizeChanged += (o, args) => CalculateMaxSize(viewbox);
-            CalculateMaxSize(viewbox);
+            var viewbox = (Viewbox)sender;
+            if (viewbox.Child is FrameworkElement child)
+            {
+                child.SizeChanged += (o, args) => CalculateMaxSize(viewbox);
+                CalculateMaxSize(viewbox);
+            }
         }
 
         private static void CalculateMaxSize(Viewbox viewbox)
         {
-            var child = viewbox.Child as FrameworkElement;
-            if (child == null)
-                return;
-            viewbox.MaxWidth = child.ActualWidth * GetMaxZoomFactor(viewbox);
-            viewbox.MaxHeight = child.ActualHeight * GetMaxZoomFactor(viewbox);
+            if (viewbox.Child is FrameworkElement child)
+            {
+                viewbox.MaxWidth = child.ActualWidth * GetMaxZoomFactor(viewbox);
+                viewbox.MaxHeight = child.ActualHeight * GetMaxZoomFactor(viewbox);
+            }
         }
-
-#pragma warning disable CA1062 // Validate arguments of public methods
-        public static void SetMaxZoomFactor(DependencyObject d, double value) => d.SetValue(MaxZoomFactorProperty, value);
-        public static double GetMaxZoomFactor(DependencyObject d) => (double)d.GetValue(MaxZoomFactorProperty);
-#pragma warning restore CA1062 // Validate arguments of public methods
     }
 }

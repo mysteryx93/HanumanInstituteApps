@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.CommonWpf
 {
@@ -11,13 +12,13 @@ namespace HanumanInstitute.CommonWpf
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            value.CheckNotNull(nameof(value));
             return (int)value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+            value.CheckNotNull(nameof(value));
             return Enum.ToObject(targetType, (int)value);
         }
     }

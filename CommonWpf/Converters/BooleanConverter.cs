@@ -20,7 +20,7 @@ namespace HanumanInstitute.CommonWpf
         public T TrueValue { get; set; }
         public T FalseValue { get; set; }
 
-        public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public virtual object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value is bool && ((bool)value) ? TrueValue : FalseValue;
         }

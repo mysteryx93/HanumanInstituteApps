@@ -8,14 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="_ValueConverters.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="_ValueConverters.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="Castle.Windsor" Version="5.0.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
@@ -23,7 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="11.0.2" />
+    <PackageReference Include="System.IO.Abstractions" Version="11.0.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -43,35 +43,36 @@ namespace HanumanInstitute.CommonWpf
             if (serviceProvider == null) { throw new ArgumentNullException(nameof(serviceProvider)); }
 
             var provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
-            var target = provideValueTarget.TargetObject as FrameworkElement;
-            Type? eventHandlerType = null;
-
-            if (provideValueTarget.TargetProperty is EventInfo eventInfo)
+            if (provideValueTarget.TargetObject is FrameworkElement target)
             {
-                eventHandlerType = eventInfo.EventHandlerType;
-            }
-            else if (provideValueTarget.TargetProperty is MethodInfo methodInfo)
-            {
-                var parameters = methodInfo.GetParameters();
+                Type? eventHandlerType = null;
 
-                if (parameters.Length == 2)
+                if (provideValueTarget.TargetProperty is EventInfo eventInfo)
                 {
-                    eventHandlerType = parameters[1].ParameterType;
+                    eventHandlerType = eventInfo.EventHandlerType;
+                }
+                else if (provideValueTarget.TargetProperty is MethodInfo methodInfo)
+                {
+                    var parameters = methodInfo.GetParameters();
+
+                    if (parameters.Length == 2)
+                    {
+                        eventHandlerType = parameters[1].ParameterType;
+                    }
+                }
+
+                if (eventHandlerType != null)
+                {
+                    foreach (var argument in _arguments)
+                    {
+                        var argumentProperty = SetUnusedStorageProperty(target, argument);
+                        _argumentProperties.Add(argumentProperty);
+                    }
+
+                    return CreateEventHandler(target, eventHandlerType);
                 }
             }
-
-            if (target == null || eventHandlerType == null)
-            {
-                return this;
-            }
-
-            foreach (var argument in _arguments)
-            {
-                var argumentProperty = SetUnusedStorageProperty(target, argument);
-                _argumentProperties.Add(argumentProperty);
-            }
-
-            return CreateEventHandler(target, eventHandlerType);
+            return this;
         }
 
         private Delegate CreateEventHandler(FrameworkElement element, Type eventHandlerType)
@@ -130,7 +131,7 @@ namespace HanumanInstitute.CommonWpf
 
                 for (var i = methodArgsStart; i < _argumentProperties.Count; i++)
                 {
-                    object? argValue = element.GetValue(_argumentProperties[i]);
+                    var argValue = element.GetValue(_argumentProperties[i]) ?? null;
 
                     if (argValue is EventSenderExtension)
                     {
@@ -158,7 +159,7 @@ namespace HanumanInstitute.CommonWpf
                 // Couldn't match a method with the raw arguments, so check if we can find a method with the same name
                 // and parameter count and try to convert any XAML string arguments to match the method parameter types
 
-                MethodInfo? method = methodTargetType.GetMethods().SingleOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Length);
+                var method = methodTargetType.GetMethods().SingleOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Length) ?? null;
 
                 if (method != null)
                 {
