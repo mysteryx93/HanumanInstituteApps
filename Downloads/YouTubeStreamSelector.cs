@@ -12,26 +12,67 @@ namespace HanumanInstitute.Downloads
         public YouTubeStreamSelector() { }
 
         /// <summary>
+        /// Analyzes download streams and returns the formats to downloads.
+        /// </summary>
+        /// <param name="streams">The download streams.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <returns>The analysis results.</returns>
+        public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo, bool downloadAudio, DownloadOptions? options)
+        {
+            streams.CheckNotNull(nameof(streams));
+            options ??= new DownloadOptions();
+
+            var result = new StreamQueryInfo()
+            {
+                DownloadVideo = downloadVideo,
+                DownloadAudio = downloadAudio
+            };
+
+            var isMuxed = false;
+            if (downloadVideo)
+            {
+                result.Video = SelectBestVideo(streams, options);
+                isMuxed = result.Video is MuxedStreamInfo;
+            }
+            if (downloadAudio && !isMuxed)
+            {
+                result.Audio = SelectBestAudio(streams, options);
+            }
+
+            result.FileExtension = GetFinalExtension(result.OutputVideo, result.OutputAudio);
+
+            return result;
+        }
+
+        /// <summary>
         /// Selects the best video stream available according to options.
         /// </summary>
         /// <param name="vinfo">The list of available streams.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The video to download.</returns>
-        public IVideoStreamInfo? SelectBestVideo(StreamManifest vinfo, DownloadOptions options)
+        private static IVideoStreamInfo? SelectBestVideo(StreamManifest vinfo, DownloadOptions options)
         {
             vinfo.CheckNotNull(nameof(vinfo));
             options.CheckNotNull(nameof(options));
 
-            if (options.PreferredVideo == SelectStreamFormat.None)
+            if (options.PreferredVideo == StreamContainerOption.None)
             {
                 return null;
             }
 
             var orderedList = (from v in vinfo.GetVideo()
-                               where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality)
+                               where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality) &&
+                                    options.PreferredVideo == StreamContainerOption.Best || ContainerEquals(options.PreferredVideo, v)
                                orderby GetVideoHeight(v) descending
                                orderby (v as IVideoStreamInfo)?.Framerate.FramesPerSecond ?? 0 descending
                                select v).ToList();
+
+            if (!orderedList.Any())
+            {
+                return null;
+            }
 
             var maxRes = GetVideoHeight(orderedList.First());
             var maxResList = orderedList.Where(v => GetVideoHeight(v) == maxRes).ToList();
@@ -39,7 +80,6 @@ namespace HanumanInstitute.Downloads
             return (from v in maxResList
                         // WebM VP9 encodes ~30% better. VP8 isn't better than MP4.
                     let Preference = (int)(v.VideoCodec == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
-                    where options.PreferredVideo == SelectStreamFormat.Best || ContainerEquals(options.PreferredVideo, v)
                     orderby Preference descending
                     select v).FirstOrDefault();
         }
@@ -50,25 +90,31 @@ namespace HanumanInstitute.Downloads
         /// <param name="vinfo">The list of available streams.</param>
         /// <param name="options">Options for stream selection.</param>
         /// <returns>The audio to download.</returns>
-        public IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
+        private static IAudioStreamInfo? SelectBestAudio(StreamManifest vinfo, DownloadOptions options)
         {
             vinfo.CheckNotNull(nameof(vinfo));
             options.CheckNotNull(nameof(options));
 
-            if (options.PreferredAudio == SelectStreamFormat.None)
+            if (!vinfo.Streams.Any() || options.PreferredAudio == StreamContainerOption.None)
             {
                 return null;
             }
 
-            return (from v in vinfo.GetAudio()
+            return (from v in vinfo.GetAudioOnly()
                         // Opus encodes ~20% better, Vorbis ~10% better than AAC
                     let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
-                    where options.PreferredAudio == SelectStreamFormat.Best || ContainerEquals(options.PreferredAudio, v)
+                    where options.PreferredAudio == StreamContainerOption.Best || ContainerEquals(options.PreferredAudio, v)
                     orderby Preference descending
-                    select v).FirstOrDefault();
+                    select v).FirstOrDefault()
+                    ??
+                    (from v in vinfo.GetAudio()
+                     where v is MuxedStreamInfo
+                     where options.PreferredAudio == StreamContainerOption.Best || ContainerEquals(options.PreferredAudio, v)
+                     orderby v.Size.TotalBytes descending
+                     select v).FirstOrDefault();
         }
 
-        private bool ContainerEquals(SelectStreamFormat option, IStreamInfo streamInfo)
+        private static bool ContainerEquals(StreamContainerOption option, IStreamInfo streamInfo)
         {
             return string.Equals(option.ToString(), streamInfo.Container.Name, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -78,7 +124,7 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="stream">The video stream to get information for.</param>
         /// <returns>The video height.</returns>
-        public int GetVideoHeight(IStreamInfo stream)
+        private static int GetVideoHeight(IStreamInfo stream)
         {
             var vInfo = stream as IVideoStreamInfo;
             if (vInfo != null)
@@ -145,7 +191,7 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         /// <param name="video">The video type to get file extension for.</param>
         /// <returns>The file extension.</returns>
-        public string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
+        private static string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
         {
             if (video != null && audio == null)
             {

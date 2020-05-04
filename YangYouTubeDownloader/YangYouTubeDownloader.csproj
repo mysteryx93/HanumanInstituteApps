@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -20,20 +20,10 @@
 
   <ItemGroup>
     <Compile Remove="Views\MainWindow.xaml.cs" />
-    <Compile Remove="Views\_MainWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Icons\App.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Remove="Views\_MainWindow.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\_MainWindow.xaml" />
-    <None Include="Views\_MainWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>

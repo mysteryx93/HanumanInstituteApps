@@ -20,47 +20,30 @@ namespace HanumanInstitute.Downloads
     public class DownloadTask : IDownloadTask
     {
         private readonly IYouTubeDownloader _youTube;
-        private readonly IYouTubeStreamSelector _streamSelector;
         private readonly IFileSystemService _fileSystem;
         private readonly IMediaMuxer _mediaMuxer;
 
-        public DownloadTask(IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IFileSystemService fileSystem, IMediaMuxer mediaMuxer,
-            Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options)
+        public DownloadTask(IYouTubeDownloader youTube, IFileSystemService fileSystem, IMediaMuxer mediaMuxer,
+            StreamQueryInfo streamsQuery, string destination)
         {
-            if (!downloadVideo && !downloadAudio) { throw new ArgumentException(Resources.NoVideoNoAudio); }
+            Query = streamsQuery.CheckNotNull(nameof(streamsQuery));
+            if (Query.OutputVideo == null && Query.OutputAudio == null) { throw new ArgumentException(Resources.RequestHasNoStream); }
 
             _youTube = youTube.CheckNotNull(nameof(youTube));
-            _streamSelector = streamSelector.CheckNotNull(nameof(streamSelector));
             _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
             _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
 
-            Url = url.CheckNotNull(nameof(url));
             Destination = destination.CheckNotNullOrEmpty(nameof(destination));
-            DownloadVideo = downloadVideo;
-            DownloadAudio = downloadAudio;
-            _options = options.CheckNotNull(nameof(options));
         }
 
         /// <summary>
-        /// Gets or sets the URL to download from.
-        /// </summary>
-        public Uri Url { get; private set; }
-        /// <summary>
-        /// Gets or sets the destination path to store the file locally.
+        /// Gets the destination path to store the file locally.
         /// </summary>
         public string Destination { get; private set; }
         /// <summary>
-        /// Gets or sets whether to download the video stream.
+        /// Gets the analyzed download query.
         /// </summary>
-        public bool DownloadVideo { get; private set; }
-        /// <summary>
-        /// Gets or sets whether to download the audio stream.
-        /// </summary>
-        public bool DownloadAudio { get; private set; }
-        /// <summary>
-        /// Gets or sets the download options.
-        /// </summary>
-        private readonly DownloadOptions _options;
+        public StreamQueryInfo Query { get; private set; }
         /// <summary>
         /// Gets the list of file streams being downloaded.
         /// </summary>
@@ -71,7 +54,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs before performing the muxing operation.
         /// </summary>
-        public event DownloadTaskEventHandler? BeforeMuxing;
+        public event MuxeTaskEventHandler? BeforeMuxing;
         /// <summary>
         /// Occurus when progress information is updated.
         /// </summary>
@@ -102,51 +85,56 @@ namespace HanumanInstitute.Downloads
             _fileSystem.EnsureDirectoryExists(Destination);
 
             // Query the download URL for the right file.
-            StreamManifest? streams = null;
-            try
-            {
-                streams = await _youTube.QueryStreamInfoAsync(Url.AbsoluteUri).ConfigureAwait(false);
-            }
-            catch (HttpRequestException) { }
-            catch (TaskCanceledException) { }
+            //StreamManifest? streams = null;
+            //try
+            //{
+            //    streams = await _youTube.QueryStreamInfoAsync(Url.AbsoluteUri).ConfigureAwait(false);
+            //}
+            //catch (HttpRequestException) { }
+            //catch (TaskCanceledException) { }
 
             // Get the highest resolution format.
-            IVideoStreamInfo? bestVideo = null;
-            IAudioStreamInfo? bestAudio = null;
-            if (streams != null)
-            {
-                bestVideo = _streamSelector.SelectBestVideo(streams, _options);
-                bestAudio = _streamSelector.SelectBestAudio(streams, _options);
-            }
+            //IVideoStreamInfo? Query.Video = null;
+            //IAudioStreamInfo? Query.Audio = null;
+            //var isMuxed = false;
+            //if (streams != null)
+            //{
+            //    if (DownloadVideo)
+            //    {
+            //        Query.Video = _streamSelector.SelectQuery.Video(streams, _options);
+            //        isMuxed = Query.Video is MuxedStreamInfo;
+            //    }
+            //    if (DownloadAudio && !isMuxed)
+            //    {
+            //        Query.Audio = _streamSelector.SelectQuery.Audio(streams, _options);
+            //        if (!DownloadVideo)
+            //        {
+            //            isMuxed = Query.Audio is MuxedStreamInfo;
+            //        }
+            //    }
+            //}
 
             // Make sure we could retrieve download streams.
-            if (bestVideo == null && bestAudio == null)
+            if (Query.Video == null && Query.Audio == null)
             {
                 Status = DownloadStatus.Failed;
                 return;
             }
 
             // Add the best video stream.
-            if (bestVideo != null && DownloadVideo)
+            if (Query.Video != null)
             {
-                Files.Add(new DownloadTaskFile(StreamType.Video, new Uri(bestVideo.Url),
-                    _fileSystem.GetPathWithoutExtension(Destination) + ".video",
-                    bestVideo, bestVideo.Size.TotalBytes));
+                Files.Add(new DownloadTaskFile(true, Query.OutputAudio != null && Query.Audio == null, new Uri(Query.Video.Url),
+                    _fileSystem.GetPathWithoutExtension(Destination) + ".tempvideo",
+                    Query.Video, Query.Video.Size.TotalBytes));
             }
 
             // Add the best audio stream.
-            if (bestAudio != null && DownloadAudio)
+            if (Query.Audio != null)
             {
-                Files.Add(new DownloadTaskFile(StreamType.Audio, new Uri(bestAudio.Url),
-                    _fileSystem.GetPathWithoutExtension(Destination) + ".audio",
-                    bestAudio, bestAudio.Size.TotalBytes));
-            }
-
-            // Add extension if Destination doesn't already include it.
-            var ext = "." + _streamSelector.GetFinalExtension(bestVideo, bestAudio);
-            if (!Destination.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Destination += ext;
+                Files.Add(new DownloadTaskFile(Query.OutputVideo != null && Query.Video == null, true, new Uri(Query.Audio.Url),
+                    _fileSystem.GetPathWithoutExtension(Destination) + ".tempaudio",
+                    Query.Audio, Query.Audio.Size.TotalBytes));
             }
 
             if (!IsCancelled)
@@ -177,9 +165,15 @@ namespace HanumanInstitute.Downloads
                 var result = true;
                 foreach (var item in Files)
                 {
-                    if (!_fileSystem.File.Exists(item.Destination) || _fileSystem.FileInfo.FromFileName(item.Destination).Length < item.Length)
+                    var fileExists = _fileSystem.File.Exists(item.Destination);
+                    if (!fileExists || _fileSystem.FileInfo.FromFileName(item.Destination).Length < item.Length)
                     {
                         result = false;
+                    }
+                    // In case one file gets deleted before all streams complete.
+                    if (!fileExists && item.Downloaded > 0)
+                    {
+                        Status = DownloadStatus.Failed;
                     }
                 }
                 return result;
@@ -218,6 +212,7 @@ namespace HanumanInstitute.Downloads
             }
             catch (HttpRequestException) { Status = DownloadStatus.Failed; }
             catch (TaskCanceledException) { Status = DownloadStatus.Failed; }
+            catch (System.IO.IOException) { Status = DownloadStatus.Failed; }
         }
 
         /// <summary>
@@ -227,12 +222,47 @@ namespace HanumanInstitute.Downloads
         {
             Status = DownloadStatus.Finalizing;
             _fileSystem.DeleteFileSilent(Destination);
+
+            var videoFile = Files.FirstOrDefault(f => f.HasVideo);
+            var audioFile = Files.FirstOrDefault(f => f.HasAudio);
+
+            // Handle already-muxed files containing both audio and video.
+            if (videoFile?.HasAudio == true)
+            {
+                if (Query.DownloadVideo && Query.DownloadAudio)
+                {
+                    // Move file, no muxing required.
+                    try
+                    {
+                        _fileSystem.File.Move(videoFile.Destination, Destination);
+                        Status = DownloadStatus.Success;
+                    }
+                    catch (System.IO.IOException) { Status = DownloadStatus.Failed; }
+                    catch (UnauthorizedAccessException) { Status = DownloadStatus.Failed; }
+                }
+                else
+                {
+                    // Extract one stream.
+                    await MuxeStreams(Query.DownloadVideo ? videoFile?.Destination : null, Query.DownloadAudio ? videoFile?.Destination : null).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                // Muxe normal streams.
+                await MuxeStreams(videoFile?.Destination, audioFile?.Destination).ConfigureAwait(false);
+            }
+
+            DeleteTempFiles();
+        }
+
+        private async Task MuxeStreams(string? videoFile, string? audioFile)
+        {
+            // Allow custom muxing.
             if (BeforeMuxing != null)
             {
                 try
                 {
-                    BeforeMuxing?.Invoke(this, new DownloadTaskEventArgs(this));
-                    // await Task.Run(() => BeforeMuxing?.Invoke(this, new DownloadTaskEventArgs(this))).ConfigureAwait(false);
+                    await Task.Run(() => BeforeMuxing?.Invoke(this, new MuxeTaskEventArgs(this, videoFile, audioFile))).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -247,35 +277,21 @@ namespace HanumanInstitute.Downloads
                 return;
             }
 
-            var result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
-            var videoFile = Files.FirstOrDefault(f => f.Type == StreamType.Video);
-            var audioFile = Files.FirstOrDefault(f => f.Type == StreamType.Audio);
+            var muxeSuccess = _fileSystem.File.Exists(Destination);
 
-            // Muxe regularly unless muxing in event handler.
-            if (result != CompletionStatus.Success)
+            // If not done through event, do standard muxing.
+            if (!muxeSuccess)
             {
-                result = await Task.Run(() => _mediaMuxer.Muxe(videoFile?.Destination, audioFile?.Destination, Destination)).ConfigureAwait(false);
+                var taskResult = await Task.Run(() => _mediaMuxer.Muxe(videoFile, audioFile, Destination)).ConfigureAwait(false);
+                muxeSuccess = taskResult == CompletionStatus.Success;
             }
 
-            if (result == CompletionStatus.Success)
+            if (muxeSuccess)
             {
-                result = _fileSystem.File.Exists(Destination) ? CompletionStatus.Success : CompletionStatus.Failed;
+                muxeSuccess = _fileSystem.File.Exists(Destination);
             }
 
-            DeleteTempFiles();
-
-            Status = result == CompletionStatus.Success ? DownloadStatus.Success : DownloadStatus.Failed;
-
-            // Ensure download and merge succeeded.
-            if (!_fileSystem.File.Exists(Destination))
-            {
-                Status = DownloadStatus.Failed;
-            }
-
-            if (Status != DownloadStatus.Success)
-            {
-                Status = DownloadStatus.Failed;
-            }
+            Status = muxeSuccess ? DownloadStatus.Success : DownloadStatus.Failed;
         }
 
         /// <summary>
@@ -285,7 +301,7 @@ namespace HanumanInstitute.Downloads
         {
             foreach (var item in Files)
             {
-                _fileSystem.File.Delete(item.Destination);
+                _fileSystem.DeleteFileSilent(item.Destination);
             }
         }
 
@@ -297,6 +313,8 @@ namespace HanumanInstitute.Downloads
             get => _status;
             private set
             {
+                if (_status == value) { return; }
+
                 // Updates the status information.
                 _status = value;
                 ProgressText = GetStatusText(value);

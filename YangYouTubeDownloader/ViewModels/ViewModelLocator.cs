@@ -14,7 +14,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Windows;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommonServiceLocator;
@@ -24,8 +23,6 @@ using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;
-//using HanumanInstitute.YangYouTubeDownloader.Business;
-//using HanumanInstitute.YangYouTubeDownloader.Views;
 using MvvmDialogs;
 
 namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
@@ -34,18 +31,16 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
     /// </summary>
+    [SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Required for designer integration")]
     public class ViewModelLocator
     {
-        private readonly IServiceLocator _locator;
-
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
         public ViewModelLocator()
         {
             using var container = new WindsorContainer();
-            _locator = new WindsorServiceLocator(container);
-            ServiceLocator.SetLocatorProvider(() => _locator);
+            ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
 
             ////if (ViewModelBase.IsInDesignModeStatic)
             ////{
@@ -58,6 +53,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             ////    SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
 
+            // Services
             container.AddCommonServices();
             container.AddDownloads();
             container.AddFFmpeg();
@@ -65,6 +61,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
                 .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
 
+            // ViewModdels
             if (ViewModelBase.IsInDesignModeStatic)
             {
                 container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModelDesign>().LifeStyle.Transient);
@@ -73,16 +70,9 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             {
                 container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);
             }
-            //container.Register(Component.For<SelectPresetViewModel>().ImplementedBy<SelectPresetViewModel>()
-            //    .DependsOn().LifeStyle.Transient);
-
-            //container.Register(Component.For<AppSettingsProvider>().ImplementedBy<AppSettingsProvider>().LifeStyle.Singleton);
-            //container.Register(Component.For<IAppPathService>().ImplementedBy<AppPathService>().LifeStyle.Singleton);
         }
 
-        public IMainViewModel Main => _locator.GetInstance<IMainViewModel>();
-
-        //public SelectPresetViewModel SelectPreset => ServiceLocator.Current.GetInstance<SelectPresetViewModel>();
+        public static IMainViewModel Main => ServiceLocator.Current.GetInstance<IMainViewModel>();
 
         public static void Cleanup()
         {

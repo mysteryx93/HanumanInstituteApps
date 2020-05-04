@@ -79,11 +79,11 @@ namespace HanumanInstitute.Downloads.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must set either downloadVideo or downloadAudio to True..
+        ///   Looks up a localized string similar to Request contains no stream to download..
         /// </summary>
-        internal static string NoVideoNoAudio {
+        internal static string RequestHasNoStream {
             get {
-                return ResourceManager.GetString("NoVideoNoAudio", resourceCulture);
+                return ResourceManager.GetString("RequestHasNoStream", resourceCulture);
             }
         }
         

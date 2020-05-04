@@ -7,10 +7,9 @@ namespace HanumanInstitute.Downloads.Tests
 {
     public class FakeDownloadTask : IDownloadTask
     {
-        public Uri Url => new Uri("");
+        public StreamQueryInfo Query => new StreamQueryInfo();
+
         public string Destination => string.Empty;
-        public bool DownloadVideo => true;
-        public bool DownloadAudio => true;
 
         public FakeStatus Status { get; set; } = FakeStatus.Waiting;
 
@@ -24,8 +23,10 @@ namespace HanumanInstitute.Downloads.Tests
 
         DownloadStatus IDownloadTask.Status => DownloadStatus.Success;
 
-        public event DownloadTaskEventHandler? BeforeMuxing;
+#pragma warning disable 67
+        public event MuxeTaskEventHandler? BeforeMuxing;
         public event DownloadTaskEventHandler? ProgressUpdated;
+#pragma warning restore 67
 
         public void Cancel()
         { }

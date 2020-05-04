@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:CommonWpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf" x:Name="window" x:Class="HanumanInstitute.YangYouTubeDownloader.Views.MainView"
         mc:Ignorable="d"
-        Title="Yang YouTube Downloader" Height="367" Width="510" Icon="/Icons/App.ico" ResizeMode="CanMinimize"
+        Title="Yang YouTube Downloader" Height="332" Width="510" Icon="/Icons/App.ico" ResizeMode="CanMinimize"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True">
     <Window.Resources>
         <CommonWpf:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -35,19 +35,17 @@
             <TextBlock HorizontalAlignment="Left" Text="Title" VerticalAlignment="Top" Margin="0,20,0,0"/>
             <TextBlock HorizontalAlignment="Left" Text="Video" VerticalAlignment="Top" Margin="0,43,0,0"/>
             <TextBlock HorizontalAlignment="Left" Text="Audio" VerticalAlignment="Top" Margin="0,66,0,0"/>
-            <TextBlock HorizontalAlignment="Left" Text="Container" VerticalAlignment="Top" Margin="0,89,0,0"/>
             <TextBlock x:Name="TitleText" HorizontalAlignment="Left" Margin="61,20,0,0" VerticalAlignment="Top" Text="{Binding VideoTitle}" />
-            <TextBlock x:Name="VideoText" HorizontalAlignment="Left" Margin="61,43,0,0" VerticalAlignment="Top" Text="{Binding VideoStreamInfo}" />
-            <TextBlock x:Name="AudioText" HorizontalAlignment="Left" Margin="61,66,0,0" VerticalAlignment="Top" Text="{Binding AudioStreamInfo}" />
-            <TextBlock x:Name="ContainerText" HorizontalAlignment="Left" Margin="61,89,0,0" VerticalAlignment="Top" Text="{Binding VideoContainer}" />
-            <Button x:Name="DownloadButton" Content="_Download" Margin="0,83,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" Command="{Binding DownloadCommand, Mode=OneWay}"/>
+            <CheckBox x:Name="VideoText" HorizontalAlignment="Left" Margin="61,43,0,0" VerticalAlignment="Top" Content="{Binding VideoStreamInfo}" IsChecked="{Binding DownloadVideo}"/>
+            <CheckBox x:Name="AudioText" HorizontalAlignment="Left" Margin="61,66,0,0" VerticalAlignment="Top" Content="{Binding AudioStreamInfo}" IsChecked="{Binding DownloadAudio}"/>
+            <Button x:Name="DownloadButton" Content="_Download" Margin="0,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" Command="{Binding DownloadCommand, Mode=OneWay}" />
         </Grid>
         <TextBlock HorizontalAlignment="Left" Margin="10,64,0,0" Text="{Binding Message, Mode=OneWay}" VerticalAlignment="Top" Foreground="#FFB20000" Visibility="{Binding DisplayMessage, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
         <ComboBox HorizontalAlignment="Right" Margin="0,8,218,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredVideo.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding PreferredVideo.SelectedIndex}" />
         <ComboBox HorizontalAlignment="Right" Margin="0,8,153,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredAudio.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding PreferredAudio.SelectedIndex}" />
         <ComboBox HorizontalAlignment="Right" Margin="0,8,88,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding MaxQuality.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding MaxQuality.SelectedIndex}" />
         <TextBlock HorizontalAlignment="Right" Margin="0,10,285,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Preferred Format" />
-        <ListView x:Name="DownloadsView_Copy" ItemsSource="{Binding Downloads.List}" SelectedIndex="{Binding Downloads.SelectedIndex}" SelectionMode="Single" Background="{x:Null}" Margin="10,198,10,0" Height="122" VerticalAlignment="Top" Visibility="{Binding HasDownloads, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+        <ListView x:Name="DownloadsView_Copy" ItemsSource="{Binding Downloads.List}" SelectedIndex="{Binding Downloads.SelectedIndex}" SelectionMode="Single" Background="{x:Null}" Margin="10,160,10,0" Height="122" VerticalAlignment="Top" Visibility="{Binding HasDownloads, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Title}" Header="Title" Width="340"/>

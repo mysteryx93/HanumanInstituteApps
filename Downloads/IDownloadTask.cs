@@ -14,21 +14,14 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         Task DownloadAsync();
         /// <summary>
-        /// Gets or sets the URL to download from.
-        /// </summary>
-        Uri Url { get; }
-        /// <summary>
-        /// Gets or sets the destination path to store the file locally.
+        /// Gets the destination path to store the file locally.
         /// </summary>
         string Destination { get; }
         /// <summary>
-        /// Gets or sets whether to download the video stream.
+        /// Gets the analyzed download query.
         /// </summary>
-        bool DownloadVideo { get; }
-        /// <summary>
-        /// Gets or sets whether to download the audio stream.
-        /// </summary>
-        bool DownloadAudio { get; }
+        public StreamQueryInfo Query { get; }
+
         /// <summary>
         /// Gets the list of file streams being downloaded.
         /// </summary>
@@ -48,7 +41,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs before performing the muxing operation.
         /// </summary>
-        event DownloadTaskEventHandler? BeforeMuxing;
+        event MuxeTaskEventHandler? BeforeMuxing;
         /// <summary>
         /// Occurus when progress information is updated.
         /// </summary>

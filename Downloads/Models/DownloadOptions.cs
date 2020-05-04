@@ -17,11 +17,11 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the preferred video stream type to download.
         /// </summary>
-        public SelectStreamFormat PreferredVideo { get; set; } = SelectStreamFormat.Best;
+        public StreamContainerOption PreferredVideo { get; set; } = StreamContainerOption.Best;
         /// <summary>
         /// Gets or sets the preferred audio stream type to download.
         /// </summary>
-        public SelectStreamFormat PreferredAudio { get; set; } = SelectStreamFormat.Best;
+        public StreamContainerOption PreferredAudio { get; set; } = StreamContainerOption.Best;
         /// <summary>
         /// Gets or sets the maximum amount of simultaneous downloads to allow.
         /// </summary>

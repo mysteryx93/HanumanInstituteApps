@@ -9,9 +9,10 @@ namespace HanumanInstitute.Downloads
     {
         //public DownloadTaskFile() { }
 
-        public DownloadTaskFile(StreamType type, Uri url, string destination, object stream, long length)
+        public DownloadTaskFile(bool hasVideo, bool hasAudio, Uri url, string destination, object stream, long length)
         {
-            Type = type;
+            HasVideo = hasVideo;
+            HasAudio = hasAudio;
             Url = url;
             Destination = destination;
             Stream = stream;
@@ -19,9 +20,13 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
-        /// Gets the type of data stream being downloaded.
+        /// Gets whether the file contains a video stream.
         /// </summary>
-        public StreamType Type { get; }
+        public bool HasVideo { get; }
+        /// <summary>
+        /// Gets whether the file contains an audio stream.
+        /// </summary>
+        public bool HasAudio { get; }
         /// <summary>
         /// Gets the URL to download from.
         /// </summary>
@@ -42,9 +47,5 @@ namespace HanumanInstitute.Downloads
         /// Gets the approximate amount of bytes downloaded so far.
         /// </summary>
         internal long Downloaded { get; set; }
-        /// <summary>
-        /// Gets whether the file download is completed.
-        /// </summary>
-        public bool Done { get; set; }
     }
 }

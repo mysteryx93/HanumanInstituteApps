@@ -19,12 +19,14 @@ namespace HanumanInstitute.Downloads
         private readonly IDownloadTaskFactory _taskFactory;
         private readonly IOptions<DownloadOptions> _options;
         private readonly IYouTubeDownloader _youTube;
+        private readonly IYouTubeStreamSelector _streamSelector;
         public const int MaxConcurrentDownloads = 50;
 
-        public DownloadManager(IDownloadTaskFactory taskFactory, IYouTubeDownloader youTube, IOptions<DownloadOptions> options)
+        public DownloadManager(IDownloadTaskFactory taskFactory, IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IOptions<DownloadOptions> options)
         {
             _taskFactory = taskFactory.CheckNotNull(nameof(taskFactory));
             _youTube = youTube.CheckNotNull(nameof(youTube));
+            _streamSelector = streamSelector.CheckNotNull(nameof(_streamSelector));
             _options = options.CheckNotNull(nameof(options));
 
             _pool = new SemaphoreSlimDynamic(options.Value.ConcurrentDownloads, MaxConcurrentDownloads);
@@ -36,62 +38,6 @@ namespace HanumanInstitute.Downloads
         public event DownloadTaskEventHandler? DownloadAdded;
 
         private readonly SemaphoreSlimDynamic _pool;
-
-        /// <summary>
-        /// Starts a new download task and adds it to the downloads pool.
-        /// </summary>
-        /// <param name="url">The URL of the video to download</param>
-        /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
-        /// <param name="downloadVideo">Whether to download the video stream.</param>
-        /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
-        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
-        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
-        /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadStatus> DownloadAsync(string url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null,
-            bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null) =>
-                await DownloadAsync(new Uri(url), destination, taskCreatedCallback, downloadVideo, downloadAudio, options).ConfigureAwait(false);
-
-        /// <summary>
-        /// Starts a new download task and adds it to the downloads pool.
-        /// </summary>
-        /// <param name="url">The URL of the video to download</param>
-        /// <param name="destination">The destination where to save the downloaded file.</param>
-        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
-        /// <param name="downloadVideo">Whether to download the video stream.</param>
-        /// <param name="downloadAudio">Whether to downloda the audio stream.</param>
-        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
-        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
-        /// <exception cref="UriFormatException">The Url is invalid.</exception>
-        public async Task<DownloadStatus> DownloadAsync(Uri url, string destination, DownloadTaskEventHandler? taskCreatedCallback = null,
-            bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null)
-        {
-            url.CheckNotNull(nameof(url));
-            destination.CheckNotNullOrEmpty(nameof(destination));
-            if (!downloadVideo && !downloadAudio) { throw new ArgumentException(Resources.NoVideoNoAudio); }
-
-            var task = _taskFactory.Create(url, destination, downloadVideo, downloadAudio, options ?? _options.Value.Clone());
-
-            // Notify UI of new download to show window.
-            var e = new DownloadTaskEventArgs(task);
-            taskCreatedCallback?.Invoke(this, e);
-            DownloadAdded?.Invoke(this, e);
-
-            // Adjust pool size if ConcurrentDownloads settings changed.
-            _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
-
-            // Wait for pool to be ready.
-            await _pool.WaitAsync().ConfigureAwait(false);
-
-            // Download the file(s).
-            await task.DownloadAsync().ConfigureAwait(false);
-
-            // Release the pool and allow next download to start.
-            _pool.TryRelease();
-            _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
-
-            return task.Status;
-        }
 
         /// <summary>
         /// Returns information about specified video.
@@ -138,12 +84,61 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
+        /// Analyzes download streams and returns the formats to downloads.
+        /// </summary>
+        /// <param name="streams">The download streams.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <returns>The analysis results.</returns>
+        public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null)
+        {
+            return _streamSelector.SelectStreams(streams, downloadVideo, downloadAudio, options);
+        }
+
+        /// <summary>
+        /// Starts a new download task and adds it to the downloads pool.
+        /// </summary>
+        /// <param name="streamQuery">The analyzed download query.</param>
+        /// <param name="destination">The destination where to save the downloaded file.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
+        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
+        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
+        /// <exception cref="UriFormatException">The Url is invalid.</exception>
+        public async Task<DownloadStatus> DownloadAsync(StreamQueryInfo streamQuery, string destination, DownloadTaskEventHandler? taskCreatedCallback = null)
+        {
+            destination.CheckNotNullOrEmpty(nameof(destination));
+
+            var task = _taskFactory.Create(streamQuery, destination);
+
+            // Notify UI of new download to show window.
+            var e = new DownloadTaskEventArgs(task);
+            taskCreatedCallback?.Invoke(this, e);
+            DownloadAdded?.Invoke(this, e);
+
+            // Adjust pool size if ConcurrentDownloads settings changed.
+            _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
+
+            // Wait for pool to be ready.
+            await _pool.WaitAsync().ConfigureAwait(false);
+
+            // Download the file(s).
+            await task.DownloadAsync().ConfigureAwait(false);
+
+            // Release the pool and allow next download to start.
+            _pool.TryRelease();
+            _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
+
+            return task.Status;
+        }
+
+        /// <summary>
         /// Parses the VideoId and throws a UriFormatException if the Uri is invalid.
         /// </summary>
         /// <param name="url">The Url to download from.</param>
         /// <returns>The parsed YouTube VideoId.</returns>
         /// <exception cref="UriFormatException">Uri does not contain a valid YouTube video ID.</exception>
-        private VideoId ParseVideoId(Uri url)
+        private static VideoId ParseVideoId(Uri url)
         {
             url.CheckNotNull(nameof(url));
 

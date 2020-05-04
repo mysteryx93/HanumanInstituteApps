@@ -8,7 +8,7 @@ namespace HanumanInstitute.Downloads.Tests
     {
         public ConcurrentBag<FakeDownloadTask> Instances { get; private set; } = new ConcurrentBag<FakeDownloadTask>();
 
-        public IDownloadTask Create(Uri url, string destination, bool downloadVideo, bool downloadAudio, DownloadOptions options)
+        public IDownloadTask Create(StreamQueryInfo streamQuery, string destination)
         {
             var result = new FakeDownloadTask();
             Instances.Add(result);
@@ -25,7 +25,7 @@ namespace HanumanInstitute.Downloads.Tests
 
         public int Total(FakeDownloadTask.FakeStatus status) => Instances.Where(x => x.Status == status).Count();
 
-        private object _lock = new object();
+        private readonly object _lock = new object();
 
         // Completes n amount of tasks.
         public void Complete(int n = 1)

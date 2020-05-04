@@ -48,10 +48,14 @@ namespace HanumanInstitute.CommonServices
         /// <param name="path">The path of the file to delete.</param>
         public void DeleteFileSilent(string path)
         {
-            if (File.Exists(path))
+            try
             {
-                File.Delete(path);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
             }
+            catch (IOException) { }
         }
 
         /// <summary>

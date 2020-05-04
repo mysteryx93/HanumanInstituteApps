@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
 using HanumanInstitute.CommonWpf;
 using HanumanInstitute.Downloads;
-using GalaSoft.MvvmLight.CommandWpf;
-using System.Globalization;
-using System.Collections.ObjectModel;
 using HanumanInstitute.YangYouTubeDownloader.Models;
 
 namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
@@ -19,9 +15,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 
         public string AudioStreamInfo => "[AudioStreamInfo]";
 
-#pragma warning disable CA1056 // Uri properties should not be strings
         public string DownloadUrl { get; set; } = "[DownloadUrl]";
-#pragma warning restore CA1056 // Uri properties should not be strings
 
         public bool HasDownloads => true;
 
@@ -35,11 +29,9 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 
         public string Message => "Message";
 
-        public ISelectableList<ListItem<SelectStreamFormat>> PreferredAudio => new SelectableList<ListItem<SelectStreamFormat>>();
+        public ISelectableList<ListItem<StreamContainerOption>> PreferredAudio => new SelectableList<ListItem<StreamContainerOption>>();
 
-        public ISelectableList<ListItem<SelectStreamFormat>> PreferredVideo => new SelectableList<ListItem<SelectStreamFormat>>();
-
-        public string VideoContainer => "VideoContainer";
+        public ISelectableList<ListItem<StreamContainerOption>> PreferredVideo => new SelectableList<ListItem<StreamContainerOption>>();
 
         public string VideoStreamInfo => "[VideoStreamInfo]";
 

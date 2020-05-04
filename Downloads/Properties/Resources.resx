@@ -123,8 +123,8 @@
   <data name="InvalidYouTubeId" xml:space="preserve">
     <value>Uri does not contain a valid YouTube video ID: {0}</value>
   </data>
-  <data name="NoVideoNoAudio" xml:space="preserve">
-    <value>You must set either downloadVideo or downloadAudio to True.</value>
+  <data name="RequestHasNoStream" xml:space="preserve">
+    <value>Request contains no stream to download.</value>
   </data>
   <data name="StatusCanceled" xml:space="preserve">
     <value>Canceled</value>
