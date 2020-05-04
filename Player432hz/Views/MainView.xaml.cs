@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using HanumanInstitute.Player432hz.ViewModels;
 
 namespace HanumanInstitute.Player432hz.Views
 {

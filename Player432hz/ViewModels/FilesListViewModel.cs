@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -44,13 +45,13 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Sets the folder paths from which to load files.
         /// </summary>
         /// <param name="paths">The list of folder paths to load.</param>
-        public void SetPaths(IEnumerable<string> paths)
+        public void SetPaths(IEnumerable<string>? paths)
         {
             _paths = paths?.ToList();
             _files.List.Clear();
             _loaded = false;
         }
-        private List<string> _paths;
+        private List<string>? _paths;
         private bool _loaded;
 
         /// <summary>
@@ -71,8 +72,8 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
         /// </summary>
-        public ICommand PlayCommand => CommandHelper.InitCommand(ref playCommand, OnPlay, CanPlay);
-        private RelayCommand playCommand;
+        public ICommand PlayCommand => CommandHelper.InitCommand(ref _playCommand, OnPlay, CanPlay);
+        private RelayCommand? _playCommand;
         private bool CanPlay() => Files?.List?.Any() == true;
         private void OnPlay()
         {

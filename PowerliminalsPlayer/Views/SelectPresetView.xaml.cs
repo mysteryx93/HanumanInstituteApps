@@ -9,7 +9,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Views
     /// </summary>
     public partial class SelectPresetView : Window
     {
-        public SelectPresetViewModel ViewModel => DataContext as SelectPresetViewModel;
+        public SelectPresetViewModel ViewModel => (SelectPresetViewModel)DataContext;
 
         public SelectPresetView()
         {

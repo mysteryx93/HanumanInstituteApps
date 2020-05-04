@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Windows;
-using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using GalaSoft.MvvmLight.Threading;
 
-namespace PowerliminalsPlayer {
+namespace PowerliminalsPlayer
+{
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application {
+    public partial class App : Application
+    {
         static App()
         {
             DispatcherHelper.Initialize();
         }
 
-        public static bool HasExited = false;
+        public static bool HasExited { get; set; } = false;
 
-        protected override void OnExit(ExitEventArgs e) {
+        protected override void OnExit(ExitEventArgs e)
+        {
             HasExited = true;
             base.OnExit(e);
         }

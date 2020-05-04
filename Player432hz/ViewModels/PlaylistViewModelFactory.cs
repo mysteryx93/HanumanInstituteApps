@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using MvvmDialogs;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.Properties;

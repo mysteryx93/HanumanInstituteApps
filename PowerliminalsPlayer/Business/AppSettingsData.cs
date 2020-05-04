@@ -10,8 +10,9 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
     /// </summary>
     [PropertyChanged.AddINotifyPropertyChangedInterface]
     [XmlRoot("PowerliminalsPlayer")]
-    public class AppSettingsFile {
-        public AppSettingsFile() { }
+    public class AppSettingsData
+    {
+        public AppSettingsData() { }
 
         /// <summary>
         /// Gets or sets the zoom factor to enlarge the UI.
@@ -23,11 +24,11 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         /// Gets or sets the list of folders in which to look for audio files.
         /// </summary>
         [XmlElement("Folder")]
-        public ObservableCollection<string> Folders { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> Folders { get; } = new ObservableCollection<string>();
         /// <summary>
         /// Gets or sets the list of saved presets.
         /// </summary>
-        public ObservableCollection<PresetItem> Presets { get; set; } = new ObservableCollection<PresetItem>();
+        public ObservableCollection<PresetItem> Presets { get; } = new ObservableCollection<PresetItem>();
         /// <summary>
         /// Gets or sets whether the folders section is expanded.
         /// </summary>
@@ -45,9 +46,6 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         /// Creates a copy of the SettingsFile class.
         /// </summary>
         /// <returns>The copied object.</returns>
-        public AppSettingsFile Clone() {
-            AppSettingsFile Result = (AppSettingsFile)MemberwiseClone();
-            return Result;
-        }
+        public AppSettingsData Clone() => (AppSettingsData)MemberwiseClone();
     }
 }

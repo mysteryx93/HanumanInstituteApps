@@ -2,7 +2,6 @@
 using System.Xml.Serialization;
 using HanumanInstitute.CommonServices;
 
-
 namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     /// <summary>
@@ -10,24 +9,19 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
     /// </summary>
     [XmlRoot("PowerliminalsPlayer")]
     [PropertyChanged.AddINotifyPropertyChangedInterface]
-    public class AppSettingsProvider : GenericSettingsProvider<AppSettingsFile>
+    public class AppSettingsProvider : SettingsProvider<AppSettingsData>
     {
-        protected IAppPathService appPath;
+        private readonly IAppPathService _appPath;
 
         public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath) : base(serializationService)
         {
-            this.appPath = appPath;
+            _appPath = appPath;
         }
 
-        public void Load() => base.Load(appPath.SettingsPath);
+        public override AppSettingsData Load() => base.Load(_appPath.SettingsPath);
 
-        public void Save() => base.Save(appPath.SettingsPath);
+        public override void Save() => base.Save(_appPath.SettingsPath);
 
-        protected override AppSettingsFile GetDefault() => new AppSettingsFile();
-
-        /// <summary>
-        /// Returns Data.Zoom
-        /// </summary>
-        //public double Zoom => Current?.Zoom ?? 1;
+        protected override AppSettingsData GetDefault() => new AppSettingsData();
     }
 }

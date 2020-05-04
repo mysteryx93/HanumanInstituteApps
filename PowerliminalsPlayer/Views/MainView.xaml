@@ -39,7 +39,7 @@
             <ListBox DockPanel.Dock="Top" x:Name="FoldersList" ItemsSource="{Binding AppData.Folders}" SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}" Height="81" VerticalAlignment="Top" TabIndex="5" Background="{x:Null}" Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=FoldersExpander}"  />
             <Grid x:Name="FilesGrid">
                 <TextBlock HorizontalAlignment="Left" Margin="0,6,0,0" VerticalAlignment="Top" Text="Files" FontWeight="Bold"/>
-                <ListBox x:Name="FilesList" Margin="0,28,0,0" ItemsSource="{Binding Files}" MouseDoubleClick="{wpf:MethodBinding FilesList_MouseDoubleClick, {wpf:EventArgs}}" SelectedIndex="{Binding SelectedFileIndex, Mode=TwoWay}" TabIndex="8" Background="{x:Null}" />
+                <ListBox x:Name="FilesList" Margin="0,28,0,0" ItemsSource="{Binding Files}" MouseDoubleClick="{wpf:MethodBinding OnFilesListMouseDoubleClick, {wpf:EventArgs}}" SelectedIndex="{Binding SelectedFileIndex, Mode=TwoWay}" TabIndex="8" Background="{x:Null}" />
                 <Button x:Name="PlayButton" Content="_Play" Margin="46,3,0,0" VerticalAlignment="Top" Command="{Binding PlayCommand}" TabIndex="9" HorizontalAlignment="Left" Width="75"/>
                 <TextBox x:Name="SearchBox" Height="21" Margin="163,4,0,0" VerticalAlignment="Top" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="{wpf:MethodBinding ReloadFiles}" Background="{x:Null}" />
             </Grid>

@@ -9,7 +9,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Views
     /// </summary>
     public partial class MainView : Window
     {
-        public MainViewModel ViewModel => DataContext as MainViewModel;
+        public MainViewModel ViewModel => (MainViewModel)DataContext;
 
         public MainView()
         {

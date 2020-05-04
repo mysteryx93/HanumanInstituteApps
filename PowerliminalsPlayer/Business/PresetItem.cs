@@ -1,63 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Serialization;
+using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     public class PresetItem : DependencyObject
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         [XmlElement("File")]
         public ObservableCollection<FileItem> Files { get; } = new ObservableCollection<FileItem>();
-        private DispatcherTimer volumeChangeTimer = new DispatcherTimer();
+        private readonly DispatcherTimer _volumeChangeTimer = new DispatcherTimer();
 
         public PresetItem()
         {
-            volumeChangeTimer.Interval = TimeSpan.FromMilliseconds(100);
-            volumeChangeTimer.Tick += VolumeChangeTimer_Tick;
+            _volumeChangeTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _volumeChangeTimer.Tick += VolumeChangeTimer_Tick;
         }
 
         public PresetItem(string name) : this()
         {
-            this.Name = name;
+            Name = name;
         }
 
-        private void VolumeChangeTimer_Tick(object sender, EventArgs e)
+        private void VolumeChangeTimer_Tick(object? sender, EventArgs e)
         {
-            volumeChangeTimer.Stop();
-            foreach (FileItem item in Files)
+            _volumeChangeTimer.Stop();
+            foreach (var item in Files)
             {
                 item.AdjustVolume(MasterVolume);
             }
         }
 
-        public static readonly DependencyProperty MasterVolumeProperty =
-            DependencyProperty.Register("MasterVolume", typeof(double),
-            typeof(PresetItem), new PropertyMetadata(100.0, OnMasterVolumeChanged));
-
-        public double MasterVolume
-        {
-            get
-            {
-                return (double)GetValue(MasterVolumeProperty);
-            }
-            set
-            {
-                SetValue(MasterVolumeProperty, value);
-            }
-        }
-
+        public static readonly DependencyProperty MasterVolumeProperty = DependencyProperty.Register("MasterVolume", typeof(double), typeof(PresetItem),
+            new PropertyMetadata(100.0, OnMasterVolumeChanged));
+        public double MasterVolume { get => (double)GetValue(MasterVolumeProperty); set => SetValue(MasterVolumeProperty, value); }
         private static void OnMasterVolumeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            PresetItem D = d as PresetItem;
+            var p = (PresetItem)d;
             //D.volumeChangeTimer.Stop();
-            D.volumeChangeTimer.Start();
+            p._volumeChangeTimer.Start();
         }
 
         /// <summary>
@@ -65,6 +49,8 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         /// </summary>
         public void SaveAs(PresetItem dst)
         {
+            dst.CheckNotNull(nameof(dst));
+
             dst.Name = Name;
             dst.MasterVolume = MasterVolume;
             dst.Files.Clear();

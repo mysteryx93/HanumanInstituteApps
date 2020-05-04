@@ -9,12 +9,12 @@ namespace HanumanInstitute.CommonServices
     /// Handles generic settings features such as loading, saving and validating data.
     /// </summary>
     /// <typeparam name="T">The type of data in which to store settings.</typeparam>
-    public class GenericSettingsProvider<T> : IGenericSettingsProvider<T>
+    public class SettingsProvider<T> : ISettingsProvider<T>
         where T : class, new()
     {
         private readonly ISerializationService _serialization;
 
-        public GenericSettingsProvider(ISerializationService serializationService)
+        public SettingsProvider(ISerializationService serializationService)
         {
             _serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
         }
@@ -22,7 +22,7 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Gets or sets the current settings.
         /// </summary>
-        public T Current { get; set; } = new T();
+        public T Value { get; set; } = new T();
 
         /// <summary>
         /// Occurs after settings are loaded.
@@ -32,12 +32,17 @@ namespace HanumanInstitute.CommonServices
         /// <summary>
         /// Occurs before settings are saved.
         /// </summary>
-        public event EventHandler? Saving;
+        //public event EventHandler? Saving;
 
         /// <summary>
         /// Occurs after settings are saved.
         /// </summary>
         public event EventHandler? Saved;
+
+        public virtual T Load()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Loads settings file if present, or creates a new object with default values.
@@ -50,9 +55,14 @@ namespace HanumanInstitute.CommonServices
                 result = _serialization.DeserializeFromFile<T>(path);
             }
             catch (InvalidOperationException) { }
-            Current = (result != null && result.Validate() == null) ? result : GetDefault();
+            Value = (result != null && result.Validate() == null) ? result : GetDefault();
             Loaded?.Invoke(this, new EventArgs());
-            return Current;
+            return Value;
+        }
+
+        public virtual void Save()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -63,11 +73,11 @@ namespace HanumanInstitute.CommonServices
         /// <exception cref="ValidationException">Settings contain validation errors.</exception>
         public void Save(string path)
         {
-            Saving?.Invoke(this, new EventArgs());
-            if (Current == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
-            if (Current.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
+            // Saving?.Invoke(this, new EventArgs());
+            if (Value == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
+            if (Value.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
-            _serialization.SerializeToFile<T>(Current, path);
+            _serialization.SerializeToFile<T>(Value, path);
             Saved?.Invoke(this, new EventArgs());
         }
 

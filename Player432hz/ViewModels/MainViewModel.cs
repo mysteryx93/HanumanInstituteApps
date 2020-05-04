@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
-using HanumanInstitute.Player432hz.Business;
+using GalaSoft.MvvmLight.CommandWpf;
+using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
-using GalaSoft.MvvmLight.CommandWpf;
+using HanumanInstitute.Player432hz.Business;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -17,20 +17,37 @@ namespace HanumanInstitute.Player432hz.ViewModels
     public class MainViewModel : ViewModelBase
     {
         private readonly IPlaylistViewModelFactory _playlistFactory;
-        private readonly ISettingsProvider _settings;
+        private readonly ISettingsProvider<SettingsData> _settings;
         private readonly IFilesListViewModel _filesListViewModel;
 
-        public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider settings, IFilesListViewModel filesListViewModel)
+        public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<SettingsData> settings, IFilesListViewModel filesListViewModel)
         {
             _playlistFactory = playlistFactory;
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _settings = settings.CheckNotNull(nameof(settings));
             _filesListViewModel = filesListViewModel;
 
             _settings.Loaded += Settings_Loaded;
-            _settings.Saving += Settings_Saving;
-            Settings_Loaded(null, null);
+            Settings_Loaded(_settings, new EventArgs());
 
             Playlists.PropertyChanged += Playlists_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Gets or sets the height of the main window.
+        /// </summary>
+        public double WindowHeight
+        {
+            get => _settings.Value.Height;
+            set => _settings.Value.Height = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the width of the main window.
+        /// </summary>
+        public double WindowWidth
+        {
+            get => _settings.Value.Width;
+            set => _settings.Value.Width = value;
         }
 
         /// <summary>
@@ -43,15 +60,15 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Adds a new playlist to the list.
         /// </summary>
-        public ICommand AddPlaylistCommand => CommandHelper.InitCommand(ref addPlaylistCommand, OnAddPlaylist, () => CanAddPlaylist);
-        private RelayCommand addPlaylistCommand;
+        public ICommand AddPlaylistCommand => CommandHelper.InitCommand(ref _addPlaylistCommand, OnAddPlaylist, () => CanAddPlaylist);
+        private RelayCommand? _addPlaylistCommand;
         private bool CanAddPlaylist => Playlists.List != null;
         private void OnAddPlaylist()
         {
             if (CanAddPlaylist)
             {
-                var NewPlaylist = _playlistFactory.Create();
-                Playlists.List.Add(NewPlaylist);
+                var newPlaylist = _playlistFactory.Create();
+                Playlists.List.Add(newPlaylist);
                 Playlists.SelectedIndex = Playlists.List.Count - 1;
             }
         }
@@ -59,8 +76,8 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Deletes selected playlist from the list.
         /// </summary>
-        public ICommand DeletePlaylistCommand => CommandHelper.InitCommand(ref deletePlaylistCommand, OnDeletePlaylist, () => CanDeletePlaylist);
-        private RelayCommand deletePlaylistCommand;
+        public ICommand DeletePlaylistCommand => CommandHelper.InitCommand(ref _deletePlaylistCommand, OnDeletePlaylist, () => CanDeletePlaylist);
+        private RelayCommand? _deletePlaylistCommand;
         private bool CanDeletePlaylist => Playlists.HasSelection;
         private void OnDeletePlaylist()
         {
@@ -78,7 +95,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// When a playlist is selected, display the files.
         /// </summary>
         /// <param name="list"></param>
-        private void Playlists_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Playlists_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Playlists.SelectedItem))
             {
@@ -89,10 +106,13 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// After settings are loaded, get the list of playlists converted into PlaylistViewModel.
         /// </summary>
-        private void Settings_Loaded(object sender, EventArgs e)
+        private void Settings_Loaded(object? sender, EventArgs e)
         {
+            RaisePropertyChanged(nameof(WindowHeight));
+            RaisePropertyChanged(nameof(WindowWidth));
+
             Playlists.List.Clear();
-            var playlists = _settings?.Current?.Playlists;
+            var playlists = _settings?.Value?.Playlists;
             if (playlists != null)
             {
                 Playlists.ReplaceAll(playlists.Select(x => _playlistFactory.Create(x)));
@@ -102,10 +122,11 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
         /// </summary>
-        private void Settings_Saving(object sender, EventArgs e)
+        public void SaveSettings()
         {
-            _settings.Current.Playlists.Clear();
-            _settings.Current.Playlists.AddRange(Playlists.List.Select(x => new SettingsPlaylistItem(x.Name, x.Folders.List)));
+            _settings.Value.Playlists.Clear();
+            _settings.Value.Playlists.AddRange(Playlists.List.Select(x => new SettingsPlaylistItem(x.Name, x.Folders.List)));
+            _settings.Save();
         }
     }
 }

@@ -199,7 +199,7 @@ namespace HanumanInstitute.CommonWpf
             return Delegate.CreateDelegate(eventHandlerType, handler.Target, handler.Method);
         }
 
-        private DependencyProperty SetUnusedStorageProperty(DependencyObject obj, object value)
+        private static DependencyProperty SetUnusedStorageProperty(DependencyObject obj, object value)
         {
             var property = s_storageProperties.FirstOrDefault(p => obj.ReadLocalValue(p) == DependencyProperty.UnsetValue);
 

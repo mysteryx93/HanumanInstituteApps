@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

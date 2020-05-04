@@ -17,7 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Remove="_SplashWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HanumanInstitute.CommonWpf;
 using Xunit;
 
@@ -74,9 +73,9 @@ namespace HanumanInstitute.CommonWpfApp.Tests.CommonUI
         {
             var model = new SelectableList<TestListItem>();
             model.List.Add(new TestListItem());
-            bool selectedIndexChanged = false;
-            bool selectedItemChanged = false;
-            bool hasSelectionChanged = false;
+            var selectedIndexChanged = false;
+            var selectedItemChanged = false;
+            var hasSelectionChanged = false;
             model.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(model.SelectedIndex))
@@ -105,7 +104,7 @@ namespace HanumanInstitute.CommonWpfApp.Tests.CommonUI
         {
             var model = new SelectableList<TestListItem>();
             model.List.Add(new TestListItem());
-            bool selectedItemChanged = false;
+            var selectedItemChanged = false;
             model.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(model.SelectedItem))

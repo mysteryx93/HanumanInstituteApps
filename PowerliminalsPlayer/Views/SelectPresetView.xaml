@@ -17,7 +17,7 @@
     <Grid Style="{DynamicResource GradiantBackground}">
         <DockPanel Margin="0,1,0,28">
             <TextBox DockPanel.Dock="Top" x:Name="NameBox" Height="21" Text="{Binding PresetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}" Visibility="{Binding ModeSave, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" wpf:FocusExtensions.SelectAllOnFocus="True"/>
-            <ListBox x:Name="PresetList" TabIndex="1" ItemsSource="{Binding AppData.Presets}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" MouseDoubleClick="{wpf:MethodBinding PresetList_MouseDoubleClick, {wpf:EventArgs}}" Background="{x:Null}" />
+            <ListBox x:Name="PresetList" TabIndex="1" ItemsSource="{Binding AppData.Presets}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" MouseDoubleClick="{wpf:MethodBinding OnPresetListMouseDoubleClick, {wpf:EventArgs}}" Background="{x:Null}" />
         </DockPanel>
         <Button x:Name="OkButton" Content="_OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="4" Margin="0,0,4.263,2.85" IsDefault="True" Command="{Binding ConfirmCommand}" />
         <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="3" Margin="0,0,79.263,2.85" IsCancel="True" />

@@ -13,7 +13,7 @@ namespace HanumanInstitute.Player432hz.Business
         /// <summary>
         /// Gets or sets the name of the playlist.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the list of folders included in the playlist.
         /// </summary>
@@ -22,7 +22,7 @@ namespace HanumanInstitute.Player432hz.Business
 
         public SettingsPlaylistItem() { }
 
-        public SettingsPlaylistItem(string name, IList<string> folders = null)
+        public SettingsPlaylistItem(string name, IList<string>? folders = null)
         {
             this.Name = name;
             if (folders != null)

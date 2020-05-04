@@ -1,5 +1,5 @@
 ﻿using System;
-using HanumanInstitute.CommonServices;
+using System.Collections.Generic;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
@@ -11,7 +11,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         /// <summary>
         /// Returns all valid audio extensions
         /// </summary>
-        string[] AudioExtensions { get; }
+        IList<string> AudioExtensions { get; }
         /// <summary>
         /// Returns the path where the Powerliminals Player settings file is stored.
         /// </summary>

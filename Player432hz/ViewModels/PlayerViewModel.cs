@@ -1,6 +1,5 @@
 ﻿using System;
 using GalaSoft.MvvmLight;
-using HanumanInstitute.CommonWpf;
 using HanumanInstitute.Player432hz.Business;
 
 namespace HanumanInstitute.Player432hz.ViewModels

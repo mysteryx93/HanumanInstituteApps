@@ -1,41 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Input;
+using MvvmDialogs;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.CommonWpfApp.Tests;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
-using Xunit;
 using Moq;
-using System.Windows.Input;
+using Xunit;
 
 namespace Player432hz.Tests.ViewModels
 {
     public class MainViewModelTests
     {
-        private Mock<IFilesListViewModel> _mockFileList;
-        private FakeSettingsProvider _mockSettings;
-        PlaylistViewModelFactory _factory;
+        public Mock<IFilesListViewModel> MockFileList => _mockFileList ?? (_mockFileList = new Mock<IFilesListViewModel>());
+        private Mock<IFilesListViewModel>? _mockFileList;
 
-        private MainViewModel SetupModel()
-        {
-            _mockFileList = new Mock<IFilesListViewModel>();
-            _factory = new PlaylistViewModelFactory(null, null);
-            _mockSettings = new FakeSettingsProvider();
-            return new MainViewModel(_factory, _mockSettings, _mockFileList.Object);
-        }
+        public ISettingsProvider<SettingsData> MockSettings => _mockSettings ?? (_mockSettings = new FakeSettingsProvider<SettingsData>());
+        private ISettingsProvider<SettingsData>? _mockSettings;
 
-        private void AddPlaylists(MainViewModel model, int count)
+        public PlaylistViewModelFactory Factory => _factory ?? (_factory = new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>()));
+        private PlaylistViewModelFactory? _factory;
+
+        public MainViewModel Model => _model ?? (_model = new MainViewModel(Factory, MockSettings, MockFileList.Object));
+        private MainViewModel? _model;
+
+
+        private void AddPlaylists(int count)
         {
             for (var i = 0; i < count; i++)
             {
-                model.Playlists.List.Add(_factory.Create());
+                Model.Playlists.List.Add(_factory!.Create());
             }
         }
 
         [Fact]
         public void CanAddPlaylistCommand_ReturnsTrue()
         {
-            var model = SetupModel();
-
-            var result = model.AddPlaylistCommand.CanExecute(null);
+            var result = Model.AddPlaylistCommand.CanExecute(null);
 
             Assert.True(result);
         }
@@ -43,11 +45,9 @@ namespace Player432hz.Tests.ViewModels
         [Fact]
         public void AddPlaylistCommand_Execute_SelectedIndexSet()
         {
-            var model = SetupModel();
+            Model.AddPlaylistCommand.Execute(null);
 
-            model.AddPlaylistCommand.Execute(null);
-
-            Assert.Equal(0, model.Playlists.SelectedIndex);
+            Assert.Equal(0, Model.Playlists.SelectedIndex);
         }
 
         [Theory]
@@ -59,11 +59,10 @@ namespace Player432hz.Tests.ViewModels
         [InlineData(int.MaxValue, false)]
         public void CanDeletePlaylistCommand_WithSelectedIndex_ReturnsTrueIfSelectedIndexValid(int selectedIndex, bool expected)
         {
-            var model = SetupModel();
-            AddPlaylists(model, 2); // List contains 2 elements.
-            model.Playlists.SelectedIndex = selectedIndex;
+            AddPlaylists(2); // List contains 2 elements.
+            Model.Playlists.SelectedIndex = selectedIndex;
 
-            var result = model.DeletePlaylistCommand.CanExecute(null);
+            var result = Model.DeletePlaylistCommand.CanExecute(null);
 
             Assert.Equal(expected, result);
         }
@@ -72,22 +71,19 @@ namespace Player432hz.Tests.ViewModels
         public void DeletePlaylistCommand_NoSelectedIndex_NoAction()
         {
             var listCount = 2;
-            var model = SetupModel();
-            AddPlaylists(model, listCount);
+            AddPlaylists(listCount);
 
-            model.DeletePlaylistCommand.Execute(null);
+            Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(listCount, model.Playlists.List.Count);
+            Assert.Equal(listCount, Model.Playlists.List.Count);
         }
 
         [Fact]
         public void DeletePlaylistCommand_EmptyList_NoAction()
         {
-            var model = SetupModel();
+            Model.DeletePlaylistCommand.Execute(null);
 
-            model.DeletePlaylistCommand.Execute(null);
-
-            Assert.Empty(model.Playlists.List);
+            Assert.Empty(Model.Playlists.List);
         }
 
         [Theory]
@@ -97,15 +93,14 @@ namespace Player432hz.Tests.ViewModels
         public void DeletePlaylistCommand_ValidSelectedIndex_RemoveAtSelectedIndex(int selectedIndex)
         {
             var listCount = 3;
-            var model = SetupModel();
-            AddPlaylists(model, listCount);
-            model.Playlists.SelectedIndex = selectedIndex;
-            var selectedItem = model.Playlists.SelectedItem;
+            AddPlaylists(listCount);
+            Model.Playlists.SelectedIndex = selectedIndex;
+            var selectedItem = Model.Playlists.SelectedItem;
 
-            model.DeletePlaylistCommand.Execute(null);
+            Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(listCount - 1, model.Playlists.List.Count);
-            Assert.DoesNotContain(selectedItem, model.Playlists.List);
+            Assert.Equal(listCount - 1, Model.Playlists.List.Count);
+            Assert.DoesNotContain(selectedItem, Model.Playlists.List);
         }
 
         [Theory]
@@ -114,59 +109,54 @@ namespace Player432hz.Tests.ViewModels
         [InlineData(3, 2, 1)]
         public void DeletePlaylistCommand_LastSelected_SetValidSelectedIndex(int count, int sel, int newSel)
         {
-            var model = SetupModel();
-            AddPlaylists(model, count);
-            model.Playlists.SelectedIndex = sel;
+            AddPlaylists(count);
+            Model.Playlists.SelectedIndex = sel;
 
-            model.DeletePlaylistCommand.Execute(null);
+            Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(newSel, model.Playlists.SelectedIndex);
+            Assert.Equal(newSel, Model.Playlists.SelectedIndex);
         }
 
         [Fact]
         public void DeletePlaylistCommand_ValidSelectedIndex_FilesListSetPathsCalled()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 1);
-            model.Playlists.SelectedIndex = 0;
-            _mockFileList.Reset();
+            AddPlaylists(1);
+            Model.Playlists.SelectedIndex = 0;
+            MockFileList.Reset();
 
-            model.DeletePlaylistCommand.Execute(null);
+            Model.DeletePlaylistCommand.Execute(null);
 
-            _mockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
+            MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [Fact]
         public void Playlists_ValidSelectedIndex_FilesListSetPathsCalled()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 1);
+            AddPlaylists(1);
 
-            model.Playlists.SelectedIndex = 0;
+            Model.Playlists.SelectedIndex = 0;
 
-            _mockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
+            MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [Fact]
         public void Playlists_RemoveSelection_FilesListSetPathsCalled()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 1);
-            model.Playlists.SelectedIndex = 0;
-            _mockFileList.Reset();
+            AddPlaylists(1);
+            Model.Playlists.SelectedIndex = 0;
+            MockFileList.Reset();
 
-            model.Playlists.SelectedIndex = -1;
+            Model.Playlists.SelectedIndex = -1;
 
-            _mockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
+            MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [Fact]
         public void PlayCommand_Get_ReturnsCommand()
         {
-            var model = SetupModel();
-            _mockFileList.Setup(x => x.PlayCommand).Returns(Mock.Of<ICommand>());
+            MockFileList.Setup(x => x.PlayCommand).Returns(Mock.Of<ICommand>());
 
-            var result = model.PlayCommand;
+            var result = Model.PlayCommand;
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<ICommand>(result);
@@ -175,51 +165,47 @@ namespace Player432hz.Tests.ViewModels
         [Fact]
         public void Settings_Loaded_FillPlaylists()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 1); // make sure it gets removed
-            _mockSettings.Current.Playlists.Add(new SettingsPlaylistItem("P1"));
-            _mockSettings.Current.Playlists.Add(new SettingsPlaylistItem("P2"));
+            AddPlaylists(1); // make sure it gets removed
+            MockSettings.Value.Playlists.Add(new SettingsPlaylistItem("P1"));
+            MockSettings.Value.Playlists.Add(new SettingsPlaylistItem("P2"));
 
-            _mockSettings.Load();
+            MockSettings.Load();
 
-            Assert.Equal(2, model.Playlists.List.Count);
+            Assert.Equal(2, Model.Playlists.List.Count);
         }
 
         [Fact]
         public void Settings_LoadedWithFolders_FillPlaylistFolders()
         {
-            var model = SetupModel();
             var folders = new List<string>() { "a", "b", "c" };
-            _mockSettings.Current.Playlists.Add(new SettingsPlaylistItem("P1", folders));
+            MockSettings.Value.Playlists.Add(new SettingsPlaylistItem("P1", folders));
 
-            _mockSettings.Load();
+            MockSettings.Load();
 
-            Assert.NotEmpty(model.Playlists.List);
-            Assert.Equal(3, model.Playlists.List[0].Folders.List.Count);
+            Assert.NotEmpty(Model.Playlists.List);
+            Assert.Equal(3, Model.Playlists.List[0].Folders.List.Count);
         }
 
         [Fact]
-        public void Settings_Saved_FillSettings()
+        public void SaveSettings_WithPlaylists_FillSettings()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 2);
+            AddPlaylists(2);
 
-            _mockSettings.Save();
+            Model.SaveSettings();
 
-            Assert.Equal(2, _mockSettings.Current.Playlists.Count);
+            Assert.Equal(2, MockSettings.Value.Playlists.Count);
         }
 
         [Fact]
-        public void Settings_SavedWithFolders_FillSettingsFolders()
+        public void SaveSettings_WithFolders_FillSettingsFolders()
         {
-            var model = SetupModel();
-            AddPlaylists(model, 1);
-            model.Playlists.List[0].Folders.List.Add("a");
+            AddPlaylists(1);
+            Model.Playlists.List[0].Folders.List.Add("a");
 
-            _mockSettings.Save();
+            Model.SaveSettings();
 
-            Assert.NotNull(_mockSettings.Current.Playlists);
-            Assert.Single(_mockSettings.Current.Playlists[0].Folders);
+            Assert.NotNull(MockSettings.Value.Playlists);
+            Assert.Single(MockSettings.Value.Playlists[0].Folders);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace HanumanInstitute.CommonWpf
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected bool SetField<TF>(ref TF field, TF value, [CallerMemberName] string propertyName = "")
+        protected bool SetField<TF>(ref TF field, TF value, string propertyName)
         {
             if (EqualityComparer<TF>.Default.Equals(field, value)) { return false; }
             field = value;
@@ -61,12 +61,12 @@ namespace HanumanInstitute.CommonWpf
 
             if (index < 0 || index >= List.Count)
             {
-                SetField(ref _selectedIndex, -1);
+                SetField(ref _selectedIndex, -1, nameof(SelectedIndex));
                 SelectedItem = null;
             }
             else
             {
-                SetField(ref _selectedIndex, index);
+                SetField(ref _selectedIndex, index, nameof(SelectedIndex));
                 SelectedItem = List[index];
             }
             HasSelection = SelectedItem != null;
@@ -88,7 +88,7 @@ namespace HanumanInstitute.CommonWpf
         public T? SelectedItem
         {
             get => _selectedItem;
-            set => SetField(ref _selectedItem, value);
+            set => SetField(ref _selectedItem, value, nameof(SelectedItem));
         }
         private T? _selectedItem;
 
@@ -98,7 +98,7 @@ namespace HanumanInstitute.CommonWpf
         public bool HasSelection
         {
             get => _hasSelection;
-            private set => SetField(ref _hasSelection, value);
+            private set => SetField(ref _hasSelection, value, nameof(HasSelection));
         }
         private bool _hasSelection;
     }

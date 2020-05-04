@@ -1,9 +1,6 @@
-﻿using HanumanInstitute.CommonServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HanumanInstitute.CommonServices;
 
 namespace HanumanInstitute.Player432hz.Business
 {
@@ -12,14 +9,14 @@ namespace HanumanInstitute.Player432hz.Business
     /// </summary>
     public class FileLocator : IFileLocator
     {
-        private readonly IAppPathService appPath;
-        private readonly IFileSystemService fileSystem;
+        private readonly IAppPathService _appPath;
+        private readonly IFileSystemService _fileSystem;
 
 
         public FileLocator(IAppPathService appPathService, IFileSystemService fileSystemService)
         {
-            appPath = appPathService;
-            fileSystem = fileSystemService;
+            _appPath = appPathService;
+            _fileSystem = fileSystemService;
         }
 
         /// <summary>
@@ -29,7 +26,7 @@ namespace HanumanInstitute.Player432hz.Business
         /// <returns>A list of audio files.</returns>
         public IEnumerable<string> GetAudioFiles(string path)
         {
-            return fileSystem.GetFilesByExtensions(path, appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+            return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
         }
 
         /// <summary>
@@ -39,14 +36,14 @@ namespace HanumanInstitute.Player432hz.Business
         /// <returns>A list of audio files.</returns>
         public IEnumerable<string> GetAudioFiles(IEnumerable<string> paths)
         {
-            if (paths == null) throw new ArgumentNullException(nameof(paths));
+            paths.CheckNotNull(nameof(paths));
 
-            var Result = new List<string>();
+            var result = new List<string>();
             foreach (var item in paths)
             {
-                Result.AddRange(GetAudioFiles(item));
+                result.AddRange(GetAudioFiles(item));
             }
-            return Result;
+            return result;
         }
     }
 }

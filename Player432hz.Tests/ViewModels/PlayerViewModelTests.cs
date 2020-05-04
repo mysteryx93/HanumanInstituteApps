@@ -1,185 +1,156 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HanumanInstitute.AvisynthScriptBuilder;
-using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp.Tests;
-using HanumanInstitute.FFmpeg;
-using HanumanInstitute.Player432hz.ViewModels;
 using HanumanInstitute.Player432hz.Business;
-using Xunit;
+using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
+using Xunit;
 
 namespace Player432hz.Tests.ViewModels
 {
     public class PlayerViewModelTests
     {
-        private IPlaylistPlayer _playlistPlayer;
-        private Mock<IChangePitchBusiness> _mockChangePitch;
-        private Mock<FakeFileSystemService> _mockFileSystem;
-        private Mock<IMediaInfoReader> _mockInfoReader;
+        public FakeFileSystemService MockFileSystem => _mockFileSystem ?? (_mockFileSystem = new FakeFileSystemService());
+        private FakeFileSystemService? _mockFileSystem;
+
+        public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ?? (_playlistPlayer = new PlaylistPlayer(MockFileSystem));
+        private IPlaylistPlayer? _playlistPlayer;
+
+        public IPlayerViewModel Model => _model ?? (_model = SetupModel());
+        private IPlayerViewModel? _model;
+
         private const string FileName1 = "file1", FileName2 = "file2", FileName3 = "file3";
-        private int NowPlayingChanged = 0;
+        private int _nowPlayingChanged = 0;
 
         private IPlayerViewModel SetupModel()
         {
-            _mockFileSystem = new Mock<FakeFileSystemService>();
-            _mockChangePitch = new Mock<IChangePitchBusiness>();
-            var appPath = new FakeAppPathService();
-            _mockInfoReader = new Mock<IMediaInfoReader>();
-            var playlistPlayerBase = new PlaylistPlayer(_mockFileSystem.Object);
-            _playlistPlayer = new PlaylistPlayer432hz(playlistPlayerBase, _mockChangePitch.Object, appPath, _mockInfoReader.Object);
-            var model = new PlayerViewModel(_playlistPlayer);
-
-            model.Player.PropertyChanged += (s, e) =>
+            var result = new PlayerViewModel(PlaylistPlayer);
+            result.Player.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(model.Player.NowPlaying))
+                if (e.PropertyName == nameof(result.Player.NowPlaying))
                 {
-                    NowPlayingChanged++;
+                    _nowPlayingChanged++;
 
-                    if (model.Player.NowPlaying == null)
+                    if (result.Player.NowPlaying == null)
                     {
-                        model.MediaFinished();
+                        result.MediaFinished();
                     }
                 }
             };
-            return model;
+            return result;
         }
 
         [Fact]
         public void Constructor_VerifyInitialState()
         {
-            var model = SetupModel();
-
-            Assert.NotNull(model.Player);
-            Assert.NotNull(model.Player.Files);
-            Assert.Empty(model.Player.Files);
-            Assert.Null(model.Player.NowPlaying);
-            Assert.Null(model.Player.NowPlayingTitle);
+            Assert.NotNull(Model.Player);
+            Assert.NotNull(Model.Player.Files);
+            Assert.Empty(Model.Player.Files);
+            Assert.Empty(Model.Player.NowPlaying);
+            Assert.Empty(Model.Player.NowPlayingTitle);
         }
 
         [Fact]
         public void Play_ListNoCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(new[] { FileName1 }, null);
 
-            model.Player.Play(new[] { FileName1 }, null);
-
-            Assert.Equal(1, model.Player.Files.Count);
-            Assert.NotEmpty(model.Player.NowPlaying);
-            Assert.Equal(FileName1, model.Player.NowPlayingTitle);
-            Assert.Equal(1, NowPlayingChanged);
+            Assert.Equal(1, Model.Player.Files.Count);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName1, Model.Player.NowPlayingTitle);
+            Assert.Equal(1, _nowPlayingChanged);
         }
 
         [Fact]
         public void Play_ListSetCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(new[] { FileName1 }, FileName2);
 
-            model.Player.Play(new[] { FileName1 }, FileName2);
-
-            Assert.Equal(1, model.Player.Files.Count);
-            Assert.NotEmpty(model.Player.NowPlaying);
-            Assert.Equal(FileName2, model.Player.NowPlayingTitle);
-            Assert.Equal(1, NowPlayingChanged);
+            Assert.Equal(1, Model.Player.Files.Count);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+            Assert.Equal(1, _nowPlayingChanged);
         }
 
         [Fact]
         public void Play_NoListSetCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(null, FileName2);
 
-            model.Player.Play(null, FileName2);
-
-            Assert.Empty(model.Player.Files);
-            Assert.NotEmpty(model.Player.NowPlaying);
-            Assert.Equal(FileName2, model.Player.NowPlayingTitle);
-            Assert.Equal(1, NowPlayingChanged);
+            Assert.Empty(Model.Player.Files);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+            Assert.Equal(1, _nowPlayingChanged);
         }
 
         [Fact]
-        public void Play_NoListNoCurrent_NowPlayingNull()
+        public void Play_NoListNoCurrent_NowPlayingEmpty()
         {
-            var model = SetupModel();
+            Model.Player.Play(null, null);
 
-            model.Player.Play(null, null);
-
-            Assert.Empty(model.Player.Files);
-            Assert.Null(model.Player.NowPlaying);
-            Assert.Null(model.Player.NowPlayingTitle);
-            Assert.Equal(0, NowPlayingChanged);
+            Assert.Empty(Model.Player.Files);
+            Assert.Empty(Model.Player.NowPlaying);
+            Assert.Empty(Model.Player.NowPlayingTitle);
+            Assert.Equal(0, _nowPlayingChanged);
         }
 
         [Fact]
         public void PlayNext_ListNoCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(new[] { FileName1 }, null);
+            Model.Player.PlayNext();
 
-            model.Player.Play(new[] { FileName1 }, null);
-            model.Player.PlayNext();
-
-            Assert.Equal(1, model.Player.Files.Count);
-            Assert.NotNull(model.Player.NowPlaying);
-            Assert.Equal(FileName1, model.Player.NowPlayingTitle);
-            Assert.Equal(3, NowPlayingChanged);
+            Assert.Equal(1, Model.Player.Files.Count);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName1, Model.Player.NowPlayingTitle);
+            Assert.Equal(3, _nowPlayingChanged);
         }
 
         [Fact]
         public void PlayNext_ListSetCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(new[] { FileName1, FileName2, FileName3 }, FileName1);
+            Model.Player.PlayNext();
 
-            model.Player.Play(new[] { FileName1, FileName2, FileName3 }, FileName1);
-            model.Player.PlayNext();
-
-            Assert.Equal(3, model.Player.Files.Count);
-            Assert.NotNull(model.Player.NowPlaying);
-            Assert.NotEqual(FileName1, model.Player.NowPlayingTitle);
-            Assert.Equal(3, NowPlayingChanged);
+            Assert.Equal(3, Model.Player.Files.Count);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.NotEqual(FileName1, Model.Player.NowPlayingTitle);
+            Assert.Equal(3, _nowPlayingChanged);
         }
 
         [Fact]
         public void PlayNext_NoListSetCurrent_StartPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(null, FileName2);
+            Model.Player.PlayNext();
 
-            model.Player.Play(null, FileName2);
-            model.Player.PlayNext();
-
-            Assert.Empty(model.Player.Files);
-            Assert.NotNull(model.Player.NowPlaying);
-            Assert.Equal(FileName2, model.Player.NowPlayingTitle);
-            Assert.Equal(1, NowPlayingChanged);
+            Assert.Empty(Model.Player.Files);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+            Assert.Equal(1, _nowPlayingChanged);
         }
 
         [Fact]
-        public void PlayNext_NoListNoCurrent_NowPlayingNull()
+        public void PlayNext_NoListNoCurrent_NowPlayingEmpty()
         {
-            var model = SetupModel();
+            Model.Player.Play(null, null);
+            Model.Player.PlayNext();
 
-            model.Player.Play(null, null);
-            model.Player.PlayNext();
-
-            Assert.Empty(model.Player.Files);
-            Assert.Null(model.Player.NowPlaying);
-            Assert.Null(model.Player.NowPlayingTitle);
-            Assert.Equal(0, NowPlayingChanged);
+            Assert.Empty(Model.Player.Files);
+            Assert.Empty(Model.Player.NowPlaying);
+            Assert.Empty(Model.Player.NowPlayingTitle);
+            Assert.Equal(0, _nowPlayingChanged);
         }
 
         [Fact]
         public void PlayTwice_List_RestartsPlayback()
         {
-            var model = SetupModel();
+            Model.Player.Play(new[] { FileName1 }, null);
+            Model.Player.Play(new[] { FileName2 }, null);
 
-            model.Player.Play(new[] { FileName1 }, null);
-            model.Player.Play(new[] { FileName2 }, null);
-
-            Assert.Equal(1, model.Player.Files.Count);
-            Assert.NotNull(model.Player.NowPlaying);
-            Assert.Equal(FileName2, model.Player.NowPlayingTitle);
-            Assert.Equal(3, NowPlayingChanged);
+            Assert.Equal(1, Model.Player.Files.Count);
+            Assert.NotEmpty(Model.Player.NowPlaying);
+            Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+            Assert.Equal(3, _nowPlayingChanged);
         }
     }
 }

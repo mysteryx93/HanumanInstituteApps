@@ -6,7 +6,7 @@ namespace HanumanInstitute.CommonWpfApp.Tests
 {
     public class FakeEnvironmentService : IEnvironmentService
     {
-        public IEnumerable<string> CommandLineArguments => null;
+        public IEnumerable<string> CommandLineArguments => Array.Empty<string>();
 
         public Version AppVersion => new Version(1, 0);
 

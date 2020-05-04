@@ -18,9 +18,9 @@ namespace HanumanInstitute.CommonWpfApp.Tests
 
         public void EnsureDirectoryExists(string path) { }
 
-        public IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly) => null;
+        public IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly) => Array.Empty<string>();
 
-        public string GetPathWithoutExtension(string path) => null;
+        public string GetPathWithoutExtension(string path) => string.Empty;
 
         public void MoveToRecycleBin(string path) { }
 

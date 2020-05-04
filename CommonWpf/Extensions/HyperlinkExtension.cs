@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Navigation;
@@ -37,8 +38,24 @@ namespace HanumanInstitute.CommonWpf
         {
             if (!string.IsNullOrEmpty(e.Uri.AbsoluteUri))
             {
-                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+                OpenBrowser(e.Uri.AbsoluteUri);
                 e.Handled = true;
+            }
+        }
+
+        private static void OpenBrowser(string url)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); // Works ok on windows
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", url);  // Works ok on linux
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", url); // Not tested
             }
         }
     }

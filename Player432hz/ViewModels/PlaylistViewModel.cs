@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
-using MvvmDialogs;
-using MvvmDialogs.FrameworkDialogs.FolderBrowser;
+using GalaSoft.MvvmLight.CommandWpf;
 using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Player432hz.Business;
-using GalaSoft.MvvmLight.CommandWpf;
+using MvvmDialogs;
+using MvvmDialogs.FrameworkDialogs.FolderBrowser;
 
 namespace HanumanInstitute.Player432hz.ViewModels
 {
@@ -22,7 +22,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
             this(dialogService, fileListViewModel, null)
         { }
 
-        public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel, SettingsPlaylistItem data)
+        public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel, SettingsPlaylistItem? data)
         {
             _dialogService = dialogService;
             _fileListViewModel = fileListViewModel;
@@ -37,7 +37,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets or sets the name of this playlist.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets the list of folders in the playlist and provides selection properties.
@@ -47,8 +47,8 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Shows a folder picker and adds selected folder to the list.
         /// </summary>
-        public ICommand AddFolderCommand => CommandHelper.InitCommand(ref addFolderCommand, OnAddFolder, () => CanAddFolder);
-        private RelayCommand addFolderCommand;
+        public ICommand AddFolderCommand => CommandHelper.InitCommand(ref _addFolderCommand, OnAddFolder, () => CanAddFolder);
+        private RelayCommand? _addFolderCommand;
         private static bool CanAddFolder => true;
         private void OnAddFolder()
         {
@@ -68,8 +68,8 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Removes selected folder from the list.
         /// </summary>
-        public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
-        private RelayCommand removeFolderCommand;
+        public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref _removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
+        private RelayCommand? _removeFolderCommand;
         private bool CanRemoveFolder => Folders.SelectedIndex > -1 && Folders.SelectedIndex < Folders.List.Count;
         private void OnRemoveFolder()
         {

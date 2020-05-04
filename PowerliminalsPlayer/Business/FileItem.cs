@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Serialization;
 using PropertyChanged;
@@ -14,25 +10,22 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
     {
         [XmlIgnore]
         public Guid Id { get; set; } = Guid.NewGuid();
-        public string FullPath { get; set; }
-        public string FileName
-        {
-            get { return System.IO.Path.GetFileName(FullPath); }
-        }
+        public string FullPath { get; set; } = string.Empty;
+        public string FileName => System.IO.Path.GetFileName(FullPath);
+
         [XmlElement("Volume")]
         public double FullVolume { get; set; } = 100;
         private double MasterVolume { get; set; } = -1;
-        private bool adjustingVolume { get; set; } = false;
+        private bool _adjustingVolume = false;
 
         public bool IsPlaying { get; set; } = false;
 
         public FileItem()
-        {
-        }
+        { }
 
         public FileItem(string path, double masterVolume)
         {
-            this.FullPath = path;
+            FullPath = path;
             // this.MasterVolume = masterVolume;
             AdjustVolume(masterVolume);
         }
@@ -41,36 +34,36 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
             new PropertyMetadata(100.0, OnVolumeChanged));
         [XmlIgnore]
         public double Volume { get => (double)GetValue(VolumeProperty); set => SetValue(VolumeProperty, value); }
+        [SuppressPropertyChangedWarnings]
         private static void OnVolumeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            FileItem Item = d as FileItem;
-            if (!Item.adjustingVolume && Item.MasterVolume > 0)
-                Item.FullVolume = ((double)e.NewValue) * 100 / Item.MasterVolume;
+            var item = (FileItem)d;
+            if (!item._adjustingVolume && item.MasterVolume > 0)
+            {
+                item.FullVolume = ((double)e.NewValue) * 100 / item.MasterVolume;
+            }
         }
 
         public void AdjustVolume(double newMasterVolume)
         {
-            if (this.MasterVolume != newMasterVolume)
+            if (MasterVolume != newMasterVolume)
             {
-                adjustingVolume = true;
+                _adjustingVolume = true;
                 Volume = FullVolume * newMasterVolume / 100;
-                this.MasterVolume = newMasterVolume;
-                adjustingVolume = false;
+                MasterVolume = newMasterVolume;
+                _adjustingVolume = false;
             }
         }
 
-        private int speed;
+        private int _speed;
         public int Speed
         {
-            get
-            {
-                return speed;
-            }
+            get => _speed;
             set
             {
-                speed = value;
-                double Factor = value / 8.0;
-                Rate = Factor < 0 ? 1 / (1 - Factor) : 1 * (1 + Factor);
+                _speed = value;
+                var factor = value / 8.0;
+                Rate = factor < 0 ? 1 / (1 - factor) : 1 * (1 + factor);
             }
         }
 
@@ -81,19 +74,10 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         [XmlIgnore]
         public double Rate
         {
-            get
-            {
-                return (double)GetValue(RateProperty);
-            }
-            set
-            {
-                SetValue(RateProperty, value);
-            }
+            get => (double)GetValue(RateProperty);
+            set => SetValue(RateProperty, value);
         }
 
-        public FileItem Clone()
-        {
-            return (FileItem)MemberwiseClone();
-        }
+        public FileItem Clone() => (FileItem)MemberwiseClone();
     }
 }

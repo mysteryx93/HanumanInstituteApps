@@ -19,7 +19,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// Sets the folder paths from which to load files.
         /// </summary>
         /// <param name="paths">The list of folder paths to load.</param>
-        void SetPaths(IEnumerable<string> paths);
+        void SetPaths(IEnumerable<string>? paths);
 
         /// <summary>
         /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.

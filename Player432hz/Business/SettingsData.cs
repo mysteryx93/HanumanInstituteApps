@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Xml.Serialization;
 using HanumanInstitute.CommonServices;
 
-namespace HanumanInstitute.Player432hz.Business {
+namespace HanumanInstitute.Player432hz.Business
+{
     /// <summary>
     /// Contains the application settings and configured playlists.
     /// </summary>
     [Serializable]
     [XmlRoot("Player432hz")]
     [PropertyChanged.AddINotifyPropertyChangedInterface]
-    public class SettingsData {
+    public class SettingsData
+    {
         /// <summary>
         /// Gets or sets the list of configured playlists.
         /// </summary>

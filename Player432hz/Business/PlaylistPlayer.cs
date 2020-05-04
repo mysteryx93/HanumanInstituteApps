@@ -14,7 +14,7 @@ namespace HanumanInstitute.Player432hz.Business
     public class PlaylistPlayer : IPlaylistPlayer
     {
 #pragma warning disable 67
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 #pragma warning restore 67
         private readonly IFileSystemService _fileSystem;
 
@@ -31,29 +31,29 @@ namespace HanumanInstitute.Player432hz.Business
         /// <summary>
         /// Gets the path of the file currently playing.
         /// </summary>
-        public string NowPlaying { get; set; }
+        public string NowPlaying { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets the display title of the file currently playing.
         /// </summary>
-        public string NowPlayingTitle { get; set; }
+        public string NowPlayingTitle { get; set; } = string.Empty;
 
-        private readonly Random random = new Random();
+        private readonly Random _random = new Random();
 
         /// <summary>
         /// Starts the playback of specified list of media files.
         /// </summary>
         /// <param name="list">The list of file paths to play.</param>
         /// <param name="current">If specified, playback will start with specified file.</param>
-        public void Play(IEnumerable<string> list, string current)
+        public void Play(IEnumerable<string>? list, string? current)
         {
             Files.Clear();
             if (list != null)
             {
                 Files.AddRange(list);
             }
-            NowPlaying = null;
-            NowPlaying = current;
+            NowPlaying = string.Empty;
+            NowPlaying = current ?? string.Empty;
             SetTitle();
             if (string.IsNullOrEmpty(current))
             {
@@ -68,20 +68,20 @@ namespace HanumanInstitute.Player432hz.Business
         {
             if (Files.Any())
             {
-                int Pos = random.Next(Files.Count);
-                if (Files[Pos] == NowPlaying)
+                var pos = _random.Next(Files.Count);
+                if (Files[pos] == NowPlaying)
                 {
-                    Pos = random.Next(Files.Count);
+                    pos = _random.Next(Files.Count);
                 }
-                NowPlaying = null;
-                NowPlaying = Files[Pos];
+                NowPlaying = string.Empty;
+                NowPlaying = Files[pos];
                 SetTitle();
             }
         }
 
         private void SetTitle()
         {
-            NowPlayingTitle = NowPlaying != null ? _fileSystem.Path.GetFileName(NowPlaying) : null;
+            NowPlayingTitle = !string.IsNullOrEmpty(NowPlaying) ? _fileSystem.Path.GetFileName(NowPlaying) : string.Empty;
         }
     }
 }

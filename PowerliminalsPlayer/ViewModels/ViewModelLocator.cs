@@ -13,7 +13,6 @@
 */
 
 using System;
-using System.Windows;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommonServiceLocator;
@@ -21,7 +20,6 @@ using CommonServiceLocator.WindsorAdapter;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.PowerliminalsPlayer.Views;
 using MvvmDialogs;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
@@ -30,45 +28,34 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Required for designer integration")]
     public class ViewModelLocator
     {
-        private static ViewModelLocator s_instance;
-        public static ViewModelLocator Instance => s_instance ?? (s_instance = (ViewModelLocator)Application.Current.FindResource("Locator"));
-
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
         public ViewModelLocator()
         {
-            var container = new WindsorContainer();
+            using var container = new WindsorContainer();
             ServiceLocator.SetLocatorProvider(() => new WindsorServiceLocator(container));
 
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
-
+            // Services
             container.AddCommonServices();
+            container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
+                .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
 
+            // ViewModels
             container.Register(Component.For<MainViewModel>().ImplementedBy<MainViewModel>().LifeStyle.Transient);
             container.Register(Component.For<SelectPresetViewModel>().ImplementedBy<SelectPresetViewModel>()
                 .DependsOn().LifeStyle.Transient);
 
-            container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
-                .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
-            container.Register(Component.For<AppSettingsProvider>().ImplementedBy<AppSettingsProvider>().LifeStyle.Singleton);
+            // Business
+            container.Register(Component.For<ISettingsProvider<AppSettingsData>>().ImplementedBy<AppSettingsProvider>().LifeStyle.Singleton);
             container.Register(Component.For<IAppPathService>().ImplementedBy<AppPathService>().LifeStyle.Singleton);
         }
 
-        public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
-
-        public SelectPresetViewModel SelectPreset => ServiceLocator.Current.GetInstance<SelectPresetViewModel>();
+        public static MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
+        public static SelectPresetViewModel SelectPreset => ServiceLocator.Current.GetInstance<SelectPresetViewModel>();
 
         public static void Cleanup()
         {

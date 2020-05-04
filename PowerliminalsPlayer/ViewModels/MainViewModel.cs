@@ -4,49 +4,41 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using HanumanInstitute.CommonServices;
-using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.CommonWpfApp;
 using GalaSoft.MvvmLight;
-using MvvmDialogs;
-using PropertyChanged;
 using GalaSoft.MvvmLight.CommandWpf;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.CommonWpfApp;
+using HanumanInstitute.PowerliminalsPlayer.Business;
+using MvvmDialogs;
+using MvvmDialogs.FrameworkDialogs.FolderBrowser;
+using PropertyChanged;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 {
     [AddINotifyPropertyChangedInterface()]
     public class MainViewModel : ViewModelBase
     {
-        protected readonly IAppPathService appPath;
-        protected readonly AppSettingsProvider appSettings;
-        protected readonly IFileSystemService fileSystem;
-        protected readonly IDialogService dialogService;
+        private readonly IAppPathService _appPath;
+        private readonly ISettingsProvider<AppSettingsData> _appSettings;
+        private readonly IFileSystemService _fileSystem;
+        private readonly IDialogService _dialogService;
 
-        public AppSettingsFile AppData => appSettings?.Current;
+        public AppSettingsData AppData => _appSettings.Value;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IAppPathService appPath, AppSettingsProvider appSettings, IFileSystemService fileSystem, IDialogService dialogService)
+        public MainViewModel(IAppPathService appPath, ISettingsProvider<AppSettingsData> appSettings, IFileSystemService fileSystem, IDialogService dialogService)
         {
-            this.appPath = appPath;
-            this.appSettings = appSettings;
-            this.fileSystem = fileSystem;
-            this.dialogService = dialogService; 
-
-            if (IsInDesignMode)
-            {
-                // Code runs in Blend --> create design time data.
-            }
-            else
-            {
-                // Code runs "for real"
-            }
+            this._appPath = appPath;
+            this._appSettings = appSettings;
+            this._fileSystem = fileSystem;
+            this._dialogService = dialogService;
         }
 
-        public string SearchText { get; set; }
+        public string SearchText { get; set; } = string.Empty;
 
-        private void OnSearchTextChanged() => ReloadFiles();
+        //private void OnSearchTextChanged() => ReloadFiles();
 
         public int MasterVolume { get; set; }
         public int SelectedFolderIndex { get; set; } = -1;
@@ -60,18 +52,16 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         /// <summary>
         /// Gets or sets the list of files currently playing.
         /// </summary>
-        public ObservableCollection<string> Files { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> Files { get; private set; } = new ObservableCollection<string>();
 
         public void Load()
         {
-            appSettings.Load();
+            _appSettings.Load();
             RaisePropertyChanged(() => AppData);
             ReloadFiles();
         }
 
-        public void Save() => appSettings.Save();
-
-        // public void ReloadFiles() => appSettings.LoadFiles(SearchText);
+        public void Save() => _appSettings.Save();
 
         /// <summary>
         /// Loads the list of files contained in Folders.
@@ -79,19 +69,20 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         /// <param name="filter">If specified, filters file names containing this value.</param>
         public void ReloadFiles()
         {
-            List<string> files = new List<string>();
-            foreach (string item in AppData.Folders)
+            var files = new List<string>();
+            foreach (var item in AppData.Folders)
             {
-                foreach (string file in GetAudioFiles(item))
+                foreach (var file in GetAudioFiles(item))
                 {
                     files.Add(file);
                 }
             }
 
-            IEnumerable<string> Query = string.IsNullOrEmpty(SearchText) ? files :
+            var query = string.IsNullOrEmpty(SearchText) ? files :
                 files.Where(f => f.IndexOf(SearchText, StringComparison.CurrentCultureIgnoreCase) != -1);
-            Query = Query.OrderBy(f => f);
-            Files = new ObservableCollection<string>(Query);
+            query = query.OrderBy(f => f);
+            // Recreate new list to avoid refreshing for each item.
+            Files = new ObservableCollection<string>(query);
         }
 
         /// <summary>
@@ -101,7 +92,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         /// <returns>A list of audio files.</returns>
         public IEnumerable<string> GetAudioFiles(string path)
         {
-            return fileSystem.GetFilesByExtensions(path, appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+            return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
         }
 
         public void MediaUnloaded(FileItem item)
@@ -113,20 +104,26 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private RelayCommand addFolderCommand;
-        public ICommand AddFolderCommand => CommandHelper.InitCommand(ref addFolderCommand, OnAddFolder);
+        public ICommand AddFolderCommand => CommandHelper.InitCommand(ref _addFolderCommand, OnAddFolder);
+        private RelayCommand? _addFolderCommand;
         private void OnAddFolder()
         {
-            string NewPath = FileFolderDialog.ShowFolderDialog(null, false);
-            if (NewPath != null)
+            var dialogSettings = new FolderBrowserDialogSettings()
             {
-                AppData.Folders.Add(NewPath);
-                ReloadFiles();
+                ShowNewFolderButton = false
+            };
+            if (_dialogService.ShowFolderBrowserDialog(this, dialogSettings) == true)
+            {
+                if (!string.IsNullOrEmpty(dialogSettings.SelectedPath))
+                {
+                    AppData.Folders.Add(dialogSettings.SelectedPath);
+                    ReloadFiles();
+                }
             }
         }
 
-        private RelayCommand removeFolderCommand;
-        public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
+        public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref _removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
+        private RelayCommand? _removeFolderCommand;
         private bool CanRemoveFolder => SelectedFolderIndex > -1;
         private void OnRemoveFolder()
         {
@@ -137,8 +134,10 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        public void FilesList_MouseDoubleClick(System.Windows.Input.MouseButtonEventArgs e)
+        public void OnFilesListMouseDoubleClick(MouseButtonEventArgs e)
         {
+            e.CheckNotNull(nameof(e));
+
             var dataContext = ((FrameworkElement)e.OriginalSource).DataContext;
             if (dataContext is string && e.LeftButton == MouseButtonState.Pressed)
             {
@@ -146,28 +145,28 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private RelayCommand playCommand;
-        public ICommand PlayCommand => CommandHelper.InitCommand(ref playCommand, OnPlay, () => CanPlay);
+        public ICommand PlayCommand => CommandHelper.InitCommand(ref _playCommand, OnPlay, () => CanPlay);
+        private RelayCommand? _playCommand;
         private bool CanPlay => (SelectedFileIndex > -1);
 
         private void OnPlay()
         {
             if (CanPlay)
             {
-                string CurrentFile = Files[SelectedFileIndex];
-                Playlist.Files.Add(new FileItem(CurrentFile, Playlist.MasterVolume));
+                var currentFile = Files[SelectedFileIndex];
+                Playlist.Files.Add(new FileItem(currentFile, Playlist.MasterVolume));
             }
         }
 
-        private RelayCommand loadPresetCommand;
-        public ICommand LoadPresetCommand => CommandHelper.InitCommand(ref loadPresetCommand, OnLoadPreset, () => CanLoadPreset);
+        public ICommand LoadPresetCommand => CommandHelper.InitCommand(ref _loadPresetCommand, OnLoadPreset, () => CanLoadPreset);
+        private RelayCommand? _loadPresetCommand;
         private bool CanLoadPreset => AppData?.Presets?.Any() == true;
         private void OnLoadPreset()
         {
             if (CanLoadPreset)
             {
-                var selectPreset = ViewModelLocator.Instance.SelectPreset.Load(false);
-                var result = dialogService.ShowDialog(this, selectPreset);
+                var selectPreset = ViewModelLocator.SelectPreset.Load(false);
+                var result = _dialogService.ShowDialog(this, selectPreset);
                 var preset = selectPreset.SelectedItem;
                 if (result == true && preset != null)
                 {
@@ -178,15 +177,17 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private RelayCommand savePresetCommand;
-        public ICommand SavePresetCommand => CommandHelper.InitCommand(ref savePresetCommand, OnSavePreset, () => CanSavePreset);
+        public ICommand SavePresetCommand => CommandHelper.InitCommand(ref _savePresetCommand, OnSavePreset, () => CanSavePreset);
+        private RelayCommand? _savePresetCommand;
         private bool CanSavePreset => Playlist?.Files?.Any() == true;
         private void OnSavePreset()
         {
             if (CanSavePreset)
             {
-                var selectPreset = ViewModelLocator.Instance.SelectPreset.Load(true);
-                var result = dialogService.ShowDialog(this, selectPreset);
+                // _dialogService.ShowDialog(this, );
+
+                var selectPreset = ViewModelLocator.SelectPreset.Load(true);
+                var result = _dialogService.ShowDialog(this, selectPreset);
                 var presetName = selectPreset.PresetName;
                 if (result == true && !string.IsNullOrWhiteSpace(presetName))
                 {
@@ -203,16 +204,17 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             }
         }
 
-        private PresetItem GetPresetByName(string name)
+        private PresetItem? GetPresetByName(string name)
         {
             if (!string.IsNullOrEmpty(name))
+            {
                 return AppData.Presets.FirstOrDefault(p => p.Name == name);
-            else
-                return null;
+            }
+            return null;
         }
 
-        private RelayCommand pauseCommand;
-        public ICommand PauseCommand => CommandHelper.InitCommand(ref pauseCommand, OnPause, () => CanPause);
+        public ICommand PauseCommand => CommandHelper.InitCommand(ref _pauseCommand, OnPause, () => CanPause);
+        private RelayCommand? _pauseCommand;
         private bool CanPause => Playlist.Files?.Any() == true;
         private void OnPause()
         {
