@@ -8,6 +8,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
+    <StartupObject>HanumanInstitute.YangYouTubeDownloader.App</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

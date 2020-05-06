@@ -14,6 +14,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Windows;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommonServiceLocator;
@@ -34,6 +36,9 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
     [SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Required for designer integration")]
     public class ViewModelLocator
     {
+        public static ViewModelLocator Instance => _instance ?? (_instance = (ViewModelLocator)Application.Current.Resources["Locator"]);
+        private static ViewModelLocator? _instance;
+
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
@@ -54,9 +59,10 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             ////}
 
             // Services
-            container.AddCommonServices();
-            container.AddDownloads();
-            container.AddFFmpeg();
+            container.AddCommonServices()
+                .AddCommonWpfApp()
+                .AddDownloads()
+                .AddFFmpeg();
 
             container.Register(Component.For<IDialogService>().ImplementedBy<DialogService>()
                 .DependsOn(Dependency.OnValue("dialogTypeLocator", new AppDialogTypeLocator())).LifeStyle.Transient);
@@ -64,7 +70,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             // ViewModdels
             if (ViewModelBase.IsInDesignModeStatic)
             {
-                container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModelDesign>().LifeStyle.Transient);
+                container.Register(Component.For<IMainViewModel>().ImplementedBy<MainViewModelDesign>().LifeStyle.Singleton);
             }
             else
             {
@@ -72,7 +78,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             }
         }
 
-        public static IMainViewModel Main => ServiceLocator.Current.GetInstance<IMainViewModel>();
+        public IMainViewModel Main => ServiceLocator.Current.GetInstance<IMainViewModel>();
 
         public static void Cleanup()
         {

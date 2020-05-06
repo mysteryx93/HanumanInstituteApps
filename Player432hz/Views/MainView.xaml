@@ -6,12 +6,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayerUI;assembly=MediaPlayerUI"
         xmlns:common="clr-namespace:HanumanInstitute.CommonWpfApp;assembly=CommonWpfApp" 
-        xmlns:cmd="http://www.galasoft.ch/mvvmlight" 
         xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf"
         x:Class="HanumanInstitute.Player432hz.Views.MainView"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Left="{Binding WindowLeft, Mode=TwoWay}" Top="{Binding WindowTop, Mode=TwoWay}"
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}" 
-        Closing="{wpf:MethodBinding SaveSettings}"
+        Closing="{wpf:MethodBinding SaveSettings}" 
         x:Name="UI" Title="432hz Player" Icon="/Icons/App.ico" MinHeight="240" MinWidth="560"
         xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True">
     <Window.DataContext>

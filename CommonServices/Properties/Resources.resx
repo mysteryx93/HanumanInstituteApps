@@ -150,6 +150,12 @@
   <data name="NumericRangeRuleOutOfRange" xml:space="preserve">
     <value>Please enter a value in the range: {0} - {1}</value>
   </data>
+  <data name="TypeMustBeAssignableFromBase" xml:space="preserve">
+    <value>{0} of type '{1}' must be assignable from type '{2}'.</value>
+  </data>
+  <data name="TypeMustDeriveFromBase" xml:space="preserve">
+    <value>{0} of type '{1}' must derive from type '{2}'.</value>
+  </data>
   <data name="ValidationFailed" xml:space="preserve">
     <value>Validation for {0} failed!</value>
   </data>

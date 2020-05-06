@@ -30,6 +30,10 @@ namespace HanumanInstitute.Player432hz.Business
         /// </summary>
         [Range(240, 10000)]
         public double Height { get; set; } = 390;
+        [Range(0, 10000)]
+        public double Top { get; set; }
+        [Range(0, 10000)]
+        public double Left { get; set; }
         /// <summary>
         /// Gets or sets the playback volume.
         /// </summary>

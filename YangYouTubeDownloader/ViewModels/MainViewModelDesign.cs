@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.CommandWpf;
 using HanumanInstitute.CommonWpf;
@@ -9,6 +10,8 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 {
     public class MainViewModelDesign : IMainViewModel
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ICommand DownloadCommand => new RelayCommand(null);
 
         public ICommand QueryCommand => new RelayCommand(null);

@@ -160,6 +160,24 @@ namespace HanumanInstitute.CommonServices.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} of type &apos;{1}&apos; must be assignable from type &apos;{2}&apos;..
+        /// </summary>
+        internal static string TypeMustBeAssignableFromBase {
+            get {
+                return ResourceManager.GetString("TypeMustBeAssignableFromBase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of type &apos;{1}&apos; must derive from type &apos;{2}&apos;..
+        /// </summary>
+        internal static string TypeMustDeriveFromBase {
+            get {
+                return ResourceManager.GetString("TypeMustDeriveFromBase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Validation for {0} failed!.
         /// </summary>
         internal static string ValidationFailed {

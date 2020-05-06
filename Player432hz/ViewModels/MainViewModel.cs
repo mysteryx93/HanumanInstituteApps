@@ -50,6 +50,18 @@ namespace HanumanInstitute.Player432hz.ViewModels
             set => _settings.Value.Width = value;
         }
 
+        public double WindowLeft
+        {
+            get => _settings.Value.Left;
+            set => _settings.Value.Left = value;
+        }
+
+        public double WindowTop
+        {
+            get => _settings.Value.Top;
+            set => _settings.Value.Top = value;
+        }
+
         /// <summary>
         /// Returns the list of playlists with selection properties that can be bound to the UI.
         /// </summary>

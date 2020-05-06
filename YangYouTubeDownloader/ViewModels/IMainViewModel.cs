@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using HanumanInstitute.CommonWpf;
 using HanumanInstitute.Downloads;
@@ -6,7 +7,7 @@ using HanumanInstitute.YangYouTubeDownloader.Models;
 
 namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 {
-    public interface IMainViewModel
+    public interface IMainViewModel : INotifyPropertyChanged
     {
         ICommand DownloadCommand { get; }
         ICommand QueryCommand { get; }

@@ -1,4 +1,9 @@
-<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:HanumanInstitute.YangYouTubeDownloader" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="YangYouTubeDownloader.App" StartupUri="Views/MainView.xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" d1p1:Ignorable="d" xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
+<Application 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        d1p1:Ignorable="d"
+        xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
     <Application.Resources>
         <Color x:Key="CustomBackgroundGradiant">#FF6E836D</Color>
         <Color x:Key="CustomButtonColor">#FF84A682</Color>

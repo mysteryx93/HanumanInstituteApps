@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
-    <StartupObject></StartupObject>
+    <StartupObject>HanumanInstitute.Player432hz.App</StartupObject>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <None Remove="Icons\App.ico" />
-    <None Remove="Icons\App.png" />
     <None Remove="Icons\pause.png" />
     <None Remove="Icons\play.png" />
     <None Remove="Icons\stop.png" />
@@ -38,7 +37,6 @@
 
   <ItemGroup>
     <Resource Include="Icons\App.ico" />
-    <Resource Include="Icons\App.png" />
     <Resource Include="Icons\pause.png" />
     <Resource Include="Icons\play.png" />
     <Resource Include="Icons\stop.png" />

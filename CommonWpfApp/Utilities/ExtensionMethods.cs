@@ -23,21 +23,21 @@ namespace HanumanInstitute.CommonWpfApp
             return imageSource;
         }
 
-        public static BitmapImage ToBitmapImage(this Bitmap bitmap)
-        {
-            if (bitmap == null) { throw new ArgumentNullException(nameof(bitmap)); }
+        //public static BitmapImage ToBitmapImage(this Bitmap bitmap)
+        //{
+        //    if (bitmap == null) { throw new ArgumentNullException(nameof(bitmap)); }
 
-            using var memory = new MemoryStream();
-            bitmap.Save(memory, ImageFormat.Png);
-            memory.Position = 0;
+        //    using var memory = new MemoryStream();
+        //    bitmap.Save(memory, ImageFormat.Png);
+        //    memory.Position = 0;
 
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memory;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
+        //    var bitmapImage = new BitmapImage();
+        //    bitmapImage.BeginInit();
+        //    bitmapImage.StreamSource = memory;
+        //    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        //    bitmapImage.EndInit();
 
-            return bitmapImage;
-        }
+        //    return bitmapImage;
+        //}
     }
 }

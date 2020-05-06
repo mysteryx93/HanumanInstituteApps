@@ -10,18 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SplashWindow.xaml.cs" />
     <Compile Remove="_FFmpegUserInterfaceManager.cs" />
     <Compile Remove="_FileFolderDialog.cs" />
-    <Compile Remove="_SplashWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Remove="_SplashWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,14 +25,13 @@
   <ItemGroup>
     <None Include="_FFmpegUserInterfaceManager.cs" />
     <None Include="_FileFolderDialog.cs" />
-    <None Include="_SplashWindow.xaml" />
-    <None Include="_SplashWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MvvmDialogs" Version="7.0.0" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
   </ItemGroup>
 
   <ItemGroup>
