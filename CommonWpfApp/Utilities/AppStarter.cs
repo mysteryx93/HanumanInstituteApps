@@ -13,35 +13,28 @@ namespace HanumanInstitute.CommonWpfApp
 {
     public class AppStarter
     {
-        public static void RunWithSplash(Bitmap splashImage, Type mainWindow, string resourceFile = "App.xaml")
+        public static void RunWithSplash(Bitmap splashImage, Func<Window> createWindow)
         {
             splashImage.CheckNotNull(nameof(splashImage));
-            mainWindow.CheckDerivesFrom(typeof(Window), nameof(mainWindow));
+            createWindow.CheckNotNull(nameof(createWindow));
 
             // Show splash screen.
             var splashVM = CommonWpfApp.ViewModels.ViewModelLocator.Splash;
-            var SplashThread = new Thread(() => ShowSplashThread(splashVM, splashImage));
-            SplashThread.SetApartmentState(ApartmentState.STA);
+            var splashThread = new Thread(() => ShowSplashThread(splashVM, splashImage));
+            splashThread.SetApartmentState(ApartmentState.STA);
             //SplashThread.IsBackground = true;
-            SplashThread.Priority = ThreadPriority.AboveNormal;
-            SplashThread.Name = "Splash Screen";
-            SplashThread.Start();
+            splashThread.Priority = ThreadPriority.AboveNormal;
+            splashThread.Name = "Splash Screen";
+            splashThread.Start();
             Thread.Yield();
-
-            // Initialize app.
-            DispatcherHelper.Initialize();
-            Application.LoadComponent(new System.Uri("/App.xaml", System.UriKind.Relative));
-            var app = Application.Current;
 
             // Initialize main window.
             // Note: using App.StartupUri would not allow us to call LoadCompleted when the main window is ready.
-            var view = mainWindow.CreateInstance<Window>();
-            app.MainWindow = view;
+            var view = createWindow();
             view.Show();
             view.Activate();
+            Application.Current.MainWindow = view;
             splashVM.LoadCompleted();
-
-            app.Run();
         }
 
         private static void ShowSplashThread(SplashViewModel splashVM, Bitmap splashImage)

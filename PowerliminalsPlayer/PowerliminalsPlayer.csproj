@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <None Remove="Icons\App.ico" />
-    <None Remove="Icons\App.png" />
     <None Remove="Icons\delete.png" />
     <None Remove="Icons\pause.png" />
     <None Remove="Icons\play.png" />
@@ -47,15 +46,23 @@
 
   <ItemGroup>
     <Resource Include="Icons\App.ico" />
-    <Resource Include="Icons\App.png" />
     <Resource Include="Icons\delete.png" />
     <Resource Include="Icons\pause.png" />
     <Resource Include="Icons\play.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
