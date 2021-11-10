@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HanumanInstitute.CommonServices;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
@@ -62,11 +63,11 @@ namespace HanumanInstitute.Downloads
                 return null;
             }
 
-            var orderedList = (from v in vinfo.GetVideo()
+            var orderedList = (from v in vinfo.GetVideoStreams()
                                where (options.MaxQuality == 0 || GetVideoHeight(v) <= options.MaxQuality) &&
                                     options.PreferredVideo == StreamContainerOption.Best || ContainerEquals(options.PreferredVideo, v)
                                orderby GetVideoHeight(v) descending
-                               orderby (v as IVideoStreamInfo)?.Framerate.FramesPerSecond ?? 0 descending
+                               orderby (v as IVideoStreamInfo)?.VideoQuality.Framerate ?? 0 descending
                                select v).ToList();
 
             if (!orderedList.Any())
@@ -79,7 +80,7 @@ namespace HanumanInstitute.Downloads
 
             return (from v in maxResList
                         // WebM VP9 encodes ~30% better. VP8 isn't better than MP4.
-                    let Preference = (int)(v.VideoCodec == VideoEncoding.Vp9 ? v.Size.TotalBytes * 1.3 : v.Size.TotalBytes)
+                    let Preference = (int)(v.VideoCodec == VideoEncoding.Vp9 ? v.Size.Bytes * 1.3 : v.Size.Bytes)
                     orderby Preference descending
                     select v).FirstOrDefault();
         }
@@ -100,17 +101,17 @@ namespace HanumanInstitute.Downloads
                 return null;
             }
 
-            return (from v in vinfo.GetAudioOnly()
+            return (from v in vinfo.GetAudioOnlyStreams()
                         // Opus encodes ~20% better, Vorbis ~10% better than AAC
-                    let Preference = (int)(v.Size.TotalBytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
+                    let Preference = (int)(v.Size.Bytes * (v.AudioCodec == AudioEncoding.Opus ? 1.2 : v.AudioCodec == AudioEncoding.Vorbis ? 1.1 : 1))
                     where options.PreferredAudio == StreamContainerOption.Best || ContainerEquals(options.PreferredAudio, v)
                     orderby Preference descending
                     select v).FirstOrDefault()
                     ??
-                    (from v in vinfo.GetAudio()
+                    (from v in vinfo.GetAudioStreams()
                      where v is MuxedStreamInfo
                      where options.PreferredAudio == StreamContainerOption.Best || ContainerEquals(options.PreferredAudio, v)
-                     orderby v.Size.TotalBytes descending
+                     orderby v.Size.Bytes descending
                      select v).FirstOrDefault();
         }
 
@@ -129,55 +130,56 @@ namespace HanumanInstitute.Downloads
             var vInfo = stream as IVideoStreamInfo;
             if (vInfo != null)
             {
-                return vInfo.Resolution.Height;
+                return vInfo.VideoResolution.Height;
             }
             else if (stream is MuxedStreamInfo mInfo)
             {
-                var q = vInfo?.VideoQuality ?? mInfo.VideoQuality;
-                if (q == VideoQuality.High4320)
-                {
-                    return 4320;
-                }
-                else if (q == VideoQuality.High3072)
-                {
-                    return 3072;
-                }
-                else if (q == VideoQuality.High2160)
-                {
-                    return 2160;
-                }
-                else if (q == VideoQuality.High1440)
-                {
-                    return 1440;
-                }
-                else if (q == VideoQuality.High1080)
-                {
-                    return 1080;
-                }
-                else if (q == VideoQuality.High720)
-                {
-                    return 720;
-                }
-                else if (q == VideoQuality.Medium480)
-                {
-                    return 480;
-                }
-                else if (q == VideoQuality.Medium360)
-                {
-                    return 360;
-                }
-                else if (q == VideoQuality.Low240)
-                {
-                    return 240;
-                }
-                else if (q == VideoQuality.Low144)
-                {
-                    return 144;
-                }
-                else
-                {
-                    return 0;
-                }
+                return vInfo?.VideoResolution.Height ?? mInfo.VideoQuality.MaxHeight;
+                //var q = vInfo?.VideoQuality ?? mInfo.VideoQuality;
+                //if (q == VideoQuality.High4320)
+                //{
+                //    return 4320;
+                //}
+                //else if (q == VideoQuality.High3072)
+                //{
+                //    return 3072;
+                //}
+                //else if (q == VideoQuality.High2160)
+                //{
+                //    return 2160;
+                //}
+                //else if (q == VideoQuality.High1440)
+                //{
+                //    return 1440;
+                //}
+                //else if (q == VideoQuality.High1080)
+                //{
+                //    return 1080;
+                //}
+                //else if (q == VideoQuality.High720)
+                //{
+                //    return 720;
+                //}
+                //else if (q == VideoQuality.Medium480)
+                //{
+                //    return 480;
+                //}
+                //else if (q == VideoQuality.Medium360)
+                //{
+                //    return 360;
+                //}
+                //else if (q == VideoQuality.Low240)
+                //{
+                //    return 240;
+                //}
+                //else if (q == VideoQuality.Low144)
+                //{
+                //    return 144;
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
             }
             else
             {

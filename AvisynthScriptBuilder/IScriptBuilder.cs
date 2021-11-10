@@ -25,6 +25,11 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         void AppendLine();
         /// <summary>
+        /// Appends specified value to the script, followed by a line break.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        void AppendLine(string value);
+        /// <summary>
         /// Appends a line to the script following specified format. Line break is automatically added.
         /// </summary>
         /// <param name="value">The value or format to append.</param>
@@ -42,6 +47,12 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         /// <param name="lines">The lines to append.</param>
         void AppendLine(IEnumerable<string> lines);
+        /// <summary>
+        /// Appends a line to the script following specified format using invariant culture. Line break is automatically added.
+        /// </summary>
+        /// <param name="value">The value or format to append.</param>
+        /// <param name="args">If adding a format, the list of arguments.</param>
+        void AppendLineInvariant(string value, params object[] args);
         /// <summary>
         /// Replaces all instances of oldValue with newValue.
         /// </summary>

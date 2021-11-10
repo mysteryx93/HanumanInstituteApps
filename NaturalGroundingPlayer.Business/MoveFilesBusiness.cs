@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EmergenceGuardian.CommonServices;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 
@@ -60,13 +60,13 @@ namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
         #region Declarations / Constructors
 
         protected readonly IFileSystemService fileSystem;
-        private IDefaultMediaPath defaultPath;
+        private IDefaultMediaPaths defaultPath;
         protected readonly ISettings settings;
         private IMediaAccess mediaAccess;
 
-        public MoveFilesBusiness() : this(new FileSystemService(), new DefaultMediaPath(), new Settings(), new MediaAccess()) { }
+        public MoveFilesBusiness() : this(new FileSystemService(), new DefaultMediaPaths(), new Settings(), new MediaAccess()) { }
 
-        public MoveFilesBusiness(IFileSystemService fileSystemService, IDefaultMediaPath defaultPath, ISettings settings, IMediaAccess mediaAccess) {
+        public MoveFilesBusiness(IFileSystemService fileSystemService, IDefaultMediaPaths defaultPath, ISettings settings, IMediaAccess mediaAccess) {
             this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
             this.defaultPath = defaultPath ?? throw new ArgumentNullException(nameof(defaultPath));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));

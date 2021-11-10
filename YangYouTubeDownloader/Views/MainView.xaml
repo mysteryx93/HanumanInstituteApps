@@ -28,11 +28,11 @@
             <Button x:Name="DownloadButton" Content="_Download" Margin="0,60,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" Command="{Binding DownloadCommand, Mode=OneWay}" />
         </Grid>
         <TextBlock HorizontalAlignment="Left" Margin="10,64,0,0" Text="{Binding Message, Mode=OneWay}" VerticalAlignment="Top" Foreground="#FFB20000" Visibility="{Binding DisplayError, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-        <ComboBox HorizontalAlignment="Right" Margin="0,8,218,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredVideo.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding PreferredVideo.SelectedIndex}" />
-        <ComboBox HorizontalAlignment="Right" Margin="0,8,153,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredAudio.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding PreferredAudio.SelectedIndex}" />
-        <ComboBox HorizontalAlignment="Right" Margin="0,8,88,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding MaxQuality.List}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedIndex="{Binding MaxQuality.SelectedIndex}" />
+        <ComboBox HorizontalAlignment="Right" Margin="0,8,218,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredVideo}" DisplayMemberPath="Text" SelectedValuePath="Value" />
+        <ComboBox HorizontalAlignment="Right" Margin="0,8,153,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding PreferredAudio}" DisplayMemberPath="Text" SelectedValuePath="Value" />
+        <ComboBox HorizontalAlignment="Right" Margin="0,8,88,0" VerticalAlignment="Top" Width="60" ItemsSource="{Binding MaxQuality}" DisplayMemberPath="Text" SelectedValuePath="Value" />
         <TextBlock HorizontalAlignment="Right" Margin="0,10,285,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Preferred Format" />
-        <ListView x:Name="DownloadsView_Copy" ItemsSource="{Binding Downloads.List}" SelectedIndex="{Binding Downloads.SelectedIndex}" SelectionMode="Single" Background="{x:Null}" Margin="10,160,10,0" Height="122" VerticalAlignment="Top" Visibility="{Binding HasDownloads, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+        <ListView ItemsSource="{Binding Downloads}" SelectionMode="Single" Background="{x:Null}" Margin="10,160,10,0" Height="122" VerticalAlignment="Top" Visibility="{Binding HasDownloads, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Title}" Header="Title" Width="340"/>

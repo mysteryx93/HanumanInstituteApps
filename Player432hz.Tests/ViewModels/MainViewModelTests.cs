@@ -13,16 +13,16 @@ namespace Player432hz.Tests.ViewModels
 {
     public class MainViewModelTests
     {
-        public Mock<IFilesListViewModel> MockFileList => _mockFileList ?? (_mockFileList = new Mock<IFilesListViewModel>());
+        public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
         private Mock<IFilesListViewModel>? _mockFileList;
 
-        public ISettingsProvider<SettingsData> MockSettings => _mockSettings ?? (_mockSettings = new FakeSettingsProvider<SettingsData>());
+        public ISettingsProvider<SettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<SettingsData>();
         private ISettingsProvider<SettingsData>? _mockSettings;
 
-        public PlaylistViewModelFactory Factory => _factory ?? (_factory = new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>()));
+        public PlaylistViewModelFactory Factory => _factory ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
         private PlaylistViewModelFactory? _factory;
 
-        public MainViewModel Model => _model ?? (_model = new MainViewModel(Factory, MockSettings, MockFileList.Object));
+        public MainViewModel Model => _model ??= new MainViewModel(Factory, MockSettings, MockFileList.Object);
         private MainViewModel? _model;
 
 
@@ -30,7 +30,7 @@ namespace Player432hz.Tests.ViewModels
         {
             for (var i = 0; i < count; i++)
             {
-                Model.Playlists.List.Add(_factory!.Create());
+                Model.Playlists.Source.Add(_factory!.Create());
             }
         }
 
@@ -47,7 +47,7 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.AddPlaylistCommand.Execute(null);
 
-            Assert.Equal(0, Model.Playlists.SelectedIndex);
+            Assert.Equal(0, Model.Playlists.CurrentPosition);
         }
 
         [Theory]
@@ -60,7 +60,7 @@ namespace Player432hz.Tests.ViewModels
         public void CanDeletePlaylistCommand_WithSelectedIndex_ReturnsTrueIfSelectedIndexValid(int selectedIndex, bool expected)
         {
             AddPlaylists(2); // List contains 2 elements.
-            Model.Playlists.SelectedIndex = selectedIndex;
+            Model.Playlists.MoveCurrentToPosition(selectedIndex);
 
             var result = Model.DeletePlaylistCommand.CanExecute(null);
 
@@ -75,7 +75,7 @@ namespace Player432hz.Tests.ViewModels
 
             Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(listCount, Model.Playlists.List.Count);
+            Assert.Equal(listCount, Model.Playlists.Source.Count);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Empty(Model.Playlists.List);
+            Assert.Empty(Model.Playlists.Source);
         }
 
         [Theory]
@@ -94,13 +94,13 @@ namespace Player432hz.Tests.ViewModels
         {
             var listCount = 3;
             AddPlaylists(listCount);
-            Model.Playlists.SelectedIndex = selectedIndex;
-            var selectedItem = Model.Playlists.SelectedItem;
+            Model.Playlists.MoveCurrentToPosition(selectedIndex);
+            var selectedItem = Model.Playlists.CurrentItem;
 
             Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(listCount - 1, Model.Playlists.List.Count);
-            Assert.DoesNotContain(selectedItem, Model.Playlists.List);
+            Assert.Equal(listCount - 1, Model.Playlists.Source.Count);
+            Assert.DoesNotContain(selectedItem, Model.Playlists.Source);
         }
 
         [Theory]
@@ -110,18 +110,18 @@ namespace Player432hz.Tests.ViewModels
         public void DeletePlaylistCommand_LastSelected_SetValidSelectedIndex(int count, int sel, int newSel)
         {
             AddPlaylists(count);
-            Model.Playlists.SelectedIndex = sel;
+            Model.Playlists.MoveCurrentToPosition(sel);
 
             Model.DeletePlaylistCommand.Execute(null);
 
-            Assert.Equal(newSel, Model.Playlists.SelectedIndex);
+            Assert.Equal(newSel, Model.Playlists.CurrentPosition);
         }
 
         [Fact]
         public void DeletePlaylistCommand_ValidSelectedIndex_FilesListSetPathsCalled()
         {
             AddPlaylists(1);
-            Model.Playlists.SelectedIndex = 0;
+            Model.Playlists.MoveCurrentToFirst();
             MockFileList.Reset();
 
             Model.DeletePlaylistCommand.Execute(null);
@@ -134,7 +134,7 @@ namespace Player432hz.Tests.ViewModels
         {
             AddPlaylists(1);
 
-            Model.Playlists.SelectedIndex = 0;
+            Model.Playlists.MoveCurrentToFirst();
 
             MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
@@ -143,10 +143,10 @@ namespace Player432hz.Tests.ViewModels
         public void Playlists_RemoveSelection_FilesListSetPathsCalled()
         {
             AddPlaylists(1);
-            Model.Playlists.SelectedIndex = 0;
+            Model.Playlists.MoveCurrentToFirst();
             MockFileList.Reset();
 
-            Model.Playlists.SelectedIndex = -1;
+            Model.Playlists.MoveCurrentToPosition(-1);
 
             MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
@@ -171,7 +171,7 @@ namespace Player432hz.Tests.ViewModels
 
             MockSettings.Load();
 
-            Assert.Equal(2, Model.Playlists.List.Count);
+            Assert.Equal(2, Model.Playlists.Source.Count);
         }
 
         [Fact]
@@ -182,8 +182,8 @@ namespace Player432hz.Tests.ViewModels
 
             MockSettings.Load();
 
-            Assert.NotEmpty(Model.Playlists.List);
-            Assert.Equal(3, Model.Playlists.List[0].Folders.List.Count);
+            Assert.NotEmpty(Model.Playlists.Source);
+            Assert.Equal(3, Model.Playlists.Source[0].Folders.Source.Count);
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace Player432hz.Tests.ViewModels
         public void SaveSettings_WithFolders_FillSettingsFolders()
         {
             AddPlaylists(1);
-            Model.Playlists.List[0].Folders.List.Add("a");
+            Model.Playlists.Source[0].Folders.Source.Add("a");
 
             Model.SaveSettings();
 

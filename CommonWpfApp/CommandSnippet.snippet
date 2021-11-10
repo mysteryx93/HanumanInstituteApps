@@ -23,7 +23,7 @@
       <Code Language="CSharp">
         <![CDATA[
         public ICommand $NameUpper$Command => CommandHelper.InitCommand(ref _$NameLower$Command, On$NameUpper$, () => Can$NameUpper$);
-        private ICommand? _$NameLower$Command;
+        private RelayCommand? _$NameLower$Command;
         private bool Can$NameUpper$ => true;
         private void On$NameUpper$()
         {
@@ -35,6 +35,9 @@
       <Imports>
         <Import>
           <Namespace>System.Windows.Input</Namespace>
+        </Import>
+        <Import>
+          <Namespace>GalaSoft.MvvmLight.CommandWpf</Namespace>
         </Import>
         <Import>
           <Namespace>HanumanInstitute.CommonWpfApp</Namespace>

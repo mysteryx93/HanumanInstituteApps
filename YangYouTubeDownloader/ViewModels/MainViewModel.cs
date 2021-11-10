@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -6,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpf;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Downloads;
@@ -33,29 +36,35 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             _streamSelector = streamSelector.CheckNotNull(nameof(streamSelector));
             _dialogService = dialogService;
 
-            var prefV = PreferredVideo.List;
-            prefV.Add(StreamContainerOption.Best);
-            prefV.Add(StreamContainerOption.MP4);
-            prefV.Add(StreamContainerOption.WebM);
-            prefV.Add(StreamContainerOption.Tgpp);
-            prefV.Add(StreamContainerOption.None);
-            PreferredVideo.SelectedIndex = 0;
+            PreferredVideo = new ListItemCollectionView<StreamContainerOption>()
+            {
+                { StreamContainerOption.Best },
+                { StreamContainerOption.MP4 },
+                { StreamContainerOption.WebM },
+                { StreamContainerOption.Tgpp },
+                { StreamContainerOption.None }
+            };
+            PreferredVideo.MoveCurrentToFirst();
 
-            var prefA = PreferredAudio.List;
-            prefA.Add(StreamContainerOption.Best);
-            prefA.Add(StreamContainerOption.MP4);
-            prefA.Add(StreamContainerOption.WebM);
-            prefA.Add(StreamContainerOption.Tgpp);
-            prefA.Add(StreamContainerOption.None);
-            PreferredAudio.SelectedIndex = 0;
+            PreferredAudio = new ListItemCollectionView<StreamContainerOption>()
+            {
+                { StreamContainerOption.Best },
+                { StreamContainerOption.MP4 },
+                { StreamContainerOption.WebM },
+                { StreamContainerOption.Tgpp },
+                { StreamContainerOption.None }
+            };
+            PreferredAudio.MoveCurrentToFirst();
 
-            var qual = MaxQuality.List;
-            qual.Add(0, Resources.Max);
+            var qual = new List<ListItem<int>>
+            {
+                { 0, Resources.Max }
+            };
             foreach (var res in new[] { 4320, 3072, 2160, 1440, 1080, 720, 480, 360, 240, 144 })
             {
                 qual.Add(res, string.Format(CultureInfo.InvariantCulture, "{0}p", res));
             }
-            MaxQuality.SelectedIndex = 0;
+            MaxQuality = new ListItemCollectionView<int>(qual);
 
             _downloadManager.DownloadAdded += DownloadManager_DownloadAdded;
         }
@@ -66,15 +75,18 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 
         public bool DisplayDownloadInfo { get; private set; }
         public bool IsDownloadValid { get; private set; }
-        public ISelectableList<ListItem<StreamContainerOption>> PreferredVideo { get; private set; } = new SelectableList<ListItem<StreamContainerOption>>();
-        public ISelectableList<ListItem<StreamContainerOption>> PreferredAudio { get; private set; } = new SelectableList<ListItem<StreamContainerOption>>();
-        public ISelectableList<ListItem<int>> MaxQuality { get; private set; } = new SelectableList<ListItem<int>>();
+        public ICollectionView<ListItem<StreamContainerOption>> PreferredVideo { get; private set; }
+        public ICollectionView<ListItem<StreamContainerOption>> PreferredAudio { get; private set; }
+        public ICollectionView<ListItem<int>> MaxQuality { get; private set; }
+        // public ISelectableList<ListItem<StreamContainerOption>> PreferredVideo { get; private set; } = new SelectableList<ListItem<StreamContainerOption>>();
+        //public ISelectableList<ListItem<StreamContainerOption>> PreferredAudio { get; private set; } = new SelectableList<ListItem<StreamContainerOption>>();
+        // public ISelectableList<ListItem<int>> MaxQuality { get; private set; }
         public string Message { get; private set; } = string.Empty;
         public string VideoTitle { get; private set; } = string.Empty;
         // public string VideoContainer { get; private set; } = string.Empty;
         public string VideoStreamInfo { get; private set; } = string.Empty;
         public string AudioStreamInfo { get; private set; } = string.Empty;
-        public ISelectableList<DownloadItem> Downloads { get; private set; } = new SelectableList<DownloadItem>();
+        public ObservableCollection<DownloadItem> Downloads { get; private set; } = new ObservableCollection<DownloadItem>();
         public bool IsDownloadInitializing { get; private set; }
         private Uri? _downloadUri;
 
@@ -93,7 +105,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
             AudioStreamInfo = string.Empty;
 
             // Validate.
-            if (PreferredVideo.SelectedItem?.Value == StreamContainerOption.None && PreferredAudio.SelectedItem?.Value == StreamContainerOption.None)
+            if (PreferredVideo.CurrentItem?.Value == StreamContainerOption.None && PreferredAudio.CurrentItem?.Value == StreamContainerOption.None)
             {
                 SetError(Resources.SetPreferredFormats);
                 return;
@@ -144,8 +156,8 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
                     {
                         VideoStreamInfo = string.Format(CultureInfo.InvariantCulture, "{0} - {1} ({2:N1}mb) (with audio)",
                             query.Video.VideoCodec,
-                            query.Video.VideoQualityLabel,
-                            query.Video.Size.TotalMegaBytes);
+                            query.Video.VideoQuality.Label,
+                            query.Video.Size.MegaBytes);
                         AudioStreamInfo = string.Format(CultureInfo.InvariantCulture, "{0}",
                             query.Audio?.AudioCodec);
                     }
@@ -155,15 +167,15 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
                         {
                             VideoStreamInfo = string.Format(CultureInfo.InvariantCulture, "{0} - {1} ({2:N1}mb)",
                                 query.Video.VideoCodec,
-                                query.Video.VideoQualityLabel,
-                                query.Video.Size.TotalMegaBytes);
+                                query.Video.VideoQuality.Label,
+                                query.Video.Size.MegaBytes);
                         }
                         if (query.Audio != null)
                         {
                             AudioStreamInfo = string.Format(CultureInfo.InvariantCulture, "{0} - {1:N0}kbps ({2:N1}mb)",
                                 query.Audio.AudioCodec,
                                 query.Audio.Bitrate.KiloBitsPerSecond,
-                                query.Audio.Size.TotalMegaBytes);
+                                query.Audio.Size.MegaBytes);
                         }
                     }
                     _downloadCommand?.RaiseCanExecuteChanged();
@@ -226,15 +238,15 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
         {
             return new DownloadOptions()
             {
-                PreferredVideo = PreferredVideo.SelectedItem!.Value,
-                PreferredAudio = PreferredAudio.SelectedItem!.Value,
-                MaxQuality = MaxQuality.SelectedItem!.Value,
+                PreferredVideo = PreferredVideo.CurrentItem!.Value,
+                PreferredAudio = PreferredAudio.CurrentItem!.Value,
+                MaxQuality = MaxQuality.CurrentItem!.Value,
                 ConcurrentDownloads = 2
             };
         }
 
         public bool DisplayError => !DisplayDownloadInfo && Message != null;
-        public bool HasDownloads => Downloads.List.Any();
+        public bool HasDownloads => Downloads.Any();
 
         private void SetError(string text = "")
         {
@@ -245,7 +257,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 
         private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e)
         {
-            Downloads.List.Add(new DownloadItem(e.Download, VideoTitle));
+            Downloads.Add(new DownloadItem(e.Download, VideoTitle));
             RaisePropertyChanged(nameof(HasDownloads));
         }
     }

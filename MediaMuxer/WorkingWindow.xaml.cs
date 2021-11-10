@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace EmergenceGuardian.AudioVideoMuxer {
+namespace HanumanInstitute.MediaMuxer {
     /// <summary>
     /// Interaction logic for InitializingWindow.xaml
     /// </summary>

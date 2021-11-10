@@ -29,7 +29,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
             _settings.Loaded += Settings_Loaded;
             Settings_Loaded(_settings, new EventArgs());
 
-            Playlists.PropertyChanged += Playlists_PropertyChanged;
+            Playlists.CurrentChanged += Playlists_CurrentChanged;
         }
 
         /// <summary>
@@ -62,10 +62,16 @@ namespace HanumanInstitute.Player432hz.ViewModels
             set => _settings.Value.Top = value;
         }
 
+        public int Volume
+        {
+            get => _settings.Value.Volume;
+            set => _settings.Value.Volume = value;
+        }
+
         /// <summary>
         /// Returns the list of playlists with selection properties that can be bound to the UI.
         /// </summary>
-        public ISelectableList<IPlaylistViewModel> Playlists { get; private set; } = new SelectableList<IPlaylistViewModel>();
+        public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } = new CollectionView<IPlaylistViewModel>();
 
         public ICommand PlayCommand => _filesListViewModel.PlayCommand;
 
@@ -74,14 +80,14 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// </summary>
         public ICommand AddPlaylistCommand => CommandHelper.InitCommand(ref _addPlaylistCommand, OnAddPlaylist, () => CanAddPlaylist);
         private RelayCommand? _addPlaylistCommand;
-        private bool CanAddPlaylist => Playlists.List != null;
+        private bool CanAddPlaylist => Playlists.Source != null;
         private void OnAddPlaylist()
         {
             if (CanAddPlaylist)
             {
                 var newPlaylist = _playlistFactory.Create();
-                Playlists.List.Add(newPlaylist);
-                Playlists.SelectedIndex = Playlists.List.Count - 1;
+                Playlists.Source.Add(newPlaylist);
+                Playlists.MoveCurrentToLast();
             }
         }
 
@@ -90,15 +96,15 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// </summary>
         public ICommand DeletePlaylistCommand => CommandHelper.InitCommand(ref _deletePlaylistCommand, OnDeletePlaylist, () => CanDeletePlaylist);
         private RelayCommand? _deletePlaylistCommand;
-        private bool CanDeletePlaylist => Playlists.HasSelection;
+        private bool CanDeletePlaylist => Playlists.CurrentItem != null;
         private void OnDeletePlaylist()
         {
             if (CanDeletePlaylist)
             {
-                Playlists.List.RemoveAt(Playlists.SelectedIndex);
-                if (Playlists.SelectedIndex >= Playlists.List.Count)
+                Playlists.Source.RemoveAt(Playlists.CurrentPosition);
+                if (Playlists.CurrentPosition >= Playlists.Source.Count)
                 {
-                    Playlists.SelectedIndex = Playlists.List.Count - 1;
+                    Playlists.MoveCurrentToLast();
                 }
             }
         }
@@ -106,13 +112,9 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// When a playlist is selected, display the files.
         /// </summary>
-        /// <param name="list"></param>
-        private void Playlists_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Playlists_CurrentChanged(object? sender, EventArgs e)
         {
-            if (e.PropertyName == nameof(Playlists.SelectedItem))
-            {
-                _filesListViewModel.SetPaths(Playlists?.SelectedItem?.Folders?.List);
-            }
+            _filesListViewModel.SetPaths(Playlists?.CurrentItem?.Folders?.Source);
         }
 
         /// <summary>
@@ -123,11 +125,15 @@ namespace HanumanInstitute.Player432hz.ViewModels
             RaisePropertyChanged(nameof(WindowHeight));
             RaisePropertyChanged(nameof(WindowWidth));
 
-            Playlists.List.Clear();
+            Playlists.Source.Clear();
             var playlists = _settings?.Value?.Playlists;
             if (playlists != null)
             {
-                Playlists.ReplaceAll(playlists.Select(x => _playlistFactory.Create(x)));
+                Playlists.Source.Clear();
+                foreach (var item in playlists.Select(x => _playlistFactory.Create(x)))
+                {
+                    Playlists.Source.Add(item);
+                }
             }
         }
 
@@ -137,7 +143,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         public void SaveSettings()
         {
             _settings.Value.Playlists.Clear();
-            _settings.Value.Playlists.AddRange(Playlists.List.Select(x => new SettingsPlaylistItem(x.Name, x.Folders.List)));
+            _settings.Value.Playlists.AddRange(Playlists.Source.Select(x => new SettingsPlaylistItem(x.Name, x.Folders.Source)));
             _settings.Save();
         }
     }

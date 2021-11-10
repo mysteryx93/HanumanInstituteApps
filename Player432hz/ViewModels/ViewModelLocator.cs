@@ -20,7 +20,6 @@ using CommonServiceLocator.WindsorAdapter;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
 using HanumanInstitute.Player432hz.Business;
-using GalaSoft.MvvmLight;
 using MvvmDialogs;
 using Component = Castle.MicroKernel.Registration.Component;
 

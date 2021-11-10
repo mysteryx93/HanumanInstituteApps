@@ -43,10 +43,10 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         public void Cleanup()
         {
-            string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[] Lines = _script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             string[] CommandsToMove = new string[] { "AddAutoloadDir", "P=", "LoadPlugin", "Import", "LoadVirtualDubPlugin" };
             var NewScriptLines = Lines.Where(l => CommandsToMove.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase))).Concat(Lines.Where(l => !CommandsToMove.Any(c => l.StartsWith(c, StringComparison.InvariantCultureIgnoreCase))));
-            script = new StringBuilder(string.Join(scriptPath.NewLine, NewScriptLines));
+            _script = new StringBuilder(string.Join(scriptPath.NewLine, NewScriptLines));
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         public void ConvertToMultiProcesses(double sourceFrameRate)
         {
-            string[] Lines = script.ToString().TrimEnd('\r', '\n').Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            script = new StringBuilder();
+            string[] Lines = _script.ToString().TrimEnd('\r', '\n').Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            _script = new StringBuilder();
             AddPluginPath();
             LoadPluginAvsi("AviSynthMT.avsi");
             LoadPluginDll("MP_Pipeline.dll");
@@ -115,11 +115,11 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         public void RemoveMT()
         {
-            script = script.Replace(string.Format("Cores={0},", Environment.ProcessorCount), "Cores=1,");
-            string[] Lines = script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            _script = _script.Replace(string.Format("Cores={0},", Environment.ProcessorCount), "Cores=1,");
+            string[] Lines = _script.ToString().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             string[] CommandsToComment = new string[] { "SetMTMode", "SetFilterMTMode", "Prefetch", @"Import(P+""AviSynthMT.avsi"")" };
             string[] NewLines = Lines.Where(l => !CommandsToComment.Any(c => l.StartsWith(c))).ToArray();
-            script = new StringBuilder(string.Join(scriptPath.NewLine, NewLines));
+            _script = new StringBuilder(string.Join(scriptPath.NewLine, NewLines));
         }
 
         /// <summary>

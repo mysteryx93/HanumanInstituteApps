@@ -2,19 +2,23 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile></DocumentationFile>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,19 +29,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Windsor" Version="5.0.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MvvmDialogs" Version="7.0.0" />
+    <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+    <PackageReference Include="MvvmDialogs" Version="8.0.0" />
     <PackageReference Include="MvvmLight" Version="5.4.1.1" />
-    <PackageReference Include="NAudio" Version="1.10.0" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
+    <PackageReference Include="NAudio" Version="2.0.0" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MediaPlayerUI.NET\MediaPlayerUI\MediaPlayerUI.csproj" />
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\MpvPlayerUI\MpvPlayerUI.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\NAudioPlayerUI\NAudioPlayerUI.csproj" />
     <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
     <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />

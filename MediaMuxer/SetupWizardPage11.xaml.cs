@@ -2,9 +2,9 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using EmergenceGuardian.WpfCommon;
+using HanumanInstitute.WpfCommon;
 
-namespace EmergenceGuardian.AudioVideoMuxer {
+namespace HanumanInstitute.MediaMuxer {
     /// <summary>
     /// Interaction logic for Page1.xaml
     /// </summary>

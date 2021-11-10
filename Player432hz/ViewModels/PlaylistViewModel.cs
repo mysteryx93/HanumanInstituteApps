@@ -30,7 +30,11 @@ namespace HanumanInstitute.Player432hz.ViewModels
             if (data != null)
             {
                 Name = data.Name;
-                Folders.ReplaceAll(data.Folders);
+                Folders.Source.Clear();
+                foreach (var item in data.Folders)
+                {
+                    Folders.Source.Add(item);
+                }
             }
         }
 
@@ -42,7 +46,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets the list of folders in the playlist and provides selection properties.
         /// </summary>
-        public SelectableList<string> Folders { get; set; } = new SelectableList<string>();
+        public ICollectionView<string> Folders { get; set; } = new CollectionView<string>();
 
         /// <summary>
         /// Shows a folder picker and adds selected folder to the list.
@@ -58,9 +62,9 @@ namespace HanumanInstitute.Player432hz.ViewModels
                 _dialogService.ShowFolderBrowserDialog(this, folderSettings);
                 if (!string.IsNullOrEmpty(folderSettings.SelectedPath))
                 {
-                    Folders.List.Add(folderSettings.SelectedPath);
-                    Folders.ForceSelect(Folders.List.Count - 1);
-                    _fileListViewModel.SetPaths(Folders.List);
+                    Folders.Source.Add(folderSettings.SelectedPath);
+                    Folders.MoveCurrentToLast();
+                    _fileListViewModel.SetPaths(Folders.Source);
                 }
             }
         }
@@ -70,15 +74,15 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// </summary>
         public ICommand RemoveFolderCommand => CommandHelper.InitCommand(ref _removeFolderCommand, OnRemoveFolder, () => CanRemoveFolder);
         private RelayCommand? _removeFolderCommand;
-        private bool CanRemoveFolder => Folders.SelectedIndex > -1 && Folders.SelectedIndex < Folders.List.Count;
+        private bool CanRemoveFolder => Folders.CurrentPosition > -1 && Folders.CurrentPosition < Folders.Source.Count;
         private void OnRemoveFolder()
         {
             if (CanRemoveFolder)
             {
-                var selection = Folders.SelectedIndex;
-                Folders.List.RemoveAt(Folders.SelectedIndex);
-                Folders.ForceSelect(selection);
-                _fileListViewModel.SetPaths(Folders.List);
+                var selection = Folders.CurrentPosition;
+                Folders.Source.RemoveAt(Folders.CurrentPosition);
+                Folders.MoveCurrentToPosition(selection);
+                _fileListViewModel.SetPaths(Folders.Source);
             }
         }
     }

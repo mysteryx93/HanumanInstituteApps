@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using YoutubeExplode.Videos;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.Downloads.Properties;
+using Microsoft.Extensions.Options;
+using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
@@ -99,6 +98,42 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.
         /// </summary>
+        /// <param name="downloadUrl">The analyzed download query.</param>
+        /// <param name="destination">The destination where to save the downloaded file.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
+        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
+        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
+        /// <exception cref="UriFormatException">The Url is invalid.</exception>
+        public async Task<DownloadStatus> DownloadAsync(string downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null)
+        {
+            return await DownloadAsync(new Uri(downloadUrl), destination, downloadVideo, downloadAudio, options, taskCreatedCallback).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Starts a new download task and adds it to the downloads pool.
+        /// </summary>
+        /// <param name="downloadUrl">The analyzed download query.</param>
+        /// <param name="destination">The destination where to save the downloaded file.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
+        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
+        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
+        /// <exception cref="UriFormatException">The Url is invalid.</exception>
+        public async Task<DownloadStatus> DownloadAsync(Uri downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null)
+        {
+            var vInfo = await QueryStreamInfoAsync(downloadUrl).ConfigureAwait(false);
+            var streams = SelectStreams(vInfo, downloadVideo, downloadAudio, options);
+            return await DownloadAsync(streams, destination, taskCreatedCallback).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Starts a new download task and adds it to the downloads pool.
+        /// </summary>
         /// <param name="streamQuery">The analyzed download query.</param>
         /// <param name="destination">The destination where to save the downloaded file.</param>
         /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
@@ -144,7 +179,7 @@ namespace HanumanInstitute.Downloads
 
             try
             {
-                var result = new VideoId(url.AbsoluteUri);
+                var result = VideoId.Parse(url.AbsoluteUri);
                 if (string.IsNullOrEmpty(result.Value))
                 {
                     throw new UriFormatException(string.Format(CultureInfo.InvariantCulture, Resources.InvalidYouTubeId, url.AbsoluteUri));
@@ -158,7 +193,7 @@ namespace HanumanInstitute.Downloads
         }
 
 
-        private bool _disposedValue = false;
+        private bool _disposedValue;
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)

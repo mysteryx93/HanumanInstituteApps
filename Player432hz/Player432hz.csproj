@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
@@ -43,11 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
   </ItemGroup>
 
   <ItemGroup>

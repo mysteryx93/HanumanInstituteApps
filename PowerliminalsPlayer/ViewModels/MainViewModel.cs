@@ -8,7 +8,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.PowerliminalsPlayer.Business;
+using HanumanInstitute.PowerliminalsPlayer.Models;
+using HanumanInstitute.PowerliminalsPlayer.Services;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs.FolderBrowser;
 using PropertyChanged;
@@ -161,18 +162,17 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         public ICommand LoadPresetCommand => CommandHelper.InitCommand(ref _loadPresetCommand, OnLoadPreset, () => CanLoadPreset);
         private RelayCommand? _loadPresetCommand;
         private bool CanLoadPreset => AppData?.Presets?.Any() == true;
-        private void OnLoadPreset()
+        private async void OnLoadPreset()
         {
             if (CanLoadPreset)
             {
-                var selectPreset = ViewModelLocator.SelectPreset.Load(false);
-                var result = _dialogService.ShowDialog(this, selectPreset);
-                var preset = selectPreset.SelectedItem;
-                if (result == true && preset != null)
+                var vm = await _dialogService.ShowSelectPresetViewAsync(this, false).ConfigureAwait(true);
+                var loadItem = vm?.SelectedItem;
+                if (loadItem != null)
                 {
-                    preset.SaveAs(Playlist);
+                    loadItem.SaveAs(Playlist);
                     Playlist.MasterVolume = -1;
-                    Playlist.MasterVolume = preset.MasterVolume;
+                    Playlist.MasterVolume = loadItem.MasterVolume;
                 }
             }
         }
@@ -180,25 +180,22 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         public ICommand SavePresetCommand => CommandHelper.InitCommand(ref _savePresetCommand, OnSavePreset, () => CanSavePreset);
         private RelayCommand? _savePresetCommand;
         private bool CanSavePreset => Playlist?.Files?.Any() == true;
-        private void OnSavePreset()
+        private async void OnSavePreset()
         {
             if (CanSavePreset)
             {
-                // _dialogService.ShowDialog(this, );
-
-                var selectPreset = ViewModelLocator.SelectPreset.Load(true);
-                var result = _dialogService.ShowDialog(this, selectPreset);
-                var presetName = selectPreset.PresetName;
-                if (result == true && !string.IsNullOrWhiteSpace(presetName))
+                var vm = await _dialogService.ShowSelectPresetViewAsync(this, true).ConfigureAwait(true);
+                var saveName = vm?.PresetName;
+                if (saveName != null && !string.IsNullOrWhiteSpace(saveName))
                 {
-                    var preset = GetPresetByName(presetName);
+                    var preset = GetPresetByName(saveName);
                     if (preset == null)
                     {
                         preset = new PresetItem();
                         AppData.Presets.Add(preset);
                     }
                     Playlist.SaveAs(preset);
-                    preset.Name = presetName;
+                    preset.Name = saveName;
                     Save();
                 }
             }

@@ -58,7 +58,35 @@ namespace HanumanInstitute.Downloads
         /// <param name="downloadAudio">Whether to download the audio.</param>
         /// <param name="options">The download options.</param>
         /// <returns>The analysis results.</returns>
-        public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null);
+        StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null);
+
+        /// <summary>
+        /// Starts a new download task and adds it to the downloads pool.
+        /// </summary>
+        /// <param name="downloadUrl">The analyzed download query.</param>
+        /// <param name="destination">The destination where to save the downloaded file.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
+        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
+        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
+        /// <exception cref="UriFormatException">The Url is invalid.</exception>
+        Task<DownloadStatus> DownloadAsync(string downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null);
+
+        /// <summary>
+        /// Starts a new download task and adds it to the downloads pool.
+        /// </summary>
+        /// <param name="downloadUrl">The analyzed download query.</param>
+        /// <param name="destination">The destination where to save the downloaded file.</param>
+        /// <param name="downloadVideo">Whether to download the video.</param>
+        /// <param name="downloadAudio">Whether to download the audio.</param>
+        /// <param name="options">The download options.</param>
+        /// <param name="taskCreatedCallback">Callback to receive an instance of the download task.</param>
+        /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
+        /// <exception cref="TaskCanceledException">Download requred was cancelled or timed out.</exception>
+        /// <exception cref="UriFormatException">The Url is invalid.</exception>
+        Task<DownloadStatus> DownloadAsync(Uri downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null);
 
         /// <summary>
         /// Starts a new download task and adds it to the downloads pool.

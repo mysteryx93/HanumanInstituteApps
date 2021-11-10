@@ -30,7 +30,7 @@ namespace HanumanInstitute.CommonWpfApp.ViewModels
     /// application and provides an entry point for the bindings.
     /// </summary>
     [SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Required for designer integration")]
-    public class ViewModelLocator
+    internal class ViewModelLocator
     {
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.

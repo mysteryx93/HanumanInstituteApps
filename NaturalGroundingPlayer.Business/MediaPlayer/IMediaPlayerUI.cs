@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
-    public interface IMediaPlayerUI {
+namespace HanumanInstitute.NaturalGroundingPlayer.MediaPlayer
+{
+    public interface IMediaPlayerUI
+    {
         event EventHandler MediaOpened;
         event EventHandler MediaResume;
         event EventHandler MediaPause;

@@ -13,7 +13,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets the list of files and selection properties.
         /// </summary>
-        SelectableList<string> Files { get; }
+        ICollectionView<string> Files { get; }
 
         /// <summary>
         /// Sets the folder paths from which to load files.

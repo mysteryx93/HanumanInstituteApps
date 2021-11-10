@@ -2,7 +2,7 @@
 using System.Timers;
 using MPC_API_LIB;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 

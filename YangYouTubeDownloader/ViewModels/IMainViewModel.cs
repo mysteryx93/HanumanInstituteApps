@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using HanumanInstitute.CommonWpf;
@@ -18,13 +19,13 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
         bool DisplayDownloadInfo { get; }
         bool DisplayError { get; }
         bool IsDownloadValid { get; }
-        ISelectableList<ListItem<int>> MaxQuality { get; }
+        ICollectionView<ListItem<int>> MaxQuality { get; }
         string Message { get; }
-        ISelectableList<ListItem<StreamContainerOption>> PreferredAudio { get; }
-        ISelectableList<ListItem<StreamContainerOption>> PreferredVideo { get; }
+        ICollectionView<ListItem<StreamContainerOption>> PreferredAudio { get; }
+        ICollectionView<ListItem<StreamContainerOption>> PreferredVideo { get; }
         //string VideoContainer { get; }
         string VideoStreamInfo { get; }
         string VideoTitle { get; }
-        ISelectableList<DownloadItem> Downloads { get; }
+        ObservableCollection<DownloadItem> Downloads { get; }
     }
 }

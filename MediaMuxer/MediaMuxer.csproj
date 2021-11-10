@@ -7,6 +7,7 @@
     <RootNamespace>HanumanInstitute.MediaMuxer</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
     <ApplicationIcon>Icons\App.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,9 +34,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Views\" />
-    <Folder Include="ViewModels\" />
+    <PackageReference Include="MvvmWizard" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg.Windsor\FFmpeg.Windsor.csproj" />
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj" />
+    <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
+    <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
+    <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
   </ItemGroup>
 
 </Project>

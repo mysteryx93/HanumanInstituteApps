@@ -12,19 +12,19 @@ namespace Player432hz.Tests.ViewModels
 {
     public class FilesListViewModelTests
     {
-        public Mock<IPlaylistPlayer> MockPlayer => _mockPlayer ?? (_mockPlayer = new Mock<IPlaylistPlayer>());
+        public Mock<IPlaylistPlayer> MockPlayer => _mockPlayer ??= new Mock<IPlaylistPlayer>();
         private Mock<IPlaylistPlayer>? _mockPlayer;
 
-        public Mock<IFileSystemService> MockFileSystem => _mockFileSystem ?? (_mockFileSystem = SetupFileSystem());
+        public Mock<IFileSystemService> MockFileSystem => _mockFileSystem ??= SetupFileSystem();
         private Mock<IFileSystemService>? _mockFileSystem;
 
-        public IAppPathService AppPath => _appPath ?? (_appPath = new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object));
+        public IAppPathService AppPath => _appPath ??= new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object);
         private IAppPathService? _appPath;
 
-        public IFileLocator FileLocator => _fileLocator ?? (_fileLocator = new FileLocator(AppPath, MockFileSystem.Object));
+        public IFileLocator FileLocator => _fileLocator ??= new FileLocator(AppPath, MockFileSystem.Object);
         private IFileLocator? _fileLocator;
 
-        public IFilesListViewModel Model => _model ?? (_model = new FilesListViewModel(FileLocator, MockPlayer.Object));
+        public IFilesListViewModel Model => _model ??= new FilesListViewModel(FileLocator, MockPlayer.Object);
         private IFilesListViewModel? _model;
 
         private static IEnumerable<string> PathValue => new string[] { "test-path" };
@@ -51,7 +51,7 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.SetPaths(null);
 
-            Assert.Empty(Model.Files.List);
+            Assert.Empty(Model.Files.Source);
             VerifyGetFiles(Times.Never());
         }
 
@@ -60,7 +60,7 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.SetPaths(PathValue);
 
-            Assert.Equal(FileList, Model.Files.List);
+            Assert.Equal(FileList, Model.Files.Source);
             VerifyGetFiles(Times.Once());
         }
 
@@ -77,8 +77,8 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.SetPaths(PathValue);
 
-            var _ = Model.Files.List;
-            _ = Model.Files.List;
+            var _ = Model.Files.Source;
+            _ = Model.Files.Source;
             VerifyGetFiles(Times.Once());
         }
 
@@ -88,7 +88,7 @@ namespace Player432hz.Tests.ViewModels
             Model.SetPaths(PathValue);
             Model.SetPaths(null);
 
-            Assert.Empty(Model.Files.List);
+            Assert.Empty(Model.Files.Source);
             VerifyGetFiles(Times.Never());
         }
 
@@ -99,7 +99,7 @@ namespace Player432hz.Tests.ViewModels
             var _ = Model.Files;
             Model.SetPaths(null);
 
-            Assert.Empty(Model.Files.List);
+            Assert.Empty(Model.Files.Source);
             VerifyGetFiles(Times.Once());
         }
     }

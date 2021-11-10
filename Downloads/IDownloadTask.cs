@@ -16,7 +16,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets the destination path to store the file locally.
         /// </summary>
-        string Destination { get; }
+        string Destination { get; set; }
         /// <summary>
         /// Gets the analyzed download query.
         /// </summary>
@@ -41,13 +41,13 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Occurs before performing the muxing operation.
         /// </summary>
-        event MuxeTaskEventHandler? BeforeMuxing;
+        event MuxeTaskEventHandler? Muxing;
         /// <summary>
         /// Occurus when progress information is updated.
         /// </summary>
         event DownloadTaskEventHandler? ProgressUpdated;
         /// <summary>
-        /// Gets or sets the progress of all streams as percentage.
+        /// Gets the progress of all streams as percentage.
         /// </summary>
         double ProgressValue { get; }
         /// <summary>

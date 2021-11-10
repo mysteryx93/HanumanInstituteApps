@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Text;
 
@@ -10,25 +11,26 @@ namespace HanumanInstitute.AvisynthScriptBuilder
     /// </summary>
     public class ScriptBuilder : IScriptBuilder
     {
-        private readonly IScriptPathService scriptPath;
-        private readonly IFileSystem fileSystem;
+        private readonly IScriptPathService _scriptPath;
+        private readonly IFileSystem _fileSystem;
 
         public ScriptBuilder() : this(new ScriptPathService(), new FileSystem()) { }
 
         public ScriptBuilder(IScriptPathService scriptPathService, IFileSystem fileSystemService)
         {
-            this.scriptPath = scriptPathService ?? throw new ArgumentNullException(nameof(scriptPathService));
-            this.fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+            _scriptPath = scriptPathService;
+            _fileSystem = fileSystemService;
         }
 
-        protected StringBuilder script = new StringBuilder();
+        private StringBuilder _script = new StringBuilder();
 
         /// <summary>
         /// Gets or sets the script contained in this class.
         /// </summary>
-        public string Script {
-            get { return script.ToString(); }
-            set { script = new StringBuilder(value); }
+        public string Script
+        {
+            get { return _script.ToString(); }
+            set { _script = new StringBuilder(value); }
         }
 
         /// <summary>
@@ -42,8 +44,18 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <summary>
         /// Returns whether the script is empty.
         /// </summary>
-        public bool IsEmpty {
-            get { return script.Length == 0; }
+        public bool IsEmpty
+        {
+            get { return _script.Length == 0; }
+        }
+
+        /// <summary>
+        /// Appends specified value to the script, followed by a line break.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        public void AppendLine(string value)
+        {
+            _script.AppendLine(value);
         }
 
         /// <summary>
@@ -51,7 +63,7 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// </summary>
         public void AppendLine()
         {
-            script.AppendLine();
+            _script.AppendLine();
         }
 
         /// <summary>
@@ -62,9 +74,13 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         public void AppendLine(string value, params object[] args)
         {
             if (args != null && args.Length > 0)
-                script.AppendFormat(value, args).AppendLine();
+            {
+                _script.AppendFormat(value, args).AppendLine();
+            }
             else
-                script.AppendLine(value);
+            {
+                _script.AppendLine(value);
+            }
         }
 
         /// <summary>
@@ -76,20 +92,44 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         public void AppendLine(IFormatProvider culture, string value, params object[] args)
         {
             if (args != null && args.Length > 0)
-                script.AppendFormat(culture, value, args).AppendLine();
+            {
+                _script.AppendFormat(culture, value, args).AppendLine();
+            }
             else
-                script.AppendLine(value);
+            {
+                _script.AppendLine(value);
+            }
         }
 
         /// <summary>
         /// Appends specified lines to the script.
         /// </summary>
         /// <param name="lines">The lines to append.</param>
-        public void AppendLine(IEnumerable<string> lines)
+        public void AppendLine(IEnumerable<string>? lines)
         {
-            foreach (string item in lines)
+            if (lines != null)
             {
-                script.AppendLine(item);
+                foreach (var item in lines)
+                {
+                    _script.AppendLine(item);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Appends a line to the script following specified format using invariant culture. Line break is automatically added.
+        /// </summary>
+        /// <param name="value">The value or format to append.</param>
+        /// <param name="args">If adding a format, the list of arguments.</param>
+        public void AppendLineInvariant(string value, params object[] args)
+        {
+            if (args != null && args.Length > 0)
+            {
+                _script.AppendFormat(CultureInfo.InvariantCulture, value, args).AppendLine();
+            }
+            else
+            {
+                _script.AppendLine(value);
             }
         }
 
@@ -100,7 +140,7 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <param name="newValue">The string to replace with.</param>
         public void Replace(string oldValue, string newValue)
         {
-            script.Replace(oldValue, newValue);
+            _script.Replace(oldValue, newValue);
         }
 
         /// <summary>
@@ -110,10 +150,12 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <returns>True if any of the value was found, otherwise false.</returns>
         public bool ContainsAny(string[] values)
         {
-            string StrScript = script.ToString();
-            foreach (string item in values)
+            values.CheckNotNull(nameof(values));
+
+            var strScript = _script.ToString();
+            foreach (var item in values)
             {
-                if (StrScript.IndexOf(scriptPath.NewLine + item, StringComparison.InvariantCultureIgnoreCase) > -1)
+                if (strScript.IndexOf(_scriptPath.NewLine + item, StringComparison.InvariantCultureIgnoreCase) > -1)
                 {
                     return true;
                 }
@@ -127,11 +169,13 @@ namespace HanumanInstitute.AvisynthScriptBuilder
         /// <param name="path">The path of the file to write.</param>
         public void WriteToFile(string path)
         {
-            string Folder = fileSystem.Path.GetDirectoryName(path);
-            if (!fileSystem.Directory.Exists(Folder))
-                fileSystem.Directory.CreateDirectory(Folder);
+            var folder = _fileSystem.Path.GetDirectoryName(path);
+            if (!_fileSystem.Directory.Exists(folder))
+            {
+                _fileSystem.Directory.CreateDirectory(folder);
+            }
 
-            fileSystem.File.WriteAllText(path, script.ToString(), Encoding.ASCII);
+            _fileSystem.File.WriteAllText(path, _script.ToString(), Encoding.ASCII);
         }
     }
 }

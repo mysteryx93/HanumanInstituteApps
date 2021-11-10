@@ -3,8 +3,6 @@ using System.Drawing;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Castle.Core.Internal;
-using GalaSoft.MvvmLight.Threading;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp.ViewModels;
 using HanumanInstitute.CommonWpfApp.Views;
@@ -19,10 +17,10 @@ namespace HanumanInstitute.CommonWpfApp
             createWindow.CheckNotNull(nameof(createWindow));
 
             // Show splash screen.
-            var splashVM = CommonWpfApp.ViewModels.ViewModelLocator.Splash;
+            var splashVM = new SplashViewModel();
             var splashThread = new Thread(() => ShowSplashThread(splashVM, splashImage));
             splashThread.SetApartmentState(ApartmentState.STA);
-            //SplashThread.IsBackground = true;
+            //splashThread.IsBackground = true;
             splashThread.Priority = ThreadPriority.AboveNormal;
             splashThread.Name = "Splash Screen";
             splashThread.Start();

@@ -73,13 +73,13 @@
     </Window.TaskbarItemInfo>-->
     <Grid Style="{DynamicResource GradiantBackground}">
         <Grid Margin="164,8,10,0" DataContext="{Binding Playlists.SelectedItem}" Height="108" VerticalAlignment="Top" IsEnabled="{Binding Converter={StaticResource HasValueConverter}, Mode=OneWay}" md:DialogServiceViews.IsRegistered="True">
-            <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders.List}" TabIndex="5" Background="{x:Null}" SelectedIndex="{Binding Folders.SelectedIndex, Mode=TwoWay}" />
+            <ListBox x:Name="FoldersList" Margin="0,23,0,0" ItemsSource="{Binding Folders}" TabIndex="5" Background="{x:Null}" />
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top" FontWeight="Bold"/>
             <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Height="21" Margin="80,0,0,0" VerticalAlignment="Top" Width="120" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="4" Background="{x:Null}"/>
             <Button x:Name="AddFolderButton" Content="Add" HorizontalAlignment="Right" Margin="0,-1,80,0" VerticalAlignment="Top" Width="75" TabIndex="6" Command="{Binding AddFolderCommand, Mode=OneWay}"/>
             <Button x:Name="RemoveFolderButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" TabIndex="7" Command="{Binding RemoveFolderCommand, Mode=OneWay}" Margin="0,-1,0,0"/>
         </Grid>
-        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,34,0,51" Width="146" ItemsSource="{Binding Playlists.List}" SelectedValuePath="Name" TabIndex="1" Background="{x:Null}" SelectedIndex="{Binding Playlists.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" >
+        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left" Margin="10,34,0,51" Width="146" ItemsSource="{Binding Playlists}" SelectedValuePath="Name" TabIndex="1" Background="{x:Null}" HorizontalContentAlignment="Stretch" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}">
@@ -100,14 +100,14 @@
             </Grid.DataContext>
             <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False" StopCommandExecuted="{wpf:MethodBinding MediaFinished}">
                 <naudio:NAudioPlayerHost Source="{Binding Player.NowPlaying, Mode=TwoWay}" Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}" MediaFinished="{wpf:MethodBinding MediaFinished}"
-                    Volume="{Binding Source={StaticResource Locator}, Path=Settings.Current.Volume, Mode=TwoWay}" Pitch="0.98181818181818181" />
+                    Volume="{Binding DataContext.Volume, ElementName=UI, Mode=TwoWay}" Pitch="0.98181818181818181" />
             </ui:MediaPlayer>
         </Grid>
         <Grid Margin="164,120,10,54">
             <Grid.DataContext>
                 <Binding Mode="OneWay" Path="FilesList" Source="{StaticResource Locator}" />
             </Grid.DataContext>
-            <ListBox x:Name="FilesList" Margin="0,24,0,0" ItemsSource="{Binding Files.List}" TabIndex="8" Background="{x:Null}" SelectedIndex="{Binding Files.SelectedIndex, Mode=TwoWay}" HorizontalContentAlignment="Stretch" >
+            <ListBox x:Name="FilesList" Margin="0,24,0,0" ItemsSource="{Binding Files}" TabIndex="8" Background="{x:Null}" HorizontalContentAlignment="Stretch" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}">

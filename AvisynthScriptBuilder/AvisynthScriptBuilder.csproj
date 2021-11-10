@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>HanumanInstitute.AvisynthScriptBuilder</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
@@ -16,11 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="11.0.2" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.29" />
   </ItemGroup>
 
   <ItemGroup>

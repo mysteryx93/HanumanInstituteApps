@@ -13,7 +13,7 @@ namespace HanumanInstitute.Downloads
         /// <summary>
         /// Gets or sets the maximum height of the video stream to download. Useful to limit bandwidth usage.
         /// </summary>
-        public int MaxQuality { get; set; } = 0;
+        public int MaxQuality { get; set; }
         /// <summary>
         /// Gets or sets the preferred video stream type to download.
         /// </summary>

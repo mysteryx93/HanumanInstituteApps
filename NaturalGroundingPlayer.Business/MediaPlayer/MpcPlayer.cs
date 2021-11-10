@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using MPC_API_LIB;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 

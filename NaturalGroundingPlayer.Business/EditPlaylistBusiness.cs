@@ -4,12 +4,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Threading.Tasks;
-using EmergenceGuardian.CommonServices;
-using EmergenceGuardian.DownloadManager;
-using EmergenceGuardian.Encoder;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.DownloadManager;
+using HanumanInstitute.Encoder;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 
@@ -137,14 +137,14 @@ namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
         protected readonly IFileSystemService fileSystem;
         protected readonly ISettings settings;
         protected readonly IAppPathService appPath;
-        private IDefaultMediaPath defaultPath;
+        private IDefaultMediaPaths defaultPath;
         private IMediaInfoReader mediaInfo;
         private ISearchMediaAccess searchAccess;
         private IMediaAccess mediaAccess;
 
         public EditPlaylistBusiness() { }
 
-        public EditPlaylistBusiness(IFileSystemService fileSystem, ISettings settings, IAppPathService appPathService, IDefaultMediaPath defaultPath, IMediaInfoReader mediaInfo, ISearchMediaAccess searchAccess, IMediaAccess editMediaAccess) {
+        public EditPlaylistBusiness(IFileSystemService fileSystem, ISettings settings, IAppPathService appPathService, IDefaultMediaPaths defaultPath, IMediaInfoReader mediaInfo, ISearchMediaAccess searchAccess, IMediaAccess editMediaAccess) {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.appPath = appPathService ?? throw new ArgumentNullException(nameof(appPathService));

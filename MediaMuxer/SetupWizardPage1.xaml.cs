@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace EmergenceGuardian.AudioVideoMuxer {
+namespace HanumanInstitute.MediaMuxer {
     /// <summary>
     /// Interaction logic for Page1.xaml
     /// </summary>

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using EmergenceGuardian.FFmpeg;
-using EmergenceGuardian.WpfCommon;
+using HanumanInstitute.FFmpeg;
+using HanumanInstitute.WpfCommon;
 using Business;
 
-namespace EmergenceGuardian.AudioVideoMuxer {
+namespace HanumanInstitute.MediaMuxer {
     /// <summary>
     /// Interaction logic for SetupWizard.xaml
     /// </summary>
@@ -19,7 +19,7 @@ namespace EmergenceGuardian.AudioVideoMuxer {
         private IWizardPage page;
         private bool isLastPage;
         // private int totalPages = 7;
-        public MuxerBusiness Business = new MuxerBusiness();
+        public MuxerService Business = new MuxerService();
 
         public MainWindow() {
             InitializeComponent();

@@ -27,7 +27,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets the list of files and selection properties.
         /// </summary>
-        public SelectableList<string> Files
+        public ICollectionView<string> Files
         {
             get
             {
@@ -39,7 +39,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
                 return _files;
             }
         }
-        private readonly SelectableList<string> _files = new SelectableList<string>();
+        private readonly ICollectionView<string> _files = new CollectionView<string>();
 
         /// <summary>
         /// Sets the folder paths from which to load files.
@@ -48,7 +48,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         public void SetPaths(IEnumerable<string>? paths)
         {
             _paths = paths?.ToList();
-            _files.List.Clear();
+            _files.Source.Clear();
             _loaded = false;
         }
         private List<string>? _paths;
@@ -59,12 +59,12 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// </summary>
         private void Load()
         {
-            _files.List.Clear();
+            _files.Source.Clear();
             if (_paths != null)
             {
                 foreach (var item in _fileLocator.GetAudioFiles(_paths))
                 {
-                    _files.List.Add(item);
+                    _files.Source.Add(item);
                 }
             }
         }
@@ -74,12 +74,12 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// </summary>
         public ICommand PlayCommand => CommandHelper.InitCommand(ref _playCommand, OnPlay, CanPlay);
         private RelayCommand? _playCommand;
-        private bool CanPlay() => Files?.List?.Any() == true;
+        private bool CanPlay() => Files?.Any() == true;
         private void OnPlay()
         {
             if (CanPlay())
             {
-                _playlistPlayer.Play(Files.List, Files.SelectedItem);
+                _playlistPlayer.Play(Files, Files.CurrentItem);
             }
         }
     }

@@ -166,6 +166,6 @@
         </MultiTrigger>
       </Style.Triggers>
     </Style>
-    <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels" />
+    <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.Services" />
   </Application.Resources>
 </Application>

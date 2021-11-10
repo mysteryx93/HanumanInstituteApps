@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerliminalsPlayer", "..\P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAudioPlayerUI", "..\..\MediaPlayerUI.NET\NAudioPlayerUI\NAudioPlayerUI.csproj", "{B909F95E-1F71-49FD-A53E-4F3ABD26019C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MpvPlayerUI", "..\..\MediaPlayerUI.NET\MpvPlayerUI\MpvPlayerUI.csproj", "{9F85C640-A534-4330-A524-20812D4AD391}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +148,22 @@ Global
 		{B909F95E-1F71-49FD-A53E-4F3ABD26019C}.Release|x64.Build.0 = Release|Any CPU
 		{B909F95E-1F71-49FD-A53E-4F3ABD26019C}.Release|x86.ActiveCfg = Release|Any CPU
 		{B909F95E-1F71-49FD-A53E-4F3ABD26019C}.Release|x86.Build.0 = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|x64.Build.0 = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F85C640-A534-4330-A524-20812D4AD391}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

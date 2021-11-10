@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EmergenceGuardian.Encoder;
+using HanumanInstitute.Encoder;
 using YoutubeExplode;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
-using EmergenceGuardian.CommonServices;
-using EmergenceGuardian.DownloadManager;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.DownloadManager;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 

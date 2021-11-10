@@ -4,10 +4,10 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
-using EmergenceGuardian.CommonServices;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
     /// <summary>
     /// Provides features to export, import and synchronize data.
     /// </summary>

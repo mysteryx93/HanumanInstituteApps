@@ -24,7 +24,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <ui:MediaPlayer IsLoopVisible="False">
-                            <naudio:NAudioPlayerHost Source="{Binding FullPath, Mode=TwoWay}" Volume="{Binding Volume, Mode=TwoWay}" SpeedInt="{Binding Speed, Mode=TwoWay}" IsPlaying="{Binding IsPlaying, Mode=TwoWay}" Loop="True" MediaUnloaded="{wpf:MethodBinding {Binding ViewModel, ElementName=UI}, MediaUnloaded, {Binding}}" PositionRefreshMilliseconds="500" />
+                            <naudio:NAudioPlayerHost Source="{Binding FullPath, Mode=TwoWay}" Volume="{Binding Volume, Mode=TwoWay}" SpeedInt="{Binding Speed, Mode=TwoWay}" IsPlaying="{Binding IsPlaying, Mode=TwoWay}" Loop="True" MediaUnloaded="{wpf:MethodBinding {Binding ViewModel, ElementName=UI}, MediaUnloaded, {Binding}}" PositionRefreshMilliseconds="500" VolumeBoost="0.4" UseSoundTouch="True" />
                         </ui:MediaPlayer>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

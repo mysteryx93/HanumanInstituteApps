@@ -50,7 +50,7 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             {
                 // Read source script and remove MT. Also remove Deshaker if present.
                 var FileContent = _fileSystem.File.ReadAllText(source);
-                FileContent.Replace(_scriptPath.NewLine + "Deshaker", _scriptPath.NewLine + "#Deshaker");
+                FileContent = FileContent.Replace(_scriptPath.NewLine + "Deshaker", _scriptPath.NewLine + "#Deshaker", StringComparison.InvariantCulture);
                 Script = _scriptFactory.CreateAvisynthScript();
                 Script.Script = FileContent;
                 Script.RemoveMT();
@@ -64,7 +64,7 @@ namespace HanumanInstitute.AvisynthScriptBuilder
             }
             // Get frame count.
             Script.AppendLine();
-            Script.AppendLine(@"WriteFileStart(""{0}"", ""FrameRate""{1}""Framecount"")", TempResult, @", """""" "","" """""", ");
+            Script.AppendLineInvariant(@"WriteFileStart(""{0}"", ""FrameRate""{1}""Framecount"")", TempResult, @", """""" "","" """""", ");
             Script.AppendLine("Trim(0,-1)");
             Script.WriteToFile(TempScript);
 

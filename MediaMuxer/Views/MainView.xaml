@@ -1,0 +1,15 @@
+﻿<Window x:Class="HanumanInstitute.MediaMuxer.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:HanumanInstitute.MediaMuxer.Views"
+        xmlns:wiz="clr-namespace:MvvmWizard.Controls;assembly=MvvmWizard"
+        Title="Audio Video Muxer" Height="350" Width="484" Loaded="Window_Loaded" ResizeMode="NoResize" Closing="Window_Closing" WindowStartupLocation="CenterOwner" Icon="/Icons/App.ico">
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <wiz:Wizard>
+            <wiz:WizardStep x:Name="Main" ViewType="{x:Type local:WizardMain}" ForwardButtonVisibility="Collapsed" />
+            <wiz:WizardStep x:Name="Muxe" ViewType="{x:Type local:WizardMuxe1}" />
+            <wiz:WizardStep ViewType="{x:Type local:WizardMuxe2}" />
+            <wiz:WizardStep x:Name="Working" ViewType="{x:Type local:WizardWorking}" />
+        </wiz:Wizard>
+    </Grid>
+</Window>

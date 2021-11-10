@@ -13,13 +13,13 @@ namespace Player432hz.Tests.ViewModels
 {
     public class PlaylistViewModelTests
     {
-        public Mock<IDialogService> MockDialogService => _mockDialogService ?? (_mockDialogService = new Mock<IDialogService>());
+        public Mock<IDialogService> MockDialogService => _mockDialogService ??= new Mock<IDialogService>();
         private Mock<IDialogService>? _mockDialogService;
 
-        public Mock<IFilesListViewModel> MockFileList => _mockFileList ?? (_mockFileList = new Mock<IFilesListViewModel>());
+        public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
         private Mock<IFilesListViewModel>? _mockFileList;
 
-        public PlaylistViewModel Model => _model ?? (_model = new PlaylistViewModel(MockDialogService.Object, MockFileList.Object));
+        public PlaylistViewModel Model => _model ??= new PlaylistViewModel(MockDialogService.Object, MockFileList.Object);
         private PlaylistViewModel? _model;
 
         private const string DialogFolderPath = "C:\\";
@@ -34,7 +34,7 @@ namespace Player432hz.Tests.ViewModels
         {
             for (var i = 0; i < count; i++)
             {
-                Model.Folders.List.Add(i.ToString(CultureInfo.InvariantCulture));
+                Model.Folders.Source.Add(i.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -57,30 +57,30 @@ namespace Player432hz.Tests.ViewModels
         [Fact]
         public void AddFolderCommand_ExecuteCancel_NoAction()
         {
-            var listCount = Model.Folders.List.Count;
+            var listCount = Model.Folders.Source.Count;
             // MockDialogService.ShowFolderBrowserDialog() returns false by default.
 
             Model.AddFolderCommand.Execute(null);
 
-            Assert.Equal(listCount, Model.Folders.List.Count);
+            Assert.Equal(listCount, Model.Folders.Source.Count);
         }
 
         [Fact]
         public void AddFolderCommand_SelectDir_FolderAddedToList()
         {
-            var listCount = Model.Folders.List.Count;
+            var listCount = Model.Folders.Source.Count;
             SetDialogFolder();
 
             Model.AddFolderCommand.Execute(null);
 
-            Assert.Equal(listCount + 1, Model.Folders.List.Count);
-            Assert.Equal(DialogFolderPath, Model.Folders.List.Last());
+            Assert.Equal(listCount + 1, Model.Folders.Source.Count);
+            Assert.Equal(DialogFolderPath, Model.Folders.Source.Last());
         }
 
         [Fact]
         public void AddFolderCommand_SelectDir_FilesListSetPathsCalled()
         {
-            var listCount = Model.Folders.List.Count;
+            var listCount = Model.Folders.Source.Count;
             SetDialogFolder();
 
             Model.AddFolderCommand.Execute(null);
@@ -98,7 +98,7 @@ namespace Player432hz.Tests.ViewModels
         public void CanRemoveFolderCommand_WithSelectedIndex_ReturnsTrueIfSelectedIndexValid(int selectedIndex, bool expected)
         {
             AddFolders(2); // List contains 2 elements.
-            Model.Folders.SelectedIndex = selectedIndex;
+            Model.Folders.MoveCurrentToPosition(selectedIndex);
 
             var result = Model.RemoveFolderCommand.CanExecute(null);
 
@@ -113,7 +113,7 @@ namespace Player432hz.Tests.ViewModels
 
             Model.RemoveFolderCommand.Execute(null);
 
-            Assert.Equal(listCount, Model.Folders.List.Count);
+            Assert.Equal(listCount, Model.Folders.Source.Count);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace Player432hz.Tests.ViewModels
         {
             Model.RemoveFolderCommand.Execute(null);
 
-            Assert.Empty(Model.Folders.List);
+            Assert.Empty(Model.Folders.Source);
         }
 
         [Theory]
@@ -132,13 +132,13 @@ namespace Player432hz.Tests.ViewModels
         {
             var listCount = 3;
             AddFolders(listCount);
-            Model.Folders.SelectedIndex = selectedIndex;
-            var selectedItem = Model.Folders.SelectedItem;
+            Model.Folders.MoveCurrentToPosition(selectedIndex);
+            var selectedItem = Model.Folders.CurrentItem;
 
             Model.RemoveFolderCommand.Execute(null);
 
-            Assert.Equal(listCount - 1, Model.Folders.List.Count);
-            Assert.DoesNotContain(selectedItem, Model.Folders.List);
+            Assert.Equal(listCount - 1, Model.Folders.Source.Count);
+            Assert.DoesNotContain(selectedItem, Model.Folders.Source);
         }
 
         [Theory]
@@ -148,18 +148,18 @@ namespace Player432hz.Tests.ViewModels
         public void RemoveFolderCommand_LastSelected_SetValidSelectedIndex(int count, int sel, int newSel)
         {
             AddFolders(count);
-            Model.Folders.SelectedIndex = sel;
+            Model.Folders.MoveCurrentToPosition(sel);
 
             Model.RemoveFolderCommand.Execute(null);
 
-            Assert.Equal(newSel, Model.Folders.SelectedIndex);
+            Assert.Equal(newSel, Model.Folders.CurrentPosition);
         }
 
         [Fact]
         public void RemoveFolderCommand_ValidSelectedIndex_FilesListSetPathsCalled()
         {
             AddFolders(1);
-            Model.Folders.SelectedIndex = 0;
+            Model.Folders.MoveCurrentToFirst();
             MockFileList.Reset();
 
             Model.RemoveFolderCommand.Execute(null);

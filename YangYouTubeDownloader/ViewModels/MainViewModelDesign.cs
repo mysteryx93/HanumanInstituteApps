@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -10,7 +11,7 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 {
     public class MainViewModelDesign : IMainViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand DownloadCommand => new RelayCommand(null);
 
@@ -28,18 +29,18 @@ namespace HanumanInstitute.YangYouTubeDownloader.ViewModels
 
         public bool IsDownloadValid => true;
 
-        public ISelectableList<ListItem<int>> MaxQuality => new SelectableList<ListItem<int>>();
+        public ICollectionView<ListItem<int>> MaxQuality => new ListItemCollectionView<int>();
 
         public string Message => "Message";
 
-        public ISelectableList<ListItem<StreamContainerOption>> PreferredAudio => new SelectableList<ListItem<StreamContainerOption>>();
+        public ICollectionView<ListItem<StreamContainerOption>> PreferredAudio => new ListItemCollectionView<StreamContainerOption>();
 
-        public ISelectableList<ListItem<StreamContainerOption>> PreferredVideo => new SelectableList<ListItem<StreamContainerOption>>();
+        public ICollectionView<ListItem<StreamContainerOption>> PreferredVideo => new ListItemCollectionView<StreamContainerOption>();
 
         public string VideoStreamInfo => "[VideoStreamInfo]";
 
         public string VideoTitle => "[VideoTitle]";
 
-        public ISelectableList<DownloadItem> Downloads => new SelectableList<DownloadItem>();
+        public ObservableCollection<DownloadItem> Downloads => new ObservableCollection<DownloadItem>();
     }
 }

@@ -3,15 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf;assembly=CommonWpf"
         xmlns:local="clr-namespace:HanumanInstitute.CommonWpfApp"
         mc:Ignorable="d"
         Title="SplashWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="True"
         Width="{Binding Size.Width, FallbackValue=480}" Height="{Binding Size.Height, FallbackValue=480}" UseLayoutRounding="True"
-        ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}"
-        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs" md:DialogServiceViews.IsRegistered="True" Closing="Window_Closing">
+        ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" Closing="Window_Closing">
     <Window.Resources>
         <!--<vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:HanumanInstitute.CommonWpfApp.ViewModels" />-->
         <local:BitmapToImageSourceConverter x:Key="BitmapToImageSourceConverter"/>
@@ -45,9 +43,9 @@
         </EventTrigger>
     </Window.Triggers>
     <i:Interaction.Triggers>
-        <ei:DataTrigger Binding="{Binding IsLoadCompleted, Mode=OneWay}" Value="true">
-            <ei:ControlStoryboardAction Storyboard="{StaticResource CloseAnimation}" ControlStoryboardOption="Play"/>
-        </ei:DataTrigger>
+        <i:DataTrigger Binding="{Binding IsLoadCompleted, Mode=OneWay}" Value="true">
+            <i:ControlStoryboardAction Storyboard="{StaticResource CloseAnimation}" ControlStoryboardOption="Play"/>
+        </i:DataTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Image x:Name="ImageBox" x:FieldModifier="public" RenderTransformOrigin="0.5,0.5" Source="{Binding Image, Converter={StaticResource BitmapToImageSourceConverter}}">

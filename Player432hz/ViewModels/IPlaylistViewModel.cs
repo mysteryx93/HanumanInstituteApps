@@ -16,7 +16,7 @@ namespace HanumanInstitute.Player432hz.ViewModels
         /// <summary>
         /// Gets the list of folders in the playlist and provides selection properties.
         /// </summary>
-        SelectableList<string> Folders { get; set; }
+        ICollectionView<string> Folders { get; set; }
 
         /// <summary>
         /// Shows a folder picker and adds selected folder to the list.

@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>HanumanInstitute.CommonTests</RootNamespace>
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="11.0.4" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.33" />
   </ItemGroup>
 
   <ItemGroup>

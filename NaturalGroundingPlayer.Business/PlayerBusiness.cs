@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
-using EmergenceGuardian.CommonServices;
-using EmergenceGuardian.DownloadManager;
-using EmergenceGuardian.NaturalGroundingPlayer.DataAccess;
+using HanumanInstitute.CommonServices;
+using HanumanInstitute.DownloadManager;
+using HanumanInstitute.NaturalGroundingPlayer.DataAccess;
 
-namespace EmergenceGuardian.NaturalGroundingPlayer.Business {
+namespace HanumanInstitute.NaturalGroundingPlayer.Business {
 
     #region Interface
 

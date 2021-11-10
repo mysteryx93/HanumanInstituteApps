@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace EmergenceGuardian.AudioVideoMuxer {
+namespace HanumanInstitute.MediaMuxer {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>

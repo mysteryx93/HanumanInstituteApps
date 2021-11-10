@@ -6,7 +6,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.CommonWpfApp;
-using HanumanInstitute.PowerliminalsPlayer.Business;
+using HanumanInstitute.PowerliminalsPlayer.Models;
 using MvvmDialogs;
 using PropertyChanged;
 
@@ -49,9 +49,9 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 
         public bool ModeSave { get; set; } = true;
 
-        public SelectPresetViewModel Load(bool modelSave)
+        public SelectPresetViewModel Load(bool modeSave)
         {
-            ModeSave = modelSave;
+            ModeSave = modeSave;
             if (!ModeSave)
             {
                 SelectedItem = AppData.Presets.FirstOrDefault();

@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using HanumanInstitute.CommonServices;
 using HanumanInstitute.Downloads.Properties;
 using HanumanInstitute.FFmpeg;
-using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads
@@ -37,9 +35,9 @@ namespace HanumanInstitute.Downloads
         }
 
         /// <summary>
-        /// Gets the destination path to store the file locally.
+        /// Gets or sets the destination path to store the file locally.
         /// </summary>
-        public string Destination { get; private set; }
+        public string Destination { get; set; }
         /// <summary>
         /// Gets the analyzed download query.
         /// </summary>
@@ -49,18 +47,18 @@ namespace HanumanInstitute.Downloads
         /// </summary>
         public IList<DownloadTaskFile> Files { get; } = new List<DownloadTaskFile>();
         private DownloadStatus _status = DownloadStatus.Waiting;
-        private bool _isCalled = false;
+        private bool _isCalled;
 
         /// <summary>
         /// Occurs before performing the muxing operation.
         /// </summary>
-        public event MuxeTaskEventHandler? BeforeMuxing;
+        public event MuxeTaskEventHandler? Muxing;
         /// <summary>
         /// Occurus when progress information is updated.
         /// </summary>
         public event DownloadTaskEventHandler? ProgressUpdated;
         /// <summary>
-        /// Gets or sets the progress of all streams as percentage.
+        /// Gets the progress of all streams as percentage.
         /// </summary>
         public double ProgressValue { get; internal set; }
         /// <summary>
@@ -126,7 +124,7 @@ namespace HanumanInstitute.Downloads
             {
                 Files.Add(new DownloadTaskFile(true, Query.OutputAudio != null && Query.Audio == null, new Uri(Query.Video.Url),
                     _fileSystem.GetPathWithoutExtension(Destination) + ".tempvideo",
-                    Query.Video, Query.Video.Size.TotalBytes));
+                    Query.Video, Query.Video.Size.Bytes));
             }
 
             // Add the best audio stream.
@@ -134,7 +132,7 @@ namespace HanumanInstitute.Downloads
             {
                 Files.Add(new DownloadTaskFile(Query.OutputVideo != null && Query.Video == null, true, new Uri(Query.Audio.Url),
                     _fileSystem.GetPathWithoutExtension(Destination) + ".tempaudio",
-                    Query.Audio, Query.Audio.Size.TotalBytes));
+                    Query.Audio, Query.Audio.Size.Bytes));
             }
 
             if (!IsCancelled)
@@ -258,11 +256,11 @@ namespace HanumanInstitute.Downloads
         private async Task MuxeStreams(string? videoFile, string? audioFile)
         {
             // Allow custom muxing.
-            if (BeforeMuxing != null)
+            if (Muxing != null)
             {
                 try
                 {
-                    await Task.Run(() => BeforeMuxing?.Invoke(this, new MuxeTaskEventArgs(this, videoFile, audioFile))).ConfigureAwait(false);
+                    await Task.Run(() => Muxing?.Invoke(this, new MuxeTaskEventArgs(this, videoFile, audioFile))).ConfigureAwait(false);
                 }
                 catch
                 {
