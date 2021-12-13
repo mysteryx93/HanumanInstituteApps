@@ -1,31 +1,30 @@
 ﻿using System.Windows.Input;
-using HanumanInstitute.CommonWpf;
+using HanumanInstitute.Common.Avalonia;
 
-namespace HanumanInstitute.Player432hz.ViewModels
+namespace HanumanInstitute.Player432hz.ViewModels;
+
+/// <summary>
+/// Represents a playlist for viewing and editing.
+/// </summary>
+public interface IPlaylistViewModel
 {
     /// <summary>
-    /// Represents a playlist for viewing and editing.
+    /// Gets or sets the name of this playlist.
     /// </summary>
-    public interface IPlaylistViewModel
-    {
-        /// <summary>
-        /// Gets or sets the name of this playlist.
-        /// </summary>
-        string Name { get; set; }
+    string Name { get; set; }
 
-        /// <summary>
-        /// Gets the list of folders in the playlist and provides selection properties.
-        /// </summary>
-        ICollectionView<string> Folders { get; set; }
+    /// <summary>
+    /// Gets the list of folders in the playlist and provides selection properties.
+    /// </summary>
+    ICollectionView<string> Folders { get; set; }
 
-        /// <summary>
-        /// Shows a folder picker and adds selected folder to the list.
-        /// </summary>
-        ICommand AddFolderCommand { get; }
+    /// <summary>
+    /// Shows a folder picker and adds selected folder to the list.
+    /// </summary>
+    ICommand AddFolderCommand { get; }
 
-        /// <summary>
-        /// Removes selected folder from the list.
-        /// </summary>
-        ICommand RemoveFolderCommand { get; }
-    }
+    /// <summary>
+    /// Removes selected folder from the list.
+    /// </summary>
+    ICommand RemoveFolderCommand { get; }
 }

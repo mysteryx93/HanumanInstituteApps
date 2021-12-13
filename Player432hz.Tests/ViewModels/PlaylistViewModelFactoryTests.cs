@@ -4,35 +4,34 @@ using MvvmDialogs;
 using Xunit;
 using Moq;
 
-namespace Player432hz.Tests.ViewModels
+namespace HanumanInstitute.Player432hz.Tests.ViewModels;
+
+public class PlaylistViewModelFactoryTests
 {
-    public class PlaylistViewModelFactoryTests
+    public IPlaylistViewModelFactory Model => _model ?? (_model = new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>()));
+    private IPlaylistViewModelFactory? _model;
+
+    private const string DefaultPlaylistName = "New Playlist";
+
+    [Fact]
+    public void Create_NoParam_ReturnsNewInstanceWithDefaultName()
     {
-        public IPlaylistViewModelFactory Model => _model ?? (_model = new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>()));
-        private IPlaylistViewModelFactory? _model;
+        var obj = Model.Create();
 
-        private const string DefaultPlaylistName = "New Playlist";
+        Assert.IsAssignableFrom<PlaylistViewModel>(obj);
+        Assert.Equal(DefaultPlaylistName, obj.Name);
+    }
 
-        [Fact]
-        public void Create_NoParam_ReturnsNewInstanceWithDefaultName()
-        {
-            var obj = Model.Create();
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("a")]
+    [InlineData(DefaultPlaylistName)]
+    public void Create_WithName_ReturnsNewInstanceWithName(string name)
+    {
+        var obj = Model.Create(name);
 
-            Assert.IsAssignableFrom<PlaylistViewModel>(obj);
-            Assert.Equal(DefaultPlaylistName, obj.Name);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("a")]
-        [InlineData(DefaultPlaylistName)]
-        public void Create_WithName_ReturnsNewInstanceWithName(string name)
-        {
-            var obj = Model.Create(name);
-
-            Assert.IsAssignableFrom<PlaylistViewModel>(obj);
-            Assert.Equal(name, obj.Name);
-        }
+        Assert.IsAssignableFrom<PlaylistViewModel>(obj);
+        Assert.Equal(name, obj.Name);
     }
 }

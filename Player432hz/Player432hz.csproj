@@ -1,78 +1,45 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
-    <NeutralLanguage>en</NeutralLanguage>
-    <StartupObject>HanumanInstitute.Player432hz.App</StartupObject>
-    <ApplicationIcon>Icons\App.ico</ApplicationIcon>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+    <IsPackable>false</IsPackable>
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <FileVersion>2.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="_\**" />
-    <EmbeddedResource Remove="_\**" />
-    <None Remove="_\**" />
-    <Page Remove="_\**" />
+    <AvaloniaResource Include="Assets\**" />
+    <None Remove=".gitignore" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Remove="Icons\App.ico" />
-    <None Remove="Icons\pause.png" />
-    <None Remove="Icons\play.png" />
-    <None Remove="Icons\stop.png" />
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
+    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
+    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
+    <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
+    <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
+    <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <Resource Include="Icons\App.ico" />
-    <Resource Include="Icons\pause.png" />
-    <Resource Include="Icons\play.png" />
-    <Resource Include="Icons\stop.png" />
+    <PackageReference Include="Avalonia" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10.4" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\MediaPlayerUI.NET\MediaPlayerUI\MediaPlayerUI.csproj" />
-    <ProjectReference Include="..\..\MediaPlayerUI.NET\NAudioPlayerUI\NAudioPlayerUI.csproj" />
-    <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
-    <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
-    <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="ffmpeg.exe">
+    <None Update="bass.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="bass_fx.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <RootNamespace>HanumanInstitute.Player432hz.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonWpfApp.Tests\CommonWpfApp.Tests.csproj" />
     <ProjectReference Include="..\Player432hz\Player432hz.csproj" />
   </ItemGroup>
 

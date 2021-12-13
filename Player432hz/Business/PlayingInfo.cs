@@ -1,12 +1,27 @@
-﻿using System;
+﻿using ReactiveUI;
 
-namespace HanumanInstitute.Player432hz.Business
+namespace HanumanInstitute.Player432hz.Business;
+
+public class PlayingInfo : ReactiveObject
 {
-    [PropertyChanged.AddINotifyPropertyChangedInterface]
-    public class PlayingInfo
+    public string FileName
     {
-        public string FileName { get; set; } = string.Empty;
-        public double Position { get; set; }
-        public double Duration { get; set; }
+        get => _fileName;
+        set => this.RaiseAndSetIfChanged(ref _fileName, value, nameof(FileName));
     }
+    private string _fileName = string.Empty;
+
+    public double Position
+    {
+        get => _position;
+        set => this.RaiseAndSetIfChanged(ref _position, value, nameof(Position));
+    }
+    private double _position;
+
+    public double Duration
+    {
+        get => _duration;
+        set => this.RaiseAndSetIfChanged(ref _duration, value, nameof(Duration));
+    }
+    private double _duration;
 }
