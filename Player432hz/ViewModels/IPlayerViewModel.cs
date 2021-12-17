@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Player432hz.Business;
+﻿using System.Windows.Input;
+using HanumanInstitute.Player432hz.Business;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
@@ -15,5 +16,5 @@ public interface IPlayerViewModel
     /// <summary>
     /// Plays the next file when playback ends.
     /// </summary>
-    void MediaFinished();
+    ICommand PlayNextCommand { get; }
 }

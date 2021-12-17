@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Input;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.Player432hz.Business;
@@ -29,7 +31,7 @@ public class MainViewModel : ViewModelBase
         _settings.Loaded += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
 
-        Playlists.CurrentChanged += Playlists_CurrentChanged;
+        Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe((_) => Playlists_CurrentChanged());
     }
 
     /// <summary>
@@ -68,6 +70,18 @@ public class MainViewModel : ViewModelBase
     public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } =
         new CollectionView<IPlaylistViewModel>();
 
+    public ICommand PlayListCommand => _playListCommand ??= ReactiveCommand.Create<TappedEventArgs>(OnPlayList);
+    private ICommand? _playListCommand;
+    private void OnPlayList(TappedEventArgs e)
+    {
+        _filesListViewModel.Files.CurrentItem = null;
+        _filesListViewModel.PlayCommand.Execute(null);
+    }
+
+    public ICommand PlayFileCommand => _playFileCommand ??= ReactiveCommand.Create<TappedEventArgs>(OnPlayFile);
+    private ICommand? _playFileCommand;
+    private void OnPlayFile(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute(null);
+
     public ICommand PlayCommand => _filesListViewModel.PlayCommand;
 
     /// <summary>
@@ -86,7 +100,7 @@ public class MainViewModel : ViewModelBase
     /// Deletes selected playlist from the list.
     /// </summary>
     public ICommand DeletePlaylistCommand => _deletePlaylistCommand ??= ReactiveCommand.Create(OnDeletePlaylist,
-            this.WhenAnyValue(x => x.Playlists.CurrentItem).Select(x => x != null));
+        this.WhenAnyValue(x => x.Playlists.CurrentItem).Select(x => x != null));
     private ICommand? _deletePlaylistCommand;
     private void OnDeletePlaylist()
     {
@@ -100,7 +114,7 @@ public class MainViewModel : ViewModelBase
     /// <summary>
     /// When a playlist is selected, display the files.
     /// </summary>
-    private void Playlists_CurrentChanged(object? sender, EventArgs e)
+    private void Playlists_CurrentChanged()
     {
         _filesListViewModel.SetPaths(Playlists.CurrentItem?.Folders?.Source);
     }
@@ -124,7 +138,9 @@ public class MainViewModel : ViewModelBase
     /// <summary>
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
     /// </summary>
-    public void SaveSettings()
+    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
+    private ICommand _saveSettingsCommand;
+    private void OnSaveSettings(CancelEventArgs e)
     {
         _settings.Value.Playlists.Clear();
         _settings.Value.Playlists.AddRange(Playlists.Source.Select(x =>

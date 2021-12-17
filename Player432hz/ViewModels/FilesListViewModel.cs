@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.MediaPlayer.Avalonia.Helpers.Mvvm;
 using HanumanInstitute.Player432hz.Business;
 using ReactiveUI;
 
@@ -48,6 +48,7 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
         _paths = paths?.ToList();
         _files.Source.Clear();
         _loaded = false;
+        this.RaisePropertyChanged(nameof(Files));
     }
     private List<string>? _paths;
     private bool _loaded;
@@ -60,24 +61,18 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
         _files.Source.Clear();
         if (_paths != null)
         {
-            foreach (var item in _fileLocator.GetAudioFiles(_paths))
-            {
-                _files.Source.Add(item);
-            }
+            _files.Source.AddRange(_fileLocator.GetAudioFiles(_paths));
         }
     }
 
     /// <summary>
     /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
     /// </summary>
-    public ICommand PlayCommand => _playCommand ??= new RelayCommand(OnPlay, CanPlay);
-    private RelayCommand? _playCommand;
-    private bool CanPlay() => Files.Any();
+    public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay);
+        // this.WhenAnyValue(x => x.Files.Source).Select(f => f.Any()));
+    private ICommand? _playCommand;
     private void OnPlay()
     {
-        if (CanPlay())
-        {
-            _playlistPlayer.Play(Files, Files.CurrentItem);
-        }
+        _playlistPlayer.Play(Files, Files.CurrentItem);
     }
 }

@@ -16,7 +16,7 @@ public interface IPlaylistViewModel
     /// <summary>
     /// Gets the list of folders in the playlist and provides selection properties.
     /// </summary>
-    ICollectionView<string> Folders { get; set; }
+    ICollectionView<string> Folders { get; }
 
     /// <summary>
     /// Shows a folder picker and adds selected folder to the list.

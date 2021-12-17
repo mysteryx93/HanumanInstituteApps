@@ -21,17 +21,27 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
     /// <summary>
     /// Gets the list of files currently playing.
     /// </summary>
-    public IList<string> Files { get; private set; } = new List<string>();
+    public IList<string> Files { get; } = new List<string>();
 
     /// <summary>
     /// Gets the path of the file currently playing.
     /// </summary>
-    public string NowPlaying { get; set; } = string.Empty;
+    public string NowPlaying
+    {
+        get => _nowPlaying;
+        set => this.RaiseAndSetIfChanged(ref _nowPlaying, value, nameof(NowPlaying));
+    }
+    private string _nowPlaying = string.Empty;
 
     /// <summary>
     /// Gets the display title of the file currently playing.
     /// </summary>
-    public string NowPlayingTitle { get; set; } = string.Empty;
+    public string NowPlayingTitle
+    {
+        get => _nowPlayingTitle;
+        set => this.RaiseAndSetIfChanged(ref _nowPlayingTitle, value, nameof(NowPlayingTitle));
+    }
+    private string _nowPlayingTitle = string.Empty;
 
     private readonly Random _random = new Random();
 

@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
     <PackageReference Include="Avalonia" Version="0.10.10" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />

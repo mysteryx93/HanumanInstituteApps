@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
+    <ProjectReference Include="..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj" />
     <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
     <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />

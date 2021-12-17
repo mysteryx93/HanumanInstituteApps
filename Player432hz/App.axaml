@@ -8,5 +8,7 @@
 
     <Application.Styles>
         <FluentTheme Mode="Light"/>
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
     </Application.Styles>
 </Application>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace HanumanInstitute.Common.Avalonia;
 
@@ -13,10 +14,6 @@ public interface ICollectionView<T> : IEnumerable<T>
     /// Gets the data source as an ObservableCollection. It uses a derived collection that supports range modifications.
     /// </summary>
     ObservableCollectionWithRange<T> Source { get; }
-    /// <summary>
-    /// Occurs when CurrentItem is changed.
-    /// </summary>
-    event EventHandler CurrentChanged;
     /// <summary>
     /// Gets the current item in the view.
     /// </summary>

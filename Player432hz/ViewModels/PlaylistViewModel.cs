@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.MediaPlayer.Avalonia.Helpers.Mvvm;
 using HanumanInstitute.Player432hz.Business;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs;
@@ -42,25 +42,30 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     /// <summary>
     /// Gets or sets the name of this playlist.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set => this.RaiseAndSetIfChanged(ref _name, value, nameof(Name));
+    }
+    private string _name = string.Empty;
 
     /// <summary>
     /// Gets the list of folders in the playlist and provides selection properties.
     /// </summary>
-    public ICollectionView<string> Folders { get; set; } = new CollectionView<string>();
+    public ICollectionView<string> Folders { get; } = new CollectionView<string>();
 
     /// <summary>
     /// Shows a folder picker and adds selected folder to the list.
     /// </summary>
-    public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.Create(OnAddFolder);
+    public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
     private ICommand? _addFolderCommand;
     private async Task OnAddFolder()
     {
         var folderSettings = new OpenFolderDialogSettings();
-        await _dialogService.ShowOpenFolderDialogAsync(this, folderSettings);
-        if (!string.IsNullOrEmpty(folderSettings.InitialPath))
+        var result = await _dialogService.ShowOpenFolderDialogAsync(this, folderSettings).ConfigureAwait(true);
+        if (!string.IsNullOrEmpty(result) && !Folders.Source.Contains(result))
         {
-            Folders.Source.Add(folderSettings.InitialPath);
+            Folders.Source.Add(result);
             Folders.MoveCurrentToLast();
             _fileListViewModel.SetPaths(Folders.Source);
         }
@@ -70,17 +75,14 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     /// Removes selected folder from the list.
     /// </summary>
     public ICommand RemoveFolderCommand =>
-        _removeFolderCommand ??= new RelayCommand(OnRemoveFolder, CanRemoveFolder);
-    private RelayCommand? _removeFolderCommand;
-    private bool CanRemoveFolder() => Folders.CurrentPosition > -1 && Folders.CurrentPosition < Folders.Source.Count;
+        _removeFolderCommand ??= ReactiveCommand.Create(OnRemoveFolder,
+            this.WhenAnyValue(x => x.Folders.CurrentItem).Select(x => x != null));
+    private ICommand? _removeFolderCommand;
     private void OnRemoveFolder()
     {
-        if (CanRemoveFolder())
-        {
-            var selection = Folders.CurrentPosition;
-            Folders.Source.RemoveAt(Folders.CurrentPosition);
-            Folders.MoveCurrentToPosition(selection);
-            _fileListViewModel.SetPaths(Folders.Source);
-        }
+        var selection = Folders.CurrentPosition;
+        Folders.Source.RemoveAt(Folders.CurrentPosition);
+        Folders.MoveCurrentToPosition(selection);
+        _fileListViewModel.SetPaths(Folders.Source);
     }
 }

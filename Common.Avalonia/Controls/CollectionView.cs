@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace HanumanInstitute.Common.Avalonia;
 
 /// <inheritdoc />
-public class CollectionView<T> : ICollectionView<T>
+public class CollectionView<T> : ICollectionView<T>, INotifyPropertyChanged
 {
     /// <summary>
     /// Initializes a new instance of the ListCollectionView class.
@@ -26,9 +32,6 @@ public class CollectionView<T> : ICollectionView<T>
     }
 
     /// <inheritdoc />
-    public event EventHandler? CurrentChanged;
-
-    /// <inheritdoc />
     public ObservableCollectionWithRange<T> Source { get; private set; } = new ObservableCollectionWithRange<T>();
 
     /// <inheritdoc />
@@ -40,7 +43,8 @@ public class CollectionView<T> : ICollectionView<T>
             if (!Equals(value, _currentItem))
             {
                 _currentItem = value;
-                CurrentChanged!.Invoke(this, EventArgs.Empty);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItem)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPosition)));
             }
         }
     }
@@ -80,5 +84,12 @@ public class CollectionView<T> : ICollectionView<T>
         {
             yield return iterator.Current!;
         }
+    }
+    
+    public event PropertyChangedEventHandler? PropertyChanged;
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;

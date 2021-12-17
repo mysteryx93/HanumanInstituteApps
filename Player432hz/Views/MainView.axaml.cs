@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using HanumanInstitute.Player432hz.ViewModels;
 
 namespace HanumanInstitute.Player432hz.Views;
 
@@ -21,4 +22,6 @@ public partial class MainView : Window
     {
         AvaloniaXamlLoader.Load(this);
     }
+    
+    public MainViewModel ViewModel => (MainViewModel)DataContext!;
 }
