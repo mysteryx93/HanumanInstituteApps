@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Linq;
+using HanumanInstitute.Common.Avalonia.App.Tests;
 using MvvmDialogs;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
@@ -54,13 +53,13 @@ public class MainViewModelTests
     [InlineData(-1, false)]
     [InlineData(0, true)]
     [InlineData(1, true)]
-    [InlineData(2, false)]
+    [InlineData(2, true)]
     [InlineData(int.MinValue, false)]
-    [InlineData(int.MaxValue, false)]
+    [InlineData(int.MaxValue, true)]
     public void CanDeletePlaylistCommand_WithSelectedIndex_ReturnsTrueIfSelectedIndexValid(int selectedIndex, bool expected)
     {
         AddPlaylists(2); // List contains 2 elements.
-        Model.Playlists.MoveCurrentToPosition(selectedIndex);
+        Model.Playlists.CurrentPosition = selectedIndex;
 
         var result = Model.DeletePlaylistCommand.CanExecute(null);
 
@@ -94,7 +93,7 @@ public class MainViewModelTests
     {
         var listCount = 3;
         AddPlaylists(listCount);
-        Model.Playlists.MoveCurrentToPosition(selectedIndex);
+        Model.Playlists.CurrentPosition = selectedIndex;
         var selectedItem = Model.Playlists.CurrentItem;
 
         Model.DeletePlaylistCommand.Execute(null);
@@ -110,7 +109,7 @@ public class MainViewModelTests
     public void DeletePlaylistCommand_LastSelected_SetValidSelectedIndex(int count, int sel, int newSel)
     {
         AddPlaylists(count);
-        Model.Playlists.MoveCurrentToPosition(sel);
+        Model.Playlists.CurrentPosition = sel;
 
         Model.DeletePlaylistCommand.Execute(null);
 
@@ -136,7 +135,7 @@ public class MainViewModelTests
 
         Model.Playlists.MoveCurrentToFirst();
 
-        MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
+        MockFileList.Verify(x => x.SetPaths(Model.Playlists.First().Folders.Source), Times.Once);
     }
 
     [Fact]
@@ -146,20 +145,9 @@ public class MainViewModelTests
         Model.Playlists.MoveCurrentToFirst();
         MockFileList.Reset();
 
-        Model.Playlists.MoveCurrentToPosition(-1);
+        Model.Playlists.CurrentPosition = -1;
 
         MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
-    }
-
-    [Fact]
-    public void PlayCommand_Get_ReturnsCommand()
-    {
-        MockFileList.Setup(x => x.PlayCommand).Returns(Mock.Of<ICommand>());
-
-        var result = Model.PlayCommand;
-
-        Assert.NotNull(result);
-        Assert.IsAssignableFrom<ICommand>(result);
     }
 
     [Fact]
@@ -187,22 +175,22 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void SaveSettings_WithPlaylists_FillSettings()
+    public void SaveSettingsCommand_WithPlaylists_FillSettings()
     {
         AddPlaylists(2);
 
-        Model.SaveSettings();
+        Model.SaveSettingsCommand.Execute(null);
 
         Assert.Equal(2, MockSettings.Value.Playlists.Count);
     }
 
     [Fact]
-    public void SaveSettings_WithFolders_FillSettingsFolders()
+    public void SaveSettingsCommand_WithFolders_FillSettingsFolders()
     {
         AddPlaylists(1);
         Model.Playlists.Source[0].Folders.Source.Add("a");
 
-        Model.SaveSettings();
+        Model.SaveSettingsCommand.Execute(null);
 
         Assert.NotNull(MockSettings.Value.Playlists);
         Assert.Single(MockSettings.Value.Playlists[0].Folders);

@@ -1,6 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using HanumanInstitute.Common.Services;
 
 namespace HanumanInstitute.Common.Avalonia;
@@ -9,10 +9,12 @@ public class PositionExtension : AvaloniaObject
 {
     static PositionExtension()
     {
-        
+        PositionProperty.Changed.Subscribe(OnPositionChanged);
     }
     
-    // Position (Window.Position doesn't support binding by default) 
+    // Position with binding
+    // Note: Window.Position doesn't support binding by default 
+    // https://github.com/AvaloniaUI/Avalonia/pull/3521#issuecomment-582243868
     public static readonly AttachedProperty<PixelPoint> PositionProperty =
         AvaloniaProperty.RegisterAttached<PositionExtension, Window, PixelPoint>("Position"); 
     public static PixelPoint GetPosition(AvaloniaObject d) => d.CheckNotNull(nameof(d)).GetValue(PositionProperty);

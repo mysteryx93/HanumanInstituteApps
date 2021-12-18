@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Player432hz.Business;
 using ReactiveUI;
@@ -68,8 +69,8 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     /// <summary>
     /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
     /// </summary>
-    public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay);
-        // this.WhenAnyValue(x => x.Files.Source).Select(f => f.Any()));
+    public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay,
+        this.Files.Source.ToObservableChangeSet(x => x).Select(x => x.Any()));
     private ICommand? _playCommand;
     private void OnPlay()
     {

@@ -1,38 +1,37 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
-using Moq;
 using Xunit;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
 public class PlayerViewModelTests
 {
-    public FakeFileSystemService MockFileSystem => _mockFileSystem ?? (_mockFileSystem = new FakeFileSystemService());
+    public FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService? _mockFileSystem;
 
-    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ?? (_playlistPlayer = new PlaylistPlayer(MockFileSystem));
+    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockFileSystem);
     private IPlaylistPlayer? _playlistPlayer;
 
-    public IPlayerViewModel Model => _model ?? (_model = SetupModel());
+    public IPlayerViewModel Model => _model ??= SetupModel();
     private IPlayerViewModel? _model;
 
     private const string FileName1 = "file1", FileName2 = "file2", FileName3 = "file3";
-    private int _nowPlayingChanged = 0;
+    private int _nowPlayingChanged;
 
     private IPlayerViewModel SetupModel()
     {
         var result = new PlayerViewModel(PlaylistPlayer);
-        result.Player.PropertyChanged += (s, e) =>
+        result.Player.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(result.Player.NowPlaying))
             {
                 _nowPlayingChanged++;
 
-                if (result.Player.NowPlaying == null)
+                if (string.IsNullOrEmpty(result.Player.NowPlaying))
                 {
-                    result.MediaFinished();
+                    result.PlayNextCommand.Execute(null);
                 }
             }
         };
@@ -106,13 +105,14 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void PlayNext_ListSetCurrent_StartPlayback()
+    public async Task PlayNext_ListSetCurrent_StartPlayback()
     {
         Model.Player.Play(new[] { FileName1, FileName2, FileName3 }, FileName1);
         Model.Player.PlayNext();
 
         Assert.Equal(3, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
+        await Task.Yield();
         Assert.NotEqual(FileName1, Model.Player.NowPlayingTitle);
         Assert.Equal(3, _nowPlayingChanged);
     }

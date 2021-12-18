@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.Player432hz.Business;
@@ -26,8 +25,8 @@ public class FilesListViewModelTests
     public IFilesListViewModel Model => _model ??= new FilesListViewModel(FileLocator, MockPlayer.Object);
     private IFilesListViewModel? _model;
 
-    private static IEnumerable<string> PathValue => new string[] { "test-path" };
-    private static IEnumerable<string> FileList => new string[] { "file1", "file2" };
+    private static IEnumerable<string> PathValue => new[] { "test-path" };
+    private static IEnumerable<string> FileList => new[] { "file1", "file2" };
 
     private static Mock<IFileSystemService> SetupFileSystem()
     {
@@ -76,9 +75,12 @@ public class FilesListViewModelTests
     {
         Model.SetPaths(PathValue);
 
-        var _ = Model.Files.Source;
-        _ = Model.Files.Source;
+        var a = Model.Files.Source;
+        var b = Model.Files.Source;
+        
         VerifyGetFiles(Times.Once());
+        Assert.NotEmpty(a);
+        Assert.NotEmpty(b);
     }
 
     [Fact]

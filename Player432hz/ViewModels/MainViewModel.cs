@@ -82,8 +82,6 @@ public class MainViewModel : ViewModelBase
     private ICommand? _playFileCommand;
     private void OnPlayFile(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute(null);
 
-    public ICommand PlayCommand => _filesListViewModel.PlayCommand;
-
     /// <summary>
     /// Adds a new playlist to the list.
     /// </summary>
@@ -104,10 +102,13 @@ public class MainViewModel : ViewModelBase
     private ICommand? _deletePlaylistCommand;
     private void OnDeletePlaylist()
     {
-        Playlists.Source.RemoveAt(Playlists.CurrentPosition);
-        if (Playlists.CurrentPosition >= Playlists.Source.Count)
+        if (Playlists.CurrentPosition > -1)
         {
-            Playlists.MoveCurrentToLast();
+            Playlists.Source.RemoveAt(Playlists.CurrentPosition);
+            if (Playlists.CurrentPosition >= Playlists.Source.Count)
+            {
+                Playlists.MoveCurrentToLast();
+            }
         }
     }
 
@@ -139,7 +140,7 @@ public class MainViewModel : ViewModelBase
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
     /// </summary>
     public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
-    private ICommand _saveSettingsCommand;
+    private ICommand? _saveSettingsCommand;
     private void OnSaveSettings(CancelEventArgs e)
     {
         _settings.Value.Playlists.Clear();

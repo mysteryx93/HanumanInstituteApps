@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 
 namespace HanumanInstitute.Common.Avalonia;
 
@@ -8,7 +6,7 @@ namespace HanumanInstitute.Common.Avalonia;
 /// Enables current record management on a collection.
 /// </summary>
 /// <typeparam name="T">The type of the list.</typeparam>
-public interface ICollectionView<T> : IEnumerable<T>
+public interface ICollectionView<T>  : IEnumerable<T>
 {
     /// <summary>
     /// Gets the data source as an ObservableCollection. It uses a derived collection that supports range modifications.
@@ -22,7 +20,7 @@ public interface ICollectionView<T> : IEnumerable<T>
     /// <summary>
     /// Gets or sets the position of the currently selected item, or -1 if none is selected.
     /// </summary>
-    int CurrentPosition { get; }
+    int CurrentPosition { get; set; }
     /// <summary>
     /// Moves selection to the first item in the list.
     /// </summary>
@@ -31,9 +29,5 @@ public interface ICollectionView<T> : IEnumerable<T>
     /// Moves selection to the last item in the list.
     /// </summary>
     void MoveCurrentToLast();
-    /// <summary>
-    /// Moves selection to specified position.
-    /// </summary>
-    /// <param name="position">The position to move the selection to.</param>
-    void MoveCurrentToPosition(int position);
+
 }

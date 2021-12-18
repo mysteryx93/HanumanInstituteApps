@@ -1,20 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
 using MvvmDialogs;
-using MvvmDialogs.FrameworkDialogs.FolderBrowser;
+using MvvmDialogs.Avalonia;
+using MvvmDialogs.FrameworkDialogs;
 using Xunit;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
 public class PlaylistViewModelTests
 {
-    public Mock<IDialogService> MockDialogService => _mockDialogService ??= new Mock<IDialogService>();
+    public PlaylistViewModelTests() {}
+
+    public Mock<IDialogService> MockDialogService => _mockDialogService ??= SetupMockDialogService();
     private Mock<IDialogService>? _mockDialogService;
+    private Mock<IDialogService> SetupMockDialogService()
+    {
+        var result = new Mock<IDialogService>();
+        result.Setup(x => x.AppSettings).Returns(new AppDialogSettings());
+        result.Setup(x => x.FrameworkDialogFactory).Returns(MockFrameworkDialogFactory.Object);
+        return result;
+    }
+
+    public Mock<IFrameworkDialogFactory> MockFrameworkDialogFactory => _mockFrameworkDialogFactory ??= SetupFrameworkDialogFactory();
+    private Mock<IFrameworkDialogFactory> _mockFrameworkDialogFactory;
+    private Mock<IFrameworkDialogFactory> SetupFrameworkDialogFactory()
+    {
+        var result = new Mock<IFrameworkDialogFactory>();
+        var dialog = Mock.Of<IFrameworkDialog<string?>>();
+        result.Setup(x => x.ShowAsync<OpenFolderDialogSettings, string?>(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()).Result)
+            .Returns(_dialogResult);
+        return result;
+    }
 
     public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
     private Mock<IFilesListViewModel>? _mockFileList;
@@ -23,12 +44,10 @@ public class PlaylistViewModelTests
     private PlaylistViewModel? _model;
 
     private const string DialogFolderPath = "C:\\";
+    private string? _dialogResult = string.Empty; // Moq async result won't work if this is null
 
-    private void SetDialogFolder()
-    {
-        MockDialogService.Setup(x => x.ShowFolderBrowserDialog(It.IsAny<INotifyPropertyChanged>(), It.IsAny<FolderBrowserDialogSettings>()))
-            .Callback<INotifyPropertyChanged, FolderBrowserDialogSettings>((owner, settings) => settings.SelectedPath = DialogFolderPath);
-    }
+    // Must be set before using Model.
+    private void SetDialogFolder() => _dialogResult = DialogFolderPath;
 
     private void AddFolders(int count)
     {
@@ -51,7 +70,7 @@ public class PlaylistViewModelTests
     {
         Model.AddFolderCommand.Execute(null);
 
-        MockDialogService.Verify(x => x.ShowFolderBrowserDialog(It.IsAny<INotifyPropertyChanged>(), It.IsAny<FolderBrowserDialogSettings>()));
+        MockFrameworkDialogFactory.Verify(x => x.ShowAsync<OpenFolderDialogSettings, string?>(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()));
     }
 
     [Fact]
@@ -68,8 +87,8 @@ public class PlaylistViewModelTests
     [Fact]
     public void AddFolderCommand_SelectDir_FolderAddedToList()
     {
-        var listCount = Model.Folders.Source.Count;
         SetDialogFolder();
+        var listCount = Model.Folders.Source.Count;
 
         Model.AddFolderCommand.Execute(null);
 
@@ -80,7 +99,7 @@ public class PlaylistViewModelTests
     [Fact]
     public void AddFolderCommand_SelectDir_FilesListSetPathsCalled()
     {
-        var listCount = Model.Folders.Source.Count;
+        // var listCount = Model.Folders.Source.Count;
         SetDialogFolder();
 
         Model.AddFolderCommand.Execute(null);
@@ -92,13 +111,13 @@ public class PlaylistViewModelTests
     [InlineData(-1, false)]
     [InlineData(0, true)]
     [InlineData(1, true)]
-    [InlineData(2, false)]
+    [InlineData(2, true)]
     [InlineData(int.MinValue, false)]
-    [InlineData(int.MaxValue, false)]
+    [InlineData(int.MaxValue, true)]
     public void CanRemoveFolderCommand_WithSelectedIndex_ReturnsTrueIfSelectedIndexValid(int selectedIndex, bool expected)
     {
         AddFolders(2); // List contains 2 elements.
-        Model.Folders.MoveCurrentToPosition(selectedIndex);
+        Model.Folders.CurrentPosition = selectedIndex;
 
         var result = Model.RemoveFolderCommand.CanExecute(null);
 
@@ -132,7 +151,7 @@ public class PlaylistViewModelTests
     {
         var listCount = 3;
         AddFolders(listCount);
-        Model.Folders.MoveCurrentToPosition(selectedIndex);
+        Model.Folders.CurrentPosition = selectedIndex;
         var selectedItem = Model.Folders.CurrentItem;
 
         Model.RemoveFolderCommand.Execute(null);
@@ -148,7 +167,7 @@ public class PlaylistViewModelTests
     public void RemoveFolderCommand_LastSelected_SetValidSelectedIndex(int count, int sel, int newSel)
     {
         AddFolders(count);
-        Model.Folders.MoveCurrentToPosition(sel);
+        Model.Folders.CurrentPosition = sel;
 
         Model.RemoveFolderCommand.Execute(null);
 

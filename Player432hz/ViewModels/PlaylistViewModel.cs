@@ -17,13 +17,8 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     private readonly IDialogService _dialogService;
     private readonly IFilesListViewModel _fileListViewModel;
 
-    public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel) :
-        this(dialogService, fileListViewModel, null)
-    {
-    }
-
     public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel,
-        SettingsPlaylistItem? data)
+        SettingsPlaylistItem? data = null)
     {
         _dialogService = dialogService;
         _fileListViewModel = fileListViewModel;
@@ -80,9 +75,12 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     private ICommand? _removeFolderCommand;
     private void OnRemoveFolder()
     {
-        var selection = Folders.CurrentPosition;
-        Folders.Source.RemoveAt(Folders.CurrentPosition);
-        Folders.MoveCurrentToPosition(selection);
-        _fileListViewModel.SetPaths(Folders.Source);
+        if (Folders.CurrentPosition > -1)
+        {
+            var selection = Folders.CurrentPosition;
+            Folders.Source.RemoveAt(Folders.CurrentPosition);
+            Folders.CurrentPosition = selection;
+            _fileListViewModel.SetPaths(Folders.Source);
+        }
     }
 }

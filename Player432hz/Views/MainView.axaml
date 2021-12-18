@@ -117,18 +117,24 @@
                  Margin="10,34,0,51" Width="146"
                  TabIndex="1" Background="{x:Null}"
                  Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
-            <i:Interaction.Behaviors>
-                <ia:EventTriggerBehavior EventName="DoubleTapped">
-                    <ia:InvokeCommandAction
-                        Command="{Binding ViewModel.PlayListCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                </ia:EventTriggerBehavior>
-            </i:Interaction.Behaviors>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}">
-                    </TextBlock>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+    <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </ListBox.Styles>
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding Name}" Padding="14" Background="Transparent">
+                <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                        <ia:InvokeCommandAction
+                            Command="{Binding ViewModel.PlayListCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                    </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
+        </DataTemplate>
+    </ListBox.ItemTemplate>
         </ListBox>
         <TextBlock HorizontalAlignment="Left" Margin="10,8,0,0" Text="Playlists" VerticalAlignment="Top"
                    FontWeight="Bold" />
