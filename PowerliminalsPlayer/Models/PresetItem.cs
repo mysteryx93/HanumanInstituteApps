@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Xml.Serialization;
+using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
 using ReactiveUI;
 
@@ -17,7 +19,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models
         private string _name = string.Empty;
         
         [XmlElement("File")]
-        public ObservableCollection<FileItem> Files { get; } = new();
+        public ObservableCollectionWithRange<FileItem> Files { get; } = new();
 
         public PresetItem()
         {
@@ -56,10 +58,8 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models
             dst.Name = Name;
             dst.MasterVolume = MasterVolume;
             dst.Files.Clear();
-            foreach (var item in Files)
-            {
-                dst.Files.Add(item.Clone());
-            }
+            // TODO: must clone; but it's breaking master volume 
+            dst.Files.AddRange(Files.Select(x => x));
         }
     }
 }

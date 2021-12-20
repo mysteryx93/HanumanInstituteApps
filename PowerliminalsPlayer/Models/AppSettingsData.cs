@@ -31,7 +31,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models
         /// <summary>
         /// Gets or sets the list of saved presets.
         /// </summary>
-        [XmlElement("Preset")]
+        //[XmlElement("Preset")]
         public ObservableCollection<PresetItem> Presets { get; } = new ObservableCollection<PresetItem>();
 
         /// <summary>

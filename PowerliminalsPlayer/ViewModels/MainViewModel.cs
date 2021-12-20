@@ -115,7 +115,9 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         public IEnumerable<string> GetAudioFiles(string path) =>
             _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
 
-        public void MediaUnloaded(FileItem item)
+        public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<FileItem>(OnRemoveMedia);
+        private ICommand? _removeMediaCommand;
+        private void OnRemoveMedia(FileItem item)
         {
             Playlist.Files.Remove(item);
             if (!Playlist.Files.Any())
@@ -162,12 +164,11 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         }
         
         public ICommand LoadPresetCommand => _loadPresetCommand ??= ReactiveCommand.Create(OnLoadPreset,
-            AppData.Presets.AsObservableChangeSet().Select(x => x.Any()));
+            AppData.Presets.ToObservableChangeSet().Select(x => x.Any()));
         private ICommand? _loadPresetCommand;
         private async void OnLoadPreset()
         {
-            var vm = await _dialogService.ShowSelectPresetViewAsync(this, false).ConfigureAwait(true);
-            var loadItem = vm?.SelectedItem;
+            var loadItem = await _dialogService.ShowLoadPresetViewAsync(this).ConfigureAwait(true);
             if (loadItem != null)
             {
                 loadItem.SaveAs(Playlist);
@@ -181,8 +182,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
         private ICommand? _savePresetCommand;
         private async void OnSavePreset()
         {
-            var vm = await _dialogService.ShowSelectPresetViewAsync(this, true).ConfigureAwait(true);
-            var saveName = vm?.PresetName;
+            var saveName = await _dialogService.ShowSavePresetViewAsync(this).ConfigureAwait(true);
             if (!string.IsNullOrWhiteSpace(saveName))
             {
                 var preset = GetPresetByName(saveName);

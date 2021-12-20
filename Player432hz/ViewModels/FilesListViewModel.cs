@@ -70,7 +70,7 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
     /// </summary>
     public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay,
-        this.Files.Source.ToObservableChangeSet(x => x).Select(x => x.Any()));
+        this.Files.Source.ToObservableChangeSet().Select(x => x.Any()));
     private ICommand? _playCommand;
     private void OnPlay()
     {

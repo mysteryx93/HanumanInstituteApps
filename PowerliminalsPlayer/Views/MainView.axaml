@@ -6,23 +6,22 @@
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         mc:Ignorable="d"
-        Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183"
+        Title="Powerliminals Player" Width="730" Height="409"  MinWidth="700" MinHeight="200"
         Icon="/Assets/App.ico"
         xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
-        xmlns:s="https://github.com/mysteryx93/MethodBinding.Avalonia"
+        xmlns:s="clr-namespace:MethodBinding.Avalonia;assembly=MethodBinding.Avalonia"
         md:DialogServiceViews.IsRegistered="True"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <!--
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" 
+                                    CommandParameter="{x:Null}"/>
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
-    -->
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>
@@ -32,12 +31,13 @@
         <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1"
                 TickFrequency="10" HorizontalAlignment="Right" Width="99" VerticalAlignment="Top"
                 Value="{Binding Playlist.MasterVolume, Mode=TwoWay}" />
-        <ScrollViewer HorizontalAlignment="Right" Width="302">
+        <ScrollViewer HorizontalAlignment="Right" Width="302" Padding="0, 0, 16, 0">
             <ItemsControl Items="{Binding Playlist.Files}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <media:MediaPlayer IsLoopVisible="False" StopCommandExecuted="{s:MethodBinding {Binding ViewModel, ElementName=Win}, MediaUnloaded, {Binding}}">
+                            <media:MediaPlayer IsLoopVisible="False">
+                                <!-- StopCommandExecuted="{s:MethodBinding {Binding ViewModel, RelativeSource={RelativeSource AncestorType={x:Type Window}}}, MediaUnloaded, {Binding}}" -->
                                 <mediab:BassPlayerHost Source="{Binding FullPath, Mode=TwoWay}"
                                                        Volume="{Binding Volume, Mode=TwoWay}"
                                                        SpeedInt="{Binding Speed, Mode=TwoWay}"
@@ -45,6 +45,12 @@
                                                        PositionRefreshMilliseconds="500" VolumeBoost="0.4"
                                                        Loop="True" UseEffects="True">
                                 </mediab:BassPlayerHost>
+                                <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="StopCommandExecuted">
+                                        <InvokeCommandAction Command="{Binding ViewModel.RemoveMediaCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
+                                                             CommandParameter="{Binding}"/>
+                                    </ia:EventTriggerBehavior>
+                                </i:Interaction.Behaviors>
                             </media:MediaPlayer>
                         </Grid>
                     </DataTemplate>
@@ -52,16 +58,16 @@
             </ItemsControl>
         </ScrollViewer>
         <Expander x:Name="FoldersExpander" Header="Folders" HorizontalAlignment="Left" Margin="10,3,0,0" Height="48"
-                  Width="130"
+                  Width="130" Background="Transparent"
                   VerticalAlignment="Top" FontWeight="Bold" IsExpanded="{Binding AppData.FoldersExpanded}">
             <Grid />
         </Expander>
-        <Button x:Name="AddFolderButton" Classes="round" Content="_Add" Margin="136,22,0,0" VerticalAlignment="Top"
+        <Button x:Name="AddFolderButton" Classes="round" Content="_Add" Margin="140,22,0,0" VerticalAlignment="Top"
                 TabIndex="6"
                 HorizontalAlignment="Left" Width="70" Command="{Binding AddFolderCommand}"
                 IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
         <Button x:Name="RemoveFolderButton" Classes="round" Content="_Remove" VerticalAlignment="Top" TabIndex="7"
-                Margin="211,22,0,0"
+                Margin="215,22,0,0"
                 HorizontalAlignment="Left" Width="70" Command="{Binding RemoveFolderCommand}"
                 IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
         <DockPanel Margin="10,51,312,35">
@@ -81,9 +87,9 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding}">
                                 <i:Interaction.Behaviors>
-                                    <EventTriggerBehavior EventName="DoubleTapped">
-                                        <InvokeCommandAction Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" CommandParameter="{x:Null}" />
-                                    </EventTriggerBehavior>
+                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                        <ia:InvokeCommandAction Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" CommandParameter="{x:Null}" />
+                                    </ia:EventTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </TextBlock>
                         </DataTemplate>
@@ -96,14 +102,14 @@
             </Grid>
         </DockPanel>
         <Button x:Name="LoadPresetButton" Classes="round" Content="_Load Preset" HorizontalAlignment="Right"
-                Margin="0,0,402,10"
-                VerticalAlignment="Bottom" Width="85" TabIndex="6" Command="{Binding LoadPresetCommand}" />
-        <Button x:Name="SavePresetButton" Classes="round" Content="_Save As" HorizontalAlignment="Right"
+                Margin="0,0,418,8"
+                VerticalAlignment="Bottom" Width="100" TabIndex="6" Command="{Binding LoadPresetCommand}" />
+        <Button x:Name="SavePresetButton" Classes="round" Content="_Save As..." HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
-                Width="85" TabIndex="6" Margin="0,0,312,10" Command="{Binding SavePresetCommand}" />
+                Width="100" TabIndex="6" Margin="0,0,312,8" Command="{Binding SavePresetCommand}" />
         <Button x:Name="PauseButton" Classes="round"
                 Content="{Binding IsPaused, Converter={StaticResource BooleanToStringConverter}}"
-                HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="85" TabIndex="6"
+                HorizontalAlignment="Left" Margin="10,0,0,8" VerticalAlignment="Bottom" Width="85" TabIndex="6"
                 Command="{Binding PauseCommand}" />
         <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" FontWeight="Bold">
             <!--
