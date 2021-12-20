@@ -1,12 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Windows.Threading;
-using HanumanInstitute.CommonServices;
+using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using MvvmDialogs;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Services
+namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     public static class DialogExtensions
     {
@@ -15,16 +13,16 @@ namespace HanumanInstitute.PowerliminalsPlayer.Services
             dialog.CheckNotNull(nameof(dialog));
 
             var viewModel = ViewModelLocator.SelectPreset.Load(modeSave);
-            var result = await ShowDialogAsync(dialog, ownerViewModel, viewModel).ConfigureAwait(false);
+            var result = await dialog.ShowDialogAsync(ownerViewModel, viewModel).ConfigureAwait(false);
             return result == true ? viewModel : null;
         }
 
-        public static async Task<bool?> ShowDialogAsync(this IDialogService dialog, INotifyPropertyChanged ownerViewModel, IModalDialogViewModel viewModel)
-        {
-            dialog.CheckNotNull(nameof(dialog));
-
-            return await Dispatcher.CurrentDispatcher.InvokeAsync(() => dialog.ShowDialog(ownerViewModel, viewModel));
-        }
+        // public static async Task<bool?> ShowDialogAsync(this IDialogService dialog, INotifyPropertyChanged ownerViewModel, IModalDialogViewModel viewModel)
+        // {
+        //     dialog.CheckNotNull(nameof(dialog));
+        //
+        //     return await Dispatcher.UIThread.InvokeAsync(() => dialog.ShowDialogAsync(ownerViewModel, viewModel));
+        // }
 
         //private static bool IsUiThread() => Thread.CurrentThread == System.Windows.Threading.Dispatcher.CurrentDispatcher.Thread;
     }

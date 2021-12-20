@@ -1,0 +1,50 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:HanumanInstitute.PowerliminalsPlayer"
+             x:Class="HanumanInstitute.PowerliminalsPlayer.App">
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+    <Application.Resources>
+        <Color x:Key="WindowBackgroundGradiant">#FF8ED473</Color>
+        <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%">
+            <GradientStop Color="White" Offset="0" />
+            <GradientStop Color="{StaticResource WindowBackgroundGradiant}" Offset="1" />
+        </LinearGradientBrush>
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme Mode="Light"/>
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
+        
+        <Style Selector="Window">
+            <Setter Property="UseLayoutRounding" Value="True" />
+        </Style>
+        <Style Selector="Window > Grid">
+            <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
+        </Style>
+        <Style Selector="Button.round">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="14" />
+        </Style>
+        <Style Selector="ListBox">
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBoxItem > TextBlock">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.compact ListBoxItem">
+            <Setter Property="Padding" Value="4" />
+        </Style>
+        <Style Selector="TextBox.compact">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Application.Styles>
+</Application>

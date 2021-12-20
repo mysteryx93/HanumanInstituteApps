@@ -6,14 +6,14 @@ using Avalonia;
 using HanumanInstitute.Common.Services;
 using ReactiveUI;
 
-namespace HanumanInstitute.Player432hz.Business;
+namespace HanumanInstitute.Player432hz.Models;
 
 /// <summary>
 /// Contains the application settings and configured playlists.
 /// </summary>
 [Serializable]
 [XmlRoot("Player432hz")]
-public class SettingsData : ReactiveObject
+public class AppSettingsData : ReactiveObject
 {
     /// <summary>
     /// Gets or sets the list of configured playlists.

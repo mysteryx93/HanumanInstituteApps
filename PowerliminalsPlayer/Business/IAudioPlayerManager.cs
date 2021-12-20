@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Services
+namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     /// <summary>
     /// Manages the playback of a list of media files.

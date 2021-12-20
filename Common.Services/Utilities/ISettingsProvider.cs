@@ -20,11 +20,6 @@ public interface ISettingsProvider<T>
     event EventHandler? Loaded;
 
     /// <summary>
-    /// Occurs before settings are saved.
-    /// </summary>
-    // event EventHandler? Saving;
-
-    /// <summary>
     /// Occurs after settings are saved.
     /// </summary>
     event EventHandler? Saved;

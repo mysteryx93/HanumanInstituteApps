@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace HanumanInstitute.Player432hz.Business;
+namespace HanumanInstitute.Player432hz.Models;
 
 /// <summary>
 /// Contains information on a playlist.

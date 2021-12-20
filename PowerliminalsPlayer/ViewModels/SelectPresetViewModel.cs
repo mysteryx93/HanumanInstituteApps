@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.Windows;
+using System.Reactive.Linq;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
-using HanumanInstitute.CommonServices;
-using HanumanInstitute.CommonWpfApp;
+using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using MvvmDialogs;
-using PropertyChanged;
+using ReactiveUI;
+using ICloseable = MvvmDialogs.ICloseable;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 {
-    [AddINotifyPropertyChangedInterface()]
-    public class SelectPresetViewModel : ViewModelBase, IModalDialogViewModel
+    public class SelectPresetViewModel : ViewModelBase, IModalDialogViewModel, ICloseable
     {
         private readonly ISettingsProvider<AppSettingsData> _appSettings;
         public AppSettingsData AppData => _appSettings.Value;
@@ -30,24 +27,33 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
 
         public bool? DialogResult { get; set; } = false;
 
-        public string PresetName { get; set; } = "New Preset";
+        public string PresetName
+        {
+            get => _presetName;
+            set => this.RaiseAndSetIfChanged(ref _presetName, value);
+        }
+        private string _presetName = "New Preset";
 
         public PresetItem? SelectedItem
         {
             get => _selectedItem;
             set
             {
-                _selectedItem = value;
+                this.RaiseAndSetIfChanged(ref _selectedItem, value);
                 if (value != null)
                 {
                     PresetName = value.Name;
                 }
-                RaisePropertyChanged(nameof(SelectedItem));
             }
         }
         private PresetItem? _selectedItem;
 
-        public bool ModeSave { get; set; } = true;
+        public bool ModeSave
+        {
+            get => _modeSave;
+            set => this.RaiseAndSetIfChanged(ref _modeSave, value);
+        }
+        private bool _modeSave = true;
 
         public SelectPresetViewModel Load(bool modeSave)
         {
@@ -56,39 +62,32 @@ namespace HanumanInstitute.PowerliminalsPlayer.ViewModels
             {
                 SelectedItem = AppData.Presets.FirstOrDefault();
             }
+
             return this;
         }
 
-        public ICommand ConfirmCommand => CommandHelper.InitCommand(ref _confirmCommand, OnConfirm, () => CanConfirm);
-        private RelayCommand? _confirmCommand;
-        private bool CanConfirm => ModeSave ? !string.IsNullOrWhiteSpace(PresetName) : SelectedItem != null;
+        public ICommand ConfirmCommand => _confirmCommand ??= ReactiveCommand.Create(OnConfirm,
+            this.WhenAnyValue(x => x.ModeSave, x => x.PresetName, x => x.SelectedItem, (modeSave, presetName, selectedItem) => 
+                modeSave ? !string.IsNullOrWhiteSpace(presetName) : selectedItem != null));
+        private ICommand? _confirmCommand;
         private void OnConfirm()
         {
-            if (CanConfirm)
-            {
-                DialogResult = true;
-                RequestClose?.Invoke(this, new EventArgs());
-            }
+            DialogResult = true;
+            RequestClose?.Invoke(this, EventArgs.Empty);
         }
 
-        public ICommand DeleteCommand => CommandHelper.InitCommand(ref _deleteCommand, OnDelete, () => CanDelete);
-        private RelayCommand? _deleteCommand;
-        private bool CanDelete => SelectedItem != null;
+        public ICommand CancelCommand => _cancelCommand ??= ReactiveCommand.Create(OnCancel);
+        private ICommand? _cancelCommand;
+        private void OnCancel() => RequestClose?.Invoke(this, EventArgs.Empty);
+
+        public ICommand DeleteCommand => _deleteCommand ??= ReactiveCommand.Create(OnDelete,
+            this.WhenAnyValue(x => x.SelectedItem).Select(x => x != null));
+        private ICommand? _deleteCommand;
         private void OnDelete()
         {
-            if (CanDelete)
+            if (SelectedItem != null)
             {
-                AppData.Presets.Remove(SelectedItem!);
-            }
-        }
-
-        public void OnPresetListMouseDoubleClick(MouseButtonEventArgs e)
-        {
-            e.CheckNotNull(nameof(e));
-            var dataContext = ((FrameworkElement)e.OriginalSource).DataContext;
-            if (dataContext is PresetItem && e.LeftButton == MouseButtonState.Pressed)
-            {
-                OnConfirm();
+                AppData.Presets.Remove(SelectedItem);
             }
         }
     }

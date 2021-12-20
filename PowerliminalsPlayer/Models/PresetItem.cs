@@ -1,23 +1,29 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Threading;
+using System.Reactive.Linq;
 using System.Xml.Serialization;
-using HanumanInstitute.CommonServices;
+using HanumanInstitute.Common.Services;
+using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models
 {
-    public class PresetItem : DependencyObject
+    public class PresetItem : ReactiveObject
     {
-        public string Name { get; set; } = string.Empty;
+        public string Name
+        {
+            get => _name;
+            set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+        private string _name = string.Empty;
+        
         [XmlElement("File")]
-        public ObservableCollection<FileItem> Files { get; } = new ObservableCollection<FileItem>();
-        private readonly DispatcherTimer _volumeChangeTimer = new DispatcherTimer();
+        public ObservableCollection<FileItem> Files { get; } = new();
 
         public PresetItem()
         {
-            _volumeChangeTimer.Interval = TimeSpan.FromMilliseconds(100);
-            _volumeChangeTimer.Tick += VolumeChangeTimer_Tick;
+            this.WhenAnyValue(x => x.MasterVolume)
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .Subscribe(VolumeChangeTimer);
         }
 
         public PresetItem(string name) : this()
@@ -25,24 +31,20 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models
             Name = name;
         }
 
-        private void VolumeChangeTimer_Tick(object? sender, EventArgs e)
+        private void VolumeChangeTimer(double value)
         {
-            _volumeChangeTimer.Stop();
             foreach (var item in Files)
             {
-                item.AdjustVolume(MasterVolume);
+                item.AdjustVolume(value);
             }
         }
 
-        public static readonly DependencyProperty MasterVolumeProperty = DependencyProperty.Register("MasterVolume", typeof(double), typeof(PresetItem),
-            new PropertyMetadata(100.0, OnMasterVolumeChanged));
-        public double MasterVolume { get => (double)GetValue(MasterVolumeProperty); set => SetValue(MasterVolumeProperty, value); }
-        private static void OnMasterVolumeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public double MasterVolume
         {
-            var p = (PresetItem)d;
-            //D.volumeChangeTimer.Stop();
-            p._volumeChangeTimer.Start();
+            get => _masterVolume;
+            set => this.RaiseAndSetIfChanged(ref _masterVolume, value);
         }
+        private double _masterVolume = 100;
 
         /// <summary>
         /// Copies this preset into specified preset object.

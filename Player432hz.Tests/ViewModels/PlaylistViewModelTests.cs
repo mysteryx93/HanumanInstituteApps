@@ -27,7 +27,7 @@ public class PlaylistViewModelTests
     }
 
     public Mock<IFrameworkDialogFactory> MockFrameworkDialogFactory => _mockFrameworkDialogFactory ??= SetupFrameworkDialogFactory();
-    private Mock<IFrameworkDialogFactory> _mockFrameworkDialogFactory;
+    private Mock<IFrameworkDialogFactory>? _mockFrameworkDialogFactory;
     private Mock<IFrameworkDialogFactory> SetupFrameworkDialogFactory()
     {
         var result = new Mock<IFrameworkDialogFactory>();

@@ -1,0 +1,117 @@
+﻿<Window x:Class="HanumanInstitute.PowerliminalsPlayer.Views.MainView" x:Name="Win"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        mc:Ignorable="d"
+        Title="Powerliminals Player" Height="409" Width="730" MinWidth="640" MinHeight="183"
+        Icon="/Assets/App.ico"
+        xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
+        xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        xmlns:hic="HanumanInstitute.Common.Avalonia"
+        xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
+        xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
+        xmlns:s="https://github.com/mysteryx93/MethodBinding.Avalonia"
+        md:DialogServiceViews.IsRegistered="True"
+        d:DataContext="{x:Static local:ViewModelLocator.Main}">
+    <!--
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Closing">
+            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    -->
+    <Window.Resources>
+        <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
+    </Window.Resources>
+    <Grid>
+        <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,340,0" Text="Volume"
+                   VerticalAlignment="Top" />
+        <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1"
+                TickFrequency="10" HorizontalAlignment="Right" Width="99" VerticalAlignment="Top"
+                Value="{Binding Playlist.MasterVolume, Mode=TwoWay}" />
+        <ScrollViewer HorizontalAlignment="Right" Width="302">
+            <ItemsControl Items="{Binding Playlist.Files}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <media:MediaPlayer IsLoopVisible="False" StopCommandExecuted="{s:MethodBinding {Binding ViewModel, ElementName=Win}, MediaUnloaded, {Binding}}">
+                                <mediab:BassPlayerHost Source="{Binding FullPath, Mode=TwoWay}"
+                                                       Volume="{Binding Volume, Mode=TwoWay}"
+                                                       SpeedInt="{Binding Speed, Mode=TwoWay}"
+                                                       IsPlaying="{Binding IsPlaying, Mode=TwoWay}"
+                                                       PositionRefreshMilliseconds="500" VolumeBoost="0.4"
+                                                       Loop="True" UseEffects="True">
+                                </mediab:BassPlayerHost>
+                            </media:MediaPlayer>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Expander x:Name="FoldersExpander" Header="Folders" HorizontalAlignment="Left" Margin="10,3,0,0" Height="48"
+                  Width="130"
+                  VerticalAlignment="Top" FontWeight="Bold" IsExpanded="{Binding AppData.FoldersExpanded}">
+            <Grid />
+        </Expander>
+        <Button x:Name="AddFolderButton" Classes="round" Content="_Add" Margin="136,22,0,0" VerticalAlignment="Top"
+                TabIndex="6"
+                HorizontalAlignment="Left" Width="70" Command="{Binding AddFolderCommand}"
+                IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
+        <Button x:Name="RemoveFolderButton" Classes="round" Content="_Remove" VerticalAlignment="Top" TabIndex="7"
+                Margin="211,22,0,0"
+                HorizontalAlignment="Left" Width="70" Command="{Binding RemoveFolderCommand}"
+                IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
+        <DockPanel Margin="10,51,312,35">
+            <ListBox DockPanel.Dock="Top" x:Name="FoldersList"
+                     BorderThickness="1" Classes="compact"
+                     Items="{Binding AppData.Folders}"
+                     SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}" Height="81" VerticalAlignment="Top"
+                     TabIndex="5" Background="{x:Null}"
+                     IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
+            <Grid x:Name="FilesGrid">
+                <TextBlock HorizontalAlignment="Left" Margin="0,8,0,0" VerticalAlignment="Top" Text="Files"
+                           FontWeight="Bold" />
+                <ListBox x:Name="FilesList" Margin="0,31,0,4" Classes="compact"
+                         Items="{Binding Files.Source}"
+                         SelectedItem="{Binding Files.CurrentItem, Mode=TwoWay}" TabIndex="8" Background="{x:Null}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}">
+                                <i:Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="DoubleTapped">
+                                        <InvokeCommandAction Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" CommandParameter="{x:Null}" />
+                                    </EventTriggerBehavior>
+                                </i:Interaction.Behaviors>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button x:Name="PlayButton" Classes="round" Content="_Play" Margin="46,3,0,0" VerticalAlignment="Top"
+                        Command="{Binding PlayCommand}" TabIndex="9" HorizontalAlignment="Left" Width="75" />
+                <TextBox x:Name="SearchBox" Classes="compact" Margin="163,4,0,0" VerticalAlignment="Top"
+                         Text="{Binding SearchText, Mode=TwoWay}" Background="{x:Null}" />
+            </Grid>
+        </DockPanel>
+        <Button x:Name="LoadPresetButton" Classes="round" Content="_Load Preset" HorizontalAlignment="Right"
+                Margin="0,0,402,10"
+                VerticalAlignment="Bottom" Width="85" TabIndex="6" Command="{Binding LoadPresetCommand}" />
+        <Button x:Name="SavePresetButton" Classes="round" Content="_Save As" HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Width="85" TabIndex="6" Margin="0,0,312,10" Command="{Binding SavePresetCommand}" />
+        <Button x:Name="PauseButton" Classes="round"
+                Content="{Binding IsPaused, Converter={StaticResource BooleanToStringConverter}}"
+                HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="85" TabIndex="6"
+                Command="{Binding PauseCommand}" />
+        <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" FontWeight="Bold">
+            <!--
+            <Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals"
+                       wpf:HyperlinkExtensions.NavigateInBrowser="True">
+                Get Powerliminals
+            </Hyperlink>
+        -->
+        </TextBlock>
+    </Grid>
+</Window>

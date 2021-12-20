@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HanumanInstitute.CommonServices;
+using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Services
+namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     /// <summary>
     /// Manages the playback of a list of media files.
@@ -44,7 +44,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Services
             Files.Clear();
             Files.AddRange(list);
             NowPlaying = current;
-            if (current != null)
+            if (!string.IsNullOrEmpty(current))
             {
                 StartPlaying?.Invoke(this, new PlayingEventArgs(NowPlaying));
             }
@@ -59,7 +59,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Services
         /// </summary>
         public void PlayNext()
         {
-            if (Files.Any() == true)
+            if (Files.Any())
             {
                 var pos = _random.Next(Files.Count);
                 if (Files[pos] == NowPlaying)

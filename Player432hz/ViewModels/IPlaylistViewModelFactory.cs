@@ -1,4 +1,4 @@
-﻿using HanumanInstitute.Player432hz.Business;
+﻿using HanumanInstitute.Player432hz.Models;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Xml.Serialization;
-using HanumanInstitute.CommonServices;
+﻿using System.Xml.Serialization;
+using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Services
+namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     /// <summary>
     /// Manages the PowerliminalsPlayer application settings.
     /// </summary>
     [XmlRoot("PowerliminalsPlayer")]
-    [PropertyChanged.AddINotifyPropertyChangedInterface]
-    public class AppSettingsProvider : SettingsProvider<AppSettingsData>
+    public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
     {
         private readonly IAppPathService _appPath;
 

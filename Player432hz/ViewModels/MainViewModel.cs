@@ -7,7 +7,7 @@ using Avalonia;
 using Avalonia.Input;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
@@ -18,10 +18,10 @@ namespace HanumanInstitute.Player432hz.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     private readonly IPlaylistViewModelFactory _playlistFactory;
-    private readonly ISettingsProvider<SettingsData> _settings;
+    private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFilesListViewModel _filesListViewModel;
 
-    public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<SettingsData> settings,
+    public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<AppSettingsData> settings,
         IFilesListViewModel filesListViewModel)
     {
         _playlistFactory = playlistFactory;

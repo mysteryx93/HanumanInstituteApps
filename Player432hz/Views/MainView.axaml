@@ -13,7 +13,7 @@
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
-        xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
+        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         md:DialogServiceViews.IsRegistered="True"
@@ -89,6 +89,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="CornerRadius" Value="14" />
         </Style>
+    
         <Style Selector="ListBox.compact ListBoxItem">
             <Setter Property="Padding" Value="4" />
         </Style>
@@ -117,24 +118,24 @@
                  Margin="10,34,0,51" Width="146"
                  TabIndex="1" Background="{x:Null}"
                  Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
-    <ListBox.Styles>
-        <Style Selector="ListBoxItem">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>
-    </ListBox.Styles>
-    <ListBox.ItemTemplate>
-        <DataTemplate>
-            <TextBlock Text="{Binding Name}" Padding="14" Background="Transparent">
-                <i:Interaction.Behaviors>
-                    <ia:EventTriggerBehavior EventName="DoubleTapped">
-                        <ia:InvokeCommandAction
-                            Command="{Binding ViewModel.PlayListCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                    </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
-            </TextBlock>
-        </DataTemplate>
-    </ListBox.ItemTemplate>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" Padding="14" Background="Transparent">
+                        <i:Interaction.Behaviors>
+                            <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                <ia:InvokeCommandAction
+                                    Command="{Binding ViewModel.PlayListCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                            </ia:EventTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
         <TextBlock HorizontalAlignment="Left" Margin="10,8,0,0" Text="Playlists" VerticalAlignment="Top"
                    FontWeight="Bold" />
@@ -153,9 +154,9 @@
                                      Pitch="0.98181818181818181"
                                      Volume="{Binding ViewModel.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <i:Interaction.Behaviors>
-                            <ia:EventTriggerBehavior EventName="MediaFinished">
-                                <ia:InvokeCommandAction Command="{Binding PlayNextCommand}" />
-                            </ia:EventTriggerBehavior>
+                        <ia:EventTriggerBehavior EventName="MediaFinished">
+                            <ia:InvokeCommandAction Command="{Binding PlayNextCommand}" />
+                        </ia:EventTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </bass:BassPlayerHost>
                 <i:Interaction.Behaviors>

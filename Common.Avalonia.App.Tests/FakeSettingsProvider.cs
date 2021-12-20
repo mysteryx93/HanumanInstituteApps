@@ -15,23 +15,23 @@ public class FakeSettingsProvider<T> : ISettingsProvider<T>
 
     public T Load()
     {
-        Loaded?.Invoke(this, new EventArgs());
+        Loaded?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
     public T Load(string path)
     {
-        Loaded?.Invoke(this, new EventArgs());
+        Loaded?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
     public void Save()
     {
-        Saved?.Invoke(this, new EventArgs());
+        Saved?.Invoke(this, EventArgs.Empty);
     }
 
     public void Save(string path)
     {
-        Saved?.Invoke(this, new EventArgs());
+        Saved?.Invoke(this, EventArgs.Empty);
     }
 }

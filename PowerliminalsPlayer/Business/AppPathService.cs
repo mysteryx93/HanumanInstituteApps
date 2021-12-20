@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using HanumanInstitute.CommonServices;
+using HanumanInstitute.Common.Services;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Services
+namespace HanumanInstitute.PowerliminalsPlayer.Business
 {
     /// <summary>
     /// Manages the file system paths used by the application.
@@ -21,13 +21,13 @@ namespace HanumanInstitute.PowerliminalsPlayer.Services
         /// <summary>
         /// Returns all valid audio extensions
         /// </summary>
-        public IList<string> AudioExtensions => _audioExtensions ?? (_audioExtensions = new string[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a", ".flac" });
+        public IList<string> AudioExtensions => _audioExtensions ??= new[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a", ".flac" };
         private IList<string>? _audioExtensions;
 
         /// <summary>
         /// Returns the path where the Powerliminals Player settings file is stored.
         /// </summary>
-        public string SettingsPath => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig.xml");
+        public string SettingsPath => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig2.xml");
         /// <summary>
         /// Returns the path where unhandled exceptions are logged.
         /// </summary>

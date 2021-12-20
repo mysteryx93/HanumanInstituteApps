@@ -3,7 +3,7 @@ using System.Linq;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using MvvmDialogs;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.Player432hz.Models;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
 using Xunit;
@@ -15,8 +15,8 @@ public class MainViewModelTests
     public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
     private Mock<IFilesListViewModel>? _mockFileList;
 
-    public ISettingsProvider<SettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<SettingsData>();
-    private ISettingsProvider<SettingsData>? _mockSettings;
+    public ISettingsProvider<AppSettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<AppSettingsData>();
+    private ISettingsProvider<AppSettingsData>? _mockSettings;
 
     public PlaylistViewModelFactory Factory => _factory ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
     private PlaylistViewModelFactory? _factory;

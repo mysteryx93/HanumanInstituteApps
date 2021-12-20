@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using HanumanInstitute.Common.Services.Properties;
 using HanumanInstitute.Common.Services.Validation;
 
@@ -30,11 +31,6 @@ public class SettingsProvider<T> : ISettingsProvider<T>
     public event EventHandler? Loaded;
 
     /// <summary>
-    /// Occurs before settings are saved.
-    /// </summary>
-    //public event EventHandler? Saving;
-
-    /// <summary>
     /// Occurs after settings are saved.
     /// </summary>
     public event EventHandler? Saved;
@@ -55,8 +51,10 @@ public class SettingsProvider<T> : ISettingsProvider<T>
             result = _serialization.DeserializeFromFile<T>(path);
         }
         catch (InvalidOperationException) { }
+        catch (FileNotFoundException) { }
+
         Value = (result != null && result.Validate() == null) ? result : GetDefault();
-        Loaded?.Invoke(this, new EventArgs());
+        Loaded?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
@@ -77,12 +75,12 @@ public class SettingsProvider<T> : ISettingsProvider<T>
         if (Value == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
         if (Value.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
-        _serialization.SerializeToFile<T>(Value, path);
-        Saved?.Invoke(this, new EventArgs());
+        _serialization.SerializeToFile(Value, path);
+        Saved?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
-    /// When overriden in a devired class, returns the default settings values.
+    /// When overriden in a derived class, returns the default settings values.
     /// </summary>
     protected virtual T GetDefault() => new T();
 }

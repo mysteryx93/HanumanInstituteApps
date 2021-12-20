@@ -1,13 +1,13 @@
 ﻿using HanumanInstitute.Common.Services;
-using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.Player432hz.Models;
-using HanumanInstitute.Player432hz.ViewModels;
+using HanumanInstitute.PowerliminalsPlayer.Business;
+using HanumanInstitute.PowerliminalsPlayer.Models;
+using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using MvvmDialogs;
 using MvvmDialogs.Avalonia;
 using MvvmDialogs.DialogTypeLocators;
 using Splat;
 
-namespace HanumanInstitute.Player432hz;
+namespace HanumanInstitute.PowerliminalsPlayer;
 
 /// <summary>
 /// This class contains static references to all the view models in the
@@ -31,22 +31,18 @@ public static class ViewModelLocator
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
-        SplatRegistrations.Register<IPlaylistViewModelFactory, PlaylistViewModelFactory>();
-        SplatRegistrations.RegisterLazySingleton<IFilesListViewModel, FilesListViewModel>();
-        SplatRegistrations.RegisterLazySingleton<IPlayerViewModel, PlayerViewModel>();
+        SplatRegistrations.Register<SelectPresetViewModel>();
 
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
-        SplatRegistrations.RegisterLazySingleton<IPlaylistPlayer, PlaylistPlayer>();
-        SplatRegistrations.Register<IFileLocator, FileLocator>();
+        SplatRegistrations.RegisterLazySingleton<IAudioPlayerManager, AudioPlayerManager>();
             
         SplatRegistrations.SetupIOC();
     }
 
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
-    public static IFilesListViewModel FilesList => Locator.Current.GetService<IFilesListViewModel>()!;
-    public static IPlayerViewModel Player => Locator.Current.GetService<IPlayerViewModel>()!;
+    public static SelectPresetViewModel SelectPreset => Locator.Current.GetService<SelectPresetViewModel>()!;
 
     public static void Cleanup()
     {

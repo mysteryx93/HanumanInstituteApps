@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.Player432hz.Models;
 using MvvmDialogs;
 using MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
