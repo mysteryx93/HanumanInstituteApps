@@ -27,10 +27,10 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business
         /// <summary>
         /// Returns the path where the Powerliminals Player settings file is stored.
         /// </summary>
-        public string SettingsPath => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig.xml");
+        public string SettingsPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig.xml");
         /// <summary>
         /// Returns the path where unhandled exceptions are logged.
         /// </summary>
-        public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\Log.txt");
+        public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\Log.txt");
     }
 }

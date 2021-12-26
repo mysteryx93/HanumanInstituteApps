@@ -17,13 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="10.3.0" />
-    <PackageReference Include="Splat" Version="14.1.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+    <PackageReference Include="Splat" Version="14.1.17" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
+    <PackageReference Include="System.IO.Abstractions" Version="16.0.1" />
   </ItemGroup>
 
   <ItemGroup>

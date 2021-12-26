@@ -37,22 +37,9 @@ public class AppPathService : IAppPathService
     /// <summary>
     /// Returns the path where unhandled exceptions are logged.
     /// </summary>
-    public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\Log.txt");
-    /// <summary>
-    /// Returns the path where the 432hz Player is storing its Avisynth script during playback.
-    /// </summary>
-    public string Player432hzScriptFile => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\432hzPlaying.avs");
+    public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\Log.txt");
     /// <summary>
     /// Returns the path where the 432hz Player settings file is stored.
     /// </summary>
-    public string Player432hzConfigFile => _fileSystem.Path.Combine(_environment.CommonApplicationDataPath, @"Natural Grounding Player\432hzConfig.xml");
-
-    /// <summary>
-    /// Returns the relative path to access the temp folder within the Natural Grounding folder.
-    /// </summary>
-    public string LocalTempPath => @"Temp\";
-    /// <summary>
-    /// Returns the system temp folder.
-    /// </summary>
-    public string SystemTempPath => _fileSystem.Path.GetTempPath();
+    public string Player432hzConfigFile => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\432hzConfig.xml");
 }

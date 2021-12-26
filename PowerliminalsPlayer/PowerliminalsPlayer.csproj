@@ -1,49 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <LangVersion>default</LangVersion>
-        <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-        <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
-    </PropertyGroup>
-    <ItemGroup>
-        <Folder Include="Models\" />
-        <AvaloniaResource Include="Assets\**" />
-        <None Remove=".gitignore" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.10" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.10" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
-        <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
-      <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
-      <ProjectReference Include="..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj" />
-      <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
-      <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
-      <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
-      <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
-      <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>default</LangVersion>
+    <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+    <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+    <None Remove=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.11" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.11" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.11" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.11" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
+    <ProjectReference Include="..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj" />
+    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
+    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
+    <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
+    <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
+    <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+  </ItemGroup>
+  
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-    <Copy SourceFiles="../DLL/bass.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-  </Target>
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-    <Copy SourceFiles="../DLL/bass_fx.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\Windows-x64\bass.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\Windows-x64\bass_fx.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\Linux-x64\libbass.so" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\Linux-x64\libbass_fx.so" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\MacOS-x64\libbass.dylib" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\DLL\MacOS-x64\libbass_fx.dylib" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
   <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
-    <Copy SourceFiles="../DLL/bass.dll" DestinationFolder="$(PublishDir)" />
-  </Target>
-  <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
-    <Copy SourceFiles="../DLL/bass_fx.dll" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\Windows-x64\bass.dll" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\Windows-x64\bass_fx.dll" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\Linux-x64\libbass.so" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\Linux-x64\libbass_fx.so" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\MacOS-x64\libbass.dylib" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="..\DLL\MacOS-x64\libbass_fx.dylib" DestinationFolder="$(PublishDir)" />
   </Target>
 </Project>

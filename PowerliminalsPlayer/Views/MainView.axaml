@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Powerliminals Player" Width="730" Height="409"  MinWidth="700" MinHeight="200"
         Icon="/Assets/App.ico"
-        xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
+        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
@@ -47,7 +47,7 @@
                                 </mediab:BassPlayerHost>
                                 <i:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="StopCommandExecuted">
-                                        <InvokeCommandAction Command="{Binding ViewModel.RemoveMediaCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
+                                        <ia:InvokeCommandAction Command="{Binding ViewModel.RemoveMediaCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                                                              CommandParameter="{Binding}"/>
                                     </ia:EventTriggerBehavior>
                                 </i:Interaction.Behaviors>

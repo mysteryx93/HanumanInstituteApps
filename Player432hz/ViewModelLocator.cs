@@ -24,10 +24,7 @@ public static class ViewModelLocator
             
         // Services
         container.AddCommonServices();
-        container.Register(() => (IDialogService)new DialogService(dialogTypeLocator: new NamingConventionDialogTypeLocator()
-        {
-            ViewSuffix = "View"
-        }));
+        container.Register(() => (IDialogService)new DialogService());
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();

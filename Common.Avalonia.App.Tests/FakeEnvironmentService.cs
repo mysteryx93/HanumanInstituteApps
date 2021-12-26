@@ -12,7 +12,7 @@ public class FakeEnvironmentService : IEnvironmentService
 
     public string AppFriendlyName => "TestApp";
 
-    public string CommonApplicationDataPath => @"C:\TestAppData\";
+    public string ApplicationDataPath => @"C:\TestAppData\";
 
     public string AppDirectory => @"C:\TestApp\";
 

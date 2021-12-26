@@ -22,19 +22,7 @@ public interface IAppPathService
     /// </summary>
     string UnhandledExceptionLogPath { get; }
     /// <summary>
-    /// Returns the path where the 432hz Player is storing its Avisynth script during playback.
-    /// </summary>
-    string Player432hzScriptFile { get; }
-    /// <summary>
     /// Returns the path where the 432hz Player settings file is stored.
     /// </summary>
     string Player432hzConfigFile { get; }
-    /// <summary>
-    /// Returns the relative path to access the temp folder within the Natural Grounding folder.
-    /// </summary>
-    string LocalTempPath { get; }
-    /// <summary>
-    /// Returns the system temp folder.
-    /// </summary>
-    string SystemTempPath { get; }
 }

@@ -23,7 +23,7 @@ public interface IEnvironmentService
     /// <summary>
     /// Returns the path of the system special folder CommonApplicationData.
     /// </summary>
-    string CommonApplicationDataPath { get; }
+    string ApplicationDataPath { get; }
     /// <summary>
     /// Returns the directory from which the application is run.
     /// </summary>

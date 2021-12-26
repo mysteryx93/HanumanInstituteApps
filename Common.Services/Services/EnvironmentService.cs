@@ -25,7 +25,7 @@ public class EnvironmentService : IEnvironmentService
     /// <summary>
     /// Returns the path of the system special folder CommonApplicationData.
     /// </summary>
-    public string CommonApplicationDataPath => Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+    public string ApplicationDataPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     /// <summary>
     /// Returns the directory from which the application is run.
     /// </summary>
