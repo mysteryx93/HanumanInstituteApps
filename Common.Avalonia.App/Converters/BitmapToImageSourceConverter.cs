@@ -5,11 +5,11 @@
 // using System.IO;
 // using Avalonia.Data.Converters;
 //
-// namespace HanumanInstitute.CommonAvaloniaApp
+// namespace HanumanInstitute.Common.Avalonia.App
 // {
 //     public class BitmapToImageSourceConverter : IValueConverter
 //     {
-//         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+//         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 //         {
 //             if (value is Bitmap bmp)
 //             {
@@ -28,7 +28,7 @@
 //             return null;
 //         }
 //
-//         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+//         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 //         {
 //             throw new NotImplementedException();
 //         }

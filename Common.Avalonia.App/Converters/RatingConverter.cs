@@ -9,7 +9,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class RatingConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var maxValue = ParseMaxValue(parameter);
 
@@ -32,7 +32,7 @@ public class RatingConverter : IValueConverter
         }
     }
 
-    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var strValue = value as string;
         if (!string.IsNullOrEmpty(strValue))

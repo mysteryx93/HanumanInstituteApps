@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services.Validation;
 
 /// <summary>
@@ -15,6 +15,7 @@ public static class ValidationExtensions
     /// <param name="v">The object to validate.</param>
     public static T ValidateAndThrow<T>(this T v)
     {
+        v.CheckNotNull(nameof(v));
         Validator.ValidateObject(v, new ValidationContext(v), true);
         return v;
     }
@@ -26,6 +27,7 @@ public static class ValidationExtensions
     /// <returns>A list of validation errors.</returns>
     public static ICollection<ValidationResult>? Validate<T>(this T v)
     {
+        v.CheckNotNull(nameof(v));
         var results = new List<ValidationResult>();
         var context = new ValidationContext(v);
         if (!Validator.TryValidateObject(v, context, results, true))

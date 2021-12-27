@@ -10,7 +10,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class RatingToColorConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var result = Color.FromRgb(0, 0, 0);
         var decValue = value as double?;
@@ -23,12 +23,12 @@ public class RatingToColorConverter : IValueConverter
         return targetType == typeof(Color) ? result : new SolidColorBrush(result);
     }
 
-    public object ConvertBack(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
 
-    public static Color HsbToRgb(double hue, double saturation, double brightness)
+    private static Color HsbToRgb(double hue, double saturation, double brightness)
     {
         int r = 0, g = 0, b = 0;
         if (saturation == 0)

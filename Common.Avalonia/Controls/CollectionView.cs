@@ -9,11 +9,8 @@ using JetBrains.Annotations;
 
 namespace HanumanInstitute.Common.Avalonia;
 
-/// <summary>
-/// Enables current record management on a collection.
-/// </summary>
-/// <typeparam name="T">The type of the list.</typeparam>
-public class CollectionView<T> : ICollectionView<T>, INotifyPropertyChanged
+/// <inheritdoc />
+public class CollectionView<T> : ICollectionView<T>
 {
     /// <summary>
     /// Initializes a new instance of the ListCollectionView class.

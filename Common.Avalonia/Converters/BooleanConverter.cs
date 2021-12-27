@@ -20,13 +20,9 @@ public class BooleanConverter<T> : IValueConverter
     public T TrueValue { get; set; }
     public T FalseValue { get; set; }
 
-    public virtual object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value is bool and true ? TrueValue : FalseValue;
-    }
+    public virtual object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is bool and true ? TrueValue : FalseValue;
 
-    public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value is T v && EqualityComparer<T>.Default.Equals(v, TrueValue);
-    }
+    public virtual object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is T v && EqualityComparer<T>.Default.Equals(v, TrueValue);
 }

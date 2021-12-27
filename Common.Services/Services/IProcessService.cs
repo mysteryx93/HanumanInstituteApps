@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -11,7 +10,6 @@ public interface IProcessService
     /// Starts specified application with specified arguments.
     /// </summary>
     /// <param name="fileName">The application to start.</param>
-    /// <param name="arguments">The arguments to pass to the application.</param>
     /// <returns>The newly created process.</returns>
     ProcessWrapper Start(string fileName);
 
@@ -19,6 +17,7 @@ public interface IProcessService
     /// Starts specified application.
     /// </summary>
     /// <param name="fileName">The application to start.</param>
+    /// <param name="arguments">The arguments to pass to the application.</param>
     /// <returns>The newly created process.</returns>
     ProcessWrapper Start(string fileName, string arguments);
 

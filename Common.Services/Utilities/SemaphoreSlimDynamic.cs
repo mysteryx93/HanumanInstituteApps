@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable CheckNamespace
 
 namespace HanumanInstitute.Common.Services;
 

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using HanumanInstitute.Common.Services.Properties;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -17,10 +17,10 @@ public class ValidateObjectAttribute : ValidationAttribute
     /// Performs validation on the decorated class member and returns the validation result.
     /// </summary>
     /// <returns></returns>
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {
-        Preconditions.CheckNotNull(value, nameof(value));
-        Preconditions.CheckNotNull(validationContext, nameof(validationContext));
+        value.CheckNotNull(nameof(value));
+        validationContext.CheckNotNull(nameof(validationContext));
 
         var results = new List<ValidationResult>();
         var context = new ValidationContext(value, null, null);
@@ -34,6 +34,6 @@ public class ValidateObjectAttribute : ValidationAttribute
 
             return compositeResults;
         }
-        return ValidationResult.Success;
+        return ValidationResult.Success!;
     }
 }

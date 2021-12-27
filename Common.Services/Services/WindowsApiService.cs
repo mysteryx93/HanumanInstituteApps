@@ -5,52 +5,33 @@ using System.Runtime.InteropServices;
 using System.Text;
 using HanumanInstitute.Common.Services.Properties;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
-/// <summary>
-/// Exposes the Windows API.
-/// </summary>
+/// <inheritdoc />
 public class WindowsApiService : IWindowsApiService
 {
-    public WindowsApiService() { }
+    private const int ResultOk = 0;
 
-    protected const int ResultOK = 0;
-
-    /// <summary>
-    /// Returns the hWnd of the window that is in the foreground.
-    /// </summary>
+    /// <inheritdoc />
     public IntPtr GetForegroundWindow() => NativeMethods.GetForegroundWindow();
 
-    /// <summary>
-    /// Moves specified window into the foreground.
-    /// </summary>
-    /// <param name="hWnd">The hWnd of the window to show.</param>
+    /// <inheritdoc />
     public bool SetForegroundWindow(IntPtr hWnd) => NativeMethods.SetForegroundWindow(hWnd);
 
-    /// <summary>
-    /// Returns the DOS-format short path name for specified path.
-    /// </summary>
-    /// <param name="path">The path to get the short name for.</param>
-    /// <exception cref="ExternalException">Occurs if the API call fails.</exception>
-    /// <returns>The short path name.</returns>
+    /// <inheritdoc />
     public string GetShortPathName(string path)
     {
-        const int MaxPathLenth = 255;
-        var result = new StringBuilder(MaxPathLenth);
-        ValidateHResult(NativeMethods.GetShortPathName(path, result, MaxPathLenth), "GetShortPathName");
+        const int MaxPathLength = 255;
+        var result = new StringBuilder(MaxPathLength);
+        ValidateHResult(NativeMethods.GetShortPathName(path, result, MaxPathLength), "GetShortPathName");
         return result.ToString();
     }
 
-    /// <summary>
-    /// Sends a file operation command via the Windows API.
-    /// </summary>
-    /// <param name="fileOperation">The file operation to perform.</param>
-    /// <param name="path">The path on which to perform the operation.</param>
-    /// <param name="flags">Additional options.</param>
-    /// <exception cref="ExternalException">Occurs if the API call fails.</exception>
-    public void SHFileOperation(ApiFileOperationType fileOperation, string path, ApiFileOperationFlags flags)
+    /// <inheritdoc />
+    public void ShFileOperation(ApiFileOperationType fileOperation, string path, ApiFileOperationFlags flags)
     {
-        var fs = new NativeMethods.SHFILEOPSTRUCT
+        var fs = new NativeMethods.ShFileOpStruct
         {
             Func = ApiFileOperationType.Delete,
             From = path + '\0' + '\0',
@@ -59,9 +40,9 @@ public class WindowsApiService : IWindowsApiService
         ValidateHResult(NativeMethods.SHFileOperation(ref fs), "SHFileOperation");
     }
 
-    protected static void ValidateHResult(int hresult, string apiName)
+    private static void ValidateHResult(int hresult, string apiName)
     {
-        if (hresult != ResultOK)
+        if (hresult != ResultOk)
         {
             throw new ExternalException(
                 string.Format(CultureInfo.CurrentCulture, Resources.ApiInvocationError, apiName, hresult),
@@ -85,14 +66,16 @@ public class WindowsApiService : IWindowsApiService
         internal static extern int GetShortPathName([MarshalAs(UnmanagedType.LPWStr)] string path, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder shortPath, int shortPathLength);
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-        internal static extern int SHFileOperation(ref SHFILEOPSTRUCT fileOp);
+        internal static extern int SHFileOperation(ref ShFileOpStruct fileOp);
 
         /// <summary>
-        /// SHFILEOPSTRUCT for SHFileOperation from COM
+        /// SHFileOperation COM data structure.
         /// </summary>
         [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "We must use fields instead of properties for API calls.")]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        internal struct SHFILEOPSTRUCT
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
+        [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
+        internal struct ShFileOpStruct
         {
             public IntPtr Hwnd;
             [MarshalAs(UnmanagedType.U4)]
@@ -156,9 +139,9 @@ public enum ApiFileOperationFlags : ushort
     /// </summary>
     SimpleProgress = 0x0100,
     /// <summary>
-    /// Surpress errors, if any occur during the process.
+    /// Suppress errors, if any occur during the process.
     /// </summary>
-    NoErrorUI = 0x0400,
+    NoErrorUi = 0x0400,
     /// <summary>
     /// Warn if files are too big to fit in the recycle bin and will need
     /// to be deleted completely.

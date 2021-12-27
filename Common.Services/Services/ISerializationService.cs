@@ -1,5 +1,6 @@
 ﻿using System;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -12,7 +13,6 @@ public interface ISerializationService
     /// </summary>
     /// <typeparam name="T">The data type of the object to serialize.</typeparam>
     /// <param name="dataToSerialize">The object to serialize.</param>
-    /// <param name="root">The root namespace for the generated XML.</param>
     /// <returns>An XML string containing serialized data.</returns>
     string Serialize<T>(T dataToSerialize);
     /// <summary>
@@ -20,7 +20,6 @@ public interface ISerializationService
     /// </summary>
     /// <typeparam name="T">The data type of the object to deserialize.</typeparam>
     /// <param name="xmlText">The XML string containing the data to deserialize.</param>
-    /// <param name="root">The root namespace of the XML.</param>
     /// <exception cref="InvalidOperationException">An error occurred during deserialization. The original exception is available using the InnerException property.</exception>
     /// <returns>The deserialized object.</returns>
     T Deserialize<T>(string xmlText) where T : class, new();
@@ -30,7 +29,7 @@ public interface ISerializationService
     /// <typeparam name="T">The data type of the object to serialize.</typeparam>
     /// <param name="path">The path of the file from which to read XML data.</param>
     /// <exception cref="InvalidOperationException">An error occurred during deserialization. The original exception is available using the InnerException property.</exception>
-    /// <returns>The object created from the file<./returns>
+    /// <returns>The object created from the file</returns>
     T DeserializeFromFile<T>(string path);
     /// <summary>
     /// Saves an object to an xml file.

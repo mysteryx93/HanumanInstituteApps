@@ -3,6 +3,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using HanumanInstitute.Common.Services;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace HanumanInstitute.Common.Avalonia;
 
@@ -89,7 +91,7 @@ public class FocusExtensions : AvaloniaObject
     {
         if (e.Sender is InputElement element && e.NewValue.Value)
         {
-            element.GotFocus += (sender, args) =>
+            element.GotFocus += (sender, _) =>
             {
                 if (sender is TextBox txt)
                 {

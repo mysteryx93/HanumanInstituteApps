@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace HanumanInstitute.Common.Avalonia;
 
@@ -6,7 +7,7 @@ namespace HanumanInstitute.Common.Avalonia;
 /// Enables current record management on a collection.
 /// </summary>
 /// <typeparam name="T">The type of the list.</typeparam>
-public interface ICollectionView<T>  : IEnumerable<T>
+public interface ICollectionView<T>  : IEnumerable<T>, INotifyPropertyChanged
 {
     /// <summary>
     /// Gets the data source as an ObservableCollection. It uses a derived collection that supports range modifications.

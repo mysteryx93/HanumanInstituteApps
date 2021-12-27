@@ -3,6 +3,7 @@
 // using System.Drawing.Imaging;
 // using System.IO;
 //
+
 // namespace HanumanInstitute.CommonAvaloniaApp
 // {
 //     public static class WpfExtensionMethods

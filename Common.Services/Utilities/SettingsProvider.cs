@@ -4,18 +4,19 @@ using System.IO;
 using HanumanInstitute.Common.Services.Properties;
 using HanumanInstitute.Common.Services.Validation;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
 /// Handles generic settings features such as loading, saving and validating data.
 /// </summary>
 /// <typeparam name="T">The type of data in which to store settings.</typeparam>
-public class SettingsProvider<T> : ISettingsProvider<T>
+public abstract class SettingsProvider<T> : ISettingsProvider<T>
     where T : class, new()
 {
     private readonly ISerializationService _serialization;
 
-    public SettingsProvider(ISerializationService serializationService)
+    protected SettingsProvider(ISerializationService serializationService)
     {
         _serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
     }
@@ -35,10 +36,11 @@ public class SettingsProvider<T> : ISettingsProvider<T>
     /// </summary>
     public event EventHandler? Saved;
 
-    public virtual T Load()
-    {
-        throw new NotImplementedException();
-    }
+    /// <summary>
+    /// Loads settings data. Must be implemented in derived class. 
+    /// </summary>
+    /// <returns>The loaded settings.</returns>
+    public abstract T Load();
 
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.
@@ -58,10 +60,10 @@ public class SettingsProvider<T> : ISettingsProvider<T>
         return Value;
     }
 
-    public virtual void Save()
-    {
-        throw new NotImplementedException();
-    }
+    /// <summary>
+    /// Saves settings data. Must be implemented in derived class. 
+    /// </summary>
+    public abstract void Save();
 
     /// <summary>
     /// Saves settings into an XML file.

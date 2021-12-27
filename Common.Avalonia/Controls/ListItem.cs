@@ -1,4 +1,5 @@
-﻿using System;
+﻿// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace HanumanInstitute.Common.Avalonia;
 

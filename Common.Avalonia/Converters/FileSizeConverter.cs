@@ -9,10 +9,10 @@ namespace HanumanInstitute.Common.Avalonia;
 /// </summary>
 public class FileSizeConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-        double size = (long)value;
+        double size = (long)(value ?? 0);
         var unit = 0;
 
         while (size >= 1024)
@@ -24,8 +24,6 @@ public class FileSizeConverter : IValueConverter
         return string.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", size, units[unit]);
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotImplementedException();
-    }
 }

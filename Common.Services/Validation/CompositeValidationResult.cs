@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>

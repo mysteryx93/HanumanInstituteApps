@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Common.Avalonia;
 
 /// <summary>
-/// Represents the generic collection view for collections that implement IList<ListItem<<typeparamref name="T"/>>>.
+/// Represents the generic collection view for collections of items that implement <see cref="ListItem{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of list.</typeparam>
 public class ListItemCollectionView<T> : CollectionView<ListItem<T>>

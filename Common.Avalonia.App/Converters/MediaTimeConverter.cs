@@ -10,7 +10,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class MediaTimeConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value != null)
         {
@@ -30,7 +30,7 @@ public class MediaTimeConverter : IValueConverter
         return string.Empty;
     }
 
-    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var strValue = value as string;
         if (!string.IsNullOrEmpty(strValue))

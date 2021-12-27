@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 public static class ExtensionMethods
@@ -43,15 +44,15 @@ public static class ExtensionMethods
         return block.Completion;
     }
 
-    /// <summary>
-    /// Loops through a list asynchronously in multiple threads.
-    /// </summary>
-    /// <typeparam name="T">The data type of the list to loop through.</typeparam>
-    /// <param name="source">The list to loop through.</param>
-    /// <param name="dop">The amount of concurrent threads to use for looping.</param>
-    /// <param name="cancel">A cancellation token to manage the cancellation of the task.</param>
-    /// <param name="body">The work to execute for each item in the list.</param>
-    /// <returns>The asynchronous task that can be awaited.</returns>
+    // /// <summary>
+    // /// Loops through a list asynchronously in multiple threads.
+    // /// </summary>
+    // /// <typeparam name="T">The data type of the list to loop through.</typeparam>
+    // /// <param name="source">The list to loop through.</param>
+    // /// <param name="dop">The amount of concurrent threads to use for looping.</param>
+    // /// <param name="cancel">A cancellation token to manage the cancellation of the task.</param>
+    // /// <param name="body">The work to execute for each item in the list.</param>
+    // /// <returns>The asynchronous task that can be awaited.</returns>
     //public static Task ForEachAsync<T>(this IEnumerable<T> source, int dop, CancellationToken cancel, Func<T, Task> body)
     //{
     //    return Task.WhenAll(
@@ -120,8 +121,9 @@ public static class ExtensionMethods
     /// </summary>
     /// <typeparam name="T">The data type to parse into.</typeparam>
     /// <param name="input">The string value to parse.</param>
-    /// <returns>The parsed value, or null if parsring failed.</returns>
-    public static Nullable<T> Parse<T>(this string input) where T : struct
+    /// <returns>The parsed value, or null if parsing failed.</returns>
+    public static T? Parse<T>(this string input) 
+        where T : struct
     {
         try
         {

@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace HanumanInstitute.Common.Avalonia;
 
 /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia.Markup.Xaml;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Common.Avalonia;
 

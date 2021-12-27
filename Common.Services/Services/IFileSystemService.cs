@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -35,7 +35,7 @@ public interface IFileSystemService : IFileSystem
     /// <returns>A file path with no file extension.</returns>
     string GetPathWithoutExtension(string path);
     /// <summary>
-    /// Send a file or path silently to the recycle bin. Surpress dialog, surpress errors, delete if too large.
+    /// Send a file or path silently to the recycle bin. Suppress dialog, suppress errors, delete if too large.
     /// </summary>
     /// <param name="path">Location of directory or file to recycle.</param>
     void MoveToRecycleBin(string path);

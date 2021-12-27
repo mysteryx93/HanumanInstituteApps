@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
 /// Abstraction wrapper around the System.Diagnostics.Process class that can be used for unit testing.
 /// </summary>
-public interface IProcess
+public interface IProcess : IDisposable
 {
     /// <summary>
     /// Gets or sets the overall priority category for the associated process.
@@ -37,9 +38,9 @@ public interface IProcess
     /// </summary>
     long PagedMemorySize64 { get; }
     /// <summary>
-    /// Gets the amount of nonpaged system memory, in bytes, allocated for the associated process.
+    /// Gets the amount of non-paged system memory, in bytes, allocated for the associated process.
     /// </summary>
-    long NonpagedSystemMemorySize64 { get; }
+    long NonPagedSystemMemorySize64 { get; }
     /// <summary>
     /// Gets the modules that have been loaded by the associated process.
     /// </summary>
@@ -103,7 +104,7 @@ public interface IProcess
     /// <summary>
     /// Gets or sets the object used to marshal the event handler calls that are issued as a result of a process exit event.
     /// </summary>
-    ISynchronizeInvoke SynchronizingObject { get; set; }
+    ISynchronizeInvoke? SynchronizingObject { get; set; }
     /// <summary>
     /// Gets the time that the associated process was started.
     /// </summary>
@@ -131,7 +132,7 @@ public interface IProcess
     /// <summary>
     /// Gets the main module for the associated process.
     /// </summary>
-    ProcessModule MainModule { get; }
+    ProcessModule? MainModule { get; }
     /// <summary>
     /// Gets the caption of the main window of the process.
     /// </summary>

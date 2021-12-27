@@ -3,51 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
-/// <summary>
-/// Provides information about the application, environment and operating system.
-/// </summary>
+/// <inheritdoc />
 public class EnvironmentService : IEnvironmentService
 {
-    /// <summary>
-    /// Returns a string array containing the command-line arguments for the current process.
-    /// </summary>
+    /// <inheritdoc />
     public IEnumerable<string> CommandLineArguments => Environment.GetCommandLineArgs();
-    /// <summary>
-    /// Returns the version of executing assembly.
-    /// </summary>
-    public Version AppVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version();
-    /// <summary>
-    /// Returns the friendly name of this application.
-    /// </summary>
-    public string AppFriendlyName => System.AppDomain.CurrentDomain.FriendlyName;
-    /// <summary>
-    /// Returns the path of the system special folder CommonApplicationData.
-    /// </summary>
+    /// <inheritdoc />
+    public Version AppVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+    /// <inheritdoc />
+    public string AppFriendlyName => AppDomain.CurrentDomain.FriendlyName;
+    /// <inheritdoc />
     public string ApplicationDataPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    /// <summary>
-    /// Returns the directory from which the application is run.
-    /// </summary>
-    public string AppDirectory => System.AppDomain.CurrentDomain?.BaseDirectory ?? string.Empty;
-    /// <summary>
-    /// Returns the root of the drive where the operating system is installed.
-    /// </summary>
+    /// <inheritdoc />
+    public string AppDirectory => AppDomain.CurrentDomain.BaseDirectory;
+    /// <inheritdoc />
     public string SystemRootDirectory => Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) ?? string.Empty;
-    /// <summary>
-    /// Returns the path where x86 Program Files are installed.
-    /// </summary>
+    /// <inheritdoc />
     public string ProgramFilesX86 => Environment.GetFolderPath(Environment.Is64BitOperatingSystem ? Environment.SpecialFolder.ProgramFilesX86 : Environment.SpecialFolder.ProgramFiles);
-    /// <summary>
-    /// Returns the character used to separate directory levels in the file system.
-    /// </summary>
+    /// <inheritdoc />
     public char DirectorySeparatorChar => Path.DirectorySeparatorChar;
-    /// <summary>
-    /// Returns the current date and time on this computer expressed as local time.
-    /// </summary>
+    /// <inheritdoc />
     public DateTime Now => DateTime.Now;
-    /// <summary>
-    /// Returns the current date and time on this computer expressed as UTC.
-    /// </summary>
+    /// <inheritdoc />
     public DateTime UtcNow => DateTime.UtcNow;
 }

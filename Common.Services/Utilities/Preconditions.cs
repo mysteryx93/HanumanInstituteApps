@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using HanumanInstitute.Common.Services.Properties;
-using JetBrains.Annotations;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -17,7 +18,8 @@ public static class Preconditions
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="name">The name of the parameter.</param>
-    public static T CheckNotNull<T>([NoEnumeration] this T value, string name)
+    [return: NotNull]
+    public static T CheckNotNull<T>([NotNull, JetBrains.Annotations.NoEnumeration] this T value, string name)
     {
         if (value == null)
         {
@@ -31,7 +33,7 @@ public static class Preconditions
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="name">The name of the parameter.</param>
-    public static string CheckNotNullOrEmpty(this string value, string name)
+    public static string CheckNotNullOrEmpty([NotNull] this string? value, string name)
     {
         value.CheckNotNull(name);
         if (string.IsNullOrEmpty(value))
@@ -46,14 +48,16 @@ public static class Preconditions
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="name">The name of the parameter.</param>
-    public static IEnumerable<T> CheckNotNullOrEmpty<T>(this IEnumerable<T> value, string name)
+    public static IEnumerable<T> CheckNotNullOrEmpty<T>([NotNull, JetBrains.Annotations.NoEnumeration] this IEnumerable<T>? value, string name)
     {
+        // ReSharper disable PossibleMultipleEnumeration
         value.CheckNotNull(name);
-        if (!value.Any())
+        if (value.Any())
         {
             ThrowArgumentNullOrEmpty(name);
         }
         return value;
+        // ReSharper restore PossibleMultipleEnumeration
     }
 
     /// <summary>
@@ -62,7 +66,7 @@ public static class Preconditions
     /// <param name="value">The Type to validate.</param>
     /// <param name="baseType">The base type that value type must derive from.</param>
     /// <param name="name">The name of the parameter.</param>
-    /// <returns></returns>
+    /// <returns>The same type.</returns>
     public static Type CheckAssignableFrom(this Type value, Type baseType, string name)
     {
         value.CheckNotNull(name);
@@ -81,7 +85,7 @@ public static class Preconditions
     /// <param name="value">The Type to validate.</param>
     /// <param name="baseType">The base type that value type must derive from.</param>
     /// <param name="name">The name of the parameter.</param>
-    /// <returns></returns>
+    /// <returns>The same type.</returns>
     public static Type CheckDerivesFrom(this Type value, Type baseType, string name)
     {
         value.CheckNotNull(name);
@@ -98,8 +102,6 @@ public static class Preconditions
     /// Throws an exception of type ArgumentException saying an argument is null or empty.
     /// </summary>
     /// <param name="name">The name of the parameter.</param>
-    public static void ThrowArgumentNullOrEmpty(this string name)
-    {
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.ArgumentNullOrEmpty, name), name);
-    }
+    private static void ThrowArgumentNullOrEmpty(this string name) => throw new ArgumentException(
+        string.Format(CultureInfo.InvariantCulture, Resources.ArgumentNullOrEmpty, name), name);
 }

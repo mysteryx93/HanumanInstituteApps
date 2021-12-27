@@ -1,5 +1,6 @@
 ﻿using System;
 
+// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -28,5 +29,5 @@ public interface IWindowsApiService
     /// <param name="fileOperation">The file operation to perform.</param>
     /// <param name="path">The path on which to perform the operation.</param>
     /// <param name="flags">Additional options, FOF_ALLOWUNDO will be automatically added.</param>
-    void SHFileOperation(ApiFileOperationType fileOperation, string path, ApiFileOperationFlags flags);
+    void ShFileOperation(ApiFileOperationType fileOperation, string path, ApiFileOperationFlags flags);
 }

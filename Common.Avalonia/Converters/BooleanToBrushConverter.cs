@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 
 namespace HanumanInstitute.Common.Avalonia;
 
