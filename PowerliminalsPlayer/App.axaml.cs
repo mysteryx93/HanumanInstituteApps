@@ -5,24 +5,20 @@ using Avalonia.Markup.Xaml;
 using HanumanInstitute.PowerliminalsPlayer.Views;
 using MvvmDialogs.Avalonia;
 
-namespace HanumanInstitute.PowerliminalsPlayer
+namespace HanumanInstitute.PowerliminalsPlayer;
+
+public class App : Application
 {
-    public class App : Application
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+
+    public override void OnFrameworkInitializationCompleted()
     {
-        public override void Initialize()
+        GC.KeepAlive(typeof(DialogService));
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            AvaloniaXamlLoader.Load(this);
+            desktop.MainWindow = new MainView {DataContext = ViewModelLocator.Main};
         }
-
-        public override void OnFrameworkInitializationCompleted()
-        {
-            GC.KeepAlive(typeof(DialogService));
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainView {DataContext = ViewModelLocator.Main};
-            }
-
-            base.OnFrameworkInitializationCompleted();
-        }
+    
+        base.OnFrameworkInitializationCompleted();
     }
 }

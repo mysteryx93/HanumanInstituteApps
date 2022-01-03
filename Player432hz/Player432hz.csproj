@@ -10,6 +10,10 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32bit>true</Prefer32bit>
+  </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />
@@ -35,12 +39,35 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  
+<Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition=" '$(Platform)' != 'x86' ">
   <ItemGroup>
-    <None Update="bass.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="bass_fx.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
+    <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
+    <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
   </ItemGroup>
+  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+</Target>
+<Target Name="CopyCustomContentOnPublish" AfterTargets="Publish" Condition=" '$(Platform)' != 'x86' ">
+  <ItemGroup>
+    <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
+    <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
+    <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
+  </ItemGroup>
+  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
+</Target>
+<Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition=" '$(Platform)' == 'x86' ">
+  <ItemGroup>
+    <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
+    <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
+  </ItemGroup>
+  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+</Target>
+<Target Name="CopyCustomContentOnPublish" AfterTargets="Publish" Condition=" '$(Platform)' == 'x86' ">
+  <ItemGroup>
+    <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
+    <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
+  </ItemGroup>
+  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
+</Target>
 </Project>

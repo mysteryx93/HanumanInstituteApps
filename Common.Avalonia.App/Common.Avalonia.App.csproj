@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <PackageReference Include="Avalonia" Version="0.10.11" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.11" />

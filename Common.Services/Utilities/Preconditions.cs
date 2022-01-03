@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using HanumanInstitute.Common.Services.Properties;
+using Res = HanumanInstitute.Common.Services.Properties.Resources;
 
 // ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace System;
 
 /// <summary>
 /// Provides helper methods to validate parameters.
@@ -74,7 +73,7 @@ public static class Preconditions
 
         if (!value.IsAssignableFrom(baseType))
         {
-            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.TypeMustBeAssignableFromBase, name, value.Name, baseType.Name));
+            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, HanumanInstitute.Common.Services.Properties.Resources.TypeMustBeAssignableFromBase, name, value.Name, baseType.Name));
         }
         return value;
     }
@@ -93,7 +92,7 @@ public static class Preconditions
 
         if (!value.IsSubclassOf(baseType))
         {
-            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.TypeMustDeriveFromBase, name, value.Name, baseType.Name));
+            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Res.TypeMustDeriveFromBase, name, value.Name, baseType.Name));
         }
         return value;
     }
@@ -103,5 +102,5 @@ public static class Preconditions
     /// </summary>
     /// <param name="name">The name of the parameter.</param>
     private static void ThrowArgumentNullOrEmpty(this string name) => throw new ArgumentException(
-        string.Format(CultureInfo.InvariantCulture, Resources.ArgumentNullOrEmpty, name), name);
+        string.Format(CultureInfo.InvariantCulture, Res.ArgumentNullOrEmpty, name), name);
 }

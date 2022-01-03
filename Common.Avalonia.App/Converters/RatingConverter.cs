@@ -9,6 +9,8 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class RatingConverter : IValueConverter
 {
+    public static RatingConverter Instance { get; } = new();
+    
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var maxValue = ParseMaxValue(parameter);

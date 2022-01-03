@@ -1,20 +1,19 @@
 ﻿using System;
 
-namespace HanumanInstitute.PowerliminalsPlayer.Models
+namespace HanumanInstitute.PowerliminalsPlayer.Models;
+
+/// <summary>
+/// Contains playback event data.
+/// </summary>
+public class PlayingEventArgs : EventArgs
 {
-    /// <summary>
-    /// Contains playback event data.
-    /// </summary>
-    public class PlayingEventArgs : EventArgs
+    public string FileName { get; set; } = string.Empty;
+
+    public PlayingEventArgs()
+    { }
+
+    public PlayingEventArgs(string fileName)
     {
-        public string FileName { get; set; } = string.Empty;
-
-        public PlayingEventArgs()
-        { }
-
-        public PlayingEventArgs(string fileName)
-        {
-            this.FileName = fileName;
-        }
+        this.FileName = fileName;
     }
 }

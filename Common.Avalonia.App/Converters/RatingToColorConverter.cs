@@ -10,6 +10,8 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class RatingToColorConverter : IValueConverter
 {
+    public static RatingToColorConverter Instance { get; } = new(); 
+    
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var result = Color.FromRgb(0, 0, 0);

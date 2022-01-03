@@ -10,6 +10,8 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class MediaTimeConverter : IValueConverter
 {
+    public static MediaTimeConverter Instance { get; } = new();
+    
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value != null)
