@@ -40,7 +40,8 @@ public class SerializationService : ISerializationService
     /// <inheritdoc />
     public T DeserializeFromFile<T>(string path)
     {
-        using var reader = XmlReader.Create(path,
+        var stream = _fileSystem.File.OpenRead(path);
+        using var reader = XmlReader.Create(stream,
             new XmlReaderSettings() { XmlResolver = null });
         var serializer = new XmlSerializer(typeof(T));
         return (T)serializer.Deserialize(reader)!;

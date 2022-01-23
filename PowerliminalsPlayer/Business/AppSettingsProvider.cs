@@ -15,8 +15,6 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
     public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath) : base(serializationService)
     {
         _appPath = appPath;
-
-        Load();
     }
 
     public override AppSettingsData Load() => base.Load(_appPath.SettingsPath);

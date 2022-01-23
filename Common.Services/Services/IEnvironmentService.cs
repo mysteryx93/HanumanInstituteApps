@@ -42,6 +42,10 @@ public interface IEnvironmentService
     /// </summary>
     char DirectorySeparatorChar { get; }
     /// <summary>
+    /// Provides a platform-specific alternate character used to separate directory levels in a path string that reflects a hierarchical file system organization.
+    /// </summary>
+    char AltDirectorySeparatorChar { get; }
+    /// <summary>
     /// Returns the current date and time on this computer expressed as local time.
     /// </summary>
     DateTime Now { get; }

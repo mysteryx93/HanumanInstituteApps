@@ -33,7 +33,6 @@ public static class ViewModelLocator
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
-        SplatRegistrations.RegisterLazySingleton<IAudioPlayerManager, AudioPlayerManager>();
             
         SplatRegistrations.SetupIOC();
     }

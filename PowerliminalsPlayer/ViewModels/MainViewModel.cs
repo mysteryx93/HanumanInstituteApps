@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
@@ -58,7 +57,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedFolderIndex, value);
     }
     private int _selectedFolderIndex = -1;
-        
+
     public bool IsPaused
     {
         get => _isPaused;
@@ -81,6 +80,9 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     public ICollectionView<string> Files { get; private set; } = new CollectionView<string>();
 
+    /// <summary>
+    /// Loads the settings file.
+    /// </summary>
     public void Load()
     {
         _settings.Load();
@@ -88,6 +90,9 @@ public class MainViewModel : ViewModelBase
         ReloadFiles();
     }
 
+    /// <summary>
+    /// Saves the settings file.
+    /// </summary>
     public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(OnSaveSettings);
     private ICommand? _saveSettingsCommand;
     private void OnSaveSettings() => _settings.Save();
@@ -112,13 +117,15 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     /// <param name="path">The path to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    public IEnumerable<string> GetAudioFiles(string path) =>
+    private IEnumerable<string> GetAudioFiles(string path) =>
         _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
 
     public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<FileItem>(OnRemoveMedia);
     private ICommand? _removeMediaCommand;
-    private void OnRemoveMedia(FileItem item)
+    private void OnRemoveMedia(FileItem? item)
     {
+        if (item == null) { return; }
+
         Playlist.Files.Remove(item);
         if (!Playlist.Files.Any())
         {
@@ -162,7 +169,7 @@ public class MainViewModel : ViewModelBase
             Playlist.Files.Add(new FileItem(Files.CurrentItem, Playlist.MasterVolume));
         }
     }
-        
+
     public ICommand LoadPresetCommand => _loadPresetCommand ??= ReactiveCommand.Create(OnLoadPreset,
         AppData.Presets.ToObservableChangeSet().Select(x => x.Any()));
     private ICommand? _loadPresetCommand;

@@ -10,7 +10,7 @@ public interface IAppPathService
     /// <summary>
     /// Returns all valid audio extensions
     /// </summary>
-    IList<string> AudioExtensions { get; }
+    IReadOnlyList<string> AudioExtensions { get; }
     /// <summary>
     /// Returns the path where the Powerliminals Player settings file is stored.
     /// </summary>

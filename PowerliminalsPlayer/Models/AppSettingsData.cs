@@ -12,17 +12,6 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models;
 public class AppSettingsData : ReactiveObject
 {
     /// <summary>
-    /// Gets or sets the zoom factor to enlarge the UI.
-    /// </summary>
-    [Range(1.0, 1.5)]
-    public double Zoom
-    {
-        get => _zoom;
-        set => this.RaiseAndSetIfChanged(ref _zoom, value);
-    }
-    private double _zoom = 1;
-
-    /// <summary>
     /// Gets or sets the list of folders in which to look for audio files.
     /// </summary>
     [XmlElement("Folder")]

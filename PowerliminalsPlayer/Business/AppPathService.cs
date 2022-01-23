@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
@@ -11,25 +12,30 @@ public class AppPathService : IAppPathService
 {
     private readonly IEnvironmentService _environment;
     private readonly IFileSystemService _fileSystem;
+    private readonly IBassDevice _bassDevice;
 
-    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService)
+    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService, IBassDevice bassDevice)
     {
-        _environment = environmentService ?? throw new ArgumentNullException(nameof(environmentService));
-        _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+        _environment = environmentService;
+        _fileSystem = fileSystemService;
+        _bassDevice = bassDevice;
     }
 
     /// <summary>
     /// Returns all valid audio extensions
     /// </summary>
-    public IList<string> AudioExtensions => _audioExtensions ??= new[] { ".mp3", ".mp2", ".aac", ".wav", ".wma", ".m4a", ".flac" };
-    private IList<string>? _audioExtensions;
+    public IReadOnlyList<string> AudioExtensions => _audioExtensions ??= 
+        _bassDevice.SupportedExtensions.SelectMany(x => x.Extensions).Distinct().OrderBy(x => x).ToList();
+    private IReadOnlyList<string>? _audioExtensions;
 
     /// <summary>
     /// Returns the path where the Powerliminals Player settings file is stored.
     /// </summary>
-    public string SettingsPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig.xml");
+    public string SettingsPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player/PowerliminalsConfig.xml")
+        .Replace(_environment.AltDirectorySeparatorChar, _environment.DirectorySeparatorChar);
     /// <summary>
     /// Returns the path where unhandled exceptions are logged.
     /// </summary>
-    public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\Log.txt");
+    public string UnhandledExceptionLogPath => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player/Log.txt")
+        .Replace(_environment.AltDirectorySeparatorChar, _environment.DirectorySeparatorChar);
 }

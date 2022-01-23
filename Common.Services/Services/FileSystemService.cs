@@ -31,13 +31,13 @@ public class FileSystemService : IFileSystemService
     public IPath Path => _fileSystem.Path;
 
     /// <inheritdoc />
-    public void EnsureDirectoryExists(string path)
+    public virtual void EnsureDirectoryExists(string path)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path));
     }
 
     /// <inheritdoc />
-    public void DeleteFileSilent(string path)
+    public virtual void DeleteFileSilent(string path)
     {
         try
         {
@@ -50,7 +50,7 @@ public class FileSystemService : IFileSystemService
     }
 
     /// <inheritdoc />
-    public IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    public virtual IEnumerable<string> GetFilesByExtensions(string path, IEnumerable<string> extensions, SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
         if (path == null) { throw new ArgumentNullException(nameof(path)); }
         if (string.IsNullOrWhiteSpace(path)) { throw new ArgumentException(Resources.ValueIsNullOrWhiteSpace, nameof(path)); }
@@ -67,17 +67,17 @@ public class FileSystemService : IFileSystemService
     }
 
     /// <inheritdoc />
-    public string GetPathWithoutExtension(string path)
+    public virtual string GetPathWithoutExtension(string path)
     {
         path.CheckNotNullOrEmpty(nameof(path));
         return Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
     }
 
     /// <inheritdoc />
-    public void MoveToRecycleBin(string path) => MoveToRecycleBin(path, false);
+    public virtual void MoveToRecycleBin(string path) => MoveToRecycleBin(path, false);
 
     /// <inheritdoc />
-    public void MoveToRecycleBin(string path, bool displayWarning)
+    public virtual void MoveToRecycleBin(string path, bool displayWarning)
     {
         var flags = ApiFileOperationFlags.AllowUndo | ApiFileOperationFlags.NoConfirmation;
         flags |= displayWarning ? ApiFileOperationFlags.WantNukeWarning : ApiFileOperationFlags.NoErrorUi | ApiFileOperationFlags.Silent;

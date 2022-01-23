@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using MvvmDialogs;
@@ -32,7 +33,7 @@ public class SelectPresetViewModel : ViewModelBase, IModalDialogViewModel, IClos
         get => _presetName;
         set => this.RaiseAndSetIfChanged(ref _presetName, value);
     }
-    private string _presetName = "New Preset";
+    private string _presetName = string.Empty;
 
     public PresetItem? SelectedItem
     {
@@ -62,16 +63,22 @@ public class SelectPresetViewModel : ViewModelBase, IModalDialogViewModel, IClos
         {
             SelectedItem = AppData.Presets.FirstOrDefault();
         }
+        else
+        {
+            PresetName = "New Preset";
+        }
 
         return this;
     }
 
     public ICommand ConfirmCommand => _confirmCommand ??= ReactiveCommand.Create(OnConfirm,
-        this.WhenAnyValue(x => x.ModeSave, x => x.PresetName, x => x.SelectedItem, (modeSave, presetName, selectedItem) => 
+        this.WhenAnyValue(x => x.ModeSave, x => x.PresetName, x => x.SelectedItem, (modeSave, presetName, selectedItem) =>
             modeSave ? !string.IsNullOrWhiteSpace(presetName) : selectedItem != null));
     private ICommand? _confirmCommand;
     private void OnConfirm()
     {
+        if (!ConfirmCommand.CanExecute(null)) return;
+        
         DialogResult = true;
         RequestClose?.Invoke(this, EventArgs.Empty);
     }

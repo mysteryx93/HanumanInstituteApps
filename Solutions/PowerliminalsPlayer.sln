@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerliminalsPlayer", "..\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MethodBinding.Avalonia", "..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj", "{4FE55A43-FC2C-40CB-92A5-EF134ECB9BA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerliminalsPlayer.Tests", "..\PowerliminalsPlayer.Tests\PowerliminalsPlayer.Tests.csproj", "{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,18 @@ Global
 		{4FE55A43-FC2C-40CB-92A5-EF134ECB9BA1}.Release|x64.Build.0 = Release|Any CPU
 		{4FE55A43-FC2C-40CB-92A5-EF134ECB9BA1}.Release|x86.ActiveCfg = Release|Any CPU
 		{4FE55A43-FC2C-40CB-92A5-EF134ECB9BA1}.Release|x86.Build.0 = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|x64.Build.0 = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Debug|x86.Build.0 = Debug|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|x64.ActiveCfg = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|x64.Build.0 = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|x86.ActiveCfg = Release|Any CPU
+		{27D30CCF-8356-4E2C-803E-8EBDB19B7F55}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

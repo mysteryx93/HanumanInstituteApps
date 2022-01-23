@@ -26,6 +26,8 @@ public class EnvironmentService : IEnvironmentService
     /// <inheritdoc />
     public char DirectorySeparatorChar => Path.DirectorySeparatorChar;
     /// <inheritdoc />
+    public char AltDirectorySeparatorChar => Path.AltDirectorySeparatorChar;
+    /// <inheritdoc />
     public DateTime Now => DateTime.Now;
     /// <inheritdoc />
     public DateTime UtcNow => DateTime.UtcNow;
