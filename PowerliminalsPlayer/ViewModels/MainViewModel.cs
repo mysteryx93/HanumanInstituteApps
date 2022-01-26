@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
@@ -102,23 +103,45 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     private void ReloadFiles()
     {
-        var files = AppData.Folders.SelectMany(GetAudioFiles);
+        // If a folder is a sub-folder of another folder, remove it.
+        var folders = AppData.Folders.ToList();
+        var foldersSorted = AppData.Folders.OrderBy(x => x).ToList();
+        foreach (var item in foldersSorted)
+        {
+            var matchList = foldersSorted.Where(x => x.StartsWith(item + _fileSystem.Path.DirectorySeparatorChar));
+            folders.RemoveMany(matchList);
+        }
+        
+        // Get the list of files.
+        var files = folders.SelectMany(GetAudioFiles);
 
+        // Apply search query.
         var query = string.IsNullOrEmpty(SearchText)
             ? files
             : files.Where(f => f.IndexOf(SearchText, StringComparison.CurrentCultureIgnoreCase) != -1);
+        
+        // Fill files list.
         query = query.OrderBy(f => f);
         Files.Source.Clear();
         Files.Source.AddRange(query);
     }
 
     /// <summary>
-    /// Returns a list of all audio files in specified directory, searching recursively.
+    /// Returns a list of all audio files in specified directory, searching recursively. Exceptions will be ignored and return an empty list.
     /// </summary>
     /// <param name="path">The path to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    private IEnumerable<string> GetAudioFiles(string path) =>
-        _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+    private IEnumerable<string> GetAudioFiles(string path)
+    {
+        try
+        {
+            return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+        }
+        catch
+        {
+            return Array.Empty<string>();
+        }
+    }
 
     public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<FileItem>(OnRemoveMedia);
     private ICommand? _removeMediaCommand;
@@ -138,9 +161,13 @@ public class MainViewModel : ViewModelBase
     private async Task OnAddFolder()
     {
         var result = await _dialogService.ShowOpenFolderDialogAsync(this).ConfigureAwait(true);
-        if (result != null)
+        if (result.HasValue())
         {
-            AppData.Folders.Add(result);
+            var newFolder = _fileSystem.Path.TrimEndingDirectorySeparator(result);
+            if (!AppData.Folders.Contains(newFolder))
+            {
+                AppData.Folders.Add(newFolder);
+            }
             ReloadFiles();
         }
     }

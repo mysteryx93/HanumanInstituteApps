@@ -13,7 +13,7 @@ public static class DialogExtensions
         dialog.CheckNotNull(nameof(dialog));
 
         var viewModel = ViewModelLocator.SelectPreset.Load(false);
-        var result = await dialog.ShowDialogAsync(ownerViewModel, viewModel).ConfigureAwait(false);
+        var result = await dialog.ShowDialogAsync(ownerViewModel, viewModel).ConfigureAwait(true);
         return result == true ? viewModel.SelectedItem : null;
     }
 
@@ -22,7 +22,7 @@ public static class DialogExtensions
         dialog.CheckNotNull(nameof(dialog));
 
         var viewModel = ViewModelLocator.SelectPreset.Load(true);
-        var result = await dialog.ShowDialogAsync(ownerViewModel, viewModel).ConfigureAwait(false);
+        var result = await dialog.ShowDialogAsync(ownerViewModel, viewModel).ConfigureAwait(true);
         return result == true ? viewModel.PresetName : null;
     }
         

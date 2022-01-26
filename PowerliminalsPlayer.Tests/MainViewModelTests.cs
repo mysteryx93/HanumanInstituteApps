@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using HanumanInstitute.Common.Avalonia.App.Tests;
@@ -12,6 +15,7 @@ using Moq;
 using MvvmDialogs;
 using MvvmDialogs.Avalonia;
 using MvvmDialogs.DialogTypeLocators;
+using MvvmDialogs.FrameworkDialogs;
 using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -38,7 +42,11 @@ public class MainViewModelTests
     protected IDialogService DialogService => _dialogService ??= new DialogService(null, MockDialogManager.Object);
     private IDialogService _dialogService;
 
-    protected FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
+    protected IDictionary<string, MockFileData> Files { get; set; } = new Dictionary<string, MockFileData>();
+    protected string CurrentDirectory { get; set; } = string.Empty;
+    protected void AddFile(string fileName) => Files.Add(fileName.ReplaceDirectorySeparator(), MockFileData.NullObject);
+
+    protected FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService(Files, CurrentDirectory);
     private FakeFileSystemService _mockFileSystem;
 
     protected Mock<FakeFileSystemService> SetupMockFileSystem()
@@ -58,6 +66,12 @@ public class MainViewModelTests
 
     protected MainViewModel Model => _model ??= new MainViewModel(AppPath, MockAppSettings.Object, MockFileSystem, DialogService);
     private MainViewModel _model;
+    
+    protected void SetDialogManagerOpenFolder(string result) =>
+        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string>(
+                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()))
+            .Returns(Task.FromResult(result?.ReplaceDirectorySeparator()));
+
 
     [Fact]
     public void SearchText_ChangeOnce_DoNotCallFileSystemImmediately()
@@ -124,7 +138,7 @@ public class MainViewModelTests
         await Task.Delay(220);
         Assert.Equal(count, Model.Files.Count());
     }
-    
+
     [Fact]
     public async Task SearchText_Empty_IgnoreNonAudioFiles()
     {
@@ -153,8 +167,211 @@ public class MainViewModelTests
     {
         Model.AppData.Folders.Add("D:\\");
 
-        Model.SaveSettingsCommand.Execute(null);
+        Model.SaveSettingsCommand.ExecuteIfCan();
 
         _mockAppSettings.Verify(x => x.Save(), Times.Once);
+    }
+
+    [Fact]
+    public void RemoveMediaCommand_OneOfTwo_RemoveFile()
+    {
+        var fileA = new FileItem("a", 1);
+        Model.Playlist.Files.Add(fileA);
+        var fileB = new FileItem("b", 1);
+        Model.Playlist.Files.Add(fileB);
+
+        Model.RemoveMediaCommand.ExecuteIfCan(fileB);
+
+        Assert.Single(Model.Playlist.Files);
+        Assert.Equal(fileA, Model.Playlist.Files.Single());
+    }
+
+    [Fact]
+    public void RemoveMediaCommand_LastFile_PausedOff()
+    {
+        var file = new FileItem("a", 1);
+        Model.Playlist.Files.Add(file);
+
+        Model.RemoveMediaCommand.ExecuteIfCan(file);
+
+        Assert.Empty(Model.Playlist.Files);
+        Assert.False(Model.IsPaused);
+    }
+
+    [Fact]
+    public void RemoveMediaCommand_Null_DoNothing()
+    {
+        var file = new FileItem("a", 1);
+        Model.Playlist.Files.Add(file);
+
+        Model.RemoveMediaCommand.Execute();
+
+        Assert.Single(Model.Playlist.Files);
+    }
+
+    [Fact]
+    public void RemoveMediaCommand_MissingItem_DoNothing()
+    {
+        var file = new FileItem("a", 1);
+
+        Model.RemoveMediaCommand.Execute(file);
+
+        Assert.Empty(Model.Playlist.Files);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void AddFolderCommand_NullOrEmpty_DoNotAddFolder(string folder)
+    {
+        SetDialogManagerOpenFolder(folder);
+
+        Model.AddFolderCommand.Execute();
+
+        Assert.Empty(Model.AppData.Folders);
+    }
+
+    [Theory]
+    [InlineData("/NewFolder")]
+    [InlineData("/NewFolder/")]
+    public void AddFolderCommand_NewFolder_AddFolder(string folder)
+    {
+        SetDialogManagerOpenFolder(folder);
+
+        Model.AddFolderCommand.ExecuteIfCan();
+
+        Assert.Single(Model.AppData.Folders);
+    }
+
+    [Fact]
+    public void AddFolderCommand_NewFolderWithEndSeparator_AddFolderWithoutEndSeparator()
+    {
+        SetDialogManagerOpenFolder("/NewFolder/");
+
+        Model.AddFolderCommand.ExecuteIfCan();
+
+        Assert.Single(Model.AppData.Folders);
+        Assert.False(Model.AppData.Folders.Single().EndsWith(Path.DirectorySeparatorChar));
+    }
+    
+    [Theory]
+    [InlineData("/NewFolder")]
+    [InlineData("/NewFolder/")]
+    public void AddFolderCommand_NewFolder_LoadFolder(string folder)
+    {
+        var fileName = "file1.mp3";
+        AddFile("/NewFolder/" + fileName);
+        SetDialogManagerOpenFolder(folder);
+
+        Model.AddFolderCommand.ExecuteIfCan();
+
+        Assert.Single(Model.Files);
+        Assert.EndsWith(fileName, Model.Files.Single());
+    }
+    
+    [Theory]
+    [InlineData("/NewFolder")]
+    [InlineData("/NewFolder/$%*")]
+    public void AddFolderCommand_InvalidFolder_AddFolderWithNoError(string folder)
+    {
+        SetDialogManagerOpenFolder(folder);
+
+        Model.AddFolderCommand.ExecuteIfCan();
+
+        Assert.Single(Model.AppData.Folders);
+        Assert.Empty(Model.Files);
+    }
+    
+    [Theory]
+    [InlineData("/NewFolder", "/NewFolder")]
+    [InlineData("/NewFolder", "/NewFolder/")]
+    public void AddFolderCommand_Duplicate_DoNotAddDuplicate(string folder1, string folder2)
+    {
+        SetDialogManagerOpenFolder(folder1);
+        Model.AddFolderCommand.Execute();
+        SetDialogManagerOpenFolder(folder2);
+        Model.AddFolderCommand.Execute();
+
+        Assert.Single(Model.AppData.Folders);
+        Assert.Equal(folder1.ReplaceDirectorySeparator(), Model.AppData.Folders.Single());
+        Assert.Empty(Model.Files);
+    }
+    
+    [Fact]
+    public void AddFolderCommand_AddSubdirectory_DoNotLoadDuplicateFile()
+    {
+        AddFile("/Dir/Sub/File1.mp3");
+        
+        SetDialogManagerOpenFolder("/Dir");
+        Model.AddFolderCommand.Execute();
+        SetDialogManagerOpenFolder("/Dir/Sub");
+        Model.AddFolderCommand.Execute();
+
+        Assert.Single(Model.Files);
+    }
+
+    [Fact]
+    public void AddFolderCommand_AddRoot_AddAndLoadRoot()
+    {
+        var root = "/".ReplaceDirectorySeparator();
+        AddFile("/File1.mp3");
+        
+        SetDialogManagerOpenFolder(root);
+        Model.AddFolderCommand.Execute();
+
+        Assert.Single(Model.Files);
+    }
+
+    [Fact]
+    public void LoadPresetCommand_NoPreset_CanExecuteFalse()
+    {
+        var result = Model.LoadPresetCommand.CanExecute();
+
+        Assert.False(result);
+    }
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData(false)]
+    public void LoadPresetCommand_NullOrFalse_DoNotLoadPreset(bool? dialogResult)
+    {
+        var presetName = "init";
+        Model.Playlist.Name = presetName;
+        Model.AppData.Presets.Add(new PresetItem(presetName));
+        SelectPresetViewModel vm = null;
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+            .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
+            {
+                vm = (SelectPresetViewModel)viewModel;
+                vm.SelectedItem = Model.AppData.Presets.First();
+                return Task.FromResult(dialogResult);
+            });
+
+        Model.LoadPresetCommand.Execute();
+
+        Assert.Equal(presetName, Model.Playlist.Name);
+        Assert.False(vm.ModeSave);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("Loaded")]
+    public void LoadPresetCommand_PresetSelected_LoadPresetName(string presetName)
+    {
+        Model.AppData.Presets.Add(new PresetItem(presetName));
+        SelectPresetViewModel vm = null;
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+            .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
+            {
+                vm = (SelectPresetViewModel)viewModel;
+                vm.SelectedItem = Model.AppData.Presets.First();
+                vm.DialogResult = true;
+                return Task.FromResult<bool?>(true);
+            });
+
+        Model.LoadPresetCommand.ExecuteIfCan();
+
+        Assert.Equal(presetName, Model.Playlist.Name);
+        Assert.False(vm.ModeSave);
     }
 }
