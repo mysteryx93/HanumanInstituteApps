@@ -20,7 +20,7 @@
         <Style Selector="Window">
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
-        <Style Selector="Window > Grid">
+        <Style Selector="Grid.GradiantBackground">
             <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
         </Style>
         <Style Selector="Button.round">

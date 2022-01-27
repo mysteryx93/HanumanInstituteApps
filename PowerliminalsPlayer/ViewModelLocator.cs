@@ -1,10 +1,10 @@
 ﻿using HanumanInstitute.Common.Services;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using MvvmDialogs;
 using MvvmDialogs.Avalonia;
-using MvvmDialogs.DialogTypeLocators;
 using Splat;
 
 namespace HanumanInstitute.PowerliminalsPlayer;
@@ -24,7 +24,8 @@ public static class ViewModelLocator
             
         // Services
         container.AddCommonServices();
-        container.Register(() => (IDialogService)new DialogService());
+        container.RegisterLazySingleton<IDialogService>(() => new DialogService());
+        container.RegisterLazySingleton<IBassDevice>(() => BassDevice.Instance);
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();

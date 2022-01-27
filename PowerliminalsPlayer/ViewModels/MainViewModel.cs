@@ -84,7 +84,9 @@ public class MainViewModel : ViewModelBase
     /// <summary>
     /// Loads the settings file.
     /// </summary>
-    public void Load()
+    // public ICommand LoadSettingsCommand => _loadSettingsCommand ??= ReactiveCommand.Create(LoadSettings);
+    // private ICommand? _loadSettingsCommand;
+    public void LoadSettings()
     {
         _settings.Load();
         this.RaisePropertyChanged(nameof(AppData));
@@ -94,9 +96,9 @@ public class MainViewModel : ViewModelBase
     /// <summary>
     /// Saves the settings file.
     /// </summary>
-    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(OnSaveSettings);
-    private ICommand? _saveSettingsCommand;
-    private void OnSaveSettings() => _settings.Save();
+    // public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
+    // private ICommand? _saveSettingsCommand;
+    public void SaveSettings() => _settings.Save();
 
     /// <summary>
     /// Loads the list of files contained in Folders.
@@ -111,7 +113,7 @@ public class MainViewModel : ViewModelBase
             var matchList = foldersSorted.Where(x => x.StartsWith(item + _fileSystem.Path.DirectorySeparatorChar));
             folders.RemoveMany(matchList);
         }
-        
+
         // Get the list of files.
         var files = folders.SelectMany(GetAudioFiles);
 
@@ -119,7 +121,7 @@ public class MainViewModel : ViewModelBase
         var query = string.IsNullOrEmpty(SearchText)
             ? files
             : files.Where(f => f.IndexOf(SearchText, StringComparison.CurrentCultureIgnoreCase) != -1);
-        
+
         // Fill files list.
         query = query.OrderBy(f => f);
         Files.Source.Clear();
@@ -133,19 +135,12 @@ public class MainViewModel : ViewModelBase
     /// <returns>A list of audio files.</returns>
     private IEnumerable<string> GetAudioFiles(string path)
     {
-        try
-        {
-            return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
-        }
-        catch
-        {
-            return Array.Empty<string>();
-        }
+        return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
     }
 
     public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<FileItem>(OnRemoveMedia);
     private ICommand? _removeMediaCommand;
-    private void OnRemoveMedia(FileItem? item)
+    public void OnRemoveMedia(FileItem? item)
     {
         if (item == null) { return; }
 
@@ -168,6 +163,7 @@ public class MainViewModel : ViewModelBase
             {
                 AppData.Folders.Add(newFolder);
             }
+            SelectedFolderIndex = AppData.Folders.Count - 1;
             ReloadFiles();
         }
     }
@@ -180,6 +176,7 @@ public class MainViewModel : ViewModelBase
         if (SelectedFolderIndex > -1)
         {
             AppData.Folders.RemoveAt(SelectedFolderIndex);
+            SelectedFolderIndex = Math.Min(SelectedFolderIndex, AppData.Folders.Count - 1);
             ReloadFiles();
         }
     }
@@ -228,7 +225,7 @@ public class MainViewModel : ViewModelBase
 
             Playlist.SaveAs(preset);
             preset.Name = saveName;
-            SaveSettingsCommand.Execute(null);
+            SaveSettings();
         }
     }
 

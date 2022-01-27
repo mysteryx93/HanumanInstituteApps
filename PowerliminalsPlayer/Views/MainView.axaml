@@ -15,17 +15,18 @@
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:s="clr-namespace:MethodBinding.Avalonia;assembly=MethodBinding.Avalonia"
         md:DialogServiceViews.IsRegistered="True"
+        Opened="{s:MethodBinding LoadSettings}"
+        Closing="{s:MethodBinding SaveSettings}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <i:Interaction.Behaviors>
+    <!--<i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" 
-                                    CommandParameter="{x:Null}"/>
+            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
         </ia:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    </i:Interaction.Behaviors>-->
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>
-    <Grid>
+    <Grid Classes="GradiantBackground">
         <TextBlock x:Name="VolumeText" HorizontalAlignment="Right" Margin="0,5,340,0" Text="Volume"
                    VerticalAlignment="Top" />
         <Slider x:Name="VolumeSlider" Margin="0,5,312,0" Maximum="100" LargeChange="10" SmallChange="1"

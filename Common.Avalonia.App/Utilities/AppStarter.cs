@@ -1,12 +1,5 @@
-﻿using System;
-using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia;
 using Avalonia.ReactiveUI;
-using Avalonia.Threading;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 

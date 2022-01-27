@@ -157,7 +157,7 @@ public class MainViewModelTests
     {
         Model.AppData.Folders.Add("D:\\");
 
-        Model.Load();
+        Model.LoadSettings();
 
         _mockAppSettings.Verify(x => x.Load(), Times.Once);
     }
@@ -167,7 +167,7 @@ public class MainViewModelTests
     {
         Model.AppData.Folders.Add("D:\\");
 
-        Model.SaveSettingsCommand.ExecuteIfCan();
+        Model.SaveSettings();
 
         _mockAppSettings.Verify(x => x.Save(), Times.Once);
     }
@@ -297,14 +297,16 @@ public class MainViewModelTests
         Assert.Empty(Model.Files);
     }
     
-    [Fact]
-    public void AddFolderCommand_AddSubdirectory_DoNotLoadDuplicateFile()
+    [Theory]
+    [InlineData("/Dir", "/Sub/Dir")]
+    [InlineData("/Sub/Dir", "/Dir")]
+    public void AddFolderCommand_AddSubdirectory_DoNotLoadDuplicateFile(string dir1, string dir2)
     {
         AddFile("/Dir/Sub/File1.mp3");
         
-        SetDialogManagerOpenFolder("/Dir");
+        SetDialogManagerOpenFolder(dir1);
         Model.AddFolderCommand.Execute();
-        SetDialogManagerOpenFolder("/Dir/Sub");
+        SetDialogManagerOpenFolder(dir2);
         Model.AddFolderCommand.Execute();
 
         Assert.Single(Model.Files);
@@ -320,6 +322,75 @@ public class MainViewModelTests
         Model.AddFolderCommand.Execute();
 
         Assert.Single(Model.Files);
+    }
+    
+    [Fact]
+    public void AddFolderCommand_Add_SelectNewItem()
+    {
+        Model.AppData.Folders.Add("/a");
+        
+        SetDialogManagerOpenFolder("/b");
+        Model.AddFolderCommand.Execute();
+
+        Assert.Equal(1, Model.SelectedFolderIndex);
+    }
+
+    [Fact]
+    public void RemoveFolderCommand_EmptyList_DoNothing()
+    {
+        Model.RemoveFolderCommand.Execute();
+        
+        Assert.Empty(Model.AppData.Folders);
+    }
+    
+    [Fact]
+    public void RemoveFolderCommand_NoSelection_DoNothing()
+    {
+        Model.AppData.Folders.Add("/");
+        Model.SelectedFolderIndex = -1;
+        
+        Model.RemoveFolderCommand.Execute();
+        
+        Assert.Single(Model.AppData.Folders);
+    }
+
+    [Fact]
+    public void RemoveFolderCommand_UniqueSelection_RemoveItem()
+    {
+        Model.AppData.Folders.Add("/");
+        Model.SelectedFolderIndex = 0;
+        
+        Model.RemoveFolderCommand.Execute();
+        
+        Assert.Empty(Model.AppData.Folders);
+    }
+    
+    [Fact]
+    public void RemoveFolderCommand_UniqueSelection_ResetSelection()
+    {
+        Model.AppData.Folders.Add("/");
+        Model.SelectedFolderIndex = 0;
+        
+        Model.RemoveFolderCommand.Execute();
+        
+        Assert.Equal(-1, Model.SelectedFolderIndex);
+    }
+    
+    [Theory]
+    [InlineData(-1, -1)]
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(2, 1)]
+    public void RemoveFolderCommand_Selection_SelectOther(int selStart, int selNext)
+    {
+        Model.AppData.Folders.Add("/a");
+        Model.AppData.Folders.Add("/b");
+        Model.AppData.Folders.Add("/c");
+        Model.SelectedFolderIndex = selStart;
+        
+        Model.RemoveFolderCommand.Execute();
+
+        Assert.Equal(selNext, Model.SelectedFolderIndex);
     }
 
     [Fact]
@@ -374,4 +445,5 @@ public class MainViewModelTests
         Assert.Equal(presetName, Model.Playlist.Name);
         Assert.False(vm.ModeSave);
     }
+    
 }
