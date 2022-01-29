@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using MvvmDialogs;
 using MvvmDialogs.Avalonia;
 
 namespace HanumanInstitute.Common.Avalonia.App;
@@ -39,10 +38,12 @@ public abstract class CommonApplication<T> : Application
             desktop.MainWindow = Activator.CreateInstance<T>();
             await t1.ConfigureAwait(true);
             desktop.MainWindow.DataContext = t1.Result;
-            await InitCompleted();
         }
 
         base.OnFrameworkInitializationCompleted();
+        
+        await Task.Delay(1).ConfigureAwait(true);
+        await InitCompleted();
     }
 
     /// <summary>

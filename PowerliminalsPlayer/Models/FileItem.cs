@@ -45,7 +45,7 @@ public class FileItem : ReactiveObject
     public FileItem()
     { }
 
-    public FileItem(string path, double masterVolume)
+    public FileItem(string path, double masterVolume = 1.0)
     {
         _fullPath = path;
         // this.MasterVolume = masterVolume;

@@ -1,34 +1,35 @@
 ﻿using System;
 using HanumanInstitute.Common.Services;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace HanumanInstitute.Common.Avalonia.App.Tests;
 
 public class FakeSettingsProvider<T> : ISettingsProvider<T>
     where T : class, new()
 {
-    public T Value { get; set; } = new T();
+    public virtual T Value { get; set; } = new T();
 
     public event EventHandler? Loaded;
     public event EventHandler? Saved;
 
-    public T Load()
+    public virtual T Load()
     {
         Loaded?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
-    public T Load(string path)
+    public virtual T Load(string path)
     {
         Loaded?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
-    public void Save()
+    public virtual void Save()
     {
         Saved?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Save(string path)
+    public virtual void Save(string path)
     {
         Saved?.Invoke(this, EventArgs.Empty);
     }

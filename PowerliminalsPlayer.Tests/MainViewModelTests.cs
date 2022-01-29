@@ -6,7 +6,6 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
@@ -24,17 +23,11 @@ namespace HanumanInstitute.PowerliminalsPlayer.Tests;
 
 public class MainViewModelTests
 {
-    protected AppSettingsData Settings { get; set; } = new();
+    protected AppSettingsData Settings => MockAppSettings.Object.Value;
 
-    protected Mock<ISettingsProvider<AppSettingsData>> MockAppSettings => _mockAppSettings ??= SetupAppSettings();
-    private Mock<ISettingsProvider<AppSettingsData>> _mockAppSettings;
-    private Mock<ISettingsProvider<AppSettingsData>> SetupAppSettings()
-    {
-        var mock = new Mock<ISettingsProvider<AppSettingsData>>();
-        mock.Setup(x => x.Value).Returns(Settings);
-        mock.Setup(x => x.Load()).Returns(Settings);
-        return mock;
-    }
+    protected Mock<FakeSettingsProvider<AppSettingsData>> MockAppSettings => _mockAppSettings ??= 
+        new Mock<FakeSettingsProvider<AppSettingsData>>() { CallBase = true };
+    private Mock<FakeSettingsProvider<AppSettingsData>> _mockAppSettings;
 
     protected Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
@@ -64,7 +57,10 @@ public class MainViewModelTests
     protected IAppPathService AppPath => _appPath ??= new AppPathService(new FakeEnvironmentService(), MockFileSystem, MockBassDevice);
     private IAppPathService _appPath;
 
-    protected MainViewModel Model => _model ??= new MainViewModel(AppPath, MockAppSettings.Object, MockFileSystem, DialogService);
+    protected IFolderPathFixer FolderPathFixer => _folderPathFixer ??= new FolderPathFixer(MockFileSystem, DialogService, MockAppSettings.Object); 
+    private IFolderPathFixer _folderPathFixer;
+
+    protected MainViewModel Model => _model ??= new MainViewModel(AppPath, MockAppSettings.Object, MockFileSystem, DialogService, FolderPathFixer);
     private MainViewModel _model;
     
     protected void SetDialogManagerOpenFolder(string result) =>
@@ -175,9 +171,9 @@ public class MainViewModelTests
     [Fact]
     public void RemoveMediaCommand_OneOfTwo_RemoveFile()
     {
-        var fileA = new FileItem("a", 1);
+        var fileA = new FileItem("a");
         Model.Playlist.Files.Add(fileA);
-        var fileB = new FileItem("b", 1);
+        var fileB = new FileItem("b");
         Model.Playlist.Files.Add(fileB);
 
         Model.RemoveMediaCommand.ExecuteIfCan(fileB);
@@ -189,7 +185,7 @@ public class MainViewModelTests
     [Fact]
     public void RemoveMediaCommand_LastFile_PausedOff()
     {
-        var file = new FileItem("a", 1);
+        var file = new FileItem("a");
         Model.Playlist.Files.Add(file);
 
         Model.RemoveMediaCommand.ExecuteIfCan(file);
@@ -201,7 +197,7 @@ public class MainViewModelTests
     [Fact]
     public void RemoveMediaCommand_Null_DoNothing()
     {
-        var file = new FileItem("a", 1);
+        var file = new FileItem("a");
         Model.Playlist.Files.Add(file);
 
         Model.RemoveMediaCommand.Execute();
@@ -212,7 +208,7 @@ public class MainViewModelTests
     [Fact]
     public void RemoveMediaCommand_MissingItem_DoNothing()
     {
-        var file = new FileItem("a", 1);
+        var file = new FileItem("a");
 
         Model.RemoveMediaCommand.Execute(file);
 

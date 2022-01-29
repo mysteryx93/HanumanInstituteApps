@@ -34,6 +34,7 @@ public static class ViewModelLocator
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
+        SplatRegistrations.RegisterLazySingleton<IFolderPathFixer, FolderPathFixer>();
             
         SplatRegistrations.SetupIOC();
     }

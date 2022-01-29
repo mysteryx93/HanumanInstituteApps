@@ -15,14 +15,12 @@
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:s="clr-namespace:MethodBinding.Avalonia;assembly=MethodBinding.Avalonia"
         md:DialogServiceViews.IsRegistered="True"
-        Opened="{s:MethodBinding LoadSettings}"
-        Closing="{s:MethodBinding SaveSettings}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <!--<i:Interaction.Behaviors>
+    <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
             <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
         </ia:EventTriggerBehavior>
-    </i:Interaction.Behaviors>-->
+    </i:Interaction.Behaviors>
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>

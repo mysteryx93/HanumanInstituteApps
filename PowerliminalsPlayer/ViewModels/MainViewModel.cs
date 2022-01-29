@@ -21,6 +21,7 @@ public class MainViewModel : ViewModelBase
     private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFileSystemService _fileSystem;
     private readonly IDialogService _dialogService;
+    private readonly IFolderPathFixer _folderPathFixer;
 
     public AppSettingsData AppData => _settings.Value;
 
@@ -28,12 +29,13 @@ public class MainViewModel : ViewModelBase
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
     public MainViewModel(IAppPathService appPath, ISettingsProvider<AppSettingsData> appSettings,
-        IFileSystemService fileSystem, IDialogService dialogService)
+        IFileSystemService fileSystem, IDialogService dialogService, IFolderPathFixer folderPathFixer)
     {
-        this._appPath = appPath;
-        this._settings = appSettings;
-        this._fileSystem = fileSystem;
-        this._dialogService = dialogService;
+        _appPath = appPath;
+        _settings = appSettings;
+        _fileSystem = fileSystem;
+        _dialogService = dialogService;
+        _folderPathFixer = folderPathFixer;
 
         this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(200)).Subscribe((_) => ReloadFiles());
     }
@@ -96,9 +98,11 @@ public class MainViewModel : ViewModelBase
     /// <summary>
     /// Saves the settings file.
     /// </summary>
-    // public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
-    // private ICommand? _saveSettingsCommand;
+    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
+    private ICommand? _saveSettingsCommand;
     public void SaveSettings() => _settings.Save();
+
+    public Task PromptFixPathsAsync() => _folderPathFixer.PromptFixPathsAsync(this);
 
     /// <summary>
     /// Loads the list of files contained in Folders.
