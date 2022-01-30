@@ -17,7 +17,7 @@ public class PresetItem : ReactiveObject
     private string _name = string.Empty;
         
     [XmlElement("File")]
-    public ObservableCollectionWithRange<FileItem> Files { get; } = new();
+    public ObservableCollectionWithRange<PlayingItem> Files { get; } = new();
 
     public PresetItem()
     {
@@ -56,7 +56,6 @@ public class PresetItem : ReactiveObject
         dst.Name = Name;
         dst.MasterVolume = MasterVolume;
         dst.Files.Clear();
-        // TODO: must clone; but it's breaking master volume 
-        dst.Files.AddRange(Files.Select(x => x));
+        dst.Files.AddRange(Files.Select(x => x.Clone()));
     }
 }

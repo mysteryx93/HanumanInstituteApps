@@ -20,7 +20,7 @@
     </Window.Title>
     <Grid Classes="GradiantBackground">
         <DockPanel Margin="0,1,0,32">
-            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="21" Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}" hic:FocusExtensions.SelectAllOnFocus="True"/>
+            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="24" Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}" hic:FocusExtensions.SelectAllOnFocus="True"/>
             <ListBox x:Name="PresetList" TabIndex="1" Classes="compact" BorderThickness="0" 
                      Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" Background="{x:Null}">
                 <ListBox.ItemTemplate>

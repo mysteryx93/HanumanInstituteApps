@@ -41,10 +41,14 @@
             <Setter Property="Padding" Value="4" />
         </Style>
         <Style Selector="TextBox.compact">
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="Height" Value="24" />
             <Setter Property="MinHeight" Value="24" />
-            <Setter Property="Padding" Value="4" />
+            <Setter Property="Padding" Value="4,2,4,2" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBox.compact:pointerover /template/ Border#PART_BorderElement, TextBox.compact:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent" />
         </Style>
     </Application.Styles>
 </Application>

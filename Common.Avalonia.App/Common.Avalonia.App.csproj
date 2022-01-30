@@ -13,7 +13,7 @@
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <PackageReference Include="Avalonia" Version="0.10.12" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.11.5" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.12" />
     <PackageReference Include="Splat" Version="14.1.17" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>

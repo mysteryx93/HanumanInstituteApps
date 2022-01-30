@@ -1,3 +1,4 @@
+using System;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
@@ -69,7 +70,7 @@ public class SelectPresetViewModelTests
         Model.RequestClose += (_, _) => called++; 
         
         Model.Load(false);
-        Model.CancelCommand.Execute(null);
+        Model.CancelCommand.Execute();
         
         Assert.Equal(1, called);
     }
@@ -78,7 +79,7 @@ public class SelectPresetViewModelTests
     public void CancelCommand_NoSelection_DialogResultFalse()
     {
         Model.Load(false);
-        Model.CancelCommand.Execute(null);
+        Model.CancelCommand.Execute();
         
         Assert.False(Model.DialogResult);
     }
@@ -90,7 +91,7 @@ public class SelectPresetViewModelTests
         Model.RequestClose += (_, _) => called++; 
 
         Model.Load(false);
-        Model.ConfirmCommand.Execute(null);
+        Model.ConfirmCommand.ExecuteIfCan();
         
         Assert.Equal(0, called);
     }
@@ -101,7 +102,7 @@ public class SelectPresetViewModelTests
         AddPreset();
 
         Model.Load(false);
-        Model.ConfirmCommand.Execute(null);
+        Model.ConfirmCommand.Execute();
         
         Assert.True(Model.DialogResult);
         Assert.NotNull(Model.SelectedItem);
@@ -115,7 +116,7 @@ public class SelectPresetViewModelTests
 
         Model.Load(true);
         Model.PresetName = name;
-        Model.ConfirmCommand.Execute(null);
+        Model.ConfirmCommand.Execute();
         
         Assert.True(Model.DialogResult);
         Assert.Equal(name, Model.PresetName);

@@ -77,8 +77,6 @@ public class SelectPresetViewModel : ViewModelBase, ICloseable, IModalDialogView
     private ICommand? _confirmCommand;
     private void OnConfirm()
     {
-        if (!ConfirmCommand.CanExecute(null)) return;
-        
         DialogResult = true;
         RequestClose?.Invoke(this, EventArgs.Empty);
     }

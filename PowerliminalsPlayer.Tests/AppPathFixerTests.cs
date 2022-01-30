@@ -17,7 +17,7 @@ using Xunit;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Tests;
 
-public class FolderPathFixerTests
+public class AppPathFixerTests
 {
     protected AppSettingsData Settings => MockSettingsProvider.Value;
 
@@ -37,8 +37,8 @@ public class FolderPathFixerTests
 
     protected INotifyPropertyChanged Owner { get; set; } = Mock.Of<INotifyPropertyChanged>();
 
-    protected IFolderPathFixer Model => _model ??= new FolderPathFixer(MockFileSystem, DialogService, MockSettingsProvider);
-    private IFolderPathFixer _model;
+    protected IPathFixer Model => _model ??= new AppPathFixer(MockFileSystem, DialogService, MockSettingsProvider);
+    private IPathFixer _model;
 
     protected void AddFile(string filePath) => Files.Add(
         new KeyValuePair<string, MockFileData>(filePath.ReplaceDirectorySeparator(), MockFileData.NullObject));
@@ -50,7 +50,7 @@ public class FolderPathFixerTests
         Settings.Presets.Add(new PresetItem(presetName));
 
     protected void AddPresetFile(string filePath) =>
-        Settings.Presets[0].Files.Add(new FileItem(filePath.ReplaceDirectorySeparator()));
+        Settings.Presets[0].Files.Add(new PlayingItem(filePath.ReplaceDirectorySeparator()));
 
     protected void SetMessageBoxResult(bool? result)
     {
@@ -83,7 +83,7 @@ public class FolderPathFixerTests
     [Fact]
     public async Task PromptFixPaths_NoFolder_DoNotPrompt()
     {
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyMessageBox(Times.Never());
         MockDialogManager.VerifyNoOtherCalls();
@@ -99,7 +99,7 @@ public class FolderPathFixerTests
         AddFile("/Dir/Sub/file.mp3");
         AddFolder(folder);
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyMessageBox(Times.Never());
         MockDialogManager.VerifyNoOtherCalls();
@@ -110,7 +110,7 @@ public class FolderPathFixerTests
     {
         AddFolder("/Invalid");
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyMessageBox(Times.Once());
         MockDialogManager.VerifyNoOtherCalls();
@@ -122,7 +122,7 @@ public class FolderPathFixerTests
         AddFolder("/Invalid");
         SetMessageBoxResult(true);
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyOpenFolder(Times.Once());
     }
@@ -134,7 +134,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/Nope".ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyOpenFolder(Times.Once());
         VerifyMessageBox(Times.Exactly(2));
@@ -153,7 +153,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(selectPath.ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         Assert.Equal("/New/Sub".ReplaceDirectorySeparator(), Settings.Folders[0]);
         VerifyMessageBox(Times.Once());
@@ -173,7 +173,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(selectPath.ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         Assert.Equal("/New/Sub".ReplaceDirectorySeparator(), Settings.Folders[0]);
         Assert.Equal("/New/Music".ReplaceDirectorySeparator(), Settings.Folders[1]);
@@ -189,7 +189,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New".ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         VerifyOpenFolder(Times.Once());
         VerifyMessageBox(Times.Exactly(2));
@@ -209,7 +209,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New/Sub".ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         Assert.Equal(expected.ReplaceDirectorySeparator(), Settings.Presets[0].Files[0].FullPath);
     }
@@ -230,7 +230,7 @@ public class FolderPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(newFolder.ReplaceDirectorySeparator());
 
-        await Model.PromptFixPathsAsync(Owner);
+        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
 
         Assert.Equal(newFile, Settings.Presets[0].Files[0].FullPath);
     }

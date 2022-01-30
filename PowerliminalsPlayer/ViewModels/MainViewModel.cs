@@ -21,7 +21,7 @@ public class MainViewModel : ViewModelBase
     private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFileSystemService _fileSystem;
     private readonly IDialogService _dialogService;
-    private readonly IFolderPathFixer _folderPathFixer;
+    private readonly IPathFixer _pathFixer;
 
     public AppSettingsData AppData => _settings.Value;
 
@@ -29,13 +29,13 @@ public class MainViewModel : ViewModelBase
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
     public MainViewModel(IAppPathService appPath, ISettingsProvider<AppSettingsData> appSettings,
-        IFileSystemService fileSystem, IDialogService dialogService, IFolderPathFixer folderPathFixer)
+        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer)
     {
         _appPath = appPath;
         _settings = appSettings;
         _fileSystem = fileSystem;
         _dialogService = dialogService;
-        _folderPathFixer = folderPathFixer;
+        _pathFixer = pathFixer;
 
         this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(200)).Subscribe((_) => ReloadFiles());
     }
@@ -79,9 +79,9 @@ public class MainViewModel : ViewModelBase
     private PresetItem _playlist = new();
 
     /// <summary>
-    /// Gets or sets the list of files currently playing.
+    /// Gets or sets the list of audio files within the folders.
     /// </summary>
-    public ICollectionView<string> Files { get; private set; } = new CollectionView<string>();
+    public ICollectionView<FileItem> Files { get; private set; } = new CollectionView<FileItem>();
 
     /// <summary>
     /// Loads the settings file.
@@ -102,12 +102,20 @@ public class MainViewModel : ViewModelBase
     private ICommand? _saveSettingsCommand;
     public void SaveSettings() => _settings.Save();
 
-    public Task PromptFixPathsAsync() => _folderPathFixer.PromptFixPathsAsync(this);
+    /// <summary>
+    /// Prompts to fix invalid paths, if any.
+    /// </summary>
+    public async Task PromptFixPathsAsync()
+    {
+        await _pathFixer.ScanAndFixFoldersAsync(this, AppData.Folders).ConfigureAwait(false);
+        ReloadFiles();
+        SaveSettings();
+    }
 
     /// <summary>
     /// Loads the list of files contained in Folders.
     /// </summary>
-    private void ReloadFiles()
+    public void ReloadFiles()
     {
         // If a folder is a sub-folder of another folder, remove it.
         var folders = AppData.Folders.ToList();
@@ -122,9 +130,9 @@ public class MainViewModel : ViewModelBase
         var files = folders.SelectMany(GetAudioFiles);
 
         // Apply search query.
-        var query = string.IsNullOrEmpty(SearchText)
-            ? files
-            : files.Where(f => f.IndexOf(SearchText, StringComparison.CurrentCultureIgnoreCase) != -1);
+        var query = SearchText.HasValue() ?
+            files.Where(f => f.Display.IndexOf(SearchText, StringComparison.CurrentCultureIgnoreCase) != -1) :
+            files;
 
         // Fill files list.
         query = query.OrderBy(f => f);
@@ -137,14 +145,20 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     /// <param name="path">The path to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    private IEnumerable<string> GetAudioFiles(string path)
+    private IEnumerable<FileItem> GetAudioFiles(string path)
     {
-        return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+        path = path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path : path + _fileSystem.Path.DirectorySeparatorChar;
+        return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories)
+            .Select(x => new FileItem(x, TrimFolder(x, path)));
+
+        string TrimFolder(string fullPath, string folder) =>
+            fullPath.StartsWith(folder) ? fullPath[folder.Length..] : fullPath;
     }
 
-    public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<FileItem>(OnRemoveMedia);
+    public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<PlayingItem>(OnRemoveMedia);
     private ICommand? _removeMediaCommand;
-    public void OnRemoveMedia(FileItem? item)
+
+    private void OnRemoveMedia(PlayingItem? item)
     {
         if (item == null) { return; }
 
@@ -154,9 +168,9 @@ public class MainViewModel : ViewModelBase
             IsPaused = false;
         }
     }
-
     public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
     private ICommand? _addFolderCommand;
+
     private async Task OnAddFolder()
     {
         var result = await _dialogService.ShowOpenFolderDialogAsync(this).ConfigureAwait(true);
@@ -171,10 +185,10 @@ public class MainViewModel : ViewModelBase
             ReloadFiles();
         }
     }
-
     public ICommand RemoveFolderCommand => _removeFolderCommand ??= ReactiveCommand.Create(OnRemoveFolder,
         this.WhenAnyValue(x => x.SelectedFolderIndex).Select(x => x > -1));
     private ICommand? _removeFolderCommand;
+
     private void OnRemoveFolder()
     {
         if (SelectedFolderIndex > -1)
@@ -186,18 +200,32 @@ public class MainViewModel : ViewModelBase
     }
 
     public void OnFilesListDoubleTap() => OnPlay();
-
     public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay,
         this.WhenAnyValue(x => x.Files.CurrentPosition).Select(x => x > -1));
     private ICommand? _playCommand;
+
     private void OnPlay()
     {
         if (Files.CurrentItem != null)
         {
-            Playlist.Files.Add(new FileItem(Files.CurrentItem, Playlist.MasterVolume));
+            // First first unused speed.
+            var usedSpeeds = Playlist.Files.Where(x => x.FullPath == Files.CurrentItem.FullPath).Select(x => x.Speed).ToList();
+            var speed = 0;
+            var containCount = 1;
+            while (usedSpeeds.Count(x => x == speed) >= containCount)
+            {
+                speed = speed > 0 ? -speed : -speed + 1;
+                if (speed >= 5)
+                {
+                    speed = 0;
+                    containCount++;
+                }
+            }
+
+            // Play file with auto-calculated speed.
+            Playlist.Files.Add(new PlayingItem(Files.CurrentItem.FullPath, Playlist.MasterVolume) { Speed = speed });
         }
     }
-
     public ICommand LoadPresetCommand => _loadPresetCommand ??= ReactiveCommand.Create(OnLoadPreset,
         AppData.Presets.ToObservableChangeSet().Select(x => x.Any()));
     private ICommand? _loadPresetCommand;
@@ -242,9 +270,9 @@ public class MainViewModel : ViewModelBase
 
         return null;
     }
-
     public ICommand PauseCommand => _pauseCommand ??= ReactiveCommand.Create(OnPause);
     private ICommand? _pauseCommand;
+
     private void OnPause()
     {
         foreach (var item in Playlist.Files)

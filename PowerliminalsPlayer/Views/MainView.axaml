@@ -84,7 +84,7 @@
                          SelectedItem="{Binding Files.CurrentItem, Mode=TwoWay}" TabIndex="8" Background="{x:Null}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}">
+                            <TextBlock Text="{Binding Display}">
                                 <i:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="DoubleTapped">
                                         <ia:InvokeCommandAction Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" CommandParameter="{x:Null}" />
@@ -97,7 +97,7 @@
                 <Button x:Name="PlayButton" Classes="round" Content="_Play" Margin="46,3,0,0" VerticalAlignment="Top"
                         Command="{Binding PlayCommand}" TabIndex="9" HorizontalAlignment="Left" Width="75" />
                 <TextBox x:Name="SearchBox" Classes="compact" Margin="163,4,0,0" VerticalAlignment="Top"
-                         Text="{Binding SearchText, Mode=TwoWay}" Background="{x:Null}" />
+                         Text="{Binding SearchText, Mode=TwoWay}" />
             </Grid>
         </DockPanel>
         <Button x:Name="LoadPresetButton" Classes="round" Content="_Load Preset" HorizontalAlignment="Right"
