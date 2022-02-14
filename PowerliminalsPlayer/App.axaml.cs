@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.Common.Avalonia.App;
@@ -12,13 +12,14 @@ public class App : CommonApplication<MainView>
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     private MainViewModel _mainViewModel = default!;
-
+    
     protected override Task<INotifyPropertyChanged?> InitViewModelAsync()
     {
+        MediaPlayer.Avalonia.Bass.BassDevice.Instance.Init();
         _mainViewModel = ViewModelLocator.Main;
         _mainViewModel.LoadSettings();
         return Task.FromResult<INotifyPropertyChanged?>(_mainViewModel);
     }
-
+    
     protected override Task InitCompleted() => _mainViewModel.PromptFixPathsAsync();
 }

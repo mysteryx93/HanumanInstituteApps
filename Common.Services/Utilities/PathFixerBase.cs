@@ -33,7 +33,7 @@ public abstract class PathFixerBase : IPathFixer
     /// </summary>
     /// <param name="owner">The ViewModel that will own dialog interactions. It will be passed to<see cref="IDialogService"/>.</param>
     /// <param name="folders">The list of folders to examine. Do not include file names.</param>
-    public async Task ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<string> folders)
+    public async Task<bool> ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<string> folders)
     {
         var invalidFolder = folders.FirstOrDefault(x => !_fileSystem.Directory.Exists(x));
         if (invalidFolder != null)
@@ -54,9 +54,10 @@ public abstract class PathFixerBase : IPathFixer
 
             if (result == true)
             {
-                await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
+                return await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
             }
         }
+        return false;
     }
 
     /// <summary>
@@ -66,7 +67,7 @@ public abstract class PathFixerBase : IPathFixer
     /// <param name="folders">The list of folders to examine. Do not include file names.</param>
     /// <param name="invalidFolder">The invalid folder path to prompt for.</param>
     /// <param name="folderName">The name of the invalid folder, without its parent path.</param>
-    private async Task BrowseNewPathAsync(INotifyPropertyChanged owner, IList<string> folders, string invalidFolder, string folderName)
+    private async Task<bool> BrowseNewPathAsync(INotifyPropertyChanged owner, IList<string> folders, string invalidFolder, string folderName)
     {
         // Browse for new path.
         var selectedPath = await _dialogService.ShowOpenFolderDialogAsync(owner).ConfigureAwait(true);
@@ -78,6 +79,7 @@ public abstract class PathFixerBase : IPathFixer
             {
                 CalculateReplacement(invalidFolder, newPath);
                 await ScanAndFixFoldersAsync(owner, folders).ConfigureAwait(true);
+                return true;
             }
             else
             {
@@ -91,10 +93,11 @@ public abstract class PathFixerBase : IPathFixer
 
                 if (result == true)
                 {
-                    await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
+                    return await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
                 }
             }
         }
+        return false;
     }
 
     /// <summary>

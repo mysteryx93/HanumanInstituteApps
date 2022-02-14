@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia;
 using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
@@ -107,9 +108,12 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        await _pathFixer.ScanAndFixFoldersAsync(this, AppData.Folders).ConfigureAwait(false);
-        ReloadFiles();
-        SaveSettings();
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, AppData.Folders).ConfigureAwait(false);
+        if (changed)
+        {
+            ReloadFiles();
+            SaveSettings();
+        }
     }
 
     /// <summary>
@@ -157,8 +161,7 @@ public class MainViewModel : ViewModelBase
 
     public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<PlayingItem>(OnRemoveMedia);
     private ICommand? _removeMediaCommand;
-
-    private void OnRemoveMedia(PlayingItem? item)
+    public void OnRemoveMedia(PlayingItem? item)
     {
         if (item == null) { return; }
 
@@ -168,9 +171,9 @@ public class MainViewModel : ViewModelBase
             IsPaused = false;
         }
     }
+
     public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
     private ICommand? _addFolderCommand;
-
     private async Task OnAddFolder()
     {
         var result = await _dialogService.ShowOpenFolderDialogAsync(this).ConfigureAwait(true);

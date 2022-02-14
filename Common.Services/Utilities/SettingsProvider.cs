@@ -53,6 +53,7 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
             result = _serialization.DeserializeFromFile<T>(path);
         }
         catch (InvalidOperationException) { }
+        catch (DirectoryNotFoundException) { }
         catch (FileNotFoundException) { }
 
         Value = (result != null && result.Validate() == null) ? result : GetDefault();

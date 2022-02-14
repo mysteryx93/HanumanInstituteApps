@@ -6,5 +6,5 @@ namespace HanumanInstitute.Common.Services;
 
 public interface IPathFixer
 {
-    Task ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<string> folders);
+    Task<bool> ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<string> folders);
 }

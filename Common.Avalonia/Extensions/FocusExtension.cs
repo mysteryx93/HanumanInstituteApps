@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 
+// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -16,14 +20,15 @@ public class FocusExtensions : AvaloniaObject
     static FocusExtensions()
     {
         IsFocusedProperty.Changed.Subscribe(OnIsFocusedChanged);
+        FocusFirstProperty.Changed.Subscribe(OnFocusFirstPropertyChanged);
         FocusOnLoadedProperty.Changed.Subscribe(OnFocusOnLoadedChanged);
         FocusOnHoverProperty.Changed.Subscribe(OnFocusOnHoverChanged);
         SelectAllOnFocusProperty.Changed.Subscribe(OnSelectAllOnFocusChanged);
     }
-        
+
     // IsFocused
     public static readonly AttachedProperty<bool> IsFocusedProperty =
-        AvaloniaProperty.RegisterAttached<FocusExtensions, InputElement, bool>("IsFocused"); 
+        AvaloniaProperty.RegisterAttached<FocusExtensions, InputElement, bool>("IsFocused");
     public static bool GetIsFocused(AvaloniaObject d) => d.CheckNotNull(nameof(d)).GetValue(IsFocusedProperty);
     public static void SetIsFocused(AvaloniaObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(IsFocusedProperty, value);
     private static void OnIsFocusedChanged(AvaloniaPropertyChangedEventArgs<bool> e)
@@ -41,20 +46,27 @@ public class FocusExtensions : AvaloniaObject
     }
 
     // FocusFirst, activates the first control when window loads.
-    // public static readonly AttachedProperty<bool> FocusFirstProperty =
-    //     AvaloniaProperty.RegisterAttached<FocusExtensions, Window, bool>("FocusFirst");
-    // public static bool GetFocusFirst(AvaloniaObject control) => control.CheckNotNull(nameof(control)).GetValue(FocusFirstProperty);
-    // public static void SetFocusFirst(AvaloniaObject control, bool value) => control.CheckNotNull(nameof(control)).SetValue(FocusFirstProperty, value);
-    // static void OnFocusFirstPropertyChanged(AvaloniaPropertyChangedEventArgs<bool> e)
-    // {
-    //     if (e.Sender is not InputElement control) { return; }
-    //
-    //     if (e.NewValue.Value)
-    //     {
-    //         control.Initialized += (sender, e) =>
-    //             control.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-    //     }
-    // }
+    public static readonly AttachedProperty<bool> FocusFirstProperty =
+        AvaloniaProperty.RegisterAttached<FocusExtensions, TopLevel, bool>("FocusFirst");
+    public static bool GetFocusFirst(AvaloniaObject control) => control.CheckNotNull(nameof(control)).GetValue(FocusFirstProperty);
+    public static void SetFocusFirst(AvaloniaObject control, bool value) => control.CheckNotNull(nameof(control)).SetValue(FocusFirstProperty, value);
+    private static void OnFocusFirstPropertyChanged(AvaloniaPropertyChangedEventArgs<bool> e)
+    {
+        if (e.Sender is not TopLevel control) { return; }
+
+        if (e.NewValue.Value)
+        {
+            control.Opened += (_, _) =>
+            {
+                IInputElement? next = control;
+                next = KeyboardNavigationHandler.GetNext(next, NavigationDirection.Next);
+                if (next != null)
+                {
+                    FocusManager.Instance?.Focus(next, NavigationMethod.Directional);
+                }
+            };
+        }
+    }
 
     // FocusOnLoaded
     public static readonly AttachedProperty<bool> FocusOnLoadedProperty =
@@ -65,12 +77,12 @@ public class FocusExtensions : AvaloniaObject
     {
         if (e.Sender is InputElement element && e.NewValue.Value)
         {
-            element.Initialized += (_, _) => element.Focus();
+            element.AttachedToVisualTree += (_, _) => element.Focus();
         }
     }
 
     // FocusOnHover
-    public static readonly AttachedProperty<bool> FocusOnHoverProperty = 
+    public static readonly AttachedProperty<bool> FocusOnHoverProperty =
         AvaloniaProperty.RegisterAttached<FocusExtensions, InputElement, bool>("FocusOnHover");
     public static bool GetFocusOnHover(AvaloniaObject d) => d.CheckNotNull(nameof(d)).GetValue(FocusOnHoverProperty);
     public static void SetFocusOnHover(AvaloniaObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(FocusOnHoverProperty, value);
@@ -83,7 +95,7 @@ public class FocusExtensions : AvaloniaObject
     }
 
     // SelectAllOnFocus
-    public static readonly AttachedProperty<bool> SelectAllOnFocusProperty = 
+    public static readonly AttachedProperty<bool> SelectAllOnFocusProperty =
         AvaloniaProperty.RegisterAttached<FocusExtensions, InputElement, bool>("SelectAllOnFocus");
     public static bool GetSelectAllOnFocus(AvaloniaObject d) => d.CheckNotNull(nameof(d)).GetValue(SelectAllOnFocusProperty);
     public static void SetSelectAllOnFocus(AvaloniaObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(SelectAllOnFocusProperty, value);

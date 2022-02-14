@@ -31,13 +31,13 @@
         <Style Selector="ListBox">
             <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <Style Selector="ListBoxItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>
         <Style Selector="ListBoxItem > TextBlock">
             <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="ListBox.compact ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBox.compact ListBoxItem > TextBlock">
             <Setter Property="Padding" Value="4" />
         </Style>
         <Style Selector="TextBox.compact">

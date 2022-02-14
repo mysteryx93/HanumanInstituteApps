@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Xml.Serialization;
+using Avalonia;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
@@ -41,7 +43,7 @@ public class AppSettingsData : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _width, value);
     }
     private double _width;
-
+    
     /// <summary>
     /// Gets or sets the main window height.
     /// </summary>

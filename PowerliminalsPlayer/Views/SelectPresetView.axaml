@@ -10,6 +10,7 @@
         xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        hic:FocusExtensions.FocusFirst="True"
         md:DialogServiceViews.IsRegistered="True"
         d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}">
     <Window.Resources>
@@ -21,7 +22,7 @@
     <Grid Classes="GradiantBackground">
         <DockPanel Margin="0,1,0,32">
             <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="24" Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}" hic:FocusExtensions.SelectAllOnFocus="True"/>
-            <ListBox x:Name="PresetList" TabIndex="1" Classes="compact" BorderThickness="0" 
+            <ListBox x:Name="PresetList" Classes="compact" BorderThickness="0" TabIndex="1" 
                      Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" Background="{x:Null}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
