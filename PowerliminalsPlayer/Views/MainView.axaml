@@ -8,17 +8,16 @@
         mc:Ignorable="d"
         Title="Powerliminals Player" Width="730" Height="409"  MinWidth="700" MinHeight="200"
         Icon="/Assets/App.ico"
-        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+        xmlns:md="https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
-        xmlns:s="clr-namespace:MethodBinding.Avalonia;assembly=MethodBinding.Avalonia"
-        xmlns:views="clr-namespace:HanumanInstitute.PowerliminalsPlayer.Views"
         hic:SizeExtension.TrackSize="True" 
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
-        hic:FocusExtensions.FocusFirst="True"
+        hic:PositionExtension.Enabled="False"
+        hic:PositionExtension.Position="{Binding AppData.Position, Mode=TwoWay}"
         md:DialogServiceViews.IsRegistered="True"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <i:Interaction.Behaviors>
@@ -47,7 +46,7 @@
                                                        SpeedInt="{Binding Speed, Mode=TwoWay}"
                                                        IsPlaying="{Binding IsPlaying, Mode=TwoWay}"
                                                        PositionRefreshMilliseconds="500" VolumeBoost="0.4"
-                                                       Loop="True" UseEffects="True">
+                                                       Loop="True" UseEffects="True" EffectsQuick="True">
                                 </mediab:BassPlayerHost>
                                 <i:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="StopCommandExecuted">
@@ -87,6 +86,11 @@
                 <ListBox x:Name="FilesList" Margin="0,31,0,4" Classes="compact"
                          Items="{Binding Files.Source}"  
                          SelectedItem="{Binding Files.CurrentItem, Mode=TwoWay}" TabIndex="8" Background="{x:Null}">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="TabIndex" Value="5" />
+                        </Style>
+                    </ListBox.Styles>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Display}">

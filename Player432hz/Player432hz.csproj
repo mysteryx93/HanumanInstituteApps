@@ -3,71 +3,65 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <IsPackable>false</IsPackable>
     <AssemblyVersion>2.0</AssemblyVersion>
     <FileVersion>2.0</FileVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <Prefer32bit>true</Prefer32bit>
+    <Configurations>Release;Debug</Configurations>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <TrimMode>copyused</TrimMode>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-    <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
-    <ProjectReference Include="..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj" />
-    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
-    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
+    <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.11" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.11" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.11" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.11" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.11.5" />
+    <PackageReference Include="Avalonia" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.14" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.0.0" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
-<Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition=" '$(Platform)' != 'x86' ">
-  <ItemGroup>
-    <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
-    <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
-    <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
-  </ItemGroup>
-  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-</Target>
-<Target Name="CopyCustomContentOnPublish" AfterTargets="Publish" Condition=" '$(Platform)' != 'x86' ">
-  <ItemGroup>
-    <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
-    <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
-    <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
-  </ItemGroup>
-  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
-</Target>
-<Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition=" '$(Platform)' == 'x86' ">
-  <ItemGroup>
-    <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
-    <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
-  </ItemGroup>
-  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-</Target>
-<Target Name="CopyCustomContentOnPublish" AfterTargets="Publish" Condition=" '$(Platform)' == 'x86' ">
-  <ItemGroup>
-    <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
-    <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
-  </ItemGroup>
-  <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
-</Target>
+
+ <!-- <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <ItemGroup Condition=" '$(Platform)' != 'x86' ">
+      <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
+      <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
+      <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
+    </ItemGroup>
+    <ItemGroup Condition=" '$(Platform)' == 'x86' ">
+      <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
+      <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
+    <ItemGroup Condition=" '$(Platform)' != 'x86' ">
+      <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
+      <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
+      <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
+    </ItemGroup>
+    <ItemGroup Condition=" '$(Platform)' == 'x86' ">
+      <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
+      <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
+  </Target>-->
 </Project>

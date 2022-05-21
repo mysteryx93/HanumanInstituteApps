@@ -56,13 +56,6 @@ public class ProcessWrapper : IProcess
     public ProcessModuleCollection Modules => _process.Modules;
 
     /// <inheritdoc />
-    public IntPtr MinWorkingSet
-    {
-        get => _process.MinWorkingSet;
-        set => _process.MinWorkingSet = value;
-    }
-
-    /// <inheritdoc />
     public long PagedSystemMemorySize64 => _process.PagedSystemMemorySize64;
 
     /// <inheritdoc />
@@ -133,13 +126,6 @@ public class ProcessWrapper : IProcess
     {
         get => _process.ProcessorAffinity;
         set => _process.ProcessorAffinity = value;
-    }
-
-    /// <inheritdoc />
-    public IntPtr MaxWorkingSet
-    {
-        get => _process.MaxWorkingSet;
-        set => _process.MaxWorkingSet = value;
     }
 
     /// <inheritdoc />

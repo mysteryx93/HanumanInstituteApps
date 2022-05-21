@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.DialogTypeLocators;
+using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using Moq;
-using MvvmDialogs;
-using MvvmDialogs.Avalonia;
-using MvvmDialogs.DialogTypeLocators;
-using MvvmDialogs.FrameworkDialogs;
 using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -33,14 +33,14 @@ public class MainViewModelTests
     protected Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
 
-    protected IDialogService DialogService => _dialogService ??= new DialogService(null, MockDialogManager.Object);
+    protected IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
     private IDialogService _dialogService;
 
     protected IDictionary<string, MockFileData> Files { get; set; } = new Dictionary<string, MockFileData>();
     protected string CurrentDirectory { get; set; } = string.Empty;
     
     protected void AddFile(string filePath) => Files.Add(
-        new KeyValuePair<string, MockFileData>(filePath.ReplaceDirectorySeparator(), MockFileData.NullObject));
+        new KeyValuePair<string, MockFileData>(filePath.ReplaceDirectorySeparator(), new MockFileData(string.Empty)));
 
     protected void AddFolder(string folder) =>
         Settings.Folders.Add(folder.ReplaceDirectorySeparator());
@@ -606,6 +606,23 @@ public class MainViewModelTests
     }
     
     [Fact]
+    public async Task LoadPresetCommand_EditMasterVolume_EditPlaylistFileVolume()
+    {
+        var volume = 80;
+        var preset = new PresetItem("a") { MasterVolume = volume };
+        preset.Files.Add(new PlayingItem("/File1", volume));
+        Model.AppData.Presets.Add(preset);
+        SetDialogManagerLoadPreset(preset);
+
+        var newVolume = 40;
+        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.Playlist.MasterVolume = newVolume;
+
+        await Task.Delay(120);
+        Assert.Equal(newVolume, Model.Playlist.Files.First().Volume);
+    }
+    
+    [Fact]
     public void LoadPresetCommand_EditMasterVolume_DoNotEditPreset()
     {
         var volume = 80;
@@ -633,7 +650,7 @@ public class MainViewModelTests
 
         Assert.Equal(volume, Model.AppData.Presets.First().Files.First().Volume);
     }
-    
+
     [Fact]
     public void SavedPresetCommand_NoFilePlaying_CanExecuteFalse()
     {
@@ -723,6 +740,23 @@ public class MainViewModelTests
 
         Assert.Single(Model.AppData.Presets);
         Assert.Equal(newFile, Model.AppData.Presets.Single().Files.Single().FullPath);
+    }
+    
+    [Fact]
+    public async Task SavePresetCommand_EditMasterVolume_EditPlaylistFileVolume()
+    {
+        var presetName = "Preset";
+        var volume = 80;
+        Model.Playlist.Files.Add(new PlayingItem("/File1", volume));
+        Model.Playlist.MasterVolume = volume;
+        SetDialogManagerSavePreset(presetName);
+
+        var newVolume = 40;
+        Model.SavePresetCommand.ExecuteIfCan();
+        Model.Playlist.MasterVolume = newVolume;
+
+        await Task.Delay(120);
+        Assert.Equal(newVolume, Model.Playlist.Files.First().Volume);
     }
     
     [Fact]

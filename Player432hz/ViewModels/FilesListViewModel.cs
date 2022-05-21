@@ -5,6 +5,7 @@ using System.Windows.Input;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Player432hz.Business;
+using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
@@ -26,7 +27,7 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     /// <summary>
     /// Gets the list of files and selection properties.
     /// </summary>
-    public ICollectionView<string> Files
+    public ICollectionView<FileItem> Files
     {
         get
         {
@@ -38,7 +39,7 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
             return _files;
         }
     }
-    private readonly ICollectionView<string> _files = new CollectionView<string>();
+    private readonly ICollectionView<FileItem> _files = new CollectionView<FileItem>();
 
     /// <summary>
     /// Sets the folder paths from which to load files.
@@ -74,6 +75,6 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     private ICommand? _playCommand;
     private void OnPlay()
     {
-        _playlistPlayer.Play(Files, Files.CurrentItem);
+        _playlistPlayer.Play(Files.Select(x => x.Path), Files.CurrentItem?.Path);
     }
 }

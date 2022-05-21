@@ -1,10 +1,10 @@
 ﻿using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
-using MvvmDialogs;
-using MvvmDialogs.Avalonia;
 using Splat;
 
 namespace HanumanInstitute.PowerliminalsPlayer;

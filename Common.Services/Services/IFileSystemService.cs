@@ -35,6 +35,12 @@ public interface IFileSystemService : IFileSystem
     /// <returns>A file path with no file extension.</returns>
     string GetPathWithoutExtension(string path);
     /// <summary>
+    /// Returns the path ensuring it ends with a directory separator char.
+    /// </summary>
+    /// <param name="path">The path to end with a separator char.</param>
+    /// <returns>A path that must end with a directory separator char.</returns>
+    string GetPathWithFinalSeparator(string path);
+    /// <summary>
     /// Send a file or path silently to the recycle bin. Suppress dialog, suppress errors, delete if too large.
     /// </summary>
     /// <param name="path">Location of directory or file to recycle.</param>

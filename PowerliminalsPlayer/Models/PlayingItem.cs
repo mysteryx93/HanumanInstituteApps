@@ -20,9 +20,8 @@ public class PlayingItem : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _fullPath, value);
     }
     private string _fullPath = string.Empty;
-        
-    [XmlIgnore]
-    public string FileName => System.IO.Path.GetFileName(FullPath);
+
+    [XmlIgnore] public string FileName => System.IO.Path.GetFileName(FullPath);
 
     [XmlElement("Volume")]
     public double FullVolume
@@ -31,7 +30,7 @@ public class PlayingItem : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _fullVolume, value);
     }
     private double _fullVolume = 100;
-        
+
     private double MasterVolume { get; set; } = -1;
     private bool _adjustingVolume;
 
@@ -43,7 +42,8 @@ public class PlayingItem : ReactiveObject
     private bool _isPlaying = true;
 
     public PlayingItem()
-    { }
+    {
+    }
 
     public PlayingItem(string path, double masterVolume = 1.0)
     {
@@ -90,12 +90,30 @@ public class PlayingItem : ReactiveObject
     }
     private int _speed;
 
+    [XmlIgnore]
     public double Rate
     {
         get => _rate;
-        set => this.RaiseAndSetIfChanged(ref _rate, value);
+        private set => this.RaiseAndSetIfChanged(ref _rate, value);
     }
     private double _rate;
+
+    public PlayingItem Clone(double newMasterVolume)
+    {
+        //MemberwiseClone caused weird behaviors.
+        //return (PlayingItem)this.MemberwiseClone();
         
-    public PlayingItem Clone() => (PlayingItem)MemberwiseClone();
+        // ReSharper disable once UseObjectOrCollectionInitializer
+        var result = new PlayingItem(FullPath, MasterVolume);
+        result._adjustingVolume = true;
+
+        result.FullVolume = FullVolume;
+        result.Id = Id;
+        result.IsPlaying = IsPlaying;
+        result.Speed = Speed;
+        result.Volume = Volume;
+
+        result._adjustingVolume = false;
+        return result;
+    }
 }

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 using HanumanInstitute.Common.Avalonia;
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.Player432hz.Models;
-using MvvmDialogs;
-using MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;

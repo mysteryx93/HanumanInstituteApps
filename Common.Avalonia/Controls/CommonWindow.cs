@@ -5,7 +5,12 @@ using Avalonia.Controls;
 
 namespace HanumanInstitute.Common.Avalonia;
 
-public abstract class CommonWindow<T> : Window
+public abstract class CommonWindow<T> : CommonWindow
+{
+    public T ViewModel => (T)DataContext!;
+}
+
+public abstract class CommonWindow : Window
 {
     protected CommonWindow()
     {
@@ -25,7 +30,12 @@ public abstract class CommonWindow<T> : Window
     
     protected abstract void Initialize();
 
-    public T ViewModel => (T)DataContext!;
+    /// <summary>
+    /// Sets a manual startup position that will be applied when the window is shown.
+    /// </summary>
+    /// <param name="position">The manual position to set.</param>
+    public void SetManualStartupPosition(PixelPoint? position) => _manualPosition = position;
+    private PixelPoint? _manualPosition;
 
     /// <summary>
     /// Fix center start position not working on Linux. 
@@ -46,7 +56,11 @@ public abstract class CommonWindow<T> : Window
         }
         var rect = new PixelRect(PixelPoint.Origin,
             PixelSize.FromSize(ClientSize, scale));
-        if (WindowStartupLocation == WindowStartupLocation.CenterScreen)
+        if (_manualPosition != null)
+        {
+            Position = _manualPosition.Value;
+        }
+        else if (WindowStartupLocation == WindowStartupLocation.CenterScreen)
         {
             var screen = Screens.ScreenFromPoint(pOwner?.Position ?? Position);
             if (screen == null)

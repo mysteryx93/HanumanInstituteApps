@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
@@ -58,8 +59,16 @@ public class FilesListViewModelTests
     {
         Model.SetPaths(PathValue);
 
-        Assert.Equal(FileList, Model.Files.Source);
+        Assert.Equal(FileList, Model.Files.Source.Select(x => x.Path));
         VerifyGetFiles(Times.Once());
+    }
+    
+    [Fact]
+    public void SetPaths_Value_FilesHaveName()
+    {
+        Model.SetPaths(PathValue);
+
+        Assert.Empty(Model.Files.Source.Select(x => string.IsNullOrEmpty(x.Name)));
     }
 
     [Fact]

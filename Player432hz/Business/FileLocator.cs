@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Avalonia.Controls.Shapes;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.Player432hz.Models;
 
 namespace HanumanInstitute.Player432hz.Business;
 
@@ -11,7 +15,6 @@ public class FileLocator : IFileLocator
 {
     private readonly IAppPathService _appPath;
     private readonly IFileSystemService _fileSystem;
-
 
     public FileLocator(IAppPathService appPathService, IFileSystemService fileSystemService)
     {
@@ -34,15 +37,21 @@ public class FileLocator : IFileLocator
     /// </summary>
     /// <param name="paths">A list of paths to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    public IEnumerable<string> GetAudioFiles(IEnumerable<string> paths)
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public IEnumerable<FileItem> GetAudioFiles(IEnumerable<string>? paths)
     {
         paths.CheckNotNull(nameof(paths));
 
-        var result = new List<string>();
-        foreach (var item in paths)
+        var result = new List<FileItem>();
+        foreach (var item in paths.Select(x => _fileSystem.GetPathWithFinalSeparator(x)))
         {
-            result.AddRange(GetAudioFiles(item));
+            result.AddRange(GetAudioFiles(item).Select(x => 
+                new FileItem(TrimPath(x, item), x)));
         }
         return result;
+
+        // Remove load path from file path. 
+        string TrimPath(string file, string path) =>
+            file.StartsWith(path) ? file[path.Length..] : file;
     }
 }

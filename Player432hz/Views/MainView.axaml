@@ -13,100 +13,35 @@
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
-        xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+        xmlns:md="https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
+        xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         md:DialogServiceViews.IsRegistered="True"
+        hic:SizeExtension.TrackSize="True" 
+        hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <!-- Position="{Binding WindowPosition, Mode=OneWayToSource}" -->
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
             <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
     <Window.Resources>
-        <!--<DrawingImage x:Key="PlayIcon">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="White">
-                            <GeometryDrawing.Geometry>
-                                <PathGeometry Figures="M4,4 L8,6 L4,8" />
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-        <DrawingImage x:Key="PauseIcon">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="White">
-                            <GeometryDrawing.Geometry>
-                                <PathGeometry />
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-        <DrawingImage x:Key="StopIcon">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="White">
-                            <GeometryDrawing.Geometry>
-                                <PathGeometry />
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>-->
         <common:MediaTimeConverter x:Key="MediaTimeConverter" />
-        <Color x:Key="WindowBackgroundGradiant">#FFCDA791</Color>
-        <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%">
-            <GradientStop Color="White" Offset="0" />
-            <GradientStop Color="{StaticResource WindowBackgroundGradiant}" Offset="1" />
-        </LinearGradientBrush>
     </Window.Resources>
-    <!--<Window.TaskbarItemInfo>
-        <TaskbarItemInfo>
-            <TaskbarItemInfo.ThumbButtonInfos>
-                <ThumbButtonInfo ImageSource="{StaticResource PlayIcon}"
-                             Description="Play" />
-                <ThumbButtonInfo ImageSource="{StaticResource PauseIcon}"
-                             Description="Pause" />
-                <ThumbButtonInfo ImageSource="{StaticResource StopIcon}"
-                             Description="Stop" />
-            </TaskbarItemInfo.ThumbButtonInfos>
-        </TaskbarItemInfo>
-    </Window.TaskbarItemInfo>-->
-    <Window.Styles>
-        <Style Selector="Button.round">
-            <Setter Property="Padding" Value="4" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="CornerRadius" Value="14" />
-        </Style>
-    
-        <Style Selector="ListBox.compact ListBoxItem">
-            <Setter Property="Padding" Value="4" />
-        </Style>
-    </Window.Styles>
-    <Grid Background="{StaticResource WindowBackgroundBrush}">
+    <Grid Classes="GradiantBackground">
         <Grid Margin="164,4,10,0" Height="108" VerticalAlignment="Top"
               IsEnabled="{Binding Converter={x:Static ObjectConverters.IsNotNull}, Mode=OneWay}"
               DataContext="{Binding Playlists.CurrentItem}" md:DialogServiceViews.IsRegistered="True">
-            <ListBox x:Name="FoldersList" Classes="compact" BorderThickness="1" Margin="0,30,0,0" TabIndex="5"
+            <ListBox x:Name="FoldersList" Classes="compact" Margin="0,30,0,0" TabIndex="5"
                      Background="{x:Null}"
                      Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
             </ListBox>
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top"
                        FontWeight="Bold" />
-            <TextBox x:Name="PlaylistNameTextBox" HorizontalAlignment="Left" Margin="80,0,0,0" VerticalAlignment="Top"
-                     Width="120" Text="{Binding Name, Mode=TwoWay}" TabIndex="4" Background="{x:Null}" MinHeight="26"
-                     Height="26" Padding="4" VerticalContentAlignment="Center" />
+            <TextBox x:Name="PlaylistNameTextBox" Classes="compact" HorizontalAlignment="Left" Margin="80,1,0,0" VerticalAlignment="Top"
+                     Width="120" Text="{Binding Name, Mode=TwoWay}" TabIndex="4" />
             <Button x:Name="AddFolderButton" Classes="round" Content="Add" HorizontalAlignment="Right"
                     Margin="0,-1,80,0"
                     VerticalAlignment="Top" Width="75" TabIndex="6" Command="{Binding AddFolderCommand, Mode=OneWay}" />
@@ -114,7 +49,7 @@
                     VerticalAlignment="Top"
                     Width="75" TabIndex="7" Command="{Binding RemoveFolderCommand, Mode=OneWay}" Margin="0,-1,0,0" />
         </Grid>
-        <ListBox x:Name="PlaylistsList" BorderThickness="1" HorizontalAlignment="Left"
+        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left"
                  Margin="10,34,0,51" Width="146"
                  TabIndex="1" Background="{x:Null}"
                  Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
@@ -126,7 +61,7 @@
             </ListBox.Styles>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" Padding="14" Background="Transparent">
+                    <TextBlock Text="{Binding Name}" Padding="14">
                         <i:Interaction.Behaviors>
                             <ia:EventTriggerBehavior EventName="DoubleTapped">
                                 <ia:InvokeCommandAction
@@ -167,12 +102,12 @@
             </ui:MediaPlayer>
         </Grid>
         <Grid Margin="164,120,10,54" DataContext="{x:Static local:ViewModelLocator.FilesList}">
-            <ListBox x:Name="FilesList" Classes="compact" BorderThickness="1" Margin="0,30,0,0" TabIndex="8"
-                     Background="{x:Null}"
+            <ListBox x:Name="FilesList" Classes="compact" Margin="0,30,0,0" TabIndex="8"
+                     Background="{x:Null}" 
                      Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}">
+                        <TextBlock Text="{Binding Name}">
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
                                     <ia:InvokeCommandAction

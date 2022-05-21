@@ -1,10 +1,9 @@
 ﻿using HanumanInstitute.Common.Services;
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.Models;
 using HanumanInstitute.Player432hz.ViewModels;
-using MvvmDialogs;
-using MvvmDialogs.Avalonia;
-using MvvmDialogs.DialogTypeLocators;
 using Splat;
 
 namespace HanumanInstitute.Player432hz;

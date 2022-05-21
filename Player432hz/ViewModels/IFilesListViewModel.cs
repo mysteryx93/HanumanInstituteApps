@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
 using HanumanInstitute.Common.Avalonia;
+using HanumanInstitute.Player432hz.Models;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
@@ -12,7 +13,7 @@ public interface IFilesListViewModel
     /// <summary>
     /// Gets the list of files and selection properties.
     /// </summary>
-    ICollectionView<string> Files { get; }
+    ICollectionView<FileItem> Files { get; }
 
     /// <summary>
     /// Sets the folder paths from which to load files.

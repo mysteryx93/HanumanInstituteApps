@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HanumanInstitute.Player432hz.Models;
 
 namespace HanumanInstitute.Player432hz.Business;
 
@@ -19,5 +20,5 @@ public interface IFileLocator
     /// </summary>
     /// <param name="paths">A list of paths to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    IEnumerable<string> GetAudioFiles(IEnumerable<string> paths);
+    IEnumerable<FileItem> GetAudioFiles(IEnumerable<string> paths);
 }

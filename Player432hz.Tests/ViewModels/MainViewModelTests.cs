@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HanumanInstitute.Common.Avalonia.App.Tests;
-using MvvmDialogs;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.Player432hz.Models;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;

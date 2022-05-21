@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 

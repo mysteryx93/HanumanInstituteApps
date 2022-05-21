@@ -5,21 +5,26 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <FileVersion>2.0</FileVersion>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <TrimMode>copyused</TrimMode>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
+    <PackageReference Include="Avalonia" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.14" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.0.0" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,12 +34,10 @@
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
-    <ProjectReference Include="..\..\MethodBinding.Avalonia\Src\MethodBinding.Avalonia\MethodBinding.Avalonia.csproj" />
-    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
-    <ProjectReference Include="..\..\mvvm-dialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+    <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -43,29 +46,4 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-    <ItemGroup Condition=" '$(Platform)' != 'x86' ">
-      <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
-      <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
-      <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
-    </ItemGroup>
-    <ItemGroup Condition=" '$(Platform)' == 'x86' ">
-      <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
-      <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
-    </ItemGroup>
-    <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-  </Target>
-  <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
-    <ItemGroup Condition=" '$(Platform)' != 'x86' ">
-      <BassFiles Include="..\DLL\Windows-x64\bass*.dll" />
-      <BassFiles Include="..\DLL\Linux-x64\libbass*.so" />
-      <BassFiles Include="..\DLL\MacOS-x64\libbass*.dylib" />
-    </ItemGroup>
-    <ItemGroup Condition=" '$(Platform)' == 'x86' ">
-      <BassFiles Include="..\DLL\Windows-x86\bass*.dll" />
-      <BassFiles Include="..\DLL\Linux-x86\libbass*.so" />
-    </ItemGroup>
-    <Copy SourceFiles="@(BassFiles)" DestinationFolder="$(OutDir)" />
-  </Target>
 </Project>

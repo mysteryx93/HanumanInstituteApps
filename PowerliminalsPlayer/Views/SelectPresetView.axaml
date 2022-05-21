@@ -7,10 +7,9 @@
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         mc:Ignorable="d" Height="289.85" Width="205.263" CanResize="False" WindowStartupLocation="CenterOwner" 
         ShowInTaskbar="False" Icon="/Assets/App.ico" 
-        xmlns:md="clr-namespace:MvvmDialogs.Avalonia;assembly=MvvmDialogs.Avalonia"
+        xmlns:md="https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
-        hic:FocusExtensions.FocusFirst="True"
         md:DialogServiceViews.IsRegistered="True"
         d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}">
     <Window.Resources>

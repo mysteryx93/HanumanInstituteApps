@@ -46,10 +46,6 @@ public interface IProcess : IDisposable
     /// </summary>
     ProcessModuleCollection Modules { get; }
     /// <summary>
-    /// Gets or sets the minimum allowable working set size, in bytes, for the associated process.
-    /// </summary>
-    IntPtr MinWorkingSet { get; set; }
-    /// <summary>
     /// Gets the amount of pageable system memory, in bytes, allocated for the associated process.
     /// </summary>
     long PagedSystemMemorySize64 { get; }
@@ -125,10 +121,6 @@ public interface IProcess : IDisposable
     /// Gets or sets the processors on which the threads in this process can be scheduled to run.
     /// </summary>
     IntPtr ProcessorAffinity { get; set; }
-    /// <summary>
-    /// Gets or sets the maximum allowable working set size, in bytes, for the associated process.
-    /// </summary>
-    IntPtr MaxWorkingSet { get; set; }
     /// <summary>
     /// Gets the main module for the associated process.
     /// </summary>

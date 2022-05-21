@@ -1,6 +1,6 @@
 ﻿using HanumanInstitute.Common.Services;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Models;
-using MvvmDialogs;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 

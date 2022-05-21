@@ -108,7 +108,7 @@ public class AppSettingsProviderTests
 
         Assert.Empty(Model.Value.Folders);
         Assert.Empty(Model.Value.Presets);
-        Assert.Equal(0, Model.Value.Width);
+        Assert.Equal(AppSettingsProvider.DefaultWidth, Model.Value.Width);
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class AppSettingsProviderTests
 
         Assert.Empty(Model.Value.Folders);
         Assert.Empty(Model.Value.Presets);
-        Assert.Equal(0, Model.Value.Width);
+        Assert.Equal(AppSettingsProvider.DefaultWidth, Model.Value.Width);
     }
 
     [Fact]

@@ -17,7 +17,7 @@ public class PresetItem : ReactiveObject
     private string _name = string.Empty;
         
     [XmlElement("File")]
-    public ObservableCollectionWithRange<PlayingItem> Files { get; } = new();
+    public ObservableCollectionWithRange<PlayingItem> Files { get; private set; } = new();
 
     public PresetItem()
     {
@@ -56,6 +56,17 @@ public class PresetItem : ReactiveObject
         dst.Name = Name;
         dst.MasterVolume = MasterVolume;
         dst.Files.Clear();
-        dst.Files.AddRange(Files.Select(x => x.Clone()));
+        dst.Files.AddRange(Files.Select(x => x.Clone(MasterVolume)));
     }
+    //
+    // public PresetItem Clone()
+    // {
+    //     var result = new PresetItem()
+    //     {
+    //         Name = Name,
+    //         MasterVolume = MasterVolume
+    //     };
+    //     result.Files.AddRange(Files.Select(x => x.Clone()));
+    //     return result;
+    // }
 }

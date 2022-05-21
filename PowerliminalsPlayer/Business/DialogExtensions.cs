@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Models;
-using MvvmDialogs;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 

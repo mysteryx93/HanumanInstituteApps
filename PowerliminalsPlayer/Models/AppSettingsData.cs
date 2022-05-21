@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 using Avalonia;
+using HanumanInstitute.Common.Avalonia;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
@@ -17,7 +18,7 @@ public class AppSettingsData : ReactiveObject
     /// </summary>
     [XmlElement("Folder")]
     public ObservableCollection<string> Folders { get; } = new ObservableCollection<string>();
-        
+
     /// <summary>
     /// Gets or sets the list of saved presets.
     /// </summary>
@@ -43,7 +44,7 @@ public class AppSettingsData : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _width, value);
     }
     private double _width;
-    
+
     /// <summary>
     /// Gets or sets the main window height.
     /// </summary>
@@ -54,9 +55,33 @@ public class AppSettingsData : ReactiveObject
     }
     private double _height;
 
+    public PositionExtension.PositionPoint Position
+    {
+        get => _position;
+        set => this.RaiseAndSetIfChanged(ref _position, value);
+    }
+    private PositionExtension.PositionPoint _position;
+
+    // [XmlElement("Position")]
+    // public PositionExtension.PositionPoint PositionStore
+    // {
+    //     get => _positionStore;
+    //     set
+    //     {
+    //         if (value.X != _positionStore.X || value.Y != _positionStore.Y)
+    //         {
+    //             this.RaiseAndSetIfChanged(ref _positionStore, value);
+    //             Position = new PixelPoint(value.X, value.Y);
+    //         }
+    //     }
+    // }
+    // private PositionExtension.PositionPoint _positionStore;
+
     /// <summary>
     /// Creates a copy of the SettingsFile class.
     /// </summary>
     /// <returns>The copied object.</returns>
     public AppSettingsData Clone() => (AppSettingsData)MemberwiseClone();
+
+
 }

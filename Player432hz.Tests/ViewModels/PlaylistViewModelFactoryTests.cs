@@ -1,5 +1,5 @@
-﻿using HanumanInstitute.Player432hz.ViewModels;
-using MvvmDialogs;
+﻿using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.Player432hz.ViewModels;
 using Xunit;
 using Moq;
 

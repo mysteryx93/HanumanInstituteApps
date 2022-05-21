@@ -74,6 +74,17 @@ public class FileSystemService : IFileSystemService
     }
 
     /// <inheritdoc />
+    public virtual string GetPathWithFinalSeparator(string path)
+    {
+        path.CheckNotNullOrEmpty(nameof(path));
+        if (!path.EndsWith(Path.DirectorySeparatorChar))
+        {
+            path += Path.DirectorySeparatorChar;
+        }
+        return path;
+    }
+
+    /// <inheritdoc />
     public virtual void MoveToRecycleBin(string path) => MoveToRecycleBin(path, false);
 
     /// <inheritdoc />

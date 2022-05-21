@@ -9,9 +9,9 @@ using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.Business;
-using MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;

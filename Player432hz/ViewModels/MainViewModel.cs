@@ -21,6 +21,8 @@ public class MainViewModel : ViewModelBase
     private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFilesListViewModel _filesListViewModel;
 
+    public AppSettingsData AppData => _settings.Value;
+
     public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<AppSettingsData> settings,
         IFilesListViewModel filesListViewModel)
     {
