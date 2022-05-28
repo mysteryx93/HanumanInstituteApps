@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HanumanInstitute.Common.Services;
+﻿using System.Linq;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
-namespace HanumanInstitute.Player432hz.Business;
+namespace HanumanInstitute.Converter432hz.Business;
 
 /// <summary>
 /// Manages the file system paths used by the application.
@@ -13,11 +10,13 @@ public class AppPathService : IAppPathService
 {
     private readonly IEnvironmentService _environment;
     private readonly IFileSystemService _fileSystem;
+    private readonly IBassDevice _bassDevice;
 
-    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService)
+    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService, IBassDevice bassDevice)
     {
-        _environment = environmentService ?? throw new ArgumentNullException(nameof(environmentService));
-        _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+        _environment = environmentService;
+        _fileSystem = fileSystemService;
+        _bassDevice = bassDevice;
     }
 
     /// <summary>
@@ -34,5 +33,5 @@ public class AppPathService : IAppPathService
     /// <summary>
     /// Returns the path where the 432hz Player settings file is stored.
     /// </summary>
-    public string Player432hzConfigFile => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\432hzConfig.xml");
+    public string Player432hzConfigFile => _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\432hzConverterConfig.xml");
 }

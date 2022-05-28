@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿
 // ReSharper disable InconsistentNaming
 
-namespace HanumanInstitute.Player432hz.Business;
+namespace HanumanInstitute.Converter432hz.Business;
 
 public interface IAppPathService
 {

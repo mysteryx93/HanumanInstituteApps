@@ -1,0 +1,30 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
+        xmlns:common="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
+        xmlns:wpf="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=CommonWpf"
+        xmlns:s="https://github.com/mysteryx93/MethodBinding.Avalonia"
+        x:Class="HanumanInstitute.Converter432hz.Views.MainView"
+        mc:Ignorable="d"
+        Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
+        Title="432hz Batch Converter" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
+        xmlns:vm="clr-namespace:HanumanInstitute.Converter432hz.ViewModels"
+        xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
+        xmlns:hic="HanumanInstitute.Common.Avalonia"
+        hic:SizeExtension.TrackSize="True" 
+        hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
+        d:DataContext="{x:Static local:ViewModelLocator.Main}">
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Closing">
+            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    <Grid Classes="GradiantBackground">
+      
+    </Grid>
+</Window>
