@@ -27,4 +27,6 @@ public class FakeEnvironmentService : IEnvironmentService
     public DateTime Now { get; set; } = new DateTime(2019, 01, 01);
 
     public DateTime UtcNow { get; set; } = new DateTime(2019, 01, 01);
+
+    public int ProcessorCount { get; set; } = 2;
 }

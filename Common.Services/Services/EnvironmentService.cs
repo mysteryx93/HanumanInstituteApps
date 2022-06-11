@@ -31,4 +31,6 @@ public class EnvironmentService : IEnvironmentService
     public DateTime Now => DateTime.Now;
     /// <inheritdoc />
     public DateTime UtcNow => DateTime.UtcNow;
+    /// <inheritdoc />
+    public int ProcessorCount => Environment.ProcessorCount;
 }

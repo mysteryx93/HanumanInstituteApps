@@ -1,7 +1,10 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Converter432hz.Views;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using ReactiveUI;
+using Splat;
 
 namespace HanumanInstitute.Converter432hz;
 
@@ -22,6 +25,8 @@ public class App : Application
             {
                 DataContext = ViewModelLocator.Main
             };
+
+            GlobalErrorHandler.Set(desktop.MainWindow);
         }
 
         base.OnFrameworkInitializationCompleted();

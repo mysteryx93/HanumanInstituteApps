@@ -1,11 +1,35 @@
-﻿using HanumanInstitute.MvvmDialogs;
+﻿using System.Windows.Input;
+using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.Converter432hz.ViewModels;
 
-public class AskFileActionViewModel : ReactiveObject, IModalDialogViewModel
+public class AskFileActionViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
 {
-    public bool? DialogResult { get; } = false;
+    public event EventHandler? RequestClose;
+
+    [Reactive] public string FilePath { get; set; } = string.Empty;
     
-    public FileExistsAction Action { get; set; }
+    [Reactive] public bool? DialogResult { get; set; } = false;
+
+    public ListItemCollectionView<FileExistsAction> Items { get; } = new()
+    {
+        { FileExistsAction.Skip, "Skip" },
+        { FileExistsAction.Overwrite, "Overwrite" },
+        { FileExistsAction.Rename, "Rename" },
+        { FileExistsAction.Cancel, "Cancel" }
+    };
+
+    public bool ApplyToAll { get; set; }
+
+    public ICommand Ok => _ok ??= ReactiveCommand.Create(OkImpl, 
+        this.WhenAnyValue(x => x.Items.SelectedValue, x => x != FileExistsAction.Ask));
+    private ICommand? _ok;
+    private void OkImpl()
+    {
+        DialogResult = true;
+        RequestClose?.Invoke(this, EventArgs.Empty);
+    }
+
+    public FileExistsAction Action => DialogResult == true ? Items.SelectedValue : FileExistsAction.Skip;
 }

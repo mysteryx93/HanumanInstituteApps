@@ -15,7 +15,7 @@ namespace HanumanInstitute.Player432hz.ViewModels;
 /// <summary>
 /// Represents the playlist editor.
 /// </summary>
-public class MainViewModel : ViewModelBase
+public class MainViewModel : ReactiveObject
 {
     private readonly IPlaylistViewModelFactory _playlistFactory;
     private readonly ISettingsProvider<AppSettingsData> _settings;

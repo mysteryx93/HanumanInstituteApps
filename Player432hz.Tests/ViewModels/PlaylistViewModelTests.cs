@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.MvvmDialogs.DialogTypeLocators;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
@@ -54,7 +54,8 @@ public class PlaylistViewModelTests
     {
         Model.AddFolderCommand.Execute(null);
 
-        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string?>(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()), Times.Once);
+        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string?>(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string?,string>?>()),
+            Times.Once);
     }
 
     [Fact]

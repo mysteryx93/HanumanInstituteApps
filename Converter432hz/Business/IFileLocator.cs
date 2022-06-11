@@ -10,7 +10,7 @@ public interface IFileLocator
     /// </summary>
     /// <param name="path">The path to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    IEnumerable<string> GetAudioFiles(string path);
+    IEnumerable<FileItem> GetAudioFiles(string path);
 
     /// <summary>
     /// Returns a list of all audio files in specified directories, searching recursively.

@@ -17,4 +17,12 @@ public class FolderItem : FileItem
     /// Gets or sets the list of files contained in the folder.
     /// </summary>
     public ObservableCollection<FileItem> Files { get; } = new ObservableCollection<FileItem>();
+
+    /// <inheritdoc />
+    public override string ToolTip => Files.Count switch
+    {
+        0 => "Empty folder",
+        1 => "1 file",
+        _ => Files.Count + " files"
+    };
 }

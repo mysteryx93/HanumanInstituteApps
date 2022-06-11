@@ -1,4 +1,4 @@
-﻿using DynamicData;
+﻿using System.ComponentModel;
 using ReactiveUI;
 using ReactiveUI.Validation.Abstractions;
 
@@ -10,6 +10,10 @@ namespace HanumanInstitute.Converter432hz.Business;
 public interface IEncoderService : IReactiveObject, IValidatableViewModel
 {
     /// <summary>
+    /// Gets or sets the ViewModel owning this service.
+    /// </summary>
+    public INotifyPropertyChanged Owner { get; set; }
+    /// <summary>
     /// Gets or sets the list of files and folders to encode.
     /// </summary>
     ObservableCollection<FileItem> Sources { get; }
@@ -18,13 +22,9 @@ public interface IEncoderService : IReactiveObject, IValidatableViewModel
     /// </summary>
     string Destination { get; set; }
     /// <summary>
-    /// Gets or sets the encoding audio format.   
+    /// Gets or sets encoding settings.
     /// </summary>
-    EncodeFormat Format { get; set; }
-    /// <summary>
-    /// Gets or sets the encoding bitrate.
-    /// </summary>
-    int Bitrate { get; set; }
+    EncodeSettings Settings { get; set; }
     /// <summary>
     /// Gets or sets the action to take when the destination file already exists.
     /// </summary>

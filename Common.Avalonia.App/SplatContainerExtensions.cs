@@ -9,10 +9,11 @@ public static class WindsorContainerExtensions
     /// Registers CommonWpfApp classes into the IoC container.
     /// </summary>
     /// <param name="services">The IoC services container.</param>
-    public static IMutableDependencyResolver AddCommonWpfApp(this IMutableDependencyResolver services)
+    public static IMutableDependencyResolver AddCommonAvaloniaApp(this IMutableDependencyResolver services)
     {
         services.CheckNotNull(nameof(services));
 
+        SplatRegistrations.Register<GlobalErrorHandler>();
         //services.Register(Component.For<SettingsProvider>().ImplementedBy<SettingsProvider>().LifeStyle.Singleton);
         // services.Register(
         //     Component.For<SplashViewModel>()

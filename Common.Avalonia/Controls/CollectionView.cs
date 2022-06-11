@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -51,8 +50,8 @@ public class CollectionView<T> : ICollectionView<T>
         if (position > -1 || _currentPosition > -1)
         {
             _currentPosition = Math.Max(-1, Math.Min(Source.Count - 1, position));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentItem)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPosition)));
+            OnPropertyChanged(nameof(CurrentItem));
+            OnPropertyChanged(nameof(CurrentPosition));
         }
     }
 

@@ -53,4 +53,7 @@ public interface IEnvironmentService
     /// Returns the current date and time on this computer expressed as UTC.
     /// </summary>
     DateTime UtcNow { get; }
+    /// <summary>Gets the number of processors on the current machine.</summary>
+    /// <returns>The 32-bit signed integer that specifies the number of processors on the current machine. There is no default. If the current machine contains multiple processor groups, this property returns the number of logical processors that are available for use by the common language runtime (CLR).</returns>
+    int ProcessorCount { get; }
 }

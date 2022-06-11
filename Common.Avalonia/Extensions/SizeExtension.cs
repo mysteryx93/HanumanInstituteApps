@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Layout;
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global

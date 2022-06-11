@@ -33,7 +33,10 @@ public class FileSystemService : IFileSystemService
     /// <inheritdoc />
     public virtual void EnsureDirectoryExists(string path)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        if (_fileSystem.Path.IsPathRooted(path))
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+        }
     }
 
     /// <inheritdoc />

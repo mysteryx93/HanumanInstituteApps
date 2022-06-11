@@ -27,4 +27,9 @@ public class FileItem : ReactiveObject
     /// The display name of the file.
     /// </summary>
     public string RelativePath { get; private set; }
+
+    /// <summary>
+    /// Gets the tooltip to display for the item.
+    /// </summary>
+    public virtual string ToolTip => Path;
 }

@@ -20,5 +20,9 @@ public enum EncodeFormat
     /// <summary>
     /// OPUS audio format, best compression.
     /// </summary>
-    Opus
+    Opus,
+    /// <summary>
+    /// OGG/Vorbis audio format, better quality than MP3.
+    /// </summary>
+    Ogg
 }

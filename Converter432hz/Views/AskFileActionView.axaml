@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
+        mc:Ignorable="d" CanResize="False"
+        x:Class="HanumanInstitute.Converter432hz.Views.AskFileActionView"
+        Title="File Conflict" Width="380" Height="255"
+        d:DataContext="{x:Static local:ViewModelLocator.AskFileAction}">
+    <Grid Classes="GradiantBackground">
+        <Grid Margin="10">
+            <StackPanel>
+                <TextBlock Text="Destination file already exists:" />
+                <TextBox Text="{Binding FilePath}" Classes="compact" IsReadOnly="True"></TextBox>
+                <TextBlock Text="What would you like to do?" Margin="0,10,0,2" />
+                <ListBox Items="{Binding Items}"
+                         SelectedItem="{Binding Items.CurrentItem}"
+                         Classes="RadioButtonListBox" />
+            </StackPanel>
+            <CheckBox IsChecked="{Binding ApplyToAll}" VerticalAlignment="Bottom">Apply to all files</CheckBox>
+            <Button Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsDefault="True"
+                    Command="{Binding Ok}" Classes="round">_OK</Button>
+        </Grid>
+    </Grid>
+</Window>

@@ -9,5 +9,6 @@ public enum EncodeStatus
     Processing,
     Completed,
     Error,
+    Cancelled,
     Skip
 }

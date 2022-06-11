@@ -11,11 +11,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
-    <PackageReference Include="Avalonia" Version="0.10.14" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
+    <PackageReference Include="Avalonia" Version="0.10.15" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.14" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.1.0" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.2.3" />
     <PackageReference Include="Splat" Version="14.2.8" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
 

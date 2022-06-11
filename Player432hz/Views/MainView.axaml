@@ -13,11 +13,9 @@
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
-        xmlns:md="https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
-        md:DialogServiceViews.IsRegistered="True"
         hic:SizeExtension.TrackSize="True" 
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
@@ -33,7 +31,7 @@
     <Grid Classes="GradiantBackground">
         <Grid Margin="164,4,10,0" Height="108" VerticalAlignment="Top"
               IsEnabled="{Binding Converter={x:Static ObjectConverters.IsNotNull}, Mode=OneWay}"
-              DataContext="{Binding Playlists.CurrentItem}" md:DialogServiceViews.IsRegistered="True">
+              DataContext="{Binding Playlists.CurrentItem}">
             <ListBox x:Name="FoldersList" Classes="compact" Margin="0,30,0,0" TabIndex="5"
                      Background="{x:Null}"
                      Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
@@ -86,7 +84,7 @@
             <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False">
                 <bass:BassPlayerHost Source="{Binding Player.NowPlaying, Mode=OneWay}"
                                      Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}"
-                                     Pitch="0.98181818181818181"
+                                     Pitch="0.98181818181818181" EffectsFloat="True" EffectsSampleRateConversion="4"
                                      Volume="{Binding ViewModel.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <i:Interaction.Behaviors>
                         <ia:EventTriggerBehavior EventName="MediaFinished">

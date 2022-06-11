@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using HanumanInstitute.Player432hz.ViewModels;
+using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz;
 
@@ -24,6 +25,6 @@ public class ViewLocator : IDataTemplate
 
     public bool Match(object data)
     {
-        return data is ViewModelBase;
+        return data is ReactiveObject;
     }
 }

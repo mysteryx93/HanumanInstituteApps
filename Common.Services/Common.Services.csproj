@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="1.1.0" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="1.2.3" />
     <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
     <PackageReference Include="Splat" Version="14.2.8" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">

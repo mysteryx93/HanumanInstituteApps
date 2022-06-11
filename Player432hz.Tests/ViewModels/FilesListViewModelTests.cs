@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
@@ -17,8 +18,11 @@ public class FilesListViewModelTests
     public Mock<IFileSystemService> MockFileSystem => _mockFileSystem ??= SetupFileSystem();
     private Mock<IFileSystemService>? _mockFileSystem;
 
-    public IAppPathService AppPath => _appPath ??= new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object);
+    public IAppPathService AppPath => _appPath ??= new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object, _mockBassDevice.Object);
     private IAppPathService? _appPath;
+
+    public Mock<IBassDevice> MockBassDevice => _mockBassDevice ??= new Mock<IBassDevice>();
+    private Mock<IBassDevice> _mockBassDevice;
 
     public IFileLocator FileLocator => _fileLocator ??= new FileLocator(AppPath, MockFileSystem.Object);
     private IFileLocator? _fileLocator;

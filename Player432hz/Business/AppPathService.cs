@@ -13,11 +13,13 @@ public class AppPathService : IAppPathService
 {
     private readonly IEnvironmentService _environment;
     private readonly IFileSystemService _fileSystem;
+    private readonly IBassDevice _bassDevice;
 
-    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService)
+    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService, IBassDevice bassDevice)
     {
-        _environment = environmentService ?? throw new ArgumentNullException(nameof(environmentService));
-        _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+        _environment = environmentService;
+        _fileSystem = fileSystemService;
+        _bassDevice = bassDevice;
     }
 
     /// <summary>

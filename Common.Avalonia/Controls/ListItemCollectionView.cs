@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Common.Avalonia;
@@ -38,4 +39,23 @@ public class ListItemCollectionView<T> : CollectionView<ListItem<T>>
     /// <param name="value">The typed value to add.</param>
     /// <returns>The newly-added item.</returns>
     public ListItem<T> Add(T value) => Add(value, Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+
+    /// <summary>
+    /// Gets or sets the currently selected value.
+    /// </summary>
+    public T? SelectedValue
+    {
+        get => CurrentItem != null ? CurrentItem.Value : default;
+        set => CurrentItem = Source.FirstOrDefault(x => x.Value?.Equals(value) == true);
+    }
+
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        
+        if (propertyName == nameof(CurrentItem))
+        {
+            OnPropertyChanged(nameof(SelectedValue));
+        }
+    }
 }

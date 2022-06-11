@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 
 namespace HanumanInstitute.Converter432hz.Business;
 
@@ -21,9 +22,11 @@ public class FileLocator : IFileLocator
     /// </summary>
     /// <param name="path">The path to search for audio files.</param>
     /// <returns>A list of audio files.</returns>
-    public IEnumerable<string> GetAudioFiles(string path)
+    public IEnumerable<FileItem> GetAudioFiles(string path)
     {
-        return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, System.IO.SearchOption.AllDirectories);
+        path = _fileSystem.GetPathWithFinalSeparator(path);
+        return _fileSystem.GetFilesByExtensions(path, _appPath.AudioExtensions, SearchOption.AllDirectories).Select(x => 
+            new FileItem(x, TrimPath(x, path)));
     }
 
     /// <summary>
@@ -36,15 +39,15 @@ public class FileLocator : IFileLocator
         paths.CheckNotNull(nameof(paths));
 
         var result = new List<FileItem>();
-        foreach (var item in paths.Select(x => _fileSystem.GetPathWithFinalSeparator(x)))
+        foreach (var item in paths)
         {
-            result.AddRange(GetAudioFiles(item).Select(x => 
-                new FileItem(x, TrimPath(x, item))));
+            result.AddRange(GetAudioFiles(item));
         }
         return result;
 
-        // Remove load path from file path. 
-        string TrimPath(string file, string path) =>
-            file.StartsWith(path) ? file[path.Length..] : file;
     }
+
+    // Remove load path from file path. 
+    private string TrimPath(string file, string path) =>
+        file.StartsWith(path) ? file[path.Length..] : file;
 }

@@ -1,4 +1,7 @@
-﻿using HanumanInstitute.MvvmDialogs;
+﻿using Avalonia.Threading;
+using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 
@@ -18,24 +21,33 @@ public static class ViewModelLocator
         var container = Locator.CurrentMutable;
             
         // Services
+        container.AddCommonAvaloniaApp();
         container.AddCommonServices();
-        container.Register(() => (IDialogService)new DialogService());
+        container.Register<IDialogService>(() => new DialogService(
+            viewModelFactory: x => Locator.Current.GetService(x)));
+        container.Register<IBassDevice>(() => BassDevice.Instance);
+        container.Register<IDispatcher>(() => Dispatcher.UIThread);
+        SplatRegistrations.Register<GlobalErrorHandler>();
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
+        SplatRegistrations.Register<AskFileActionViewModel>();
+        SplatRegistrations.Register<AdvancedSettingsViewModel>();
 
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
         SplatRegistrations.Register<IEncoderService, EncoderService>();
+        SplatRegistrations.Register<IBassEncoder, BassEncoder>();
             
         SplatRegistrations.SetupIOC();
     }
 
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static AskFileActionViewModel AskFileAction => Locator.Current.GetService<AskFileActionViewModel>()!;
-
+    public static AdvancedSettingsViewModel AdvancedSettings => Locator.Current.GetService<AdvancedSettingsViewModel>()!;
+    
     public static void Cleanup()
     {
     }

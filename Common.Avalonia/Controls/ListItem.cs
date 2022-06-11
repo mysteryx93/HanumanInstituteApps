@@ -16,4 +16,6 @@ public class ListItem<T>
         Text = text;
         Value = value;
     }
+
+    public override string ToString() => Text;
 }

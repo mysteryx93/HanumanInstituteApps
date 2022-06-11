@@ -1,6 +1,4 @@
-﻿using ReactiveUI.Fody.Helpers;
-
-namespace HanumanInstitute.Converter432hz.Models;
+﻿namespace HanumanInstitute.Converter432hz.Models;
 
 /// <summary>
 /// Represents a file encoding operation.

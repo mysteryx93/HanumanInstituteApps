@@ -1,10 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.LogicalTree;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
