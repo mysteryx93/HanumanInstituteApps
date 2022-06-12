@@ -1,10 +1,10 @@
-﻿using System.IO;
-using System.Reflection;
-using ManagedBass;
+﻿using ManagedBass;
 using ManagedBass.Enc;
 using ManagedBass.Fx;
 using ManagedBass.Mix;
 using Xunit.Abstractions;
+using Bass = ManagedBass.Bass;
+using BassEnc = ManagedBass.Enc.BassEnc;
 
 namespace HanumanInstitute.Converter432hz.Tests.Integration;
 
@@ -41,7 +41,7 @@ public class BassPitchShift
         // Add tempo effects.
         chan = BassFx.TempoCreate(chan, BassFlags.Decode).Valid();
         Bass.Configure(Configuration.SRCQuality, 4);
-        
+
         // In BASS, 2x speed is 100 (+100%), whereas our Speed property is 2. Need to convert.
         // speed 1=0, 2=100, 3=200, 4=300, .5=-100, .25=-300
         Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / pitch * speed - 1.0) * 100.0);
@@ -73,12 +73,12 @@ public class BassPitchShift
         _output.WriteLine($"Destination duration: {dstDuration.TotalSeconds:F3} seconds");
         var ratio = dstDuration / srcDuration;
         _output.WriteLine($"Ratio: {ratio:P2}");
-        var r = (1 - (1 / ratio)) / (1 - pitch); 
+        var r = (1 - (1 / ratio)) / (1 - pitch);
         _output.WriteLine($"Slowdown / Pitch: {r:P2}");
-        
+
         Bass.Free();
     }
-    
+
     [Fact]
     public void WavEncoder()
     {
@@ -91,11 +91,12 @@ public class BassPitchShift
 
         var buffer = new byte[16 * 1024];
         while (Bass.ChannelGetData(chan, buffer, buffer.Length) > -1)
-        { }
+        {
+        }
 
         Bass.StreamFree(chan);
     }
-    
+
     private TimeSpan GetDuration(int chan) =>
         TimeSpan.FromSeconds(ManagedBass.Bass.ChannelBytes2Seconds(chan, ManagedBass.Bass.ChannelGetLength(chan)));
 }

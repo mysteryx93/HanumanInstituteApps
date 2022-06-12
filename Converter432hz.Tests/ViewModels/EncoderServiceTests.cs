@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using Avalonia.Threading;
+using DynamicData;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Xunit.Abstractions;
-
+// ReSharper disable RedundantArgumentDefaultValue
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PossibleMultipleEnumeration
+
 namespace HanumanInstitute.Converter432hz.Tests.ViewModels;
 
 public class EncoderServiceTests
@@ -23,7 +23,10 @@ public class EncoderServiceTests
 
     public EncoderService Model => _model ??= 
         new EncoderService(FakeFileSystem, DialogService, MockBassEncoder.Object, new FakeDispatcher())
-            { Owner = Mock.Of<INotifyPropertyChanged>() };
+        {
+            Owner = Mock.Of<INotifyPropertyChanged>(),
+            DelayBeforeStart = 5
+        };
     private EncoderService _model;
 
     public Mock<IBassEncoder> MockBassEncoder => _mockBassEncoder ??= SetupMockBassEncoder();
@@ -32,17 +35,13 @@ public class EncoderServiceTests
     {
         var result = new Mock<IBassEncoder>();
         result.Setup(x => x.StartAsync(It.IsAny<ProcessingItem>(), It.IsAny<EncodeSettings>(), It.IsAny<CancellationToken>()))
-            .Callback<ProcessingItem, EncodeSettings, CancellationToken>((file, settings, token) =>
+            .Returns<ProcessingItem, EncodeSettings, CancellationToken>(async (file, _, token) =>
             {
                 _output.WriteLine("Start");
-                var _ = Task.Run(() =>
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                    }
-                    _output.WriteLine("Callback");
-                    file.Status = token.IsCancellationRequested ? EncodeStatus.Cancelled : EncodeStatus.Completed;
-                }, token).ConfigureAwait(false);
+                await _fakeFileSystem.File.WriteAllTextAsync(file.Destination, "file content", token);
+                await Task.Delay(100, token);
+                _output.WriteLine("Callback");
+                file.Status = token.IsCancellationRequested ? EncodeStatus.Cancelled : EncodeStatus.Completed;
             });
         return result;
     }
@@ -224,8 +223,10 @@ public class EncoderServiceTests
         await Model.RunAsync();
 
         Assert.Single(Model.ProcessingFiles);
-        Assert.Equal(_model.ProcessingFiles.First().Path, file1.Path);
-        Assert.Equal(EncodeStatus.Completed, Model.ProcessingFiles.First().Status);
+        var proc = _model.ProcessingFiles.First();
+        Assert.Equal(proc.Path, file1.Path);
+        Assert.Equal(EncodeStatus.Completed, proc.Status);
+        Assert.True(_fakeFileSystem.File.Exists(proc.Destination));
     }
 
     [Fact]
@@ -238,14 +239,14 @@ public class EncoderServiceTests
         await Model.RunAsync();
 
         Assert.Equal(2, Model.ProcessingFiles.Count);
-        Assert.Equal(_model.ProcessingFiles[0].Path, file1.Path);
-        Assert.Equal(_model.ProcessingFiles[1].Path, file2.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(0).Path, file1.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(1).Path, file2.Path);
     }
 
     [Fact]
     public async Task RunAsync_RunTwice_ProcessOnce()
     {
-        var file1 = AddSourceFile();
+        AddSourceFile();
         SetValidDestination();
 
         var t1 = Model.RunAsync();
@@ -259,7 +260,7 @@ public class EncoderServiceTests
     [Fact]
     public async Task RunAsync_EmptyFolder_CompleteFilesEmpty()
     {
-        var folder1 = AddSourceFolder(1);
+        AddSourceFolder(1);
         SetValidDestination();
 
         await Model.RunAsync();
@@ -277,7 +278,7 @@ public class EncoderServiceTests
         await Model.RunAsync();
 
         Assert.Single(Model.ProcessingFiles);
-        Assert.Equal(_model.ProcessingFiles[0].Path, file1.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(0).Path, file1.Path);
     }
 
     [Fact]
@@ -291,8 +292,8 @@ public class EncoderServiceTests
         await Model.RunAsync();
 
         Assert.Equal(2, Model.ProcessingFiles.Count);
-        Assert.Equal(_model.ProcessingFiles[0].Path, file1.Path);
-        Assert.Equal(_model.ProcessingFiles[1].Path, file2.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(0).Path, file1.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(1).Path, file2.Path);
     }
 
 
@@ -308,8 +309,8 @@ public class EncoderServiceTests
         await Model.RunAsync();
 
         Assert.Equal(2, Model.ProcessingFiles.Count);
-        Assert.Equal(_model.ProcessingFiles[0].Path, file1.Path);
-        Assert.Equal(_model.ProcessingFiles[1].Path, file2.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(0).Path, file1.Path);
+        Assert.Equal(_model.ProcessingFiles.ElementAt(1).Path, file2.Path);
     }
 
     [Theory]
@@ -480,7 +481,7 @@ public class EncoderServiceTests
         Model.FileExistsAction = FileExistsAction.Ask;
         MockDialogManager.Setup(x =>
                 x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
-            .Callback<INotifyPropertyChanged, IModalDialogViewModel>((INotifyPropertyChanged owner, IModalDialogViewModel viewModel) =>
+            .Callback((INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
             {
                 var vm = (AskFileActionViewModel)viewModel;
                 vm.Items.SelectedValue = FileExistsAction.Cancel;
@@ -501,7 +502,7 @@ public class EncoderServiceTests
         Model.FileExistsAction = FileExistsAction.Ask;
         MockDialogManager.Setup(x =>
                 x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
-            .Callback<INotifyPropertyChanged, IModalDialogViewModel>((owner, viewModel) =>
+            .Callback<INotifyPropertyChanged, IModalDialogViewModel>((_, viewModel) =>
             {
                 var vm = (AskFileActionViewModel)viewModel;
                 vm.Items.SelectedValue = FileExistsAction.Overwrite;
@@ -516,8 +517,8 @@ public class EncoderServiceTests
     [Fact]
     public async Task RunAsync_TwoFiles_BassEncoderCalledTwice()
     {
-        var file1 = AddSourceFile(1);
-        var file2 = AddSourceFile(2);
+        AddSourceFile(1);
+        AddSourceFile(2);
         SetValidDestination();
 
         await Model.RunAsync();
@@ -527,5 +528,179 @@ public class EncoderServiceTests
             Times.Exactly(2));
     }
 
+    [Fact]
+    public async Task RunAsync_CancelFirst_DoNotProcessSecond()
+    {
+        AddSourceFile(1);
+        AddSourceFile(2);
+        SetValidDestination();
+
+        var t1 = Model.RunAsync();
+        Model.Cancel();
+        await t1;
+
+        Assert.Single(Model.ProcessingFiles);
+        Assert.Equal(EncodeStatus.Cancelled, Model.ProcessingFiles.First().Status);
+    }
     
+    [Fact]
+    public async Task RunAsync_Cancel_DeleteFile()
+    {
+        AddSourceFile(1);
+        SetValidDestination();
+
+        var t1 = Model.RunAsync();
+        Model.Cancel();
+        await t1;
+
+        var proc = Model.ProcessingFiles.Single();
+        Assert.False(_fakeFileSystem.File.Exists(proc.Destination));
+    }
+    
+    [Fact]
+    public async Task RunAsync_MultiThreaded_ProcessAll()
+    {
+        for (var i = 0; i < 20; i++)
+        {
+            AddSourceFile(i);
+        }
+        SetValidDestination();
+        Model.Settings.MaxThreads = 8;
+
+        await Model.RunAsync();
+
+        Assert.Equal(20, Model.ProcessingFiles.Count);
+        Assert.All(Model.ProcessingFiles, x =>
+        {
+            Assert.Equal(EncodeStatus.Completed, x.Status);
+        });
+    }
+    
+    [Fact]
+    public async Task RunAsync_MultiThreaded_AskActionOnce()
+    {
+        SetValidDestination();
+        for (var i = 0; i < 4; i++)
+        {
+            var file = AddSourceFile(i);
+            await CreateFileAsync(file.RelativePath);
+        }
+        Model.Settings.MaxThreads = 8;
+        Model.FileExistsAction = FileExistsAction.Ask;
+        var callCount = 0;
+        MockDialogManager.Setup(x =>
+                x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
+            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
+            {
+                callCount++;     
+                await Task.Delay(1000);
+            });
+        
+        var t1 = Model.RunAsync();
+        await Task.Delay(200);
+
+        Assert.Equal(1, callCount);
+        Model.Cancel();
+    }
+    
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task RunAsync_MultiThreadedCancelFirst_DoNotAskAgain(bool applyToAll)
+    {
+        SetValidDestination();
+        for (var i = 0; i < 14; i++)
+        {
+            var file = AddSourceFile(i);
+            await CreateFileAsync(file.RelativePath);
+        }
+        Model.Settings.MaxThreads = 8;
+        Model.FileExistsAction = FileExistsAction.Ask;
+        var callCount = 0;
+        MockDialogManager.Setup(x =>
+                x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
+            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
+            {
+                callCount++;
+                await Task.Delay(200);
+                var vm = (AskFileActionViewModel)viewModel;
+                vm.Items.SelectedValue = FileExistsAction.Cancel;
+                vm.ApplyToAll = applyToAll;
+                vm.DialogResult = true;
+            });
+        
+        await Model.RunAsync();
+
+        Assert.Equal(1, callCount);
+        Assert.True(Model.ProcessingFiles.Count > 1);
+        Assert.All(Model.ProcessingFiles, x =>
+        {
+            _output.WriteLine(x.Status.ToString());
+            Assert.Equal(EncodeStatus.Cancelled, x.Status);
+        });
+    }
+    
+    [Fact]
+    public async Task RunAsync_MultiThreadedCancel_DoNotDeleteExistingFiles()
+    {
+        SetValidDestination();
+        for (var i = 0; i < 4; i++)
+        {
+            var file = AddSourceFile(i);
+            await CreateFileAsync(file.RelativePath);
+        }
+        Model.Settings.MaxThreads = 8;
+        Model.FileExistsAction = FileExistsAction.Ask;
+        MockDialogManager.Setup(x =>
+                x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
+            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
+            {
+                await Task.Delay(100);
+                var vm = (AskFileActionViewModel)viewModel;
+                vm.Items.SelectedValue = FileExistsAction.Cancel;
+                vm.DialogResult = true;
+            });
+        
+        await Model.RunAsync();
+
+        for (var i = 0; i < 4; i++)
+        {
+            Assert.True(_fakeFileSystem.File.Exists($"/Output/File{i}.mp3"));
+        }
+    }
+    
+    [Fact]
+    public async Task RunAsync_MultiThreadedSkipAll_DoNotAskAgain()
+    {
+        SetValidDestination();
+        for (var i = 0; i < 4; i++)
+        {
+            var file = AddSourceFile(i);
+            await CreateFileAsync(file.RelativePath);
+        }
+        Model.Settings.MaxThreads = 8;
+        Model.FileExistsAction = FileExistsAction.Ask;
+        var callCount = 0;
+        MockDialogManager.Setup(x =>
+                x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
+            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
+            {
+                callCount++;
+                _output.WriteLine("ShowAskFileAction");
+                await Task.Delay(100);
+                var vm = (AskFileActionViewModel)viewModel;
+                vm.Items.SelectedValue = FileExistsAction.Skip;
+                vm.ApplyToAll = true;
+                vm.DialogResult = true;
+            });
+        
+        await Model.RunAsync();
+
+        Assert.Equal(1, callCount);
+        Assert.All(Model.ProcessingFiles, x =>
+        {
+            _output.WriteLine(x.Status.ToString());
+            Assert.Equal(EncodeStatus.Skip, x.Status);
+        });
+    }
 }

@@ -9,41 +9,6 @@ namespace HanumanInstitute.Converter432hz.Business;
 /// </summary>
 public static class DialogServiceExtensions
 {
-    private static SemaphoreSlim _semaphoreAskFileAction = new SemaphoreSlim(1, 1);
-
-    /// <summary>
-    /// Shows the AskFileAction dialog.
-    /// </summary>
-    /// <param name="service">The IDialogService on which to attach the extension method.</param>
-    /// <param name="ownerViewModel">A view model that represents the owner window of the dialog.</param>
-    /// <param name="filePath">The path to the existing file.</param>
-    /// <returns>The selected action, or Skip if the dialog was closed.</returns>
-    public static async Task<AskFileActionViewModel> ShowAskFileActionAsync(this IDialogService service,
-        INotifyPropertyChanged ownerViewModel, string filePath, CancellationToken cancellationToken = default)
-    {
-        // Allow a single instance at the same time.
-        await _semaphoreAskFileAction.WaitAsync(cancellationToken);
-
-        try
-        {
-            var vm = service.CreateViewModel<AskFileActionViewModel>();
-            vm.FilePath = filePath;
-            if (cancellationToken.IsCancellationRequested)
-            {
-                vm.Items.SelectedValue = FileExistsAction.Cancel;
-            }
-            else
-            {
-                await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false);
-            }
-            return vm;
-        }
-        finally
-        {
-            _semaphoreAskFileAction.Release();
-        }
-    }
-
     /// <summary>
     /// Shows the AdvancedSettings dialog.
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Validation.Abstractions;
 
@@ -33,6 +34,10 @@ public interface IEncoderService : IReactiveObject, IValidatableViewModel
     /// Gets or sets whether encoding is in progress.
     /// </summary>
     bool IsProcessing { get; }
+    /// <summary>
+    /// Gets or sets the delay in milliseconds between the start of new threads.
+    /// </summary>
+    int DelayBeforeStart { get; set; }
     /// <summary>
     /// Gets the list of completed files.
     /// </summary>

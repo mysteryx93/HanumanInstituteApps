@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Windows.Input;
+using DynamicData;
+using DynamicData.Aggregation;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -43,12 +46,32 @@ public class MainViewModel : ReactiveObject
             .BindTo(this, x => x.FileExistsActionList.SelectedValue);
         this.WhenAnyValue(x => x.FileExistsActionList.SelectedValue)
             .BindTo(this, x => x.Encoder.FileExistsAction);
-        
-        _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
-            .ToProperty(this, x => x.IsQualitySpeedVisible);
+
+        _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
+            .ToProperty(this, x => x.IsBitrateVisible);
         _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
             .ToProperty(this, x => x.IsSampleRateVisible);
+        _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
+            .ToProperty(this, x => x.IsQualitySpeedVisible);
+        
+        // FilesCompletedCount = Encoder.ProcessingFiles.Connect().Filter(x => x.Status == EncodeStatus.Completed).Count();
+        // var combined = new SourceList<IObservable<int>>();
+        // var sourceObserve = Encoder.Sources.Connect();
+        // combined.Add(sourceObserve.Filter(x => x is not FolderItem).Count());
+        // combined.Add(SumEx.Sum(sourceObserve.Filter(x => x is FolderItem), x =>((FolderItem)x).Files.Count));
     }
+
+    /// <summary>
+    /// Gets whether Bitrate control should be visible.
+    /// </summary>
+    public bool IsBitrateVisible =>  _isBitrateVisible.Value;  
+    private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
+    
+    /// <summary>
+    /// Gets whether SampleRate control should be visible.
+    /// </summary>
+    public bool IsSampleRateVisible =>  _isSampleRateVisible.Value;  
+    private readonly ObservableAsPropertyHelper<bool> _isSampleRateVisible;
 
     /// <summary>
     /// Gets whether QualitySpeed slider should be visible.
@@ -56,12 +79,11 @@ public class MainViewModel : ReactiveObject
     public bool IsQualitySpeedVisible =>  _isQualitySpeedVisible.Value;  
     private readonly ObservableAsPropertyHelper<bool> _isQualitySpeedVisible;
 
-    /// <summary>
-    /// Gets whether SampleRate control should be visible.
-    /// </summary>
-    public bool IsSampleRateVisible =>  _isSampleRateVisible.Value;  
-    private readonly ObservableAsPropertyHelper<bool> _isSampleRateVisible;
-
+    // /// <summary>
+    // /// Gets the quantity of files completed.
+    // /// </summary>
+    // public IObservable<int> FilesCompletedCount { get; }
+    
     /// <summary>
     /// The encoder service.
     /// </summary>
@@ -144,7 +166,7 @@ public class MainViewModel : ReactiveObject
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
-        { EncodeFormat.Wav, "WAV" },
+        // { EncodeFormat.Wav, "WAV" }, Not currently working.
         { EncodeFormat.Flac, "FLAC" },
         { EncodeFormat.Ogg, "OGG" },
         { EncodeFormat.Opus, "OPUS" }

@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Avalonia.Threading;
-using DynamicData.Binding;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI.Validation.Helpers;
@@ -57,7 +55,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     // }
 
     /// <inheritdoc />
-    public ObservableCollection<FileItem> Sources { get; } = new ObservableCollectionExtended<FileItem>();
+    public ObservableCollection<FileItem> Sources { get; } = new();
 
     /// <inheritdoc />
     [Reactive]
@@ -65,7 +63,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
 
     /// <inheritdoc />
     [Reactive]
-    public EncodeSettings Settings { get; set; } = new EncodeSettings();
+    public EncodeSettings Settings { get; set; } = new();
 
     /// <inheritdoc />
     [Reactive]
@@ -76,7 +74,11 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     public bool IsProcessing { get; set; }
 
     /// <inheritdoc />
-    public ObservableCollection<ProcessingItem> ProcessingFiles { get; } = new ObservableCollection<ProcessingItem>();
+    [Reactive]
+    public int DelayBeforeStart { get; set; } = 100;
+
+    /// <inheritdoc />
+    public ObservableCollection<ProcessingItem> ProcessingFiles { get; } = new();
 
     /// <inheritdoc />
     public async Task RunAsync()
@@ -133,7 +135,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     private async Task EncodeJobAsync(CancellationToken cancellationToken = default)
     {
         var pool = new List<Task>();
-        
+
         var source = Sources.FirstOrDefault();
         while (source != null)
         {
@@ -181,7 +183,8 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             }
             else
             {
-                await Task.Delay(100, CancellationToken.None);
+                // If OperationCanceledException is thrown here it won't be caught.
+                await Task.Delay(DelayBeforeStart, CancellationToken.None);
             }
             lock (pool)
             {
@@ -198,18 +201,37 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     private async Task EncodeFileAsync(FileItem fileItem, CancellationToken cancellationToken = default)
     {
         var file = new ProcessingItem(fileItem);
-        await SetDestination(file, cancellationToken).ConfigureAwait(false);
-
-        await _dispatcher.InvokeAsync(() => ProcessingFiles.Add(file)).ConfigureAwait(false);
-
-        if (file.Status != EncodeStatus.None || string.IsNullOrEmpty(file.Destination))
+        try
         {
-            return;
-        }
-        file.Status = EncodeStatus.Processing;
+            await _dispatcher.InvokeAsync(() => ProcessingFiles.Add(file)).ConfigureAwait(false);
 
-        await _bassEncoder.StartAsync(file, Settings, cancellationToken);
-        file.ProgressPercent = 0;
+            await SetDestination(file, cancellationToken).ConfigureAwait(false);
+
+            if (file.Status != EncodeStatus.None || string.IsNullOrEmpty(file.Destination))
+            {
+                return;
+            }
+            file.Status = EncodeStatus.Processing;
+            file.IsFileCreated = true;
+
+            await _bassEncoder.StartAsync(file, Settings, cancellationToken);
+            file.ProgressPercent = 0;
+        }
+        catch (OperationCanceledException)
+        {
+            file.Status = EncodeStatus.Cancelled;
+        }
+        catch (Exception)
+        {
+            file.Status = EncodeStatus.Error;
+        }
+        finally
+        {
+            if (file.IsFileCreated && (file.Status == EncodeStatus.Cancelled || file.Status == EncodeStatus.Error))
+            {
+                _fileSystem.DeleteFileSilent(file.Destination);
+            }
+        }
     }
 
     /// <summary>
@@ -222,58 +244,99 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
         var destPath = _fileSystem.Path.Combine(Destination, item.RelativePath);
         destPath = ChangeExtension(destPath, Settings.Format);
         var destExists = _fileSystem.File.Exists(destPath);
-        if (!destExists)
+        item.Destination = destPath;
+        if (destExists && FileExistsAction == FileExistsAction.Ask)
         {
-            item.Destination = destPath;
+            await ShowAskFileActionUnique(item, cancellationToken);
         }
-        else if (FileExistsAction == FileExistsAction.Ask)
+        else if (destExists)
         {
-            var actionVm = await _dialogService.ShowAskFileActionAsync(Owner, destPath, cancellationToken);
-            if (actionVm.DialogResult == true && actionVm.ApplyToAll)
+            ApplyFileExistsAction(item, FileExistsAction, cancellationToken);
+        }
+    }
+
+    private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
+    /// <summary>
+    /// Shows the AskFileAction dialog only once even if there are multiple threads.
+    /// Applies the action before releasing the semaphore. 
+    /// </summary>
+    /// <param name="item">The file to process.</param>
+    /// <param name="cancellationToken"></param>
+    private async Task ShowAskFileActionUnique(ProcessingItem item, CancellationToken cancellationToken)
+    {
+        // Allow a single instance at the same time.
+        await _semaphore.WaitAsync(cancellationToken);
+        
+        try
+        {
+            // A first dialog can be applied to all, don't show another dialog.
+            if (FileExistsAction != FileExistsAction.Ask || cancellationToken.IsCancellationRequested)
             {
-                FileExistsAction = actionVm.Action;
+                ApplyFileExistsAction(item, FileExistsAction, cancellationToken);
+                return;
             }
-            ApplyFileExistsAction(item, destPath, actionVm.Action);
+        
+            var vm = _dialogService.CreateViewModel<AskFileActionViewModel>();
+            // if (cancellationToken.IsCancellationRequested)
+            // {
+            //     vm.Items.SelectedValue = FileExistsAction.Cancel;
+            // }
+            // else
+            // {
+                await _dialogService.ShowDialogAsync(Owner, vm).ConfigureAwait(false);
+            // }
+
+            // Cancel action must be applied before semaphore is released to avoid showing an extra dialog.
+            if (vm.DialogResult == true && vm.ApplyToAll)
+            {
+                FileExistsAction = vm.Action;
+            }
+            ApplyFileExistsAction(item, vm.Action, cancellationToken);
         }
-        else
+        finally
         {
-            ApplyFileExistsAction(item, destPath, FileExistsAction);
+            _semaphore.Release();
         }
     }
 
     private string ChangeExtension(string path, EncodeFormat format)
     {
-        return _fileSystem.GetPathWithoutExtension(path) + 
-            format switch
-        {
-            EncodeFormat.Mp3 => ".mp3",
-            EncodeFormat.Flac => ".flac",
-            EncodeFormat.Ogg => ".ogg",
-            EncodeFormat.Opus => ".opus",
-            EncodeFormat.Wav => ".wav",
-            _ => ""
-        };
+        return _fileSystem.GetPathWithoutExtension(path) +
+               format switch
+               {
+                   EncodeFormat.Mp3 => ".mp3",
+                   EncodeFormat.Flac => ".flac",
+                   EncodeFormat.Ogg => ".ogg",
+                   EncodeFormat.Opus => ".opus",
+                   EncodeFormat.Wav => ".wav",
+                   _ => ""
+               };
     }
 
-    private void ApplyFileExistsAction(ProcessingItem item, string destPath, FileExistsAction action)
+    private void ApplyFileExistsAction(ProcessingItem item, FileExistsAction action, CancellationToken cancellationToken)
     {
-        if (action == FileExistsAction.Cancel)
+        if (cancellationToken.IsCancellationRequested)
+        {
+            item.Status = EncodeStatus.Cancelled;
+        }
+        else if (action == FileExistsAction.Cancel)
         {
             item.Status = EncodeStatus.Cancelled;
             Cancel();
         }
         else if (action == FileExistsAction.Overwrite)
         {
-            item.Destination = destPath;
         }
         else if (action == FileExistsAction.Skip || action == FileExistsAction.Ask)
         {
             item.Status = EncodeStatus.Skip;
+            item.Destination = string.Empty;
         }
         else if (action == FileExistsAction.Rename)
         {
-            var destPathFile = _fileSystem.GetPathWithoutExtension(destPath);
-            var destPathExt = _fileSystem.Path.GetExtension(destPath);
+            var destPathFile = _fileSystem.GetPathWithoutExtension(item.Destination);
+            var destPathExt = _fileSystem.Path.GetExtension(item.Destination);
             var destPathRename = string.Empty;
             var i = 1;
             do

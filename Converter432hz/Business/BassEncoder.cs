@@ -83,7 +83,7 @@ public class BassEncoder : IBassEncoder
             }
 
             // Create encoder.
-            var options = GetOptions(settings, bitrate, tags);
+            var options = GetOptions(settings, bitrate, chanInfo, tags);
             var flags = EncodeFlags.ConvertFloatTo8BitInt | EncodeFlags.Dither | EncodeFlags.AutoFree;
             var encHandle = settings.Format switch
             {
@@ -128,10 +128,17 @@ public class BassEncoder : IBassEncoder
     /// </summary>
     /// <param name="settings">The encoding settings.</param>
     /// <param name="sourceBitrate">The bitrate of the source.</param>
+    /// <param name="chanInfo">Information about the media channel.</param>
     /// <param name="tags">A class to read media tags.</param>
-    private string GetOptions(EncodeSettings settings, int sourceBitrate, TagsReader tags)
+    private string GetOptions(EncodeSettings settings, int sourceBitrate, ChannelInfo chanInfo, TagsReader tags)
     {
         var bitrate = settings.Bitrate > 0 ? settings.Bitrate : sourceBitrate;
+        // Limit MONO at 192kbps (OGG won't support it, and there's no reason to use higher). 
+        if (chanInfo.Channels == 1 && bitrate > 192)
+        {
+            bitrate = 192;
+        }
+
         return settings.Format switch
         {
             EncodeFormat.Mp3 => $"--abr {bitrate} -q {settings.Mp3QualitySpeed} --add-id3v2"

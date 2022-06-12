@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         mc:Ignorable="d" CanResize="False"
         x:Class="HanumanInstitute.Converter432hz.Views.AskFileActionView"
-        Title="File Conflict" Width="380" Height="255"
+        Title="File Conflict" Width="380" Height="255" 
         d:DataContext="{x:Static local:ViewModelLocator.AskFileAction}">
     <Grid Classes="GradiantBackground">
         <Grid Margin="10">

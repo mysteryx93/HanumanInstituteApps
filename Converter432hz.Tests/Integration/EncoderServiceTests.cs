@@ -86,7 +86,7 @@ public class EncoderServiceTests
         await Model.RunAsync();
     
         Assert.Equal(2, Model.ProcessingFiles.Count);
-        Assert.Equal(EncodeStatus.Completed, Model.ProcessingFiles[0].Status);
-        Assert.Equal(EncodeStatus.Completed, Model.ProcessingFiles[1].Status);
+        Assert.Equal(EncodeStatus.Completed, Model.ProcessingFiles.ElementAt(0).Status);
+        Assert.Equal(EncodeStatus.Completed, Model.ProcessingFiles.ElementAt(1).Status);
     }
 }

@@ -7,7 +7,7 @@
         x:Class="HanumanInstitute.Converter432hz.Views.MainView"
         mc:Ignorable="d"
         Title="432hz Batch Converter" Icon="/Assets/App.ico"
-        MinHeight="350" MinWidth="560"
+        MinHeight="350" MinWidth="570"
         hic:SizeExtension.TrackSize="True"
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
@@ -35,7 +35,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Column="0" Grid.Row="0">
                 <Grid>
-                    <TextBlock VerticalAlignment="Center" FontSize="16">Sources</TextBlock>
+                    <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="DemiBold">Sources</TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,2">
                         <Button Classes="round" Width="85" Command="{Binding AddFiles}">Add Files</Button>
                         <Button Classes="round" Width="85" Command="{Binding AddFolder}">Add Folder</Button>
@@ -50,7 +50,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <TextBlock FontSize="16" Margin="0,10,0,2">Destination Folder</TextBlock>
+                <TextBlock FontSize="16" FontWeight="DemiBold" Margin="0,10,0,2">Destination Folder</TextBlock>
                 <Grid IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -61,7 +61,10 @@
                 </Grid>
             </StackPanel>
             <Grid Grid.Column="0" Grid.Row="1">
-                <TextBlock FontSize="16">Processing</TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
+                    <!-- <TextBlock FontSize="16" Text=" (5 / 18 completed)" /> -->
+                </StackPanel>
                 <DataGrid Classes="NoSelect" Margin="0,20,0,0" CanUserSortColumns="False" RowHeight="24"
                           HeadersVisibility="None"
                           Items="{Binding Encoder.ProcessingFiles}">
@@ -86,24 +89,27 @@
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,0,0">
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
-                    <TextBlock FontSize="16" Margin="0,0,0,10">Settings</TextBlock>
+                    <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold">Settings</TextBlock>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
                         <ComboBox HorizontalAlignment="Right" Width="100" Classes="compact"
                                   Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
-                    <Grid Margin="0,2,0,2">
-                        <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
-                        <ComboBox HorizontalAlignment="Right" Width="100" Classes="compact"
-                                  Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
-                        </ComboBox>
+                    <Grid Margin="0,2,0,2" Height="24">
+                        <Grid IsVisible="{Binding IsBitrateVisible}">
+                            <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
+                            <ComboBox HorizontalAlignment="Right" Width="100" Classes="compact"
+                                      Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
+                            </ComboBox>
+                        </Grid>
                     </Grid>
                     <Grid Margin="0,2,0,2" Height="24">
                         <Grid IsVisible="{Binding IsSampleRateVisible}">
                             <TextBlock VerticalAlignment="Center">Sample rate</TextBlock>
                             <ComboBox HorizontalAlignment="Right" Width="100" Classes="compact"
-                                      Items="{Binding SampleRateList}" SelectedItem="{Binding SampleRateList.CurrentItem}">
+                                      Items="{Binding SampleRateList}"
+                                      SelectedItem="{Binding SampleRateList.CurrentItem}">
                             </ComboBox>
                         </Grid>
                     </Grid>
@@ -118,7 +124,9 @@
                         </Grid>
                     </Grid>
                     <Button Classes="round" Width="100" HorizontalAlignment="Center" Margin="0,5"
-                            Command="{Binding ShowAdvancedSettings}">Advanced</Button>
+                            Command="{Binding ShowAdvancedSettings}">
+                        Advanced
+                    </Button>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">

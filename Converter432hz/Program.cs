@@ -1,5 +1,4 @@
 ﻿using Avalonia.ReactiveUI;
-using HanumanInstitute.Common.Avalonia.App;
 
 namespace HanumanInstitute.Converter432hz;
 
@@ -9,9 +8,6 @@ public class Program
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
-    // [STAThread]
-    // public static void Main(string[] args) => AppStarter.Start<App>(args);
-
     [STAThread]
     public static void Main(string[] args) => BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);

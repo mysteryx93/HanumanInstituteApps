@@ -27,6 +27,12 @@ public class ProcessingItem : FileItem
     public string Destination { get; set; } = string.Empty;
     
     /// <summary>
+    /// Gets or sets whether the destination file has been created by the encoder.
+    /// </summary>
+    [Reactive]
+    public bool IsFileCreated { get; set; }
+    
+    /// <summary>
     /// Gets or sets the status of the encoding operation.
     /// </summary>
     [Reactive]
