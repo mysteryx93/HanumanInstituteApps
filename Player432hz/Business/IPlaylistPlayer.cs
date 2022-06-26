@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using HanumanInstitute.Player432hz.Models;
 
 namespace HanumanInstitute.Player432hz.Business;
 
@@ -21,6 +20,10 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// Gets the display title of the file currently playing.
     /// </summary>
     string NowPlayingTitle { get; set; }
+    
+    double Pitch { get; }
+    
+    double PitchFrom { get; set; }
     /// <summary>
     /// Starts the playback of specified list of media files.
     /// </summary>

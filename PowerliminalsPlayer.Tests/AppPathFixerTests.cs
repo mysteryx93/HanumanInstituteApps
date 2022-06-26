@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
@@ -6,7 +7,6 @@ using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.MvvmDialogs.DialogTypeLocators;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
@@ -55,29 +55,29 @@ public class AppPathFixerTests
     protected void SetMessageBoxResult(bool? result)
     {
         MockDialogManager.Setup(x =>
-                x.ShowFrameworkDialogAsync<MessageBoxSettings, bool?>(Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>()))
+                x.ShowFrameworkDialogAsync(Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<bool?,string>>()))
             .ReturnsAsync(result);
     }
 
     protected void SetOpenFolderResult(string result, bool? nextPromptResult = null)
     {
         MockDialogManager.Setup(x =>
-                x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string>(Owner, It.IsAny<OpenFolderDialogSettings>(),
-                    It.IsAny<AppDialogSettingsBase>()))
+                x.ShowFrameworkDialogAsync(Owner, It.IsAny<OpenFolderDialogSettings>(),
+                    It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()))
             .ReturnsAsync(result)
             .Callback(() => SetMessageBoxResult(nextPromptResult));
     }
 
     protected void VerifyMessageBox(Times times)
     {
-        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync<MessageBoxSettings, bool?>(
-            Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>()), times);
+        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync(
+            Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<bool?,string>>()), times);
     }
 
     protected void VerifyOpenFolder(Times times)
     {
-        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string>(
-            Owner, It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()), times);
+        MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync(
+            Owner, It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()), times);
     }
 
     [Fact]

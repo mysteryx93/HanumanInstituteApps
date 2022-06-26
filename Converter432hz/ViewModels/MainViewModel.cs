@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
@@ -53,13 +54,23 @@ public class MainViewModel : ReactiveObject
             .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
-        
+
+        FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Select(x => x switch
+        {
+            IChangeSet<FolderItem> folder => folder.Select(f => f.Item.Current.Files.Count).Sum(),
+            _ => 1
+        }).Sum();
+        this.WhenAnyObservable(x => x.FilesLeftObservable).ToProperty(this, x => x.FilesLeft);
         // FilesCompletedCount = Encoder.ProcessingFiles.Connect().Filter(x => x.Status == EncodeStatus.Completed).Count();
         // var combined = new SourceList<IObservable<int>>();
         // var sourceObserve = Encoder.Sources.Connect();
         // combined.Add(sourceObserve.Filter(x => x is not FolderItem).Count());
         // combined.Add(SumEx.Sum(sourceObserve.Filter(x => x is FolderItem), x =>((FolderItem)x).Files.Count));
     }
+
+    public int FilesLeft { get; private set; }
+    
+    public IObservable<int> FilesLeftObservable { get; private set; }
 
     /// <summary>
     /// Gets whether Bitrate control should be visible.
@@ -104,10 +115,11 @@ public class MainViewModel : ReactiveObject
 
     [Reactive] public int SourcesSelectedIndex { get; set; }
 
-    public ICommand AddFiles => _addFiles ??= ReactiveCommand.Create(AddFilesImpl);
+    public ICommand AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
     private ICommand? _addFiles;
     private async Task AddFilesImpl()
     {
+        // throw new NotSupportedException();
         var settings = new OpenFileDialogSettings()
         {
             Title = "Select files to convert",
@@ -124,7 +136,7 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public ICommand AddFolder => _addFolder ??= ReactiveCommand.Create(AddFolderImpl);
+    public ICommand AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
     private ICommand? _addFolder;
     private async Task AddFolderImpl()
     {
@@ -151,7 +163,7 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public ICommand BrowseDestination => _browseDestination ??= ReactiveCommand.Create(BrowseDestinationImpl);
+    public ICommand BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
     private ICommand? _browseDestination;
     private async Task BrowseDestinationImpl()
     {
@@ -166,7 +178,7 @@ public class MainViewModel : ReactiveObject
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
-        // { EncodeFormat.Wav, "WAV" }, Not currently working.
+        { EncodeFormat.Wav, "WAV" },
         { EncodeFormat.Flac, "FLAC" },
         { EncodeFormat.Ogg, "OGG" },
         { EncodeFormat.Opus, "OPUS" }
@@ -201,7 +213,7 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the advanced settings window.
     /// </summary>
-    public ICommand ShowAdvancedSettings => _showAdvancedSettings ??= ReactiveCommand.Create(ShowAdvancedSettingsImpl);
+    public ICommand ShowAdvancedSettings => _showAdvancedSettings ??= ReactiveCommand.CreateFromTask(ShowAdvancedSettingsImpl);
     private ICommand? _showAdvancedSettings;
     private Task ShowAdvancedSettingsImpl() =>
         _dialogService.ShowAdvancedSettingsAsync(this, Encoder.Settings);
@@ -209,7 +221,7 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Starts the batch encoding job.
     /// </summary>
-    public ICommand StartEncoding => _startEncoding ??= ReactiveCommand.Create(StartEncodingImpl);
+    public ICommand StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImpl);
     private ICommand? _startEncoding;
     private Task StartEncodingImpl()
     {

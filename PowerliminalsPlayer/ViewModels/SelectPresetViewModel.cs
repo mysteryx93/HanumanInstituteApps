@@ -11,7 +11,7 @@ using ICloseable = HanumanInstitute.MvvmDialogs.ICloseable;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
-public class SelectPresetViewModel : ViewModelBase, ICloseable, IModalDialogViewModel
+public class SelectPresetViewModel : ReactiveObject, ICloseable, IModalDialogViewModel
 {
     private readonly ISettingsProvider<AppSettingsData> _appSettings;
     public AppSettingsData AppData => _appSettings.Value;

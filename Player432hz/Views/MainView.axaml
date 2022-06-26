@@ -14,8 +14,8 @@
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
-        xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
+        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         hic:SizeExtension.TrackSize="True" 
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
@@ -84,7 +84,7 @@
             <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False">
                 <bass:BassPlayerHost Source="{Binding Player.NowPlaying, Mode=OneWay}"
                                      Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}"
-                                     Pitch="0.98181818181818181" EffectsFloat="True" EffectsSampleRateConversion="4"
+                                     Pitch="{Binding Player.Pitch}" EffectsFloat="True" EffectsSampleRateConversion="4"
                                      Volume="{Binding ViewModel.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <i:Interaction.Behaviors>
                         <ia:EventTriggerBehavior EventName="MediaFinished">

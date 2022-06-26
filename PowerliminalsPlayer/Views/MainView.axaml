@@ -8,17 +8,15 @@
         mc:Ignorable="d"
         Title="Powerliminals Player" Width="730" Height="409"  MinWidth="700" MinHeight="200"
         Icon="/Assets/App.ico"
-        xmlns:md="https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
-        xmlns:hic="HanumanInstitute.Common.Avalonia"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
+        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         hic:SizeExtension.TrackSize="True" 
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
         hic:PositionExtension.Enabled="False"
         hic:PositionExtension.Position="{Binding AppData.Position, Mode=TwoWay}"
-        md:DialogServiceViews.IsRegistered="True"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
@@ -46,7 +44,7 @@
                                                        SpeedInt="{Binding Speed, Mode=TwoWay}"
                                                        IsPlaying="{Binding IsPlaying, Mode=TwoWay}"
                                                        PositionRefreshMilliseconds="500" VolumeBoost="0.4"
-                                                       Loop="True" UseEffects="True" EffectsQuick="True">
+                                                       Loop="True" UseEffects="True" EffectsQuick="True" EffectsAntiAlias="True">
                                 </mediab:BassPlayerHost>
                                 <i:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="StopCommandExecuted">

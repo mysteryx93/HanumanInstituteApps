@@ -1,10 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using HanumanInstitute.MvvmDialogs.Avalonia;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
@@ -27,7 +25,6 @@ public abstract class CommonApplication<T> : Application
     {
 #if DEBUG
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
-        GC.KeepAlive(typeof(DialogService));
 #endif
 
         var desktop = DesktopLifetime;

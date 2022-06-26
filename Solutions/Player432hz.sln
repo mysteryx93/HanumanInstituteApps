@@ -28,6 +28,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanumanInstitute.Validators
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BassDlls", "..\DLL\Bass\BassDlls.csproj", "{8DE4FA27-7C24-468B-ADCB-22E2B2522C64}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BassAudio", "..\BassAudio\BassAudio.csproj", "{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BassAudio.Tests", "..\BassAudio.Tests\BassAudio.Tests.csproj", "{91160965-4E5D-48A0-97E2-319444410888}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -200,6 +204,38 @@ Global
 		{8DE4FA27-7C24-468B-ADCB-22E2B2522C64}.Release|x64.Build.0 = Release|Any CPU
 		{8DE4FA27-7C24-468B-ADCB-22E2B2522C64}.Release|x86.ActiveCfg = Release|Any CPU
 		{8DE4FA27-7C24-468B-ADCB-22E2B2522C64}.Release|x86.Build.0 = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|x64.Build.0 = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Debug|x86.Build.0 = Debug|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|x64.ActiveCfg = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|x64.Build.0 = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|x86.ActiveCfg = Release|Any CPU
+		{516A5A4D-87DF-4640-AE8F-8A39DDB52ABC}.Release|x86.Build.0 = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|x64.Build.0 = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Debug|x86.Build.0 = Debug|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|x64.ActiveCfg = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|x64.Build.0 = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|x86.ActiveCfg = Release|Any CPU
+		{91160965-4E5D-48A0-97E2-319444410888}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

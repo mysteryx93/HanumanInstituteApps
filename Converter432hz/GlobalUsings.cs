@@ -7,6 +7,7 @@ global using Avalonia;
 global using HanumanInstitute.Common;
 global using HanumanInstitute.Common.Avalonia;
 global using HanumanInstitute.Common.Services;
+global using HanumanInstitute.BassAudio;
 global using HanumanInstitute.Converter432hz.Business;
 global using HanumanInstitute.Converter432hz.Models;
 global using HanumanInstitute.Converter432hz.ViewModels;

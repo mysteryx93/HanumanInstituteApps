@@ -1,5 +1,4 @@
-﻿using System;
-using Splat;
+﻿using Splat;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 

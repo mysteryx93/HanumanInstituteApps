@@ -10,11 +10,11 @@ using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.MvvmDialogs.DialogTypeLocators;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.PowerliminalsPlayer.Business;
 using HanumanInstitute.PowerliminalsPlayer.Models;
 using HanumanInstitute.PowerliminalsPlayer.ViewModels;
+using HanumanInstitute.Validators;
 using Moq;
 using Xunit;
 
@@ -89,12 +89,12 @@ public class MainViewModelTests
     private MainViewModel _model;
     
     protected void SetDialogManagerOpenFolder(string result) =>
-        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings, string>(
-                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>()))
+        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(
+                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()))
             .Returns(Task.FromResult(result?.ReplaceDirectorySeparator()));
 
     protected void SetDialogManagerLoadPreset(PresetItem result) =>
-        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
             .Returns<INotifyPropertyChanged, IModalDialogViewModel, Type>((_, viewModel, _) =>
             {
                 var vm = (SelectPresetViewModel)viewModel;
@@ -104,7 +104,7 @@ public class MainViewModelTests
             });
     
     protected void SetDialogManagerSavePreset(string result) =>
-        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
             .Returns<INotifyPropertyChanged, IModalDialogViewModel, Type>((_, viewModel, _) =>
             {
                 var vm = (SelectPresetViewModel)viewModel;
@@ -556,7 +556,7 @@ public class MainViewModelTests
         Model.Playlist.Name = presetName;
         Model.AppData.Presets.Add(new PresetItem(presetName));
         SelectPresetViewModel vm = null;
-        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
             .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
             {
                 vm = (SelectPresetViewModel)viewModel;
@@ -677,7 +677,7 @@ public class MainViewModelTests
     public void SavedPresetCommand_NullOrFalse_DoNotSavePreset(bool? dialogResult)
     {
         SelectPresetViewModel vm = null;
-        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>(), It.IsAny<Type>()))
+        MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
             .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
             {
                 vm = (SelectPresetViewModel)viewModel;

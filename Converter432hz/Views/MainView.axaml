@@ -13,7 +13,7 @@
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
-        xmlns:models="clr-namespace:HanumanInstitute.Converter432hz.Models"
+        xmlns:bassAudio="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="Closing">
@@ -63,7 +63,7 @@
             <Grid Grid.Column="0" Grid.Row="1">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
-                    <!-- <TextBlock FontSize="16" Text=" (5 / 18 completed)" /> -->
+                    <TextBlock FontSize="16" Text="{Binding FilesLeft}" />
                 </StackPanel>
                 <DataGrid Classes="NoSelect" Margin="0,20,0,0" CanUserSortColumns="False" RowHeight="24"
                           HeadersVisibility="None"
@@ -73,7 +73,7 @@
                                             IsReadOnly="True" />
                         <DataGridTemplateColumn Width="120">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="models:ProcessingItem">
+                                <DataTemplate x:DataType="bassAudio:ProcessingItem">
                                     <Grid>
                                         <ProgressBar Value="{Binding ProgressPercent, Mode=OneWay}"
                                                      Maximum="1" Height="24" Background="Transparent"

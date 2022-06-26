@@ -1,5 +1,6 @@
 ﻿using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.Player432hz.Business;
@@ -24,6 +25,7 @@ public static class ViewModelLocator
             
         // Services
         container.AddCommonServices();
+        container.AddBassAudio();
         container.Register(() => (IDialogService)new DialogService());
         container.Register(() => (IBassDevice)BassDevice.Instance);
             

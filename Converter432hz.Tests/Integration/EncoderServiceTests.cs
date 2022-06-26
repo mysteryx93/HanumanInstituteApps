@@ -6,6 +6,7 @@ using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Xunit.Abstractions;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Converter432hz.Tests.Integration;
 

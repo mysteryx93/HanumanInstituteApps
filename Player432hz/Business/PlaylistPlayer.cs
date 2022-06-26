@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace HanumanInstitute.Player432hz.Business;
 
@@ -12,10 +12,12 @@ namespace HanumanInstitute.Player432hz.Business;
 /// </summary>
 public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
 {
+    private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
 
-    public PlaylistPlayer(IFileSystemService fileSystem)
+    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem)
     {
+        _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
     }
 
@@ -27,22 +29,27 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
     /// <summary>
     /// Gets the path of the file currently playing.
     /// </summary>
-    public string NowPlaying
-    {
-        get => _nowPlaying;
-        set => this.RaiseAndSetIfChanged(ref _nowPlaying, value, nameof(NowPlaying));
-    }
-    private string _nowPlaying = string.Empty;
+    [Reactive]
+    public string NowPlaying { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the display title of the file currently playing.
     /// </summary>
-    public string NowPlayingTitle
+    [Reactive]
+    public string NowPlayingTitle { get; set; } = string.Empty;
+
+    public double Pitch => 432.0 / PitchFrom;
+
+    public double PitchFrom
     {
-        get => _nowPlayingTitle;
-        set => this.RaiseAndSetIfChanged(ref _nowPlayingTitle, value, nameof(NowPlayingTitle));
+        get => _pitchFrom;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _pitchFrom, value);
+            this.RaisePropertyChanged(nameof(Pitch));
+        }
     }
-    private string _nowPlayingTitle = string.Empty;
+    private double _pitchFrom = 440.0;
 
     private readonly Random _random = new Random();
 
@@ -79,6 +86,9 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
             {
                 pos = _random.Next(Files.Count);
             }
+
+            PitchFrom = _pitchDetector.GetPitch(Files[pos]);
+            
             NowPlaying = string.Empty;
             NowPlaying = Files[pos];
             SetTitle();
@@ -87,6 +97,6 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
 
     private void SetTitle()
     {
-        NowPlayingTitle = !string.IsNullOrEmpty(NowPlaying) ? _fileSystem.Path.GetFileName(NowPlaying) : string.Empty;
+        NowPlayingTitle = !string.IsNullOrEmpty(NowPlaying) ? $"[{PitchFrom:F1}] " + _fileSystem.Path.GetFileName(NowPlaying) : string.Empty;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Avalonia.Threading;
 using HanumanInstitute.Common.Avalonia.App;
-using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;

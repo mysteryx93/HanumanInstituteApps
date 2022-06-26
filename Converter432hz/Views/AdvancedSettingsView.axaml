@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
-        mc:Ignorable="d" Width="350" Height="220"
+        mc:Ignorable="d" MinWidth="350" MinHeight="220" MaxWidth="350" MaxHeight="220"
         x:Class="HanumanInstitute.Converter432hz.Views.AdvancedSettingsView"
         Title="Advanced Settings" CanResize="False" 
         d:DataContext="{x:Static local:ViewModelLocator.AdvancedSettings}">

@@ -1,7 +1,5 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using HanumanInstitute.Player432hz.ViewModels;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz;

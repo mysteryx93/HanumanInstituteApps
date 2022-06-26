@@ -16,7 +16,7 @@ using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class MainViewModel : ReactiveObject
 {
     private readonly IAppPathService _appPath;
     private readonly ISettingsProvider<AppSettingsData> _settings;
