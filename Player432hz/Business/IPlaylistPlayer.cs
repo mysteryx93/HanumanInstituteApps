@@ -20,9 +20,13 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// Gets the display title of the file currently playing.
     /// </summary>
     string NowPlayingTitle { get; set; }
-    
+    /// <summary>
+    /// Gets the media player pitch.
+    /// </summary>
     double Pitch { get; }
-    
+    /// <summary>
+    /// Gets or sets the pitch of the currently-playing file. Used to calculate the Pitch property.
+    /// </summary>
     double PitchFrom { get; set; }
     /// <summary>
     /// Starts the playback of specified list of media files.

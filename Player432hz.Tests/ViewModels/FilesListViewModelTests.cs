@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
 using Xunit;
+
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PossibleUnintendedReferenceComparison
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
@@ -15,14 +20,17 @@ public class FilesListViewModelTests
     public Mock<IPlaylistPlayer> MockPlayer => _mockPlayer ??= new Mock<IPlaylistPlayer>();
     private Mock<IPlaylistPlayer>? _mockPlayer;
 
-    public Mock<IFileSystemService> MockFileSystem => _mockFileSystem ??= SetupFileSystem();
-    private Mock<IFileSystemService>? _mockFileSystem;
+    public Mock<FakeFileSystemService> MockFileSystem => _mockFileSystem ??= SetupFileSystem();
+    private Mock<FakeFileSystemService>? _mockFileSystem;
 
-    public IAppPathService AppPath => _appPath ??= new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object, _mockBassDevice.Object);
+    public IAppPathService AppPath =>
+        _appPath ??= new AppPathService(Mock.Of<IEnvironmentService>(), MockFileSystem.Object, MockBassDevice);
     private IAppPathService? _appPath;
 
-    public Mock<IBassDevice> MockBassDevice => _mockBassDevice ??= new Mock<IBassDevice>();
-    private Mock<IBassDevice> _mockBassDevice;
+    public IBassDevice MockBassDevice => _mockBassDevice ??= Mock.Of<IBassDevice>(x =>
+        x.SupportedExtensions == new List<FileExtension>(new[] { new FileExtension("MP3", new[] { "mp3" }) })
+    );
+    private IBassDevice? _mockBassDevice;
 
     public IFileLocator FileLocator => _fileLocator ??= new FileLocator(AppPath, MockFileSystem.Object);
     private IFileLocator? _fileLocator;
@@ -33,9 +41,9 @@ public class FilesListViewModelTests
     private static IEnumerable<string> PathValue => new[] { "test-path" };
     private static IEnumerable<string> FileList => new[] { "file1", "file2" };
 
-    private static Mock<IFileSystemService> SetupFileSystem()
+    private static Mock<FakeFileSystemService> SetupFileSystem()
     {
-        var result = new Mock<IFileSystemService>();
+        var result = new Mock<FakeFileSystemService>() { CallBase = true };
         result.Setup(
                 x => x.GetFilesByExtensions(It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<SearchOption>()))
             .Returns(FileList);
@@ -66,13 +74,17 @@ public class FilesListViewModelTests
         Assert.Equal(FileList, Model.Files.Source.Select(x => x.Path));
         VerifyGetFiles(Times.Once());
     }
-    
+
     [Fact]
     public void SetPaths_Value_FilesHaveName()
     {
         Model.SetPaths(PathValue);
 
-        Assert.Empty(Model.Files.Source.Select(x => string.IsNullOrEmpty(x.Name)));
+        Assert.All(Model.Files.Source, x =>
+        {
+            Assert.NotNull(x.Name);
+            Assert.NotEmpty(x.Name);
+        });
     }
 
     [Fact]
@@ -90,7 +102,7 @@ public class FilesListViewModelTests
 
         var a = Model.Files.Source;
         var b = Model.Files.Source;
-        
+
         VerifyGetFiles(Times.Once());
         Assert.NotEmpty(a);
         Assert.NotEmpty(b);

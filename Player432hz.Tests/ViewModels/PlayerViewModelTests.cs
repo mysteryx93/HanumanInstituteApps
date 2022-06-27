@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Dynamic;
+using System.Threading.Tasks;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.ViewModels;
+using Moq;
 using Xunit;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
@@ -11,8 +14,18 @@ public class PlayerViewModelTests
     public FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService? _mockFileSystem;
 
-    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockFileSystem);
+    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem);
     private IPlaylistPlayer? _playlistPlayer;
+
+    public Mock<IPitchDetector> MockPitchDetector => _mockPitchDetector ??= CreatePitchDetector();
+    private Mock<IPitchDetector>? _mockPitchDetector;
+    private Mock<IPitchDetector> CreatePitchDetector()
+    {
+        var mock = new Mock<IPitchDetector>();
+        mock.Setup(x => x.GetPitch(It.IsAny<string>())).Returns(440f);
+        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>())).Returns(Task.FromResult(440f));
+        return mock;
+    }
 
     public IPlayerViewModel Model => _model ??= SetupModel();
     private IPlayerViewModel? _model;
@@ -55,7 +68,7 @@ public class PlayerViewModelTests
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName1, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName1, Model.Player.NowPlayingTitle);
         Assert.Equal(1, _nowPlayingChanged);
     }
 
@@ -66,7 +79,7 @@ public class PlayerViewModelTests
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName2, Model.Player.NowPlayingTitle);
         Assert.Equal(1, _nowPlayingChanged);
     }
 
@@ -77,7 +90,7 @@ public class PlayerViewModelTests
 
         Assert.Empty(Model.Player.Files);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName2, Model.Player.NowPlayingTitle);
         Assert.Equal(1, _nowPlayingChanged);
     }
 
@@ -100,7 +113,7 @@ public class PlayerViewModelTests
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName1, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName1, Model.Player.NowPlayingTitle);
         Assert.Equal(3, _nowPlayingChanged);
     }
 
@@ -125,7 +138,7 @@ public class PlayerViewModelTests
 
         Assert.Empty(Model.Player.Files);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName2, Model.Player.NowPlayingTitle);
         Assert.Equal(1, _nowPlayingChanged);
     }
 
@@ -149,7 +162,7 @@ public class PlayerViewModelTests
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
-        Assert.Equal(FileName2, Model.Player.NowPlayingTitle);
+        Assert.EndsWith(FileName2, Model.Player.NowPlayingTitle);
         Assert.Equal(3, _nowPlayingChanged);
     }
 }
