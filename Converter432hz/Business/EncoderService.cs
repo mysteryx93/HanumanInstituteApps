@@ -13,15 +13,15 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
 {
     private readonly IFileSystemService _fileSystem;
     private readonly IDialogService _dialogService;
-    private readonly IBassEncoder _bassEncoder;
+    private readonly IAudioEncoder _audioEncoder;
     private readonly IDispatcher _dispatcher;
     private CancellationTokenSource? _cancelTokenSource;
 
-    public EncoderService(IFileSystemService fileSystem, IDialogService dialogService, IBassEncoder bassEncoder, IDispatcher dispatcher)
+    public EncoderService(IFileSystemService fileSystem, IDialogService dialogService, IAudioEncoder audioEncoder, IDispatcher dispatcher)
     {
         _fileSystem = fileSystem;
         _dialogService = dialogService;
-        _bassEncoder = bassEncoder;
+        _audioEncoder = audioEncoder;
         _dispatcher = dispatcher;
 
         // var sourceNotEmpty = Sources
@@ -214,7 +214,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             file.Status = EncodeStatus.Processing;
             file.IsFileCreated = true;
 
-            await _bassEncoder.StartAsync(file, Settings, cancellationToken);
+            await _audioEncoder.StartAsync(file, Settings, cancellationToken);
             file.ProgressPercent = 0;
         }
         catch (OperationCanceledException)

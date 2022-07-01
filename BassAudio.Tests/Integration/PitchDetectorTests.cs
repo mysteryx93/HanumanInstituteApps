@@ -7,14 +7,10 @@ using Xunit.Abstractions;
 
 namespace HanumanInstitute.BassAudio.Tests.Integration;
 
-public class PitchDetectorTests
+public class PitchDetectorTests : TestsBase
 {
-    public PitchDetectorTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
-    private readonly ITestOutputHelper _output;
+    public PitchDetectorTests(ITestOutputHelper output) : base(output)
+    { }
 
     public PitchDetector Model => _model ??= SetupModel();
     private PitchDetector _model;
@@ -30,6 +26,7 @@ public class PitchDetectorTests
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/INNA/Inna/")]
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/Symphony X - V The New Mythology Suite/")]
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/DJ Project/DJ Project - Experience/")]
+    [InlineData("/run/media/hanuman/Storage-ntfs/Music/Enigma/Enigma - Best of Enigma CD1/")]
     public void DetectPitch(string dir)
     {
         foreach (var file in Directory.GetFiles(dir, "*.mp3"))

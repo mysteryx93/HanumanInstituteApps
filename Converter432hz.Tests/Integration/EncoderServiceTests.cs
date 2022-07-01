@@ -10,20 +10,19 @@ using Xunit.Abstractions;
 
 namespace HanumanInstitute.Converter432hz.Tests.Integration;
 
-public class EncoderServiceTests
+public class EncoderServiceTests : TestsBase
 {
-    public EncoderServiceTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
-    private readonly ITestOutputHelper _output;
+    public EncoderServiceTests(ITestOutputHelper output) : base(output)
+    { }
 
     public EncoderService Model => _model ??= new EncoderService(FileSystem, DialogService, BassEncoder, new FakeDispatcher());
     private EncoderService _model;
     
-    public IBassEncoder BassEncoder => _bassEncoder ??= new BassEncoder(FileSystem);
-    private IBassEncoder _bassEncoder;
+    public IAudioEncoder BassEncoder => _bassEncoder ??= new AudioEncoder(PitchDetector, FileSystem);
+    private IAudioEncoder _bassEncoder;
+
+    public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem);
+    private IPitchDetector _pitchDetector;
 
     public FileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
     private FileSystemService _fileSystem;

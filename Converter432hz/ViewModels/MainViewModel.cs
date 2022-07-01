@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Windows.Input;
-using DynamicData;
-using DynamicData.Aggregation;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -21,11 +18,13 @@ public class MainViewModel : ReactiveObject
     private readonly IFileLocator _fileLocator;
     private readonly IAppPathService _appPath;
     private readonly IEnvironmentService _environment;
+    private readonly IPitchDetector _pitchDetector;
 
     public AppSettingsData AppData => _settings.Value;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IEncoderService encoder, IDialogService dialogService,
-        IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, IEnvironmentService environment)
+        IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, IEnvironmentService environment,
+        IPitchDetector pitchDetector)
     {
         _settings = settings.CheckNotNull(nameof(settings));
         Encoder = encoder;
@@ -35,13 +34,15 @@ public class MainViewModel : ReactiveObject
         _fileLocator = fileLocator;
         _appPath = appPath;
         _environment = environment;
-        
+        _pitchDetector = pitchDetector;
+
         Encoder.Settings.PitchTo = 432;
         Encoder.Settings.MaxThreads = Math.Min(64, _environment.ProcessorCount);
         FormatsList.SelectedValue = EncodeFormat.Mp3;
         BitrateList.SelectedValue = 0;
         SampleRateList.SelectedValue = 48000;
         FileExistsActionList.SelectedValue = FileExistsAction.Ask;
+        SourcesSelectedIndex = -1;
 
         this.WhenAnyValue(x => x.Encoder.FileExistsAction)
             .BindTo(this, x => x.FileExistsActionList.SelectedValue);
@@ -55,12 +56,13 @@ public class MainViewModel : ReactiveObject
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
 
-        FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Select(x => x switch
-        {
-            IChangeSet<FolderItem> folder => folder.Select(f => f.Item.Current.Files.Count).Sum(),
-            _ => 1
-        }).Sum();
-        this.WhenAnyObservable(x => x.FilesLeftObservable).ToProperty(this, x => x.FilesLeft);
+        // FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Transform(x => x switch
+        // {
+        //     IChangeSet<FolderItem> folder => folder.Transform(f => f.Item.Current.Files.Count).Sum(),
+        //     _ => 1
+        // }).Sum();
+        // this.WhenAnyObservable(x => x.FilesLeftObservable).ToProperty(this, x => x.FilesLeft);
+        //
         // FilesCompletedCount = Encoder.ProcessingFiles.Connect().Filter(x => x.Status == EncodeStatus.Completed).Count();
         // var combined = new SourceList<IObservable<int>>();
         // var sourceObserve = Encoder.Sources.Connect();
@@ -69,32 +71,32 @@ public class MainViewModel : ReactiveObject
     }
 
     public int FilesLeft { get; private set; }
-    
+
     public IObservable<int> FilesLeftObservable { get; private set; }
 
     /// <summary>
     /// Gets whether Bitrate control should be visible.
     /// </summary>
-    public bool IsBitrateVisible =>  _isBitrateVisible.Value;  
+    public bool IsBitrateVisible => _isBitrateVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
-    
+
     /// <summary>
     /// Gets whether SampleRate control should be visible.
     /// </summary>
-    public bool IsSampleRateVisible =>  _isSampleRateVisible.Value;  
+    public bool IsSampleRateVisible => _isSampleRateVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isSampleRateVisible;
 
     /// <summary>
     /// Gets whether QualitySpeed slider should be visible.
     /// </summary>
-    public bool IsQualitySpeedVisible =>  _isQualitySpeedVisible.Value;  
+    public bool IsQualitySpeedVisible => _isQualitySpeedVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isQualitySpeedVisible;
 
     // /// <summary>
     // /// Gets the quantity of files completed.
     // /// </summary>
     // public IObservable<int> FilesCompletedCount { get; }
-    
+
     /// <summary>
     /// The encoder service.
     /// </summary>
@@ -125,15 +127,28 @@ public class MainViewModel : ReactiveObject
             Title = "Select files to convert",
             Filters = new List<FileFilter>()
             {
-                new FileFilter("All files", "*"),
-                new FileFilter("Audio files", _appPath.AudioExtensions)
+                new FileFilter("Audio files", _appPath.AudioExtensions),
+                new FileFilter("All files", "*")
             }
         };
-        var files = await _dialogService.ShowOpenFilesDialogAsync(this, null);
-        foreach (var item in files)
+        var files = await _dialogService.ShowOpenFilesDialogAsync(this, settings);
+        var validFiles = files.Where(x => _fileSystem.File.Exists(x)).ToList();
+
+        var items = validFiles.Select(x => new FileItem(x, _fileSystem.Path.GetFileName(x))).ToList();
+        Encoder.Sources.AddRange(items);
+
+        // Auto-detect pitch.
+        await items.ForEachAsync(async x =>
         {
-            Encoder.Sources.Add(new FileItem(item, _fileSystem.Path.GetFileName(item)));
-        }
+            try
+            {
+                x.Pitch = await _pitchDetector.GetPitchAsync(x.Path);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }).ConfigureAwait(false);
     }
 
     public ICommand AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
@@ -153,13 +168,17 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public ICommand RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl);
+    public ICommand RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl, 
+        this.WhenAnyValue(x => x.SourcesSelectedIndex, index => index > -1));
     private ICommand? _removeFile;
     private void RemoveFileImpl()
     {
         if (SourcesSelectedIndex > -1 && SourcesSelectedIndex < Encoder.Sources.Count)
         {
-            Encoder.Sources.RemoveAt(SourcesSelectedIndex);
+            var sel = SourcesSelectedIndex;
+            Encoder.Sources.RemoveAt(sel);
+            SourcesSelectedIndex = -1;
+            SourcesSelectedIndex = sel >= Encoder.Sources.Count ? Encoder.Sources.Count - 1 : sel; 
         }
     }
 
@@ -226,16 +245,16 @@ public class MainViewModel : ReactiveObject
     private Task StartEncodingImpl()
     {
         Encoder.ProcessingFiles.Clear();
-        
+
         Encoder.Settings.Format = FormatsList.SelectedValue;
         Encoder.Settings.Bitrate = BitrateList.SelectedValue;
         Encoder.Settings.SampleRate = SampleRateList.SelectedValue;
         Encoder.FileExistsAction = FileExistsActionList.SelectedValue;
         Encoder.Settings.PitchTo = 432;
-        
-        return Encoder.RunAsync();  
+
+        return Encoder.RunAsync();
     }
-    
+
     /// <summary>
     /// Cancels the batch encoding job.
     /// </summary>

@@ -10,10 +10,12 @@ namespace HanumanInstitute.BassAudio;
 /// <inheritdoc />
 public class AudioEncoder : IAudioEncoder
 {
+    private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
 
-    public AudioEncoder(IFileSystemService fileSystem)
+    public AudioEncoder(IPitchDetector pitchDetector, IFileSystemService fileSystem)
     {
+        _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
     }
 
@@ -36,6 +38,15 @@ public class AudioEncoder : IAudioEncoder
         }
         _fileSystem.EnsureDirectoryExists(file.Destination);
 
+        // Calculate pitch.
+        if (settings.AutoDetectPitch)
+        {
+            file.Pitch ??= _pitchDetector.GetPitch(file.Path);
+        }
+        var pitch = settings.AutoDetectPitch ? 
+            settings.PitchTo / file.Pitch!.Value : 
+            settings.Pitch;
+        
         // Create channel.
         var chan = Bass.CreateStream(file.Path, Flags: BassFlags.Float | BassFlags.Decode).Valid();
         file.Status = EncodeStatus.Processing;
@@ -56,13 +67,13 @@ public class AudioEncoder : IAudioEncoder
 
             // In BASS, 2x speed is 100 (+100%), whereas our Speed property is 2. Need to convert.
             // speed 1=0, 2=100, 3=200, 4=300, .5=-100, .25=-300
-            Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / settings.Pitch * settings.Speed - 1.0) * 100.0);
+            Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / pitch * settings.Speed - 1.0) * 100.0);
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoFrequency,
-                chanInfo.Frequency * settings.Pitch * settings.Rate);
+                chanInfo.Frequency * pitch * settings.Rate);
 
-            var speed = settings.Speed / settings.Pitch;
+            var speed = settings.Speed / pitch;
             var tempo = speed >= 1 ? -100.0 / speed + 100 : 100.0 * speed - 100;
-            var freq = chanInfo.Frequency * settings.Rate * settings.Pitch;
+            var freq = chanInfo.Frequency * settings.Rate * pitch;
             Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, tempo);
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoFrequency, freq);
 

@@ -17,16 +17,45 @@ public class FileItem : ReactiveObject
         Path = path;
         RelativePath = relativePath;
     }
-    
+
     /// <summary>
     /// The full path to the file.
     /// </summary>
-    public string Path { get; private set; }
+    [Reactive]
+    public string Path { get; set; }
 
     /// <summary>
     /// The display name of the file.
     /// </summary>
-    public string RelativePath { get; private set; }
+    public string RelativePath
+    {
+        get => _relativePath;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _relativePath, value);
+            this.RaisePropertyChanged(nameof(Text));
+        }
+    }
+    private string _relativePath;
+
+    /// <summary>
+    /// Gets or sets the file audio pitch.
+    /// </summary>
+    public float? Pitch
+    {
+        get => _pitch;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _pitch, value);
+            this.RaisePropertyChanged(nameof(Text));
+        }
+    }
+    private float? _pitch;
+
+    /// <summary>
+    /// Gets the display text.
+    /// </summary>
+    public string Text => Pitch.HasValue ? $"[{Pitch:F1}] {RelativePath}" : RelativePath;
 
     /// <summary>
     /// Gets the tooltip to display for the item.

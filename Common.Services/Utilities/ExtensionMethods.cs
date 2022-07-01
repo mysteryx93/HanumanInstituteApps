@@ -90,30 +90,30 @@ public static class ExtensionMethods
             targetField?.SetValue(target, sourceField.GetValue(source));
         }
     }
-
-    /// <summary>
-    /// Adds the elements of the specified collection to the end of the IList.
-    /// </summary>
-    /// <typeparam name="T">The type of list items.</typeparam>
-    /// <param name="list">The list to add elements to.</param>
-    /// <param name="items">The collection whose elements should be added to the end of the IList.</param>
-    public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
-    {
-        list.CheckNotNull(nameof(list));
-        items.CheckNotNull(nameof(items));
-
-        if (list is List<T> castedList)
-        {
-            castedList.AddRange(items);
-        }
-        else
-        {
-            foreach (var item in items)
-            {
-                list.Add(item);
-            }
-        }
-    }
+    //
+    // /// <summary>
+    // /// Adds the elements of the specified collection to the end of the IList.
+    // /// </summary>
+    // /// <typeparam name="T">The type of list items.</typeparam>
+    // /// <param name="list">The list to add elements to.</param>
+    // /// <param name="items">The collection whose elements should be added to the end of the IList.</param>
+    // public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
+    // {
+    //     list.CheckNotNull(nameof(list));
+    //     items.CheckNotNull(nameof(items));
+    //
+    //     if (list is List<T> castedList)
+    //     {
+    //         castedList.AddRange(items);
+    //     }
+    //     else
+    //     {
+    //         foreach (var item in items)
+    //         {
+    //             list.Add(item);
+    //         }
+    //     }
+    // }
 
     /// <summary>
     /// Parses a string value into specified data type.

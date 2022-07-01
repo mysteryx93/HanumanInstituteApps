@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.BassAudio;
 
@@ -18,7 +19,7 @@ public class PitchDetector : IPitchDetector
     /// <inheritdoc />
     public async Task<float> GetPitchAsync(string filePath) =>
         await Task.Run(() => GetPitch(filePath), default).ConfigureAwait(false);
-    
+
     /// <inheritdoc />
     public float GetPitch(string filePath)
     {
@@ -27,8 +28,9 @@ public class PitchDetector : IPitchDetector
             throw new FileNotFoundException("Source audio file was not found.", filePath);
         }
 
+        var toneFreq = ToneFreq;
         BassDevice.Instance.Init();
-        
+
         // Get file stream.
         var chan = Bass.CreateStream(filePath, Flags: BassFlags.Float | BassFlags.Decode).Valid();
         try
@@ -53,38 +55,57 @@ public class PitchDetector : IPitchDetector
                         fft[i] += fftBuffer[i];
                     }
                 }
-            }
-            while (read > 0 && readTotal < maxRead);
+            } while (read > 0 && readTotal < maxRead);
 
-            // Generate 440hz tones. The first one is not used except as "previous tone" reference.
-            var toneFreq = new float[61];
-            for (var i = 0; i < 61; i++)
-            {
-                toneFreq[i] = GetFrequency(i + 20);
-            }
-            
             // Find the tuning frequency
             var maxSum = 0.0f;
             var maxFreq = 440.0f;
+            // for (var i = 424.0f; i < 448.1f; i += 0.1f)
+            // {
+            //     var sum = 0.0f;
+            //     var tones = Array.ConvertAll(toneFreq, x => x * i / 440f);
+            //     // First and last tone are used for previous/next reference.
+            //     for (var j = 1; j < tones.Length - 1; j++)
+            //     {
+            //         // We get more consistent results with rounding down (int) than with Math.Round
+            //         // var index = (int)Math.Round(tones[j] / freqStep, 0);
+            //         var index = (int)(tones[j] / freqStep);
+            //         // FFT bands are larger at lower frequencies and smaller at higher frequencies, compensate for that.
+            //         var factor = (tones[j] - tones[j - 1]) / freqStep;
+            //         // Applying a parabolic curve to favor middle-tones is not improving the results.
+            //         // var curve = (float)-Math.Pow(j - 1 - 40, 2) / 2000 + 1;
+            //         sum += fft[index] * factor;
+            //     }
+            //     if (sum > maxSum)
+            //     {
+            //         maxSum = sum;
+            //         maxFreq = i;
+            //     }
+            // }
             for (var i = 424.0f; i < 448.1f; i += 0.1f)
             {
-                var sum = 0.0f;
                 var tones = Array.ConvertAll(toneFreq, x => x * i / 440f);
-                for (var j = 1; j < tones.Length; j++)
+                // First and last tone are used for previous/next reference.
+                for (var tone = 0; tone < 12; tone++)
                 {
-                    // We get more consistent results with rounding down (int) than with Math.Round
-                    // var index = (int)Math.Round(tones[j] / freqStep, 0);
-                    var index = (int)(tones[j] / freqStep);
-                    // FFT bands are larger at lower frequencies and smaller at higher frequencies, compensate for that.
-                    var factor = (tones[j] - tones[j - 1]) / freqStep;
-                    // Applying a parabolic curve to favor middle-tones is not improving the results.
-                    // var curve = (float)-Math.Pow(j - 1 - 40, 2) / 2000 + 1;
-                    sum += fft[index] * factor;
-                }
-                if (sum > maxSum)
-                {
-                    maxSum = sum;
-                    maxFreq = i;
+                    var sum = 0.0f;
+                    for (var octave = 0; octave < 5; octave++)
+                    {
+                        var j = tone + octave * 12 + 1;
+                        // We get more consistent results with rounding down (int) than with Math.Round
+                        // var index = (int)Math.Round(tones[j] / freqStep, 0);
+                        var index = (int)(tones[j] / freqStep);
+                        // FFT bands are larger at lower frequencies and smaller at higher frequencies, compensate for that.
+                        var factor = (tones[j] - tones[j - 1]) / freqStep;
+                        // Applying a parabolic curve to favor middle-tones is not improving the results.
+                        // var curve = (float)-Math.Pow(j - 1 - 40, 2) / 2000 + 1;
+                        sum += fft[index] * factor;
+                    }
+                    if (sum > maxSum)
+                    {
+                        maxSum = sum;
+                        maxFreq = i;
+                    }
                 }
             }
             return maxFreq;
@@ -95,5 +116,24 @@ public class PitchDetector : IPitchDetector
         }
     }
 
-    private float GetFrequency(int keyIndex) => (float)Math.Pow(2, (keyIndex - 49) / 12.0) * 440;
+    private static float[]? _toneFreq;
+
+    /// <summary>
+    /// Returns a cached array of tones 20 to 62 (5 octaves + a tone before and after).
+    /// </summary>
+    protected static float[] ToneFreq
+    {
+        get
+        {
+            if (_toneFreq == null)
+            {
+                _toneFreq = new float[62];
+                for (var i = 0; i < 62; i++)
+                {
+                    _toneFreq[i] = (float)Math.Pow(2, (20 + i - 49) / 12.0) * 440;
+                }
+            }
+            return _toneFreq;
+        }
+    }
 }

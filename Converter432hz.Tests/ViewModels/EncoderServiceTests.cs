@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using DynamicData;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -12,28 +11,22 @@ using Xunit.Abstractions;
 
 namespace HanumanInstitute.Converter432hz.Tests.ViewModels;
 
-public class EncoderServiceTests
+public class EncoderServiceTests : TestsBase
 {
-    public EncoderServiceTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
-    private readonly ITestOutputHelper _output;
+    public EncoderServiceTests(ITestOutputHelper output) : base(output) 
+    { }
 
     public EncoderService Model => _model ??= 
-        new EncoderService(FakeFileSystem, DialogService, MockBassEncoder.Object, new FakeDispatcher())
+        new EncoderService(FakeFileSystem, DialogService, MockEncoder.Object, new FakeDispatcher())
         {
             Owner = Mock.Of<INotifyPropertyChanged>(),
             DelayBeforeStart = 5
         };
     private EncoderService _model;
 
-    public Mock<IBassEncoder> MockBassEncoder => _mockBassEncoder ??= SetupMockBassEncoder();
-    private Mock<IBassEncoder> _mockBassEncoder;
-    private Mock<IBassEncoder> SetupMockBassEncoder()
+    public Mock<IAudioEncoder> MockEncoder => _mockEncoder ??= Init(() =>
     {
-        var result = new Mock<IBassEncoder>();
+        var result = new Mock<IAudioEncoder>();
         result.Setup(x => x.StartAsync(It.IsAny<ProcessingItem>(), It.IsAny<EncodeSettings>(), It.IsAny<CancellationToken>()))
             .Returns<ProcessingItem, EncodeSettings, CancellationToken>(async (file, _, token) =>
             {
@@ -44,7 +37,8 @@ public class EncoderServiceTests
                 file.Status = token.IsCancellationRequested ? EncodeStatus.Cancelled : EncodeStatus.Completed;
             });
         return result;
-    }
+    });
+    private Mock<IAudioEncoder> _mockEncoder;
 
     public FakeFileSystemService FakeFileSystem => _fakeFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService _fakeFileSystem;
@@ -523,7 +517,7 @@ public class EncoderServiceTests
 
         await Model.RunAsync();
 
-        MockBassEncoder.Verify(
+        MockEncoder.Verify(
             x => x.StartAsync(It.IsAny<ProcessingItem>(), It.IsAny<EncodeSettings>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
@@ -703,4 +697,15 @@ public class EncoderServiceTests
             Assert.Equal(EncodeStatus.Skip, x.Status);
         });
     }
+    
+    [Fact]
+    public void SettingsPitch_SetFromTo_PitchCalculated()
+    {
+        Model.Settings.PitchFrom = 400;
+        Model.Settings.PitchTo = 420;
+
+        Assert.Equal(420.0 / 400, Model.Settings.Pitch);
+    }
+    
+    
 }

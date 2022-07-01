@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
-    <FileVersion>2.0.1</FileVersion>
+    <AssemblyVersion>2.1</AssemblyVersion>
+    <FileVersion>2.1</FileVersion>
     <RootNamespace>HanumanInstitute.Converter432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -24,6 +24,10 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
+<!--    <ProjectReference Include="..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />-->
+<!--    <ProjectReference Include="..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs\MvvmDialogs.csproj" />-->
+    <ProjectReference Include="..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
+    <ProjectReference Include="..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
@@ -38,7 +42,6 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.15" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.15" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.3.0" />
     <PackageReference Include="ManagedBass.Enc" Version="3.1.1" />
     <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
     <PackageReference Include="ManagedBass.Tags" Version="3.1.1" />

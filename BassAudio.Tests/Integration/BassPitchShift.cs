@@ -8,14 +8,10 @@ using BassEnc = ManagedBass.Enc.BassEnc;
 
 namespace HanumanInstitute.BassAudio.Tests.Integration;
 
-public class BassPitchShift
+public class BassPitchShift : TestsBase
 {
-    public BassPitchShift(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
-    private readonly ITestOutputHelper _output;
+    public BassPitchShift(ITestOutputHelper output) : base(output)
+    { }
 
     [Theory]
     [InlineData(.8)]

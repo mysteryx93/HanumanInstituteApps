@@ -9,21 +9,18 @@ using Xunit.Abstractions;
 
 namespace HanumanInstitute.BassAudio.Tests.Integration;
 
-public class AudioEncoderTests
+public class AudioEncoderTests : TestsBase
 {
-    public AudioEncoderTests(ITestOutputHelper output)
+    public AudioEncoderTests(ITestOutputHelper output) : base(output)
     {
-        _output = output;
     }
-
-    private readonly ITestOutputHelper _output;
 
     public IAudioEncoder Model => _model ??= SetupModel();
     private IAudioEncoder _model;
     private IAudioEncoder SetupModel()
     {
         BassDevice.Instance.Init(0);
-        return new AudioEncoder(FileSystem);
+        return new AudioEncoder(new PitchDetector(FileSystem), FileSystem);
     }
 
     public EncodeSettings Settings { get; set; } = new EncodeSettings() { QualityOrSpeed = 2 };

@@ -1,5 +1,4 @@
-﻿using System;
-using HanumanInstitute.Common.Services;
+﻿using HanumanInstitute.Common.Services;
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace HanumanInstitute.Common.Avalonia.App.Tests;

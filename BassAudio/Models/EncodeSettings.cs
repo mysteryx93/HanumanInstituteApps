@@ -56,6 +56,12 @@ public class EncodeSettings : ReactiveObject
     /// Gets the pitch multiplier based on PitchFrom and PitchTo.
     /// </summary>
     public double Pitch => PitchTo / PitchFrom;
+
+    /// <summary>
+    /// Gets or sets whether to auto-detect music pitch.
+    /// </summary>
+    [Reactive]
+    public bool AutoDetectPitch { get; set; } = true;
     
     /// <summary>
     /// Gets or sets the pitch of the source audio. 

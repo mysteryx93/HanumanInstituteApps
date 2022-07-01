@@ -46,7 +46,7 @@
                          Items="{Binding Encoder.Sources}" SelectedIndex="{Binding SourcesSelectedIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding RelativePath}" ToolTip.Tip="{Binding ToolTip}" />
+                            <TextBlock Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

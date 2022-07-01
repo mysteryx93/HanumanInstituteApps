@@ -1,5 +1,6 @@
 ﻿using Avalonia.Threading;
 using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
@@ -22,6 +23,8 @@ public static class ViewModelLocator
         // Services
         container.AddCommonAvaloniaApp();
         container.AddCommonServices();
+        container.AddBassAudio();
+        
         container.Register<IDialogService>(() => new DialogService(
             viewModelFactory: x => Locator.Current.GetService(x)));
         container.Register<IBassDevice>(() => BassDevice.Instance);
@@ -38,7 +41,6 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
         SplatRegistrations.Register<IEncoderService, EncoderService>();
-        SplatRegistrations.Register<IBassEncoder, BassEncoder>();
             
         SplatRegistrations.SetupIOC();
     }

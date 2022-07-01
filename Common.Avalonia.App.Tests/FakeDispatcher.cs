@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Avalonia.Threading;
 
 namespace HanumanInstitute.Common.Avalonia.App.Tests;

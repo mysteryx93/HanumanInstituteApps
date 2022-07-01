@@ -27,4 +27,13 @@
     <ProjectReference Include="..\Converter432hz\Converter432hz.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SourceLong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceShort.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
