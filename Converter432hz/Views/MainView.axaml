@@ -63,13 +63,12 @@
             <Grid Grid.Column="0" Grid.Row="1">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
-                    <TextBlock FontSize="16" Text="{Binding FilesLeft}" />
                 </StackPanel>
                 <DataGrid Classes="NoSelect" Margin="0,20,0,0" CanUserSortColumns="False" RowHeight="24"
                           HeadersVisibility="None"
                           Items="{Binding Encoder.ProcessingFiles}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="File" Width="*" Binding="{Binding RelativePath, Mode=OneWay}"
+                        <DataGridTextColumn Header="File" Width="*" Binding="{Binding Text, Mode=OneWay}"
                                             IsReadOnly="True" />
                         <DataGridTemplateColumn Width="120">
                             <DataGridTemplateColumn.CellTemplate>

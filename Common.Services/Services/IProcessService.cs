@@ -34,4 +34,10 @@ public interface IProcessService
     /// <param name="appName">The name of the processes to look for.</param>
     /// <returns>An array of processes.</returns>
     ProcessWrapper[] GetProcessesByName(string appName);
+
+    /// <summary>
+    /// Opens specified URL in the default browser.
+    /// </summary>
+    /// <param name="url">The URL to navigate to.</param>
+    void OpenBrowserUrl(string url);
 }

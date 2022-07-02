@@ -26,7 +26,9 @@ public static class ViewModelLocator
         container.AddBassAudio();
         
         container.Register<IDialogService>(() => new DialogService(
-            viewModelFactory: x => Locator.Current.GetService(x)));
+            viewModelFactory: x => Locator.Current.GetService(x), 
+            dialogManager: new DialogManager(viewLocator: new ViewLocator(),
+                dialogFactory: new DialogFactory().AddMessageBox())));
         container.Register<IBassDevice>(() => BassDevice.Instance);
         container.Register<IDispatcher>(() => Dispatcher.UIThread);
         SplatRegistrations.Register<GlobalErrorHandler>();

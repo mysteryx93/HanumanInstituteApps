@@ -34,10 +34,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaPlayer.Avalonia", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaPlayer.Avalonia.Bass", "..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj", "{1697E531-1E21-4076-844E-6B12D572D6FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvvmDialogs", "..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs\MvvmDialogs.csproj", "{627128E6-91D5-4EF8-8FEF-C445FD1921A9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvvmDialogs.Avalonia", "..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj", "{0FB95ED4-96AB-432E-A810-1A26491BF41A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -258,38 +254,6 @@ Global
 		{1697E531-1E21-4076-844E-6B12D572D6FD}.Release|x64.Build.0 = Release|Any CPU
 		{1697E531-1E21-4076-844E-6B12D572D6FD}.Release|x86.ActiveCfg = Release|Any CPU
 		{1697E531-1E21-4076-844E-6B12D572D6FD}.Release|x86.Build.0 = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|x64.Build.0 = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Debug|x86.Build.0 = Debug|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|x64.ActiveCfg = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|x64.Build.0 = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|x86.ActiveCfg = Release|Any CPU
-		{627128E6-91D5-4EF8-8FEF-C445FD1921A9}.Release|x86.Build.0 = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|x64.Build.0 = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Debug|x86.Build.0 = Debug|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|x64.ActiveCfg = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|x64.Build.0 = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|x86.ActiveCfg = Release|Any CPU
-		{0FB95ED4-96AB-432E-A810-1A26491BF41A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

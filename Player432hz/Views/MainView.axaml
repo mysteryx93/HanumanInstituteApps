@@ -16,7 +16,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
-        hic:SizeExtension.TrackSize="True" 
+        hic:SizeExtension.TrackSize="True"
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
@@ -38,7 +38,8 @@
             </ListBox>
             <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top"
                        FontWeight="Bold" />
-            <TextBox x:Name="PlaylistNameTextBox" Classes="compact" HorizontalAlignment="Left" Margin="80,1,0,0" VerticalAlignment="Top"
+            <TextBox x:Name="PlaylistNameTextBox" Classes="compact" HorizontalAlignment="Left" Margin="80,1,0,0"
+                     VerticalAlignment="Top"
                      Width="120" Text="{Binding Name, Mode=TwoWay}" TabIndex="4" />
             <Button x:Name="AddFolderButton" Classes="round" Content="Add" HorizontalAlignment="Right"
                     Margin="0,-1,80,0"
@@ -72,11 +73,15 @@
         </ListBox>
         <TextBlock HorizontalAlignment="Left" Margin="10,8,0,0" Text="Playlists" VerticalAlignment="Top"
                    FontWeight="Bold" />
-        <Button x:Name="AddPlaylistButton" Classes="round" Content="Add" HorizontalAlignment="Left" Margin="74,4,0,0"
-                VerticalAlignment="Top" Width="44" TabIndex="2" Command="{Binding AddPlaylistCommand}" />
-        <Button x:Name="RemovePlaylistButton" Classes="round" Content="Del" HorizontalAlignment="Left"
+        <Button x:Name="AddPlaylistButton" Classes="round" HorizontalAlignment="Left" Margin="74,4,0,0"
+                VerticalAlignment="Top" Width="40" TabIndex="2" Command="{Binding AddPlaylistCommand}">
+            <Svg Path="/Assets/plus.svg"/>
+        </Button>
+        <Button x:Name="RemovePlaylistButton" Classes="round" HorizontalAlignment="Left"
                 Margin="121,4,0,0"
-                VerticalAlignment="Top" Width="34" TabIndex="3" Command="{Binding DeletePlaylistCommand}" />
+                VerticalAlignment="Top" Width="40" TabIndex="3" Command="{Binding DeletePlaylistCommand}">
+            <Svg Path="/Assets/minus.svg" />
+        </Button>
         <Grid Height="43" VerticalAlignment="Bottom" Grid.ColumnSpan="2"
               DataContext="{x:Static local:ViewModelLocator.Player}">
             <TextBlock HorizontalAlignment="Stretch" Height="24" Text="{Binding Player.NowPlaying, Mode=OneWay}"
@@ -101,7 +106,7 @@
         </Grid>
         <Grid Margin="164,120,10,54" DataContext="{x:Static local:ViewModelLocator.FilesList}">
             <ListBox x:Name="FilesList" Classes="compact" Margin="0,30,0,0" TabIndex="8"
-                     Background="{x:Null}" 
+                     Background="{x:Null}"
                      Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

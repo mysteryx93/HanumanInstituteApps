@@ -16,6 +16,7 @@ public class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         GC.KeepAlive(typeof(DialogService));
+        GC.KeepAlive(typeof(Avalonia.Svg.Skia.SvgImage));
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

@@ -60,29 +60,7 @@ public class PitchDetector : IPitchDetector
             // Find the tuning frequency
             var maxSum = 0.0f;
             var maxFreq = 440.0f;
-            // for (var i = 424.0f; i < 448.1f; i += 0.1f)
-            // {
-            //     var sum = 0.0f;
-            //     var tones = Array.ConvertAll(toneFreq, x => x * i / 440f);
-            //     // First and last tone are used for previous/next reference.
-            //     for (var j = 1; j < tones.Length - 1; j++)
-            //     {
-            //         // We get more consistent results with rounding down (int) than with Math.Round
-            //         // var index = (int)Math.Round(tones[j] / freqStep, 0);
-            //         var index = (int)(tones[j] / freqStep);
-            //         // FFT bands are larger at lower frequencies and smaller at higher frequencies, compensate for that.
-            //         var factor = (tones[j] - tones[j - 1]) / freqStep;
-            //         // Applying a parabolic curve to favor middle-tones is not improving the results.
-            //         // var curve = (float)-Math.Pow(j - 1 - 40, 2) / 2000 + 1;
-            //         sum += fft[index] * factor;
-            //     }
-            //     if (sum > maxSum)
-            //     {
-            //         maxSum = sum;
-            //         maxFreq = i;
-            //     }
-            // }
-            for (var i = 424.0f; i < 448.1f; i += 0.1f)
+            for (var i = 424f; i <= 448f; i += 0.1f)
             {
                 var tones = Array.ConvertAll(toneFreq, x => x * i / 440f);
                 // First and last tone are used for previous/next reference.

@@ -6,6 +6,7 @@ using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.Player432hz.Business;
 using HanumanInstitute.Player432hz.Models;
 using HanumanInstitute.Player432hz.ViewModels;
+using HanumanInstitute.Player432hz.Views;
 using Splat;
 
 namespace HanumanInstitute.Player432hz;
@@ -26,7 +27,9 @@ public static class ViewModelLocator
         // Services
         container.AddCommonServices();
         container.AddBassAudio();
-        container.Register(() => (IDialogService)new DialogService());
+        container.Register(() => (IDialogService)new DialogService(new DialogManager(
+            viewLocator: new ViewLocator(),
+            dialogFactory: new DialogFactory().AddMessageBox())));
         container.Register(() => (IBassDevice)BassDevice.Instance);
             
         // ViewModels
@@ -34,6 +37,7 @@ public static class ViewModelLocator
         SplatRegistrations.Register<IPlaylistViewModelFactory, PlaylistViewModelFactory>();
         SplatRegistrations.RegisterLazySingleton<IFilesListViewModel, FilesListViewModel>();
         SplatRegistrations.RegisterLazySingleton<IPlayerViewModel, PlayerViewModel>();
+        SplatRegistrations.Register<AboutViewModel>();
 
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
@@ -47,6 +51,7 @@ public static class ViewModelLocator
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static IFilesListViewModel FilesList => Locator.Current.GetService<IFilesListViewModel>()!;
     public static IPlayerViewModel Player => Locator.Current.GetService<IPlayerViewModel>()!;
+    public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
 
     public static void Cleanup()
     {

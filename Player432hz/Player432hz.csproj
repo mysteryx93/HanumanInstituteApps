@@ -14,6 +14,8 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <Company>Hanuman Institute</Company>
+    <Product>432hz Player</Product>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -33,8 +35,10 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.15" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.14" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.15" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.3.0" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.3.1" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.MessageBox" Version="1.3.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.2.5" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.33">
       <PrivateAssets>all</PrivateAssets>

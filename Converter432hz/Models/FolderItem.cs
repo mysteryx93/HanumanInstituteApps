@@ -11,7 +11,8 @@ public class FolderItem : FileItem
     /// <param name="path">The absolute folder path.</param>
     /// <param name="relativePath">The folder to create in the destination.</param>
     public FolderItem(string path, string relativePath) : base(path, relativePath)
-    { }
+    {
+    }
 
     /// <summary>
     /// Gets or sets the list of files contained in the folder.
@@ -19,10 +20,12 @@ public class FolderItem : FileItem
     public ObservableCollection<FileItem> Files { get; } = new ObservableCollection<FileItem>();
 
     /// <inheritdoc />
-    public override string ToolTip => Files.Count switch
-    {
-        0 => "Empty folder",
-        1 => "1 file",
-        _ => Files.Count + " files"
-    };
+    public override string ToolTip =>
+        Path + Environment.NewLine +
+        Files.Count switch
+        {
+            0 => "Empty folder",
+            1 => "1 file",
+            _ => Files.Count + " files"
+        };
 }

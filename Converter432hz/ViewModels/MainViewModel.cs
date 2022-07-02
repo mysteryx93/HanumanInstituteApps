@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using DynamicData;
+using DynamicData.Aggregation;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -58,9 +60,9 @@ public class MainViewModel : ReactiveObject
 
         // FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Transform(x => x switch
         // {
-        //     IChangeSet<FolderItem> folder => folder.Transform(f => f.Item.Current.Files.Count).Sum(),
+        //     FolderItem folder => folder.Files.Count,
         //     _ => 1
-        // }).Sum();
+        // }).Sum(x => x);
         // this.WhenAnyObservable(x => x.FilesLeftObservable).ToProperty(this, x => x.FilesLeft);
         //
         // FilesCompletedCount = Encoder.ProcessingFiles.Connect().Filter(x => x.Status == EncodeStatus.Completed).Count();
@@ -135,7 +137,7 @@ public class MainViewModel : ReactiveObject
         var validFiles = files.Where(x => _fileSystem.File.Exists(x)).ToList();
 
         var items = validFiles.Select(x => new FileItem(x, _fileSystem.Path.GetFileName(x))).ToList();
-        Encoder.Sources.AddRange(items);
+        ListExtensions.AddRange(Encoder.Sources, items);
 
         // Auto-detect pitch.
         await items.ForEachAsync(async x =>
@@ -159,11 +161,10 @@ public class MainViewModel : ReactiveObject
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings);
         if (folder != null)
         {
-            var folderItem = new FolderItem(folder, folder);
-            foreach (var file in _fileLocator.GetAudioFiles(folder))
-            {
-                folderItem.Files.Add(file);
-            }
+            var folderName = _fileSystem.Path.GetFileName(folder.TrimEnd(_environment.DirectorySeparatorChar));
+            var folderItem = new FolderItem(folder, _environment.DirectorySeparatorChar + folderName);
+            var files = _fileLocator.GetAudioFiles(folder);
+            folderItem.Files.AddRange(files.Select(x => new FileItem(x.Path, _fileSystem.Path.Combine(folderName, x.RelativePath))));
             Encoder.Sources.Add(folderItem);
         }
     }

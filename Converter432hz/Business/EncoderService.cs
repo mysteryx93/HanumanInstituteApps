@@ -278,14 +278,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             }
         
             var vm = _dialogService.CreateViewModel<AskFileActionViewModel>();
-            // if (cancellationToken.IsCancellationRequested)
-            // {
-            //     vm.Items.SelectedValue = FileExistsAction.Cancel;
-            // }
-            // else
-            // {
-                await _dialogService.ShowDialogAsync(Owner, vm).ConfigureAwait(false);
-            // }
+            await _dialogService.ShowDialogAsync(Owner, vm).ConfigureAwait(false);
 
             // Cancel action must be applied before semaphore is released to avoid showing an extra dialog.
             if (vm.DialogResult == true && vm.ApplyToAll)
