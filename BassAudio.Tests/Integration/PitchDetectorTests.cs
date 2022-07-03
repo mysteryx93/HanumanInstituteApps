@@ -34,7 +34,7 @@ public class PitchDetectorTests : TestsBase
             // var file = "SourceLong.mp3";
             var pitch = Model.GetPitch(file);
 
-            _output.WriteLine($"{Path.GetFileName(file)}: {pitch.ToStringInvariant()}");
+            Output.WriteLine($"{Path.GetFileName(file)}: {pitch.ToStringInvariant()}");
             Assert.True(pitch is > 400 and < 450);
         }
     }
@@ -52,7 +52,7 @@ public class PitchDetectorTests : TestsBase
 
         foreach (var f in fft)
         {
-            _output.WriteLine(f.ToStringInvariant());
+            Output.WriteLine(f.ToStringInvariant());
         }
         // Assert.Contains(fft, x => x > 0);
     }

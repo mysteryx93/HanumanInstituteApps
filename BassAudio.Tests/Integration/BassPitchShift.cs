@@ -31,8 +31,8 @@ public class BassPitchShift : TestsBase
         var chan = Bass.CreateStream(source, Flags: BassFlags.Float | BassFlags.Decode);
         var chanInfo = Bass.ChannelGetInfo(chan);
         var srcDuration = GetDuration(chan);
-        _output.WriteLine($"Pitch: {pitch}");
-        _output.WriteLine($"Source duration: {srcDuration.TotalSeconds:F3} seconds");
+        Output.WriteLine($"Pitch: {pitch}");
+        Output.WriteLine($"Source duration: {srcDuration.TotalSeconds:F3} seconds");
 
         // Add tempo effects.
         chan = BassFx.TempoCreate(chan, BassFlags.Decode).Valid();
@@ -66,11 +66,11 @@ public class BassPitchShift : TestsBase
 
         chan = Bass.CreateStream(destination, Flags: BassFlags.Float | BassFlags.Decode);
         var dstDuration = GetDuration(chan);
-        _output.WriteLine($"Destination duration: {dstDuration.TotalSeconds:F3} seconds");
+        Output.WriteLine($"Destination duration: {dstDuration.TotalSeconds:F3} seconds");
         var ratio = dstDuration / srcDuration;
-        _output.WriteLine($"Ratio: {ratio:P2}");
+        Output.WriteLine($"Ratio: {ratio:P2}");
         var r = (1 - (1 / ratio)) / (1 - pitch);
-        _output.WriteLine($"Slowdown / Pitch: {r:P2}");
+        Output.WriteLine($"Slowdown / Pitch: {r:P2}");
 
         Bass.Free();
     }

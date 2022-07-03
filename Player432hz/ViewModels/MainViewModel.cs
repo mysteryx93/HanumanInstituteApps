@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Input;
 using HanumanInstitute.Common.Avalonia;
 using HanumanInstitute.Common.Services;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
 
@@ -19,20 +20,32 @@ public class MainViewModel : ReactiveObject
     private readonly IPlaylistViewModelFactory _playlistFactory;
     private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFilesListViewModel _filesListViewModel;
+    private readonly IDialogService _dialogService;
 
     public AppSettingsData AppData => _settings.Value;
 
     public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<AppSettingsData> settings,
-        IFilesListViewModel filesListViewModel)
+        IFilesListViewModel filesListViewModel, IDialogService dialogService)
     {
         _playlistFactory = playlistFactory;
         _settings = settings.CheckNotNull(nameof(settings));
         _filesListViewModel = filesListViewModel;
+        _dialogService = dialogService;
 
         _settings.Loaded += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
 
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe((_) => Playlists_CurrentChanged());
+    }
+    
+    public ICommand InitWindow => _initWindow ??= ReactiveCommand.Create(InitWindowImpl);
+    private ICommand? _initWindow;
+    private void InitWindowImpl()
+    {
+        if (_settings.Value.ShowInfoOnStartup)
+        {
+            ShowSettings.Execute();
+        }
     }
 
     /// <summary>
@@ -41,7 +54,7 @@ public class MainViewModel : ReactiveObject
     public double WindowHeight
     {
         get => _settings.Value.Height;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._height, value, nameof(WindowHeight));
+        set => this.RaiseAndSetIfChanged(ref _settings.Value._height, value);
     }
 
     /// <summary>
@@ -50,19 +63,19 @@ public class MainViewModel : ReactiveObject
     public double WindowWidth
     {
         get => _settings.Value.Width;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._width, value, nameof(WindowWidth));
+        set => this.RaiseAndSetIfChanged(ref _settings.Value._width, value);
     }
 
     public PixelPoint WindowPosition
     {
         get => _settings.Value.Position;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._position, value, nameof(WindowPosition));
+        set => this.RaiseAndSetIfChanged(ref _settings.Value._position, value);
     }
 
     public int Volume
     {
         get => _settings.Value.Volume;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._volume, value, nameof(Volume));
+        set => this.RaiseAndSetIfChanged(ref _settings.Value._volume, value);
     }
 
     /// <summary>
@@ -71,24 +84,24 @@ public class MainViewModel : ReactiveObject
     public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } =
         new CollectionView<IPlaylistViewModel>();
 
-    public ICommand PlayListCommand => _playListCommand ??= ReactiveCommand.Create<TappedEventArgs>(OnPlayList);
-    private ICommand? _playListCommand;
-    private void OnPlayList(TappedEventArgs e)
+    public ICommand StartPlayList => _startPlayList ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayListImpl);
+    private ICommand? _startPlayList;
+    private void StartPlayListImpl(TappedEventArgs e)
     {
         _filesListViewModel.Files.CurrentItem = null;
         _filesListViewModel.PlayCommand.Execute(null);
     }
 
-    public ICommand PlayFileCommand => _playFileCommand ??= ReactiveCommand.Create<TappedEventArgs>(OnPlayFile);
-    private ICommand? _playFileCommand;
-    private void OnPlayFile(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute(null);
+    public ICommand StartPlayFile => _startPlayFile ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayFileImpl);
+    private ICommand? _startPlayFile;
+    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute(null);
 
     /// <summary>
     /// Adds a new playlist to the list.
     /// </summary>
-    public ICommand AddPlaylistCommand => _addPlaylistCommand ??= ReactiveCommand.Create(OnAddPlaylist);
-    private ICommand? _addPlaylistCommand;
-    private void OnAddPlaylist()
+    public ICommand AddPlaylist => _addPlaylist ??= ReactiveCommand.Create(AddPlaylistImpl);
+    private ICommand? _addPlaylist;
+    private void AddPlaylistImpl()
     {
         var newPlaylist = _playlistFactory.Create();
         Playlists.Source.Add(newPlaylist);
@@ -98,10 +111,10 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Deletes selected playlist from the list.
     /// </summary>
-    public ICommand DeletePlaylistCommand => _deletePlaylistCommand ??= ReactiveCommand.Create(OnDeletePlaylist,
+    public ICommand DeletePlaylist => _deletePlaylist ??= ReactiveCommand.Create(DeletePlaylistImpl,
         this.WhenAnyValue(x => x.Playlists.CurrentItem).Select(x => x != null));
-    private ICommand? _deletePlaylistCommand;
-    private void OnDeletePlaylist()
+    private ICommand? _deletePlaylist;
+    private void DeletePlaylistImpl()
     {
         if (Playlists.CurrentPosition > -1)
         {
@@ -140,13 +153,36 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
     /// </summary>
-    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
-    private ICommand? _saveSettingsCommand;
-    private void OnSaveSettings(CancelEventArgs e)
+    public ICommand SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
+    private ICommand? _saveSettings;
+    private void SaveSettingsImpl(CancelEventArgs e)
     {
         _settings.Value.Playlists.Clear();
         _settings.Value.Playlists.AddRange(Playlists.Source.Select(x =>
             new SettingsPlaylistItem(x.Name, x.Folders.Source)));
         _settings.Save();
+    }
+
+    /// <summary>
+    /// Shows the About window.
+    /// </summary>
+    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private ICommand? _showAbout;
+    private async Task ShowAboutImplAsync()
+    {
+        var vm = _dialogService.CreateViewModel<AboutViewModel>();
+        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
+        _settings.Save();
+    }
+    
+    /// <summary>
+    /// Shows the Settings window.
+    /// </summary>
+    public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    private ICommand? _showSettings;
+    private Task ShowSettingsImplAsync()
+    {
+        var vm = _dialogService.CreateViewModel<AboutViewModel>();
+        return _dialogService.ShowDialogAsync(this, vm);
     }
 }

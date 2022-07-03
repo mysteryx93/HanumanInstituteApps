@@ -6,13 +6,10 @@
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:common="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
-        xmlns:wpf="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=CommonWpf"
-        xmlns:s="https://github.com/mysteryx93/MethodBinding.Avalonia"
         x:Class="HanumanInstitute.Player432hz.Views.MainView"
         mc:Ignorable="d"
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
-        xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
@@ -21,75 +18,125 @@
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Opened">
+            <ia:InvokeCommandAction Command="{Binding InitWindow}" />
+        </ia:EventTriggerBehavior>
         <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+            <ia:InvokeCommandAction Command="{Binding SaveSettings}" />
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
     <Window.Resources>
         <common:MediaTimeConverter x:Key="MediaTimeConverter" />
     </Window.Resources>
     <Grid Classes="GradiantBackground">
-        <Grid Margin="164,4,10,0" Height="108" VerticalAlignment="Top"
-              IsEnabled="{Binding Converter={x:Static ObjectConverters.IsNotNull}, Mode=OneWay}"
-              DataContext="{Binding Playlists.CurrentItem}">
-            <ListBox x:Name="FoldersList" Classes="compact" Margin="0,30,0,0" TabIndex="5"
-                     Background="{x:Null}"
-                     Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
-            </ListBox>
-            <TextBlock HorizontalAlignment="Left" Margin="0,4,0,0" Text="Folders" VerticalAlignment="Top"
-                       FontWeight="Bold" />
-            <TextBox x:Name="PlaylistNameTextBox" Classes="compact" HorizontalAlignment="Left" Margin="80,1,0,0"
-                     VerticalAlignment="Top"
-                     Width="120" Text="{Binding Name, Mode=TwoWay}" TabIndex="4" />
-            <Button x:Name="AddFolderButton" Classes="round" Content="Add" HorizontalAlignment="Right"
-                    Margin="0,-1,80,0"
-                    VerticalAlignment="Top" Width="75" TabIndex="6" Command="{Binding AddFolderCommand, Mode=OneWay}" />
-            <Button x:Name="RemoveFolderButton" Classes="round" Content="Remove" HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Width="75" TabIndex="7" Command="{Binding RemoveFolderCommand, Mode=OneWay}" Margin="0,-1,0,0" />
+        <Grid Margin="10,6,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="40" />
+            </Grid.RowDefinitions>
+            <Grid Column="0">
+                <Grid VerticalAlignment="Top">
+                    <TextBlock Text="Playlists" FontWeight="Bold" VerticalAlignment="Center" />
+                    <Button Classes="round" Width="35" TabIndex="2"
+                            HorizontalAlignment="Right" Margin="0,0,38,0" Command="{Binding AddPlaylist}">
+                        <Svg Path="/Assets/plus.svg" />
+                    </Button>
+                    <Button Classes="round" Width="35" TabIndex="3"
+                            HorizontalAlignment="Right" Command="{Binding DeletePlaylist}" >
+                        <Svg Path="/Assets/minus.svg" />
+                    </Button>
+                </Grid>
+                <ListBox TabIndex="1" Background="{x:Null}" Margin="0,28,0,0"
+                         Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Padding="14">
+                                <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                        <ia:InvokeCommandAction
+                                            Command="{Binding ViewModel.StartPlayList, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                    </ia:EventTriggerBehavior>
+                                </i:Interaction.Behaviors>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+            <Grid Column="1" Margin="12,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Row="0" IsEnabled="{Binding Converter={x:Static ObjectConverters.IsNotNull}, Mode=OneWay}"
+                      DataContext="{Binding Playlists.CurrentItem}">
+                    <Grid VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Folders" FontWeight="Bold" VerticalAlignment="Center" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding Name, Mode=TwoWay}" TabIndex="4" Margin="15,0,15,0" />
+                            <Button Classes="round" Width="35" TabIndex="6" Margin="0,0,3,0"
+                                    Command="{Binding AddFolderCommand, Mode=OneWay}">
+                                <Svg Path="/Assets/plus.svg" />
+                            </Button>
+                            <Button Classes="round" Width="35" TabIndex="7"
+                                    Command="{Binding RemoveFolderCommand, Mode=OneWay}">
+                                <Svg Path="/Assets/minus.svg" />
+                            </Button>
+                        </StackPanel>
+                        <Button Classes="round" Width="35" HorizontalAlignment="Right" Margin="0,0,38,0" 
+                            Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                            <Svg Path="/Assets/information.svg" />
+                        </Button>
+                        <Button Classes="round" Width="35" HorizontalAlignment="Right" >
+                            <Svg Path="/Assets/settings.svg" />
+                        </Button>
+                    </Grid>
+                    <ListBox Classes="compact" TabIndex="5" Background="{x:Null}" Margin="0,28,0,0"
+                             Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
+                    </ListBox>
+                </Grid>
+                <Grid Row="1" DataContext="{x:Static local:ViewModelLocator.FilesList}" Margin="0,6,0,0">
+                    <Grid VerticalAlignment="Top">
+                        <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Button Classes="round" Content="Play" HorizontalAlignment="Right"
+                                Width="75" TabIndex="9" Command="{Binding PlayCommand}" />
+                    </Grid>
+                    <ListBox Classes="compact" TabIndex="8" Background="{x:Null}" Margin="0,28,0,0"
+                             Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}">
+                                    <i:Interaction.Behaviors>
+                                        <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                            <ia:InvokeCommandAction
+                                                Command="{Binding ViewModel.StartPlayFile, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                        </ia:EventTriggerBehavior>
+                                    </i:Interaction.Behaviors>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Grid>
         </Grid>
-        <ListBox x:Name="PlaylistsList" HorizontalAlignment="Left"
-                 Margin="10,34,0,51" Width="146"
-                 TabIndex="1" Background="{x:Null}"
-                 Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
-            <ListBox.Styles>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListBox.Styles>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" Padding="14">
-                        <i:Interaction.Behaviors>
-                            <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                <ia:InvokeCommandAction
-                                    Command="{Binding ViewModel.PlayListCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                            </ia:EventTriggerBehavior>
-                        </i:Interaction.Behaviors>
-                    </TextBlock>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <TextBlock HorizontalAlignment="Left" Margin="10,8,0,0" Text="Playlists" VerticalAlignment="Top"
-                   FontWeight="Bold" />
-        <Button x:Name="AddPlaylistButton" Classes="round" HorizontalAlignment="Left" Margin="74,4,0,0"
-                VerticalAlignment="Top" Width="40" TabIndex="2" Command="{Binding AddPlaylistCommand}">
-            <Svg Path="/Assets/plus.svg"/>
-        </Button>
-        <Button x:Name="RemovePlaylistButton" Classes="round" HorizontalAlignment="Left"
-                Margin="121,4,0,0"
-                VerticalAlignment="Top" Width="40" TabIndex="3" Command="{Binding DeletePlaylistCommand}">
-            <Svg Path="/Assets/minus.svg" />
-        </Button>
-        <Grid Height="43" VerticalAlignment="Bottom" Grid.ColumnSpan="2"
+        <Grid Height="43" VerticalAlignment="Bottom"
               DataContext="{x:Static local:ViewModelLocator.Player}">
-            <TextBlock HorizontalAlignment="Stretch" Height="24" Text="{Binding Player.NowPlaying, Mode=OneWay}"
-                       Background="Green" />
-            <ui:MediaPlayer IsLoopVisible="False" IsSpeedVisible="False">
+            <ui:MediaPlayer 
+                IsLoopVisible="False" IsSpeedVisible="False">
                 <bass:BassPlayerHost Source="{Binding Player.NowPlaying, Mode=OneWay}"
                                      Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}"
-                                     Pitch="{Binding Player.Pitch}" EffectsFloat="True" EffectsSampleRateConversion="4"
+                                     Pitch="{Binding Player.Pitch}" EffectsFloat="True"
+                                     EffectsSampleRateConversion="4"
                                      Volume="{Binding ViewModel.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <i:Interaction.Behaviors>
                         <ia:EventTriggerBehavior EventName="MediaFinished">
@@ -103,29 +150,6 @@
                     </ia:EventTriggerBehavior>
                 </i:Interaction.Behaviors>
             </ui:MediaPlayer>
-        </Grid>
-        <Grid Margin="164,120,10,54" DataContext="{x:Static local:ViewModelLocator.FilesList}">
-            <ListBox x:Name="FilesList" Classes="compact" Margin="0,30,0,0" TabIndex="8"
-                     Background="{x:Null}"
-                     Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}">
-                            <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                    <ia:InvokeCommandAction
-                                        Command="{Binding ViewModel.PlayFileCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                </ia:EventTriggerBehavior>
-                            </i:Interaction.Behaviors>
-                        </TextBlock>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <TextBlock HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="Files"
-                       FontWeight="Bold" />
-            <Button Classes="round" x:Name="PlayButton" Content="Play" HorizontalAlignment="Right"
-                    VerticalAlignment="Top" Width="75"
-                    TabIndex="9" Command="{Binding PlayCommand}" />
         </Grid>
     </Grid>
 </Window>

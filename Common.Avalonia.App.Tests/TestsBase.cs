@@ -7,9 +7,9 @@ namespace HanumanInstitute.Common.Avalonia.App.Tests;
 /// </summary>
 public class TestsBase
 {
-    protected readonly ITestOutputHelper _output;
+    protected ITestOutputHelper Output { get; }
 
-    public TestsBase(ITestOutputHelper output) => _output = output;
+    public TestsBase(ITestOutputHelper output) => Output = output;
 
     /// <summary>
     /// Allows using a lambda expression after ??= operator.

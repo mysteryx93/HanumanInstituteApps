@@ -37,7 +37,7 @@ public class MainViewModelTests
     [Fact]
     public void CanAddPlaylistCommand_ReturnsTrue()
     {
-        var result = Model.AddPlaylistCommand.CanExecute(null);
+        var result = Model.AddPlaylist.CanExecute(null);
 
         Assert.True(result);
     }
@@ -45,7 +45,7 @@ public class MainViewModelTests
     [Fact]
     public void AddPlaylistCommand_Execute_SelectedIndexSet()
     {
-        Model.AddPlaylistCommand.Execute(null);
+        Model.AddPlaylist.Execute(null);
 
         Assert.Equal(0, Model.Playlists.CurrentPosition);
     }
@@ -62,7 +62,7 @@ public class MainViewModelTests
         AddPlaylists(2); // List contains 2 elements.
         Model.Playlists.CurrentPosition = selectedIndex;
 
-        var result = Model.DeletePlaylistCommand.CanExecute(null);
+        var result = Model.DeletePlaylist.CanExecute(null);
 
         Assert.Equal(expected, result);
     }
@@ -73,7 +73,7 @@ public class MainViewModelTests
         var listCount = 2;
         AddPlaylists(listCount);
 
-        Model.DeletePlaylistCommand.Execute(null);
+        Model.DeletePlaylist.Execute(null);
 
         Assert.Equal(listCount, Model.Playlists.Source.Count);
     }
@@ -81,7 +81,7 @@ public class MainViewModelTests
     [Fact]
     public void DeletePlaylistCommand_EmptyList_NoAction()
     {
-        Model.DeletePlaylistCommand.Execute(null);
+        Model.DeletePlaylist.Execute(null);
 
         Assert.Empty(Model.Playlists.Source);
     }
@@ -97,7 +97,7 @@ public class MainViewModelTests
         Model.Playlists.CurrentPosition = selectedIndex;
         var selectedItem = Model.Playlists.CurrentItem;
 
-        Model.DeletePlaylistCommand.Execute(null);
+        Model.DeletePlaylist.Execute(null);
 
         Assert.Equal(listCount - 1, Model.Playlists.Source.Count);
         Assert.DoesNotContain(selectedItem, Model.Playlists.Source);
@@ -112,7 +112,7 @@ public class MainViewModelTests
         AddPlaylists(count);
         Model.Playlists.CurrentPosition = sel;
 
-        Model.DeletePlaylistCommand.Execute(null);
+        Model.DeletePlaylist.Execute(null);
 
         Assert.Equal(newSel, Model.Playlists.CurrentPosition);
     }
@@ -124,7 +124,7 @@ public class MainViewModelTests
         Model.Playlists.MoveCurrentToFirst();
         MockFileList.Reset();
 
-        Model.DeletePlaylistCommand.Execute(null);
+        Model.DeletePlaylist.Execute(null);
 
         MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
     }
@@ -180,7 +180,7 @@ public class MainViewModelTests
     {
         AddPlaylists(2);
 
-        Model.SaveSettingsCommand.Execute(null);
+        Model.SaveSettings.Execute(null);
 
         Assert.Equal(2, MockSettings.Value.Playlists.Count);
     }
@@ -191,7 +191,7 @@ public class MainViewModelTests
         AddPlaylists(1);
         Model.Playlists.Source[0].Folders.Source.Add("a");
 
-        Model.SaveSettingsCommand.Execute(null);
+        Model.SaveSettings.Execute(null);
 
         Assert.NotNull(MockSettings.Value.Playlists);
         Assert.Single(MockSettings.Value.Playlists[0].Folders);

@@ -22,9 +22,10 @@ public class AppSettingsData : ReactiveObject
     public List<SettingsPlaylistItem> Playlists
     {
         get => _playlists;
-        set => this.RaiseAndSetIfChanged(ref _playlists, value, nameof(Playlists));
+        set => this.RaiseAndSetIfChanged(ref _playlists, value);
     }
     internal List<SettingsPlaylistItem> _playlists = new();
+    
     /// <summary>
     /// Gets or sets the width of the main window.
     /// </summary>
@@ -32,9 +33,10 @@ public class AppSettingsData : ReactiveObject
     public double Width
     {
         get => _width;
-        set => this.RaiseAndSetIfChanged(ref _width, value, nameof(Width));
+        set => this.RaiseAndSetIfChanged(ref _width, value);
     }
     internal double _width = 583;
+    
     /// <summary>
     /// Gets or sets the height of the main window.
     /// </summary>
@@ -42,18 +44,20 @@ public class AppSettingsData : ReactiveObject
     public double Height
     {
         get => _height;
-        set => this.RaiseAndSetIfChanged(ref _height, value, nameof(Height));
+        set => this.RaiseAndSetIfChanged(ref _height, value);
     }
     internal double _height = 390;
+    
     /// <summary>
     /// Gets or sets the position of the main window.
     /// </summary>
     public PixelPoint Position
     {
         get => _position;
-        set => this.RaiseAndSetIfChanged(ref _position, value, nameof(Position));
+        set => this.RaiseAndSetIfChanged(ref _position, value);
     }
     internal PixelPoint _position;
+    
     /// <summary>
     /// Gets or sets the playback volume.
     /// </summary>
@@ -61,7 +65,17 @@ public class AppSettingsData : ReactiveObject
     public int Volume
     {
         get => _volume;
-        set => this.RaiseAndSetIfChanged(ref _volume, value, nameof(Volume));
+        set => this.RaiseAndSetIfChanged(ref _volume, value);
     } 
     internal int _volume = 100;
+
+    /// <summary>
+    /// Gets or sets whether to display the About window on startup.
+    /// </summary>
+    public bool ShowInfoOnStartup
+    {
+        get => _showInfoOnStartup;
+        set => this.RaiseAndSetIfChanged(ref _showInfoOnStartup, value);
+    }
+    internal bool _showInfoOnStartup = true;
 }

@@ -13,13 +13,14 @@ public static class SplatContainerExtensions
     {
         services.CheckNotNull(nameof(services));
 
-        //services.Register(Component.For<SettingsProvider>().ImplementedBy<SettingsProvider>().LifeStyle.Singleton);
-        SplatRegistrations.Register<ISerializationService, SerializationService>();
-        SplatRegistrations.Register<IFileSystemService, FileSystemService>();
-        SplatRegistrations.Register<IFileSystem, FileSystem>();
-        SplatRegistrations.Register<IProcessService, ProcessService>();
-        SplatRegistrations.Register<IEnvironmentService, EnvironmentService>();
-        SplatRegistrations.Register<IWindowsApiService, WindowsApiService>();
+        SplatRegistrations.RegisterLazySingleton<ISerializationService, SerializationService>();
+        SplatRegistrations.RegisterLazySingleton<IFileSystemService, FileSystemService>();
+        SplatRegistrations.RegisterLazySingleton<IFileSystem, FileSystem>();
+        SplatRegistrations.RegisterLazySingleton<IProcessService, ProcessService>();
+        SplatRegistrations.RegisterLazySingleton<IEnvironmentService, EnvironmentService>();
+        SplatRegistrations.RegisterLazySingleton<IWindowsApiService, WindowsApiService>();
+        SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
+        SplatRegistrations.RegisterLazySingleton<ISyndicationFeedService, SyndicationFeedService>();
         SplatRegistrations.SetupIOC();
 
         return services;

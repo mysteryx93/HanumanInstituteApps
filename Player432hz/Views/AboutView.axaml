@@ -4,15 +4,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:commonApp="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
-        mc:Ignorable="d" Width="550" Height="380" MaxWidth="550" MaxHeight="380"
+        mc:Ignorable="d" MinWidth="550" MinHeight="400" MaxWidth="550" MaxHeight="400"
         x:Class="HanumanInstitute.Player432hz.Views.AboutView"
-        Title="AboutView"
+        Title="Information"
         d:DataContext="{x:Static local:ViewModelLocator.About}">
     <Window.Resources>
         <commonApp:VersionConverter x:Key="VersionConverter" />
     </Window.Resources>
     <Grid Classes="GradiantBackground">
-        <Grid Margin="10">
+        <Grid Margin="10,8,10,4">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding AppName}" Margin="0,0,8,0" />
@@ -20,8 +20,8 @@
                 </StackPanel>
                 <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppDescription}" HorizontalAlignment="Center" />
                 <Button Classes="link" HorizontalAlignment="Center" Margin="0,5,0,0"
-                        Command="{Binding OpenBrowser}" CommandParameter="https://github.com/mysteryx93/NaturalGroundingPlayer/releases">
-                    Check for updates
+                        Command="{Binding OpenBrowser}" CommandParameter="https://github.com/mysteryx93/NaturalGroundingPlayer/releases"
+                        Content="{Binding CheckForUpdateText}">
                 </Button>
                 <TextBlock Margin="0,15,0,0" Text="License: MIT (Free &amp; Open Source)"
                            HorizontalAlignment="Center" />
@@ -39,12 +39,14 @@
                     <TabControl.Styles>
                         <Style Selector="TabItem">
                             <Setter Property="FontSize" Value="18" />
-                            <Setter Property="Margin" Value="0,0,0,10" />
+                            <Setter Property="FontWeight" Value="DemiBold" />
+                            <Setter Property="Margin" Value="0,0,0,6" />
+                            <Setter Property="Padding" Value="8,5,8,5" />
                         </Style>
                     </TabControl.Styles>
                     <TabItem Header="Hanuman Institute">
                         <StackPanel>
-                            <TextBlock Text="Donate to Etienne Charland to build the Hanuman Institute as an ascension hub to be shaped by God, to provide the support that Lightworkers need." TextWrapping="Wrap" />
+                            <TextBlock Text="Donate to Etienne Charland to build the Hanuman Institute as an ascension hub, to provide the support that Lightworkers need." TextWrapping="Wrap" />
                             <Button Classes="link" Margin="0,10,0,0" Command="{Binding OpenBrowser}" CommandParameter="https://store.spiritualselftransformation.com/donation">
                                 >> Donate here
                             </Button>
@@ -68,8 +70,11 @@
                     </TabItem>
                 </TabControl>
             </StackPanel>
-            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round" 
-                    Command="{Binding Close}" IsDefault="True" IsCancel="true">_Close</Button>
+            <Grid VerticalAlignment="Bottom">
+                <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
+                <Button HorizontalAlignment="Right" Width="100" Classes="round" 
+                        Command="{Binding Close}" IsDefault="True" IsCancel="true">_Close</Button>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

@@ -30,6 +30,9 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="CornerRadius" Value="14" />
         </Style>
+        <Style Selector="Button.round:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
         <Style Selector="ListBox">
             <Setter Property="BorderThickness" Value="1" />
         </Style>

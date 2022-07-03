@@ -117,7 +117,7 @@ public class AudioEncoderTests : TestsBase
         var t1 = Model.StartAsync(file, Settings);
 
         var ex = await Assert.ThrowsAsync<ValidationException>(() => t1);
-        _output.WriteLine(ex.Message);
+        Output.WriteLine(ex.Message);
     }
 
     [Theory]
@@ -133,7 +133,7 @@ public class AudioEncoderTests : TestsBase
         Settings.Format = format;
         file.WhenAnyValue(x => x.ProgressPercent).Subscribe(x =>
         {
-            _output.WriteLine(x.ToStringInvariant());
+            Output.WriteLine(x.ToStringInvariant());
         });
 
         await Model.StartAsync(file, Settings);
@@ -155,7 +155,7 @@ public class AudioEncoderTests : TestsBase
         Settings.Format = format;
         file.WhenAnyValue(x => x.ProgressPercent).Subscribe(x =>
         {
-            _output.WriteLine(x.ToStringInvariant());
+            Output.WriteLine(x.ToStringInvariant());
         });
 
         await Model.StartAsync(file, Settings);
@@ -189,7 +189,7 @@ public class AudioEncoderTests : TestsBase
 
         Assert.True(FileSystem.File.Exists(file.Destination));
         var fileLength = FileSystem.FileInfo.FromFileName(file.Destination).Length;
-        _output.WriteLine(fileLength.ToString());
+        Output.WriteLine(fileLength.ToString());
     }
 
     [Theory]
@@ -343,7 +343,7 @@ public class AudioEncoderTests : TestsBase
 
         Assert.True(FileSystem.File.Exists(file.Destination));
         var fileSize = FileSystem.FileInfo.FromFileName(file.Destination).Length;
-        _output.WriteLine(fileSize.ToString());
+        Output.WriteLine(fileSize.ToString());
         // Look at test run times
     }
 
@@ -386,7 +386,7 @@ public class AudioEncoderTests : TestsBase
     public async Task Start_WithTag_SameTagInOutputFile(EncodeFormat format, string tagName)
     {
         var srcTag = GetTag(tagName);
-        _output.WriteLine($"{tagName} = {srcTag}");
+        Output.WriteLine($"{tagName} = {srcTag}");
         var file = CreateSourceShort(format);
         FileSystem.DeleteFileSilent(file.Destination);
         Settings.Format = format;
@@ -395,7 +395,7 @@ public class AudioEncoderTests : TestsBase
 
         Assert.True(FileSystem.File.Exists(file.Destination));
         var dstTag = GetTag(tagName, file.Destination);
-        _output.WriteLine($"Output = {dstTag}");
+        Output.WriteLine($"Output = {dstTag}");
         Assert.Equal(srcTag, dstTag);
     }
 }
