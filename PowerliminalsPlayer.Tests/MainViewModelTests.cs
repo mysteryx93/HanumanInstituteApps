@@ -90,12 +90,12 @@ public class MainViewModelTests
     
     protected void SetDialogManagerOpenFolder(string result) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(
-                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()))
-            .Returns(Task.FromResult(result?.ReplaceDirectorySeparator()));
+                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
+            .Returns(Task.FromResult<object>(result?.ReplaceDirectorySeparator()));
 
     protected void SetDialogManagerLoadPreset(PresetItem result) =>
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
-            .Returns<INotifyPropertyChanged, IModalDialogViewModel, Type>((_, viewModel, _) =>
+            .Returns<INotifyPropertyChanged, IModalDialogViewModel>((_, viewModel) =>
             {
                 var vm = (SelectPresetViewModel)viewModel;
                 vm.SelectedItem = result;
@@ -105,7 +105,7 @@ public class MainViewModelTests
     
     protected void SetDialogManagerSavePreset(string result) =>
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
-            .Returns<INotifyPropertyChanged, IModalDialogViewModel, Type>((_, viewModel, _) =>
+            .Returns<INotifyPropertyChanged, IModalDialogViewModel>((_, viewModel) =>
             {
                 var vm = (SelectPresetViewModel)viewModel;
                 vm.PresetName = result;
@@ -557,7 +557,7 @@ public class MainViewModelTests
         Model.AppData.Presets.Add(new PresetItem(presetName));
         SelectPresetViewModel vm = null;
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
-            .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
+            .Returns<INotifyPropertyChanged, INotifyPropertyChanged>((_, viewModel) =>
             {
                 vm = (SelectPresetViewModel)viewModel;
                 vm.SelectedItem = Model.AppData.Presets.First();
@@ -678,7 +678,7 @@ public class MainViewModelTests
     {
         SelectPresetViewModel vm = null;
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
-            .Returns<INotifyPropertyChanged, INotifyPropertyChanged, Type>((_, viewModel, _) =>
+            .Returns<INotifyPropertyChanged, INotifyPropertyChanged>((_, viewModel) =>
             {
                 vm = (SelectPresetViewModel)viewModel;
                 vm.PresetName = "a";

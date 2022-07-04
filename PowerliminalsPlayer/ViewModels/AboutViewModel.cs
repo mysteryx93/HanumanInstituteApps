@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
-namespace HanumanInstitute.Player432hz.ViewModels;
+namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
 public class AboutViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
 {
@@ -23,7 +23,7 @@ public class AboutViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
         _processService = processService;
         _settings = settings;
         _updateService = updateService;
-        _updateService.FileFormat = "Player432hz-{0}_Win_x64.zip";
+        _updateService.FileFormat = "PowerliminalsPlayer-{0}_Win_x64.zip";
         
         // Start in constructor to save time.
         if (!Design.IsDesignMode)
@@ -35,12 +35,12 @@ public class AboutViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
     /// <summary>
     /// Returns the name of the application.
     /// </summary>
-    public string AppName => "432hz Player";
+    public string AppName => "Powerliminals Player";
 
     /// <summary>
     /// Returns the description of the application.
     /// </summary>
-    public string AppDescription => "Plays music in 432hz";
+    public string AppDescription => "Plays multiple audios simultaneously at varying speeds";
 
     /// <summary>
     /// Returns the version of the application.

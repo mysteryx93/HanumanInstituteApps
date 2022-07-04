@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace HanumanInstitute.Player432hz.Views;
+namespace HanumanInstitute.PowerliminalsPlayer.Views;
 
 public partial class AboutView : Window
 {

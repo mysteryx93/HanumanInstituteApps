@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Player432hz.Models;
-
-namespace HanumanInstitute.Player432hz.ViewModels;
+﻿namespace HanumanInstitute.Player432hz.ViewModels;
 
 /// <summary>
 /// Creates new instances of IPlaylistViewModel.

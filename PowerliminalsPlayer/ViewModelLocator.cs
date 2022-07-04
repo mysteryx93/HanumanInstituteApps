@@ -24,11 +24,15 @@ public static class ViewModelLocator
             
         // Services
         container.AddCommonServices();
-        container.RegisterLazySingleton<IDialogService>(() => new DialogService());
+        container.Register(() => (IDialogService)new DialogService(new DialogManager(
+                viewLocator: new ViewLocator(),
+                dialogFactory: new DialogFactory().AddMessageBox()),
+            viewModelFactory: t => Locator.Current.GetService(t)));
         container.RegisterLazySingleton<IBassDevice>(() => BassDevice.Instance);
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
+        SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<SelectPresetViewModel>();
 
         // Business
@@ -40,6 +44,7 @@ public static class ViewModelLocator
     }
 
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
+    public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static SelectPresetViewModel SelectPreset => Locator.Current.GetService<SelectPresetViewModel>()!;
 
     public static void Cleanup()

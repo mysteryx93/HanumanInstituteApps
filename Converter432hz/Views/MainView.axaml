@@ -7,7 +7,7 @@
         x:Class="HanumanInstitute.Converter432hz.Views.MainView"
         mc:Ignorable="d"
         Title="432hz Batch Converter" Icon="/Assets/App.ico"
-        MinHeight="350" MinWidth="570"
+        MinHeight="350" MinWidth="570" 
         hic:SizeExtension.TrackSize="True"
         hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
@@ -16,6 +16,9 @@
         xmlns:bassAudio="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="Opened">
+            <ia:InvokeCommandAction Command="{Binding InitWindow}" />
+        </ia:EventTriggerBehavior>
         <ia:EventTriggerBehavior EventName="Closing">
             <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
         </ia:EventTriggerBehavior>
@@ -54,10 +57,12 @@
                 <Grid IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Classes="compact" Grid.Column="0" Text="{Binding Encoder.Destination}" />
-                    <Button Classes="round" Grid.Column="1" Command="{Binding BrowseDestination}">Browse</Button>
+                    <Button Classes="round" Grid.Column="1" Command="{Binding BrowseDestination}" Width="35" >
+                        <Svg Path="/Assets/folder.svg" />
+                    </Button>
                 </Grid>
             </StackPanel>
             <Grid Grid.Column="0" Grid.Row="1">
@@ -88,7 +93,13 @@
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,0,0">
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
-                    <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold">Settings</TextBlock>
+                    <Grid>
+                        <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold">Settings</TextBlock>
+                        <Button Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                            <Svg Path="/Assets/information.svg" />
+                        </Button>
+                    </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
                         <ComboBox HorizontalAlignment="Right" Width="100" Classes="compact"

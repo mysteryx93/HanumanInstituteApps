@@ -30,10 +30,10 @@ public class EncoderServiceTests : TestsBase
         result.Setup(x => x.StartAsync(It.IsAny<ProcessingItem>(), It.IsAny<EncodeSettings>(), It.IsAny<CancellationToken>()))
             .Returns<ProcessingItem, EncodeSettings, CancellationToken>(async (file, _, token) =>
             {
-                _output.WriteLine("Start");
+                Output.WriteLine("Start");
                 await _fakeFileSystem.File.WriteAllTextAsync(file.Destination, "file content", token);
                 await Task.Delay(100, token);
-                _output.WriteLine("Callback");
+                Output.WriteLine("Callback");
                 file.Status = token.IsCancellationRequested ? EncodeStatus.Cancelled : EncodeStatus.Completed;
             });
         return result;
@@ -60,7 +60,7 @@ public class EncoderServiceTests : TestsBase
     {
         foreach (var item in errors)
         {
-            _output.WriteLine(item.ToString());
+            Output.WriteLine(item.ToString());
         }
     }
 
@@ -629,7 +629,7 @@ public class EncoderServiceTests : TestsBase
         Assert.True(Model.ProcessingFiles.Count > 1);
         Assert.All(Model.ProcessingFiles, x =>
         {
-            _output.WriteLine(x.Status.ToString());
+            Output.WriteLine(x.Status.ToString());
             Assert.Equal(EncodeStatus.Cancelled, x.Status);
         });
     }
@@ -680,7 +680,7 @@ public class EncoderServiceTests : TestsBase
             .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
             {
                 callCount++;
-                _output.WriteLine("ShowAskFileAction");
+                Output.WriteLine("ShowAskFileAction");
                 await Task.Delay(100);
                 var vm = (AskFileActionViewModel)viewModel;
                 vm.Items.SelectedValue = FileExistsAction.Skip;
@@ -693,7 +693,7 @@ public class EncoderServiceTests : TestsBase
         Assert.Equal(1, callCount);
         Assert.All(Model.ProcessingFiles, x =>
         {
-            _output.WriteLine(x.Status.ToString());
+            Output.WriteLine(x.Status.ToString());
             Assert.Equal(EncodeStatus.Skip, x.Status);
         });
     }

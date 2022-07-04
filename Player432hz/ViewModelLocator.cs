@@ -1,12 +1,7 @@
-﻿using HanumanInstitute.Common.Services;
+﻿using HanumanInstitute.BassAudio;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
-using HanumanInstitute.BassAudio;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.Player432hz.Models;
-using HanumanInstitute.Player432hz.ViewModels;
-using HanumanInstitute.Player432hz.Views;
 using Splat;
 
 namespace HanumanInstitute.Player432hz;

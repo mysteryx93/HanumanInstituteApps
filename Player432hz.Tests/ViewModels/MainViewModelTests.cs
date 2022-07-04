@@ -1,30 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.Player432hz.Models;
 using HanumanInstitute.Player432hz.ViewModels;
 using Moq;
 using Xunit;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
 public class MainViewModelTests
 {
     public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
-    private Mock<IFilesListViewModel>? _mockFileList;
+    private Mock<IFilesListViewModel> _mockFileList;
 
     public ISettingsProvider<AppSettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<AppSettingsData>();
-    private ISettingsProvider<AppSettingsData>? _mockSettings;
+    private ISettingsProvider<AppSettingsData> _mockSettings;
 
     public PlaylistViewModelFactory Factory => _factory ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
-    private PlaylistViewModelFactory? _factory;
+    private PlaylistViewModelFactory _factory;
 
-    public MainViewModel Model => _model ??= new MainViewModel(Factory, MockSettings, MockFileList.Object);
-    private MainViewModel? _model;
+    public MainViewModel Model => _model ??= new MainViewModel(Factory, MockSettings, MockFileList.Object, DialogService);
+    private MainViewModel _model;
+    
+    protected Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
+    private Mock<IDialogManager> _mockDialogManager;
 
+    protected IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
+    private IDialogService _dialogService;
 
     private void AddPlaylists(int count)
     {

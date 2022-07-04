@@ -42,4 +42,14 @@ public class AppSettingsData : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _position, value, nameof(Position));
     }
     internal PixelPoint _position;
+    
+    /// <summary>
+    /// Gets or sets whether to display the About window on startup.
+    /// </summary>
+    public bool ShowInfoOnStartup
+    {
+        get => _showInfoOnStartup;
+        set => this.RaiseAndSetIfChanged(ref _showInfoOnStartup, value);
+    }
+    internal bool _showInfoOnStartup = true;
 }

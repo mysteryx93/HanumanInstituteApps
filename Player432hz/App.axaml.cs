@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -15,7 +14,6 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        GC.KeepAlive(typeof(DialogService));
         GC.KeepAlive(typeof(Avalonia.Svg.Skia.SvgImage));
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

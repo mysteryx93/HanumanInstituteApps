@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Windows.Input;
 using DynamicData;
-using DynamicData.Aggregation;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -70,6 +69,16 @@ public class MainViewModel : ReactiveObject
         // var sourceObserve = Encoder.Sources.Connect();
         // combined.Add(sourceObserve.Filter(x => x is not FolderItem).Count());
         // combined.Add(SumEx.Sum(sourceObserve.Filter(x => x is FolderItem), x =>((FolderItem)x).Files.Count));
+    }
+    
+    public ICommand InitWindow => _initWindow ??= ReactiveCommand.Create(InitWindowImpl);
+    private ICommand? _initWindow;
+    private void InitWindowImpl()
+    {
+        if (_settings.Value.ShowInfoOnStartup)
+        {
+            ShowAbout.ExecuteIfCan();
+        }
     }
 
     public int FilesLeft { get; private set; }
@@ -262,4 +271,26 @@ public class MainViewModel : ReactiveObject
     public ICommand StopEncoding => _stopEncoding ??= ReactiveCommand.Create(StopEncodingImpl);
     private ICommand? _stopEncoding;
     private void StopEncodingImpl() => Encoder.Cancel();
+    
+    /// <summary>
+    /// Shows the About window.
+    /// </summary>
+    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private ICommand? _showAbout;
+    private async Task ShowAboutImplAsync()
+    {
+        var vm = _dialogService.CreateViewModel<AboutViewModel>();
+        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
+        _settings.Save();
+    }
+    
+    // /// <summary>
+    // /// Shows the Settings window.
+    // /// </summary>
+    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    // private ICommand? _showSettings;
+    // private Task ShowSettingsImplAsync()
+    // {
+    //
+    // }
 }

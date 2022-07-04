@@ -5,38 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        mc:Ignorable="d" Height="289.85" Width="205.263" CanResize="False" WindowStartupLocation="CenterOwner" 
-        ShowInTaskbar="False" Icon="/Assets/App.ico" 
+        mc:Ignorable="d" Height="290" MinHeight="290" MaxHeight="290" Width="285" MinWidth="205" MaxWidth="205"
+        CanResize="False" WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False" Icon="/Assets/App.ico"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}">
     <Window.Resources>
-        <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Save Preset As..." FalseValue="Load Preset..."/>
+        <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Save Preset As..."
+                                      FalseValue="Load Preset..." />
     </Window.Resources>
     <Window.Title>
-        <Binding Converter="{StaticResource BooleanToStringConverter}" Path="ModeSave"/>
+        <Binding Converter="{StaticResource BooleanToStringConverter}" Path="ModeSave" />
     </Window.Title>
-    <Grid Classes="GradiantBackground">
-        <DockPanel Margin="0,1,0,32">
-            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="24" Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0" Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}" hic:FocusExtensions.SelectAllOnFocus="True"/>
-            <ListBox x:Name="PresetList" Classes="compact" BorderThickness="0" TabIndex="1" 
-                     Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" Background="{x:Null}">
+    <Grid Classes="GradiantBackground" RowDefinitions="Auto,*,Auto">
+        <Grid Row="0">
+            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="24"
+                     Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0"
+                     Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}"
+                     hic:FocusExtensions.SelectAllOnFocus="True" />
+        </Grid>
+        <Grid Row="1">
+            <ListBox x:Name="PresetList" Classes="compact" BorderThickness="0" TabIndex="1"
+                     Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                     Background="{x:Null}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}">
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
                                     <ia:InvokeCommandAction
-                                        Command="{Binding ViewModel.ConfirmCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" CommandParameter="{x:Null}" />
+                                        Command="{Binding ViewModel.ConfirmCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        CommandParameter="{x:Null}" />
                                 </ia:EventTriggerBehavior>
                             </i:Interaction.Behaviors>
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-        </DockPanel>
-        <Button x:Name="OkButton" Classes="round" Content="_OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="4" Margin="0,0,4.263,2.85" IsDefault="True" Command="{Binding ConfirmCommand}" />
-        <Button x:Name="CancelButton" Classes="round" Content="_Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="70" TabIndex="3" Margin="0,0,79.263,2.85" IsCancel="True" Command="{Binding CancelCommand}" />
-        <Button x:Name="DelButton" Classes="round" Content="Del" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="40" TabIndex="2" Margin="0,0,154.263,2.85" Command="{Binding DeleteCommand}" />
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button x:Name="OkButton" Classes="round" Content="_OK" Width="70" TabIndex="4" IsDefault="True"
+                    Command="{Binding ConfirmCommand}" Margin="5,2,0,2" />
+            <Button x:Name="CancelButton" Classes="round" Content="_Cancel" Width="70" TabIndex="3" IsCancel="True"
+                    Command="{Binding CancelCommand}" Margin="5,2,0,2" />
+            <Button x:Name="DelButton" Classes="round" Content="Del" Width="40" TabIndex="2"
+                    Command="{Binding DeleteCommand}" Margin="5,2,0,2" />
+        </StackPanel>
     </Grid>
 </Window>

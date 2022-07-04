@@ -35,6 +35,7 @@ public static class ViewModelLocator
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
+        SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<AskFileActionViewModel>();
         SplatRegistrations.Register<AdvancedSettingsViewModel>();
 
@@ -48,6 +49,7 @@ public static class ViewModelLocator
     }
 
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
+    public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static AskFileActionViewModel AskFileAction => Locator.Current.GetService<AskFileActionViewModel>()!;
     public static AdvancedSettingsViewModel AdvancedSettings => Locator.Current.GetService<AdvancedSettingsViewModel>()!;
     

@@ -43,7 +43,7 @@ public class AppSettingsData : ReactiveObject
         get => _width;
         set => this.RaiseAndSetIfChanged(ref _width, value);
     }
-    private double _width;
+    private double _width = 730;
 
     /// <summary>
     /// Gets or sets the main window height.
@@ -53,7 +53,7 @@ public class AppSettingsData : ReactiveObject
         get => _height;
         set => this.RaiseAndSetIfChanged(ref _height, value);
     }
-    private double _height;
+    private double _height = 410;
 
     public PositionExtension.PositionPoint Position
     {
@@ -62,6 +62,16 @@ public class AppSettingsData : ReactiveObject
     }
     private PositionExtension.PositionPoint _position;
 
+    /// <summary>
+    /// Gets or sets whether to display the About window on startup.
+    /// </summary>
+    public bool ShowInfoOnStartup
+    {
+        get => _showInfoOnStartup;
+        set => this.RaiseAndSetIfChanged(ref _showInfoOnStartup, value);
+    }
+    internal bool _showInfoOnStartup = true;
+    
     // [XmlElement("Position")]
     // public PositionExtension.PositionPoint PositionStore
     // {

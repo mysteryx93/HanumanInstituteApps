@@ -2,12 +2,8 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using Avalonia;
 using Avalonia.Input;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
@@ -44,7 +40,7 @@ public class MainViewModel : ReactiveObject
     {
         if (_settings.Value.ShowInfoOnStartup)
         {
-            ShowSettings.Execute();
+            ShowAbout.ExecuteIfCan();
         }
     }
 
@@ -175,14 +171,13 @@ public class MainViewModel : ReactiveObject
         _settings.Save();
     }
     
-    /// <summary>
-    /// Shows the Settings window.
-    /// </summary>
-    public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    private ICommand? _showSettings;
-    private Task ShowSettingsImplAsync()
-    {
-        var vm = _dialogService.CreateViewModel<AboutViewModel>();
-        return _dialogService.ShowDialogAsync(this, vm);
-    }
+    // /// <summary>
+    // /// Shows the Settings window.
+    // /// </summary>
+    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    // private ICommand? _showSettings;
+    // private Task ShowSettingsImplAsync()
+    // {
+    //
+    // }
 }

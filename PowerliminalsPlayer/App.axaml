@@ -24,9 +24,13 @@
             <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
         </Style>
         <Style Selector="Button.round">
+            <Setter Property="Height" Value="26" />
             <Setter Property="Padding" Value="4" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="CornerRadius" Value="14" />
+        </Style>
+        <Style Selector="Button.round:disabled">
+            <Setter Property="Opacity" Value="0.5" />
         </Style>
         <Style Selector="ListBox">
             <Setter Property="BorderThickness" Value="1" />
@@ -49,6 +53,27 @@
         </Style>
         <Style Selector="TextBox.compact:pointerover /template/ Border#PART_BorderElement, TextBox.compact:focus /template/ Border#PART_BorderElement">
             <Setter Property="Background" Value="Transparent" />
+        </Style>
+        
+        <Style Selector="Button.link">
+            <Setter Property="Foreground" Value="Blue" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Content="{TemplateBinding Content}">
+                        <ContentPresenter.Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="Foreground" Value="{TemplateBinding Foreground}"/>
+                                <Setter Property="FontSize" Value="{TemplateBinding FontSize}"/>
+                                <Setter Property="TextDecorations" Value="Underline"/>
+                            </Style>
+                        </ContentPresenter.Styles>
+                    </ContentPresenter>
+                </ControlTemplate>
+            </Setter>
         </Style>
     </Application.Styles>
 </Application>

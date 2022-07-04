@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.ReactiveUI;
+﻿using Avalonia.ReactiveUI;
 
 namespace HanumanInstitute.Player432hz;
 

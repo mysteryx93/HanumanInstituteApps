@@ -12,11 +12,15 @@ public interface IAppPathService
     /// </summary>
     IReadOnlyList<string> AudioExtensions { get; }
     /// <summary>
-    /// Returns the path where the Powerliminals Player settings file is stored.
-    /// </summary>
-    string SettingsPath { get; }
-    /// <summary>
     /// Returns the path where unhandled exceptions are logged.
     /// </summary>
     string UnhandledExceptionLogPath { get; }
+    /// <summary>
+    /// Returns the path where the application settings file is stored.
+    /// </summary>
+    string ConfigFile { get; }
+    /// <summary>
+    /// If a settings file is found at an old location, it will be moved to the new location. This is for compatibility with previous version.
+    /// </summary>
+    string OldConfigFile { get; }
 }

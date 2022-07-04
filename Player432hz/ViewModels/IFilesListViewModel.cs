@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Player432hz.Models;
+﻿using System.Windows.Input;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 

@@ -40,6 +40,17 @@ public class MainViewModel : ReactiveObject
 
         this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(200)).Subscribe((_) => ReloadFiles());
     }
+    
+    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImpl);
+    private ICommand? _initWindow;
+    private async Task InitWindowImpl()
+    {
+        if (_settings.Value.ShowInfoOnStartup)
+        {
+            ShowAbout.ExecuteIfCan();
+            await PromptFixPathsAsync();
+        }
+    }
 
     public string SearchText
     {
@@ -285,4 +296,26 @@ public class MainViewModel : ReactiveObject
 
         IsPaused = !IsPaused;
     }
+    
+    /// <summary>
+    /// Shows the About window.
+    /// </summary>
+    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private ICommand? _showAbout;
+    private async Task ShowAboutImplAsync()
+    {
+        var vm = _dialogService.CreateViewModel<AboutViewModel>();
+        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
+        _settings.Save();
+    }
+    
+    // /// <summary>
+    // /// Shows the Settings window.
+    // /// </summary>
+    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    // private ICommand? _showSettings;
+    // private Task ShowSettingsImplAsync()
+    // {
+    //
+    // }
 }

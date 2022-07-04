@@ -1,7 +1,5 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using HanumanInstitute.Player432hz.ViewModels;
 
 namespace HanumanInstitute.Player432hz.Views;
 

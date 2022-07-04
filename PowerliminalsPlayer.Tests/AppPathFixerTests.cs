@@ -55,7 +55,7 @@ public class AppPathFixerTests
     protected void SetMessageBoxResult(bool? result)
     {
         MockDialogManager.Setup(x =>
-                x.ShowFrameworkDialogAsync(Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<bool?,string>>()))
+                x.ShowFrameworkDialogAsync(Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
             .ReturnsAsync(result);
     }
 
@@ -63,7 +63,7 @@ public class AppPathFixerTests
     {
         MockDialogManager.Setup(x =>
                 x.ShowFrameworkDialogAsync(Owner, It.IsAny<OpenFolderDialogSettings>(),
-                    It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()))
+                    It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
             .ReturnsAsync(result)
             .Callback(() => SetMessageBoxResult(nextPromptResult));
     }
@@ -71,13 +71,13 @@ public class AppPathFixerTests
     protected void VerifyMessageBox(Times times)
     {
         MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync(
-            Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<bool?,string>>()), times);
+            Owner, It.IsAny<MessageBoxSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()), times);
     }
 
     protected void VerifyOpenFolder(Times times)
     {
         MockDialogManager.Verify(x => x.ShowFrameworkDialogAsync(
-            Owner, It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<string,string>>()), times);
+            Owner, It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()), times);
     }
 
     [Fact]

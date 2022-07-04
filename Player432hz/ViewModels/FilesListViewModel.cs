@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData.Binding;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.Player432hz.Models;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;

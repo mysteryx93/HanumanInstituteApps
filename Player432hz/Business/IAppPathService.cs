@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿
 // ReSharper disable InconsistentNaming
 
 namespace HanumanInstitute.Player432hz.Business;
 
+/// <summary>
+/// Manages the file system paths used by the application.
+/// </summary>
 public interface IAppPathService
 {
     /// <summary>
@@ -14,7 +17,11 @@ public interface IAppPathService
     /// </summary>
     string UnhandledExceptionLogPath { get; }
     /// <summary>
-    /// Returns the path where the 432hz Player settings file is stored.
+    /// Returns the path where the application settings file is stored.
     /// </summary>
-    string Player432hzConfigFile { get; }
+    string ConfigFile { get; }
+    /// <summary>
+    /// If a settings file is found at an old location, it will be moved to the new location. This is for compatibility with previous version.
+    /// </summary>
+    string OldConfigFile { get; }
 }
