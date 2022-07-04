@@ -34,13 +34,14 @@ public class MainViewModel : ReactiveObject
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe((_) => Playlists_CurrentChanged());
     }
     
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.Create(InitWindowImpl);
+    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
     private ICommand? _initWindow;
-    private void InitWindowImpl()
+    private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
         {
-            ShowAbout.ExecuteIfCan();
+            await Task.Delay(1).ConfigureAwait(true);
+            await ShowAboutImplAsync().ConfigureAwait(false);
         }
     }
 

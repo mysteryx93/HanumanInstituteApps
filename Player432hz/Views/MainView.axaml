@@ -81,13 +81,13 @@
                                 <Svg Path="/Assets/minus.svg" />
                             </Button>
                         </StackPanel>
-                        <Button Classes="round" Width="35" HorizontalAlignment="Right" Margin="0,0,38,0" 
+                        <Button Classes="round" Width="35" HorizontalAlignment="Right"  
                             Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
                             <Svg Path="/Assets/information.svg" />
                         </Button>
-                        <Button Classes="round" Width="35" HorizontalAlignment="Right" >
+                        <!--<Button Classes="round" Width="35" HorizontalAlignment="Right" >
                             <Svg Path="/Assets/settings.svg" />
-                        </Button>
+                        </Button>-->
                     </Grid>
                     <ListBox Classes="compact" TabIndex="5" Background="{x:Null}" Margin="0,28,0,0"
                              Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">

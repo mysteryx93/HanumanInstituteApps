@@ -1,8 +1,8 @@
 #!/bin/bash
 ################################################################################
 # PROJECT   : Publish-AppImage for .NET
-# WEBPAGE   : https://kuiper.zone/publish-appimage-dotnet/
-# COPYRIGHT : Andy Thomas 2021
+# WEBPAGE   : https://github.com/kuiperzone/Publish-AppImage
+# COPYRIGHT : Andy Thomas 2021-2022
 # LICENSE   : MIT
 ################################################################################
 
@@ -10,12 +10,12 @@
 # CONSTANTS
 ###############################
 
-declare -r _SCRIPT_VERSION="1.1.0"
+declare -r _SCRIPT_VERSION="1.2.1"
 declare -r _SCRIPT_TITLE="Publish-AppImage for .NET"
 declare -r _SCRIPT_IMPL_MIN=1
 declare -r _SCRIPT_IMPL_MAX=1
-declare -r _SCRIPT_COPYRIGHT="Copyright 2021 Andy Thomas"
-declare -r _SCRIPT_WEBSITE="https://kuiper.zone/"
+declare -r _SCRIPT_COPYRIGHT="Copyright 2022 Andy Thomas"
+declare -r _SCRIPT_WEBSITE="https://github.com/kuiperzone/Publish-AppImage"
 
 declare -r _SCRIPT_NAME="publish-appimage"
 declare -r _DEFAULT_CONF="${_SCRIPT_NAME}.conf"
@@ -114,12 +114,6 @@ declare -r _RID_ARG_NAME="runtime"
 _rid_arg_value="linux-x64"
 _arg_syntax="${_arg_syntax}${_RID_ARG}:"
 
-# App version
-declare -r _APPVER_ARG="x"
-declare -r _APPVER_ARG_NAME="app-version"
-_appver_arg_value=""
-_arg_syntax="${_arg_syntax}${_APPVER_ARG}:"
-
 # Package kind
 declare -r _KIND_ARG="k"
 declare -r _KIND_ARG_NAME="kind"
@@ -164,7 +158,6 @@ for arg in "${@}"; do
   case "${arg}" in
     ("--${_CONF_ARG_NAME}") set -- "$@" "-${_CONF_ARG}" ;;
     ("--${_RID_ARG_NAME}") set -- "$@" "-${_RID_ARG}" ;;
-    ("--${_APPVER_ARG_NAME}") set -- "$@" "-${_APPVER_ARG}" ;;
     ("--${_KIND_ARG_NAME}") set -- "$@" "-${_KIND_ARG}" ;;
     ("--${_RUNAPP_NAME}") set -- "$@" "-${_RUNAPP_ARG}" ;;
     ("--${_VERBOSE_ARG_NAME}") set -- "$@" "-${_VERBOSE_ARG}" ;;
@@ -188,7 +181,6 @@ if [ ${_exit_help} == 0 ]; then
         case "${arg}" in
             (${_CONF_ARG}) _conf_arg_value="${OPTARG}" ;;
             (${_RID_ARG}) _rid_arg_value="${OPTARG}" ;;
-            (${_APPVER_ARG}) _appver_arg_value="${OPTARG}" ;;
             (${_KIND_ARG}) _kind_arg_value="${OPTARG}" ;;
             (${_RUNAPP_ARG}) _runapp_arg_value=true ;;
             (${_VERBOSE_ARG}) _verbose_arg_value=true ;;
@@ -231,11 +223,6 @@ if [ ${_help_arg_value} == true ] || [ $_exit_help != 0 ]; then
     echo "${_indent}linux-x64 and linux-arm64. Default is linux-x64 if unspecified."
     echo "${_indent}See also: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog"
     echo
-    echo "${_indent}-${_APPVER_ARG}, --${_APPVER_ARG_NAME} value"
-    echo "${_indent}Application version supplied to the dotnet publish command as "-p:Version=value"".
-
-    echo "${_indent}It may also be used to form the output file. Example: --${_APPVER_ARG_NAME} 1.2.3."
-    echo
     echo "${_indent}-${_KIND_ARG}, --${_KIND_ARG_NAME} value"
     echo "${_indent}Package output kind. Value must be one of: ${_APPIMAGE_KIND} or ${_ZIP_KIND}."
     echo "${_indent}Default is ${_APPIMAGE_KIND} if unspecified."
@@ -251,7 +238,7 @@ if [ ${_help_arg_value} == true ] || [ $_exit_help != 0 ]; then
     echo
 
     echo "Example:"
-    echo "${_indent}${_SCRIPT_NAME} -${_RID_ARG} linux-arm64 -${_APPVER_ARG} 1.2.3"
+    echo "${_indent}${_SCRIPT_NAME} -${_RID_ARG} linux-arm64"
     echo
 
     exit $_exit_help
@@ -298,26 +285,22 @@ export DOTNET_RID="${_rid_arg_value}"
 export PKG_KIND="${_kind_arg_value}"
 export ISO_DATE=`date +"%Y-%m-%d"`
 
-if [ "${_appver_arg_value}" != "" ]; then
-    export VERSION="${_appver_arg_value}"
-else
-    unset VERSION
-fi
-
-
 if [ ! -f "${_conf_arg_value}" ]; then
     echo "Configuration file not found: ${_conf_arg_value}"
     echo
     exit 1
 fi
 
-# Export to contents to any post publish command
+# Export contents to any post publish command
 set -a
 
 # Source local to PWD
 source "${_conf_arg_value}"
-
 set +a
+
+# For AppImage tool and backward compatibility
+export VERSION="${APP_VERSION}"
+
 
 # Then change PWD to conf file
 cd "$(dirname "${_conf_arg_value}")"
@@ -417,17 +400,19 @@ if [ "${_kind_arg_value}" == "${_APPIMAGE_KIND}" ]; then
     # AppImage
     export APPDIR_USR="${APPDIR_ROOT}/usr"
     export APPDIR_BIN="${APPDIR_ROOT}/usr/bin"
+    export APPDIR_SHARE="${APPDIR_ROOT}/usr/share"
 
-    _apprun_target="usr/bin/${APP_MAIN}${_exec_ext}"
+    _local_run="usr/bin/${APP_MAIN}${_exec_ext}"
 else
     # Simple zip
     export APPDIR_USR=""
     export APPDIR_BIN="${APPDIR_ROOT}"
+    export APPDIR_SHARE="${APPDIR_ROOT}"
 
-    _apprun_target="${APP_MAIN}${_exec_ext}"
+    _local_run="${APP_MAIN}${_exec_ext}"
 fi
 
-_appdir_target="${APPDIR_BIN}/${APP_MAIN}${_exec_ext}"
+export APPRUN_TARGET="${APPDIR_BIN}/${APP_MAIN}${_exec_ext}"
 
 
 # DOTNET PUBLISH
@@ -441,8 +426,8 @@ if [ "${DOTNET_PROJECT_PATH}" != "${_DOTNET_NONE}" ]; then
 
     _publish_cmd="${_publish_cmd} -r ${_rid_arg_value}"
 
-    if [ "${VERSION}" != "" ]; then
-        _publish_cmd="${_publish_cmd} -p:Version=${VERSION}"
+    if [ "${APP_VERSION}" != "" ]; then
+        _publish_cmd="${_publish_cmd} -p:Version=${APP_VERSION}"
     fi
 
     if [ "${DOTNET_PUBLISH_ARGS}" != "" ]; then
@@ -455,8 +440,8 @@ fi
 
 
 # PACKAGE OUTPUT
-if [ $PKG_VERSION_FLAG == true ] && [ "${VERSION}" != "" ]; then
-    _version_out="-${VERSION}"
+if [ $PKG_VERSION_FLAG == true ] && [ "${APP_VERSION}" != "" ]; then
+    _version_out="-${APP_VERSION}"
 fi
 
 if [ "${_kind_arg_value}" == "${_APPIMAGE_KIND}" ]; then
@@ -483,7 +468,7 @@ else
     _package_cmd="(cd \"${APPDIR_ROOT}\" && zip -r \"${PWD}/${_package_out}\" ./)"
 
     if [ ${_runapp_arg_value} == true ]; then
-        _packrun_cmd="${_appdir_target}"
+        _packrun_cmd="${APPRUN_TARGET}"
     fi
 
 fi
@@ -539,9 +524,9 @@ echo "${_SCRIPT_TITLE}, ${_SCRIPT_VERSION}"
 echo "${_SCRIPT_COPYRIGHT}"
 echo
 
-echo "APP MAIN: ${APP_MAIN}"
-echo "APP ID: ${APP_ID}"
-echo "APP VERSION: ${VERSION}"
+echo "APP_MAIN: ${APP_MAIN}"
+echo "APP_ID: ${APP_ID}"
+echo "APP_VERSION: ${APP_VERSION}"
 echo "OUTPUT: ${_package_out}"
 echo
 
@@ -593,7 +578,15 @@ fi
 ensure_directory "${PKG_OUTPUT_DIR}"
 remove_path "${APPDIR_ROOT}"
 remove_path "${_package_out}"
+
+# Create AppDir structure
 ensure_directory "${APPDIR_BIN}"
+
+if [ "${_kind_arg_value}" != "${_ZIP_KIND}" ]; then
+    # We also create usr/share/icons, as some packages require this.
+    # See: https://github.com/kuiperzone/Publish-AppImage/issues/7
+    ensure_directory "${APPDIR_SHARE}/icons"
+fi
 
 echo
 
@@ -612,8 +605,8 @@ if [ "${POST_PUBLISH}" != "" ]; then
 fi
 
 # Application file must exist!
-if [ ! -f "${_appdir_target}" ]; then
-    echo "Expected application file not found: ${_appdir_target}"
+if [ ! -f "${APPRUN_TARGET}" ]; then
+    echo "Expected application file not found: ${APPRUN_TARGET}"
     echo
     exit 1
 fi
@@ -631,7 +624,7 @@ if [ "${_kind_arg_value}" == "${_APPIMAGE_KIND}" ]; then
     fi
 
     if [ "${_appxml}" != "" ]; then
-        _dir="${APPDIR_USR}/share/metainfo"
+        _dir="${APPDIR_SHARE}/metainfo"
         _file="${_dir}/${APP_ID}.appdata.xml"
         echo "Creating: ${_file}"
         ensure_directory "${_dir}"
@@ -661,7 +654,7 @@ if [ "${_kind_arg_value}" == "${_APPIMAGE_KIND}" ]; then
     if [ ! -f "${_temp}" ]; then
 
         echo "Creating: ${_temp}"
-        ln -s "${_apprun_target}" "${_temp}"
+        ln -s "${_local_run}" "${_temp}"
         assert_result
     fi
 fi

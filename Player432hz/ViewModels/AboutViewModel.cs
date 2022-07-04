@@ -1,4 +1,4 @@
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Avalonia.Controls;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;

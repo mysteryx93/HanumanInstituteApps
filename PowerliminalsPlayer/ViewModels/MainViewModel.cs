@@ -40,15 +40,15 @@ public class MainViewModel : ReactiveObject
 
         this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(200)).Subscribe((_) => ReloadFiles());
     }
-    
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImpl);
+
+    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
     private ICommand? _initWindow;
-    private async Task InitWindowImpl()
+    private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
         {
-            ShowAbout.ExecuteIfCan();
-            await PromptFixPathsAsync();
+            await Task.Delay(1).ConfigureAwait(true); // work-around rendering bug in Avalonia v0.10.15
+            await ShowAboutImplAsync().ConfigureAwait(false);
         }
     }
 
