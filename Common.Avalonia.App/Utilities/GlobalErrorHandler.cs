@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -13,6 +14,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 public class GlobalErrorHandler : IObserver<Exception>
 {
     private readonly IDialogService _dialogService;
+
 
     /// <summary>
     /// Sets the global error handler to display all errors with specified owner Window.
@@ -43,7 +45,8 @@ public class GlobalErrorHandler : IObserver<Exception>
     {
         if (Debugger.IsAttached) Debugger.Break();
 
-        var _ = await _dialogService.ShowMessageBoxAsync(Owner, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
+        // var _ = await _dialogService.ShowMessageBoxAsync(Owner, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
+        ShowError(error);
     }
 
     /// <inheritdoc />
@@ -58,5 +61,11 @@ public class GlobalErrorHandler : IObserver<Exception>
     {
         if (Debugger.IsAttached) Debugger.Break();
 
+    }
+
+    public async void ShowError(Exception error)
+    {
+        
+        var _ = _dialogService.ShowMessageBoxAsync(Owner!, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
     }
 }

@@ -1,23 +1,19 @@
-﻿// using System;
-// using System.Drawing;
-// using System.Drawing.Imaging;
-// using System.IO;
-//
+﻿using ReactiveUI;
+using Splat;
 
-// namespace HanumanInstitute.CommonAvaloniaApp
-// {
-//     public static class WpfExtensionMethods
-//     {
-//         public static ImageSource ToImageSource(this Icon icon)
-//         {
-//             if (icon == null) { throw new ArgumentNullException(nameof(icon)); }
-//
-//             ImageSource imageSource = Imaging.CreateBitmapSourceFromHIcon(
-//                 icon.Handle,
-//                 Int32Rect.Empty,
-//                 BitmapSizeOptions.FromEmptyOptions());
-//
-//             return imageSource;
-//         }
-//     }
-// }
+namespace HanumanInstitute.Common.Avalonia.App;
+
+public static class ExtensionMethods
+{
+    public static ReactiveCommand<TParam, TResult> HandleExceptions<TParam, TResult>(this ReactiveCommand<TParam, TResult> command)
+    {
+        command.ThrownExceptions.Subscribe(Exception_Raised);
+        return command;
+    }
+
+    private static void Exception_Raised(Exception e)
+    {
+        var handler = Locator.Current.GetService<GlobalErrorHandler>()!;
+        handler.ShowError(e);
+    }
+}

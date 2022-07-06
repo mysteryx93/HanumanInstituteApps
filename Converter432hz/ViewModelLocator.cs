@@ -31,7 +31,7 @@ public static class ViewModelLocator
                 dialogFactory: new DialogFactory().AddMessageBox())));
         container.Register<IBassDevice>(() => BassDevice.Instance);
         container.Register<IDispatcher>(() => Dispatcher.UIThread);
-        SplatRegistrations.Register<GlobalErrorHandler>();
+        SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();

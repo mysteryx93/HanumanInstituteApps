@@ -22,14 +22,20 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-x86'">
-    <Content Include="linux-x86\**" >
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-arm64'">
+    <Content Include="linux-arm64\**" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(RuntimeIdentifier)'=='osx-x64'">
     <Content Include="osx-x64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='osx-arm64'">
+    <Content Include="osx-arm64\**" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -12,7 +12,7 @@ public static class WindsorContainerExtensions
     {
         services.CheckNotNull(nameof(services));
 
-        SplatRegistrations.Register<GlobalErrorHandler>();
+        SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
         //services.Register(Component.For<SettingsProvider>().ImplementedBy<SettingsProvider>().LifeStyle.Singleton);
         // services.Register(
         //     Component.For<SplashViewModel>()
