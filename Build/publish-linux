@@ -1,0 +1,41 @@
+#!/bin/bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+echo "Create Linux AppImage bundle for .NET project"
+
+if [ -z "$1" ] ; then
+  echo "Syntax: publish-linux AppName [runtime]"
+  echo "Runtime: linux-x64 or linux-arm64"
+  exit 1
+fi
+runtime=$2
+if [ -z "$2" ] ; then
+  runtime="linux-x64"
+fi
+cd "../$1" || { echo "Application folder $1 not found."; exit 127; }
+
+# Read from project file: AssemblyVersion, Product, LSApplicationCategoryType
+version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" "$1.csproj")
+if [ -z "$version" ] ; then
+  echo "AssemblyVersion is missing from project file."
+  exit 1
+fi
+
+case "$runtime" in
+    "linux-x64") arch="Linux_x64"; image="x86_64" ;;
+    "linux-arm64") arch="Linux_arm64"; image="aarch64" ;;
+    *) arch="$runtime"; image="$runtime" ;;
+esac
+
+
+outPath="../Build/${version}"
+outFile="${1}-${version}_${arch}.AppImage"
+echo "Runtime = $runtime"
+echo "AppName = $1"
+echo "Version = $version"
+echo "Output = $outPath/$outFile"
+echo
+
+mkdir -p "$outPath"
+
+"$SCRIPT_DIR/publish-appimage" -f "publish-appimage.conf" -y -r $runtime
+cp "bin/AppImages/$1-${image}.AppImage" "$outPath/$outFile"

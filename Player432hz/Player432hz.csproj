@@ -6,16 +6,15 @@
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <AssemblyVersion>2.1</AssemblyVersion>
-    <FileVersion>2.1</FileVersion>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <NeutralLanguage>en-US</NeutralLanguage>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <Company>Hanuman Institute</Company>
     <Product>432hz Player</Product>
+    <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

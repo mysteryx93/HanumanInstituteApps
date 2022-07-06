@@ -1,0 +1,8 @@
+./publish-osx Player432hz osx-x64
+./publish-osx Player432hz osx-arm64
+
+./publish-osx Converter432hz osx-x64
+./publish-osx Converter432hz osx-arm64
+
+./publish-osx PowerliminalsPlayer osx-x64
+./publish-osx PowerliminalsPlayer osx-arm64

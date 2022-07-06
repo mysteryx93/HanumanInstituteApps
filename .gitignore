@@ -16,7 +16,7 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
-Publish/
+Build/*/
 
 
 # Windows image file caches
