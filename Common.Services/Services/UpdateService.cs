@@ -41,27 +41,34 @@ public class UpdateService : IUpdateService
             _init = true;
         }
 
-        var feed = _feedService.Load(FeedUrl);
-        foreach (var item in feed.Items)
+        try
         {
-            // Id looks like this. Get version number. 
-            // tag:github.com,2008:Repository/37950127/v2.0.1
-            var pos = item.Id.LastIndexOf('/');
-            if (pos > -1)
+            var feed = _feedService.Load(FeedUrl);
+            foreach (var item in feed.Items)
             {
-                var version = item.Id[(pos + 2)..];
-
-                // Produce download string like this.
-                // https://github.com/mysteryx93/NaturalGroundingPlayer/releases/download/v2.0.1/Converter432hz-2.0.1_Win_x64.zip
-                var downloadLink = GitRepo + string.Format("/releases/download/v{0}/" + FileFormat, version);
-
-                // Check if link exists.
-                if (UrlExists(downloadLink))
+                // Id looks like this. Get version number. 
+                // tag:github.com,2008:Repository/37950127/v2.0.1
+                var pos = item.Id.LastIndexOf('/');
+                if (pos > -1)
                 {
-                    return Version.Parse(version);
+                    var version = item.Id[(pos + 2)..];
+
+                    // Produce download string like this.
+                    // https://github.com/mysteryx93/NaturalGroundingPlayer/releases/download/v2.0.1/Converter432hz-2.0.1_Win_x64.zip
+                    var downloadLink = GitRepo + string.Format("/releases/download/v{0}/" + FileFormat, version);
+
+                    // Check if link exists.
+                    if (UrlExists(downloadLink))
+                    {
+                        return Version.Parse(version);
+                    }
                 }
             }
         }
+        catch (HttpRequestException)
+        {
+        }
+
         return null;
     }
 

@@ -1,29 +1,13 @@
-using Avalonia.Controls.ApplicationLifetimes;
+using System.ComponentModel;
 using Avalonia.Markup.Xaml;
-using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Player432hz.Views;
 
 namespace HanumanInstitute.Player432hz;
 
-public class App : Application
+public class App : CommonApplication<MainView>
 {
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
-    public override void OnFrameworkInitializationCompleted()
-    {
-        GC.KeepAlive(typeof(Avalonia.Svg.Skia.SvgImage));
-        
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainView
-            {
-                DataContext = ViewModelLocator.Main
-            };
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
+    protected override INotifyPropertyChanged? InitViewModel() => ViewModelLocator.Main;
 }

@@ -1,10 +1,7 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using Avalonia.Controls;
+﻿using System.ComponentModel;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
-using Splat;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
@@ -13,59 +10,52 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class GlobalErrorHandler : IObserver<Exception>
 {
-    private readonly IDialogService _dialogService;
+    private IDialogService? _dialogService;
 
-
-    /// <summary>
-    /// Sets the global error handler to display all errors with specified owner Window.
-    /// </summary>
-    /// <param name="owner">The Window owner in which to display the errors.</param>
-    public static void Set(Window owner)
-    {
-        var errHandler = Locator.Current.GetService<GlobalErrorHandler>()!;
-        errHandler.Owner = owner;
-        RxApp.DefaultExceptionHandler = errHandler;
-    }
+    public static GlobalErrorHandler Instance => _instance ??= new GlobalErrorHandler(); 
+    private static GlobalErrorHandler? _instance;
     
     /// <summary>
-    /// Initializes a new instance of the GlobalErrorHandler class.
+    /// Sets the global error handler to display all errors.
+    /// We set dependencies later because we want to initialize the ViewModelLocator in parallel to the View,
+    /// and DefaultExceptionHandler must be set before creating the view.
     /// </summary>
-    public GlobalErrorHandler(IDialogService dialogService)
+    public static void BeginInit() => RxApp.DefaultExceptionHandler = Instance;
+    
+    /// <summary>
+    /// Sets the dependencies for handling and displaying errors.
+    /// </summary>
+    /// <param name="dialogService">The service used to display dialogs.</param>
+    /// <param name="ownerVm">The ViewModel of the View in which to display error messages.</param>
+    public static void EndInit(IDialogService dialogService, INotifyPropertyChanged? ownerVm)
     {
-        _dialogService = dialogService;
+        Instance._dialogService = dialogService;
+        Instance.OwnerVm = ownerVm;
     }
 
     /// <summary>
-    /// Gets or sets the Window owner in which to display error messages.
+    /// Gets or sets the ViewModel of the View in which to display error messages.
     /// </summary>
-    public Window? Owner { get; set; }
+    public INotifyPropertyChanged? OwnerVm { get; set; }
     
     /// <inheritdoc />
-    public async void OnNext(Exception error)
-    {
-        if (Debugger.IsAttached) Debugger.Break();
-
-        // var _ = await _dialogService.ShowMessageBoxAsync(Owner, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
-        ShowError(error);
-    }
+    public async void OnNext(Exception error) => ShowError(error);
 
     /// <inheritdoc />
     public void OnError(Exception error)
     {
-        if (Debugger.IsAttached) Debugger.Break();
-
     }
 
     /// <inheritdoc />
     public void OnCompleted()
     {
-        if (Debugger.IsAttached) Debugger.Break();
-
     }
 
-    public async void ShowError(Exception error)
+    private async void ShowError(Exception error)
     {
-        
-        var _ = _dialogService.ShowMessageBoxAsync(Owner!, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
+        if (_dialogService != null && OwnerVm != null)
+        {
+            await _dialogService.ShowMessageBoxAsync(OwnerVm!, error.ToString(), "Application Error", MessageBoxButton.Ok, MessageBoxImage.Error);
+        }
     }
 }

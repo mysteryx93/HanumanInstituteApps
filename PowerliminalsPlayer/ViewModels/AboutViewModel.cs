@@ -73,7 +73,9 @@ public class AboutViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
         var version = await _updateService.GetLatestVersionAsync();
         CheckForUpdateText = version > _environment.AppVersion ?
             $"v{version} is available!" :
-            "You have the latest version";
+            version != null ?
+                "You have the latest version" :
+                "Could not get update information";
     }
 
     /// <summary>

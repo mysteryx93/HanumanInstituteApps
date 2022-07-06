@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
 using HanumanInstitute.Common.Avalonia.App;
@@ -58,12 +59,6 @@ public class MainViewModel : ReactiveObject
             .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
-
-        ((ReactiveCommand<Unit, Unit>)AddFolder).HandleExceptions();
-        // ((ReactiveCommand<Unit, Unit>)AddFolder).ThrownExceptions.Subscribe(x =>
-        // {
-        //     var _ = _dialogService.ShowMessageBoxAsync(this, x.ToString());
-        // });
 
         // FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Transform(x => x switch
         // {
@@ -171,11 +166,11 @@ public class MainViewModel : ReactiveObject
         }).ConfigureAwait(false);
     }
 
-    public ICommand AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl).HandleExceptions();
+    public ICommand AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
     private ICommand? _addFolder;
     private async Task AddFolderImpl()
     {
-        throw new InvalidOperationException("You failed.");
+        throw new InvalidOperationException("You failed!");
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings);
         if (folder != null)
