@@ -28,15 +28,15 @@ public static class AppStarter
                 // Dump error to log file and open default text editor.
                 var log = logPath();
                 System.IO.File.WriteAllText(log, ex.ToString());
-                var notepad = new Process
+                new Process
                 {
                     StartInfo = new ProcessStartInfo(log)
                     {
                         UseShellExecute = true
                     }
-                };
-                notepad.Start();
-                Thread.Sleep(TimeSpan.FromSeconds(10));
+                }.Start();
+                // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
+                Thread.Sleep(TimeSpan.FromSeconds(1));
             }
         }
     }
