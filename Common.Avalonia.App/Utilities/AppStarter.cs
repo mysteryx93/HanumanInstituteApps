@@ -1,6 +1,7 @@
-﻿using Avalonia;
+﻿using System.Diagnostics;
+using System.Threading;
+using Avalonia;
 using Avalonia.ReactiveUI;
-using MessageBox.Avalonia.Enums;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
@@ -12,7 +13,7 @@ public static class AppStarter
     /// <summary>
     /// Call this from Program.Main.
     /// </summary>
-    public static async void Start<TApp>(string[] args)
+    public static void Start<TApp>(string[] args, Func<string>? logPath)
         where TApp : Application, new()
     {
         try
@@ -22,8 +23,21 @@ public static class AppStarter
         }
         catch (Exception ex)
         {
-            MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("Application Error", ex.ToString(), 
-                ButtonEnum.Ok, Icon.Error);
+            if (logPath != null)
+            {
+                // Dump error to log file and open default text editor.
+                var log = logPath();
+                System.IO.File.WriteAllText(log, ex.ToString());
+                var notepad = new Process
+                {
+                    StartInfo = new ProcessStartInfo(log)
+                    {
+                        UseShellExecute = true
+                    }
+                };
+                notepad.Start();
+                Thread.Sleep(TimeSpan.FromSeconds(10));
+            }
         }
     }
 

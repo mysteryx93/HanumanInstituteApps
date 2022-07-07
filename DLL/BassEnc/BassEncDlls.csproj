@@ -35,7 +35,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(RuntimeIdentifier)'=='osx-arm64'">
-    <Content Include="osx-arm64\**" >
+    <Content Include="osx-x64\**" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

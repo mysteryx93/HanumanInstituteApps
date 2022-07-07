@@ -20,7 +20,7 @@ public abstract class CommonApplication<T> : Application
     /// Returns the <see cref="IClassicDesktopStyleApplicationLifetime" />.
     /// </summary>
     public IClassicDesktopStyleApplicationLifetime? DesktopLifetime => ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-    
+
     /// <summary>
     /// Once Avalonia framework is initialized, create the View and ViewModel.
     /// </summary>
@@ -32,20 +32,24 @@ public abstract class CommonApplication<T> : Application
 #endif
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.
-        
+
         // Set DefaultExceptionHelper now but we want to initialize ViewModelLocator later in parallel with View for faster startup.
         GlobalErrorHandler.BeginInit();
 
         var desktop = DesktopLifetime;
         if (desktop != null)
         {
-            // Initialize View and ViewModel/ViewModelLocator in parallel.
-            var t1 = Task.Run(InitViewModel); 
+            // In Avalonia 0.10.15, it causes the About button to be sometimes grayed out (particularly on MacOS) when trimming the assembly.
+            // Initialize View and ViewModel/ ViewModelLocator in parallel.
+            //var t1 = Task.Run(InitViewModel);
+            //desktop.MainWindow = Activator.CreateInstance<T>();
+            //await t1.ConfigureAwait(true);
+            //desktop.MainWindow.DataContext = t1.Result;
+
             desktop.MainWindow = Activator.CreateInstance<T>();
-            await t1.ConfigureAwait(true);
-            desktop.MainWindow.DataContext = t1.Result;
+            desktop.MainWindow.DataContext = InitViewModel();
         }
-        
+
         GlobalErrorHandler.EndInit(Locator.Current.GetService<IDialogService>()!, desktop?.MainWindow.DataContext as INotifyPropertyChanged);
 
         base.OnFrameworkInitializationCompleted();

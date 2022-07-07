@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <AssemblyVersion>2.1.1</AssemblyVersion>
+    <AssemblyVersion>2.1.2</AssemblyVersion>
     <RootNamespace>HanumanInstitute.Converter432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>

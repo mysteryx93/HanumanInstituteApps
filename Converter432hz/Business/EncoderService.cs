@@ -75,7 +75,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
 
     /// <inheritdoc />
     [Reactive]
-    public int DelayBeforeStart { get; set; } = 100;
+    public int DelayBeforeStart { get; set; } = 150;
 
     /// <inheritdoc />
     public ObservableCollection<ProcessingItem> ProcessingFiles { get; } = new();

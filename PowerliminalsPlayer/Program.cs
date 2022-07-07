@@ -1,4 +1,5 @@
 ﻿using HanumanInstitute.Common.Avalonia.App;
+using Splat;
 
 // ReSharper disable ClassNeverInstantiated.Global
 namespace HanumanInstitute.PowerliminalsPlayer;
@@ -10,7 +11,8 @@ public class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args) => AppStarter.Start<App>(args);
+    public static void Main(string[] args) => AppStarter.Start<App>(args,
+        () => Locator.Current.GetService<IAppPathService>()!.UnhandledExceptionLogPath);
 
     // Avalonia configuration, don't remove; also used by visual designer.
     // ReSharper disable once MemberCanBePrivate.Global

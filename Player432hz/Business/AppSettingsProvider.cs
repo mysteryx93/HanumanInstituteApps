@@ -14,7 +14,7 @@ public class AppSettingsProvider : SettingsProvider<AppSettingsData>
         _appPath = appPath;
         _fileSystem = fileSystem;
 
-        Load();
+        // Load();
     }
 
     /// <summary>
