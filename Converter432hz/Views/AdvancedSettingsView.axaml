@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         mc:Ignorable="d" MinWidth="350" MinHeight="220" MaxWidth="350" MaxHeight="220"
         x:Class="HanumanInstitute.Converter432hz.Views.AdvancedSettingsView"
-        Title="Advanced Settings" CanResize="False" 
+        Title="Advanced Settings" CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         d:DataContext="{x:Static local:ViewModelLocator.AdvancedSettings}">
     <Grid Classes="GradiantBackground">
         <Grid Margin="10">

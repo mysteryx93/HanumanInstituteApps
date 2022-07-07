@@ -13,7 +13,7 @@ public static class AppStarter
     /// <summary>
     /// Call this from Program.Main.
     /// </summary>
-    public static void Start<TApp>(string[] args, Func<string>? logPath)
+    public static void Start<TApp>(string[] args, Func<string?>? logPath)
         where TApp : Application, new()
     {
         try
@@ -27,16 +27,19 @@ public static class AppStarter
             {
                 // Dump error to log file and open default text editor.
                 var log = logPath();
-                System.IO.File.WriteAllText(log, ex.ToString());
-                new Process
+                if (log.HasValue())
                 {
-                    StartInfo = new ProcessStartInfo(log)
+                    System.IO.File.WriteAllText(log, ex.ToString());
+                    new Process
                     {
-                        UseShellExecute = true
-                    }
-                }.Start();
-                // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                        StartInfo = new ProcessStartInfo(log)
+                        {
+                            UseShellExecute = true
+                        }
+                    }.Start();
+                    // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                }
             }
         }
     }

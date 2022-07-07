@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Splat;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.Common.Avalonia.App;
@@ -15,8 +15,11 @@ public class App : CommonApplication<MainView>
     {
         base.OnFrameworkInitializationCompleted();
 
-        Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
-        BassDevice.Instance.Init();
+        if (!Avalonia.Controls.Design.IsDesignMode)
+        {
+            Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
+            BassDevice.Instance.Init();
+        }
     }
 
     protected override INotifyPropertyChanged? InitViewModel() => ViewModelLocator.Main;

@@ -24,12 +24,12 @@ public abstract class CommonApplication<T> : Application
     /// <summary>
     /// Once Avalonia framework is initialized, create the View and ViewModel.
     /// </summary>
-    public override async void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
     {
-#if DEBUG
+//#if DEBUG
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
         GC.KeepAlive(typeof(SvgImage));
-#endif
+//#endif
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.
 

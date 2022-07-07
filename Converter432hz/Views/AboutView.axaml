@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         xmlns:commonApp="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
-        mc:Ignorable="d" MinWidth="550" MinHeight="400" MaxWidth="550" MaxHeight="400"
+        mc:Ignorable="d" MinWidth="550" MaxWidth="550" MinHeight="400" MaxHeight="400"
         x:Class="HanumanInstitute.Converter432hz.Views.AboutView"
         Title="Information" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static local:ViewModelLocator.About}">

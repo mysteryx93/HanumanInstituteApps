@@ -11,7 +11,7 @@ public class Program
     // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args) => AppStarter.Start<App>(args, 
-        () => Locator.Current.GetService<IAppPathService>()!.UnhandledExceptionLogPath);
+        () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);
 
     // Avalonia configuration, don't remove; also used by visual designer.
     // ReSharper disable once MemberCanBePrivate.Global
