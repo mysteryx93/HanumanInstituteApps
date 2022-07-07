@@ -24,6 +24,7 @@ public class MainViewModel : ReactiveObject
         IFilesListViewModel filesListViewModel, IDialogService dialogService)
     {
         _playlistFactory = playlistFactory;
+        _playlistFactory.OwnerViewModel = this;
         _settings = settings.CheckNotNull(nameof(settings));
         _filesListViewModel = filesListViewModel;
         _dialogService = dialogService;
@@ -141,10 +142,7 @@ public class MainViewModel : ReactiveObject
 
         var playlists = _settings.Value.Playlists;
         Playlists.Source.Clear();
-        foreach (var item in playlists.Select(x => _playlistFactory.Create(x)))
-        {
-            Playlists.Source.Add(item);
-        }
+        Playlists.Source.AddRange(playlists.Select(x => _playlistFactory.Create(x)));
     }
 
     /// <summary>

@@ -1,15 +1,20 @@
-﻿using HanumanInstitute.MvvmDialogs;
+﻿using System.ComponentModel;
+using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.Player432hz.Properties;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
-/// <summary>
-/// Creates new instances of IPlaylistViewModel.
-/// </summary>
+/// <inheritdoc />
 public class PlaylistViewModelFactory : IPlaylistViewModelFactory
 {
     private readonly IDialogService _dialogService;
     private readonly IFilesListViewModel _fileListViewModel;
+
+    /// <inheritdoc />
+    public INotifyPropertyChanged? OwnerViewModel { get; set; }
+
+    private INotifyPropertyChanged Owner => OwnerViewModel ?? throw new ArgumentNullException(nameof(OwnerViewModel),
+        @"OwnerViewModel must be set before calling IPlaylistViewModelFactory.Create");
 
     public PlaylistViewModelFactory(IDialogService dialogService, IFilesListViewModel fileListViewModel)
     {
@@ -17,32 +22,14 @@ public class PlaylistViewModelFactory : IPlaylistViewModelFactory
         _fileListViewModel = fileListViewModel;
     }
 
-    /// <summary>
-    /// Returns a new instance of PlaylistViewModel with default playlist name.
-    /// </summary>
-    /// <returns>A new PlaylistViewModel instance.</returns>
+    /// <inheritdoc />
     public IPlaylistViewModel Create() => Create(Resources.NewPlaylistName);
 
-    /// <summary>
-    /// Returns a new instance of PlaylistViewModel with specified playlist name.
-    /// </summary>
-    /// <param name="name">The name of the new playlist.</param>
-    /// <returns>A new PlaylistViewModel instance.</returns>
-    public IPlaylistViewModel Create(string name)
-    {
-        return new PlaylistViewModel(_dialogService, _fileListViewModel)
-        {
-            Name = name
-        };
-    }
+    /// <inheritdoc />
+    public IPlaylistViewModel Create(string name) =>
+        new PlaylistViewModel(_dialogService, _fileListViewModel, null, Owner) { Name = name };
 
-    /// <summary>
-    /// Returns a new instance of PlaylistViewModel from settings data.
-    /// </summary>
-    /// <param name="data">A playlist element within the settings file.</param>
-    /// <returns>A new PlaylistViewModel instance.</returns>
-    public IPlaylistViewModel Create(SettingsPlaylistItem data)
-    {
-        return new PlaylistViewModel(_dialogService, _fileListViewModel, data);
-    }
+    /// <inheritdoc />
+    public IPlaylistViewModel Create(SettingsPlaylistItem data) =>
+        new PlaylistViewModel(_dialogService, _fileListViewModel, data, Owner);
 }

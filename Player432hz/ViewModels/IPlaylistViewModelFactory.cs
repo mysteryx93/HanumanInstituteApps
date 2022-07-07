@@ -1,10 +1,17 @@
-﻿namespace HanumanInstitute.Player432hz.ViewModels;
+﻿using System.ComponentModel;
+
+namespace HanumanInstitute.Player432hz.ViewModels;
 
 /// <summary>
 /// Creates new instances of IPlaylistViewModel.
 /// </summary>
 public interface IPlaylistViewModelFactory
 {
+    /// <summary>
+    /// Gets or sets the ViewModel of the View hosting this factory. Must be set before calling Create.
+    /// </summary>
+    INotifyPropertyChanged? OwnerViewModel { get; set; }
+    
     /// <summary>
     /// Returns a new instance of PlaylistViewModel with default playlist name.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -13,21 +14,23 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
 {
     private readonly IDialogService _dialogService;
     private readonly IFilesListViewModel _fileListViewModel;
+    /// <summary>
+    /// The ViewModel of the View hosting this instance. 
+    /// </summary>
+    private readonly INotifyPropertyChanged? _owner;
 
     public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel,
-        SettingsPlaylistItem? data = null)
+        SettingsPlaylistItem? data = null, INotifyPropertyChanged? owner = null)
     {
         _dialogService = dialogService;
         _fileListViewModel = fileListViewModel;
+        _owner = owner;
 
         if (data != null)
         {
             Name = data.Name;
             Folders.Source.Clear();
-            foreach (var item in data.Folders)
-            {
-                Folders.Source.Add(item);
-            }
+            Folders.Source.AddRange(data.Folders);
         }
     }
 
@@ -54,7 +57,7 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     private async Task OnAddFolder()
     {
         var folderSettings = new OpenFolderDialogSettings();
-        var result = await _dialogService.ShowOpenFolderDialogAsync(this, folderSettings).ConfigureAwait(true);
+        var result = await _dialogService.ShowOpenFolderDialogAsync(_owner!, folderSettings).ConfigureAwait(true);
         if (!string.IsNullOrEmpty(result) && !Folders.Source.Contains(result))
         {
             Folders.Source.Add(result);

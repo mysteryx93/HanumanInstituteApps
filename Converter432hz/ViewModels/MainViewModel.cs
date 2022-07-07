@@ -170,7 +170,6 @@ public class MainViewModel : ReactiveObject
     private ICommand? _addFolder;
     private async Task AddFolderImpl()
     {
-        throw new InvalidOperationException("You failed!");
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings);
         if (folder != null)
