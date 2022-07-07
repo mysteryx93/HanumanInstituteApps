@@ -24,12 +24,12 @@ public abstract class CommonApplication<T> : Application
     /// <summary>
     /// Once Avalonia framework is initialized, create the View and ViewModel.
     /// </summary>
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
-//#if DEBUG
+#if DEBUG
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
         GC.KeepAlive(typeof(SvgImage));
-//#endif
+#endif
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.
 
@@ -39,15 +39,11 @@ public abstract class CommonApplication<T> : Application
         var desktop = DesktopLifetime;
         if (desktop != null)
         {
-            // In Avalonia 0.10.15, it causes the About button to be sometimes grayed out (particularly on MacOS) when trimming the assembly.
             // Initialize View and ViewModel/ ViewModelLocator in parallel.
-            //var t1 = Task.Run(InitViewModel);
-            //desktop.MainWindow = Activator.CreateInstance<T>();
-            //await t1.ConfigureAwait(true);
-            //desktop.MainWindow.DataContext = t1.Result;
-
+            var t1 = Task.Run(InitViewModel);
             desktop.MainWindow = Activator.CreateInstance<T>();
-            desktop.MainWindow.DataContext = InitViewModel();
+            await t1.ConfigureAwait(true);
+            desktop.MainWindow.DataContext = t1.Result;
         }
 
         GlobalErrorHandler.EndInit(Locator.Current.GetService<IDialogService>()!, desktop?.MainWindow.DataContext as INotifyPropertyChanged);

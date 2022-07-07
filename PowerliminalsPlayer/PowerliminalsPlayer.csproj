@@ -15,9 +15,14 @@
     <Company>Hanuman Institute</Company>
     <Product>Powerliminals Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
+    <TrimMode>copyused</TrimMode> <!-- Disable trimming for this assembly only -->
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Remove="Assets\App.icns" />
+    <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.15" />

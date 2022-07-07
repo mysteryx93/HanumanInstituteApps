@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Converter432hz.Views;
@@ -24,3 +25,4 @@ public class App : CommonApplication<MainView>
 
     protected override INotifyPropertyChanged? InitViewModel() => ViewModelLocator.Main;
 }
+
