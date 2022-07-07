@@ -38,7 +38,7 @@ esac
 
 bundlePath=bin/Publish/$runtime
 publishPath=$bundlePath/$1.app/Contents/MacOS
-outPath="../Build/${version}"
+outPath="../Publish/${version}"
 outFile="${1}-${version}_${arch}.zip"
 echo "Runtime = $runtime"
 echo "AppName = $1"

@@ -18,6 +18,8 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
     {
         _appPath = appPath;
         _fileSystem = fileSystem;
+
+        Load();
     }
 
     public override AppSettingsData Load()

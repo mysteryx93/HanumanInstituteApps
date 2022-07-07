@@ -45,12 +45,12 @@
             </ListBox>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button x:Name="OkButton" Classes="round" Content="_OK" Width="70" TabIndex="4" IsDefault="True"
-                    Command="{Binding ConfirmCommand}" Margin="5,2,0,2" />
-            <Button x:Name="CancelButton" Classes="round" Content="_Cancel" Width="70" TabIndex="3" IsCancel="True"
-                    Command="{Binding CancelCommand}" Margin="5,2,0,2" />
             <Button x:Name="DelButton" Classes="round" Content="Del" Width="40" TabIndex="2"
                     Command="{Binding DeleteCommand}" Margin="5,2,0,2" />
+            <Button x:Name="CancelButton" Classes="round" Content="_Cancel" Width="70" TabIndex="3" IsCancel="True"
+                    Command="{Binding CancelCommand}" Margin="5,2,0,2" />
+            <Button x:Name="OkButton" Classes="round" Content="_OK" Width="70" TabIndex="4" IsDefault="True"
+                    Command="{Binding ConfirmCommand}" Margin="5,2,0,2" />
         </StackPanel>
     </Grid>
 </Window>

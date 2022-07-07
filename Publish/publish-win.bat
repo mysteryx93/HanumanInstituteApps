@@ -37,7 +37,7 @@ echo Runtime = %runtime%
 echo AppName = %1
 echo Version = %version%
 echo PublishPath = %publishPath%
-echo Output = Build\%output%
+echo Output = Publish\%output%
 
 :: Start publishing
 @echo on

@@ -17,7 +17,8 @@ public class App : CommonApplication<MainView>
 
         if (!Avalonia.Controls.Design.IsDesignMode)
         {
-            Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
+            // For now, load in AppSettingsProvider constructor otherwise it's not displaying the data. Need to investigate.
+            //Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
             BassDevice.Instance.Init();
         }
     }

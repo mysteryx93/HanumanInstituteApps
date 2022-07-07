@@ -26,7 +26,7 @@ case "$runtime" in
 esac
 
 publishPath=bin/Publish/$runtime
-outPath="../Build/${version}"
+outPath="../Publish/${version}"
 outFile="${1}-${version}_${arch}.zip"
 echo "Runtime = $runtime"
 echo "AppName = $1"
