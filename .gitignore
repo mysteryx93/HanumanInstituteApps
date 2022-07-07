@@ -13,10 +13,9 @@ _*
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
 [Bb]in/
 [Oo]bj/
-Build/*/
+Publish/*/
 
 
 # Windows image file caches
