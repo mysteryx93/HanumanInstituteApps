@@ -57,7 +57,7 @@ osxApp="$bundlePath/$1.app"
 echo "Creating OSX app bundle... $osxApp"
 mkdir -p "$osxApp/Contents/Resources"
 
-cp -af "PublishInfo/App.icns" "$osxApp/Contents/Resources/$1.icns"
+cp -af "Assets/App.icns" "$osxApp/Contents/Resources/$1.icns"
 cp -af "$SCRIPT_DIR/Info.plist" "$osxApp/Contents/Info.plist"
 cp -af "$SCRIPT_DIR/App.entitlements" "$osxApp/Contents/$1.entitlements"
 
