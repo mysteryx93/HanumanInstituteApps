@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 
 namespace HanumanInstitute.Downloads.Tests
 {
@@ -28,7 +26,7 @@ namespace HanumanInstitute.Downloads.Tests
         private readonly object _lock = new object();
 
         // Completes n amount of tasks.
-        public void Complete(int n = 1)
+        public void Complete(int n)
         {
             for (var i = 0; i < n; i++)
             {

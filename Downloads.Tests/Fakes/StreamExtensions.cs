@@ -1,13 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace HanumanInstitute.Downloads.Tests
 {
     internal static class StreamExtensionsTests
     {
-        public static async Task<int> CopyBufferedToAsync(this Stream source, Stream destination, byte[] buffer,
+        private static async Task<int> CopyBufferedToAsync(this Stream source, Stream destination, byte[] buffer,
             CancellationToken cancellationToken = default)
         {
             var bytesCopied = await source.ReadAsync(buffer, cancellationToken);
@@ -29,7 +26,7 @@ namespace HanumanInstitute.Downloads.Tests
                 bytesCopied = await source.CopyBufferedToAsync(destination, buffer, cancellationToken);
 
                 // *** To simulate a real operation
-                await Task.Delay(1);
+                await Task.Delay(1, cancellationToken);
 
                 // Report progress
                 totalBytesCopied += bytesCopied;

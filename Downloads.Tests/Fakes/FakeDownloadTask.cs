@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace HanumanInstitute.Downloads.Tests
+﻿namespace HanumanInstitute.Downloads.Tests
 {
     public class FakeDownloadTask : IDownloadTask
     {
         public StreamQueryInfo Query => new StreamQueryInfo();
 
-        public string Destination => string.Empty;
+        public string Destination { get; set; } = string.Empty;
 
         public FakeStatus Status { get; set; } = FakeStatus.Waiting;
 
@@ -24,16 +19,17 @@ namespace HanumanInstitute.Downloads.Tests
         DownloadStatus IDownloadTask.Status => DownloadStatus.Success;
 
 #pragma warning disable 67
-        public event MuxeTaskEventHandler? BeforeMuxing;
+        public event MuxeTaskEventHandler? Muxing;
         public event DownloadTaskEventHandler? ProgressUpdated;
 #pragma warning restore 67
+        
 
         public void Cancel()
         { }
 
         public void Fail()
         { }
-
+        
         public void Done()
         {
             Status = FakeStatus.Done;

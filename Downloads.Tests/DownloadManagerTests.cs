@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using HanumanInstitute.CommonTests;
-using HanumanInstitute.FFmpeg;
+﻿using HanumanInstitute.FFmpeg;
 using Microsoft.Extensions.Options;
-using Moq;
-using Xunit;
+using YoutubeExplode.Common;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Downloads.Tests
 {
@@ -19,16 +14,16 @@ namespace HanumanInstitute.Downloads.Tests
         const string VideoTitle = "Title";
         private readonly DownloadOptions _options = new DownloadOptions();
 
-        public FakeFileSystemService FileSystem => _fileSystem ?? (_fileSystem = new FakeFileSystemService());
+        public FakeFileSystemService FileSystem => _fileSystem ??= new FakeFileSystemService();
         private FakeFileSystemService? _fileSystem;
 
-        public FakeYouTubeDownloader MockYouTube => _mockYouTube ?? (_mockYouTube = new FakeYouTubeDownloader(FileSystem));
+        public FakeYouTubeDownloader MockYouTube => _mockYouTube ??= new FakeYouTubeDownloader(FileSystem);
         private FakeYouTubeDownloader? _mockYouTube;
 
-        public IYouTubeStreamSelector StreamSelector => _streamSelector ?? (_streamSelector = new YouTubeStreamSelector());
+        public IYouTubeStreamSelector StreamSelector => _streamSelector ??= new YouTubeStreamSelector();
         private IYouTubeStreamSelector? _streamSelector;
 
-        public FakeDownloadTaskFactory MockFactory => _mockFactory ?? (_mockFactory = new FakeDownloadTaskFactory());
+        public FakeDownloadTaskFactory MockFactory => _mockFactory ??= new FakeDownloadTaskFactory();
         private FakeDownloadTaskFactory? _mockFactory;
 
         public Mock<IMediaMuxer> MockMuxer => _mockMuxer ?? SetupMuxer();
@@ -37,11 +32,11 @@ namespace HanumanInstitute.Downloads.Tests
         {
             _mockMuxer = new Mock<IMediaMuxer>();
             _mockMuxer.Setup(x => x.Muxe(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string>(), It.IsAny<ProcessOptionsEncoder?>(), It.IsAny<ProcessStartedEventHandler?>()))
-                .Returns<string?, string?, string, ProcessOptionsEncoder?, ProcessStartedEventHandler?>((Func<string?, string?, string, ProcessOptionsEncoder?, ProcessStartedEventHandler?, CompletionStatus>)((videoFile, audioFile, destination, options, callback) =>
+                .Returns<string?, string?, string, ProcessOptionsEncoder?, ProcessStartedEventHandler?>((videoFile, audioFile, destination, _, _) =>
                 {
                     FileSystem.File.Copy(videoFile ?? audioFile, destination);
                     return CompletionStatus.Success;
-                }));
+                });
             return _mockMuxer;
         }
 
@@ -60,8 +55,8 @@ namespace HanumanInstitute.Downloads.Tests
         {
             MockYouTube.Configure(VideoUrl, VideoTitle, new StreamManifest(new List<IStreamInfo>()
             {
-                new VideoOnlyStreamInfo(1, "https://www.youtube.com/video", Container.Mp4, new FileSize(10240), new Bitrate(), "h264", "", VideoQuality.High720, new VideoResolution(960, 720), new Framerate()),
-                new AudioOnlyStreamInfo(1, "https://www.youtube.com/audio", Container.Mp4, new FileSize(500), new Bitrate(), "aac")
+                new VideoOnlyStreamInfo("https://www.youtube.com/video", Container.Mp4, new FileSize(10240), new Bitrate(), "h264", new VideoQuality(720, 30), new Resolution(960, 720)),
+                new AudioOnlyStreamInfo("https://www.youtube.com/audio", Container.Mp4, new FileSize(500), new Bitrate(), "aac")
             }));
         }
 
@@ -69,7 +64,7 @@ namespace HanumanInstitute.Downloads.Tests
         {
             MockYouTube.Configure(VideoUrl, VideoTitle, new StreamManifest(new List<IStreamInfo>()
             {
-                new MuxedStreamInfo(1, "https://www.youtube.com/video", Container.Mp4, new FileSize(10240), new Bitrate(), "mp4a.40.2", "avc1.42001E", "", VideoQuality.Medium360, new VideoResolution(480, 360), new Framerate())
+                new MuxedStreamInfo("https://www.youtube.com/video", Container.Mp4, new FileSize(10240), new Bitrate(), "mp4a.40.2", "avc1.42001E", new VideoQuality(360, 24), new Resolution(480, 360))
             }));
         }
 
@@ -141,10 +136,10 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
             //Uri? url = null;
             string? dest = null;
-            model.DownloadAdded += (s, e) =>
+            model.DownloadAdded += (_, e) =>
             {
                 // url = e?.Download?.Url;
-                dest = e?.Download?.Destination;
+                dest = e.Download.Destination;
             };
 
             var query = await GetQueryAsync(model);
@@ -161,18 +156,18 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
 
             var query = await GetQueryAsync(model);
-            var tList = new int[2].Select(x => model.DownloadAsync(query, DestFile)).ToList();
-            tList.Add(Task.Run((Func<Task<DownloadStatus>?>)(async () =>
+            var tList = new int[2].Select(_ => model.DownloadAsync(query, DestFile)).ToList();
+            tList.Add(Task.Run(async () =>
             {
                 // Wait for all downloads to start.
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 2);
 
-                Assert.Equal(2, (int)MockFactory.TotalRunning);
-                MockFactory.Complete();
-                Assert.Equal(1, (int)MockFactory.TotalRunning);
-                MockFactory.Complete();
+                Assert.Equal(2, MockFactory.TotalRunning);
+                MockFactory.Complete(1);
+                Assert.Equal(1, MockFactory.TotalRunning);
+                MockFactory.Complete(1);
                 return DownloadStatus.Success;
-            })));
+            }));
             await Task.WhenAll(tList);
 
             Assert.Equal(2, MockFactory
@@ -186,23 +181,23 @@ namespace HanumanInstitute.Downloads.Tests
             using var model = SetupModelWithFakeTask();
 
             var query = await GetQueryAsync(model);
-            var tList = new int[5].Select(x => model.DownloadAsync(query, DestFile)).ToList();
-            tList.Add(Task.Run((Func<Task<DownloadStatus>?>)(async () =>
+            var tList = new int[5].Select(_ => model.DownloadAsync(query, DestFile)).ToList();
+            tList.Add(Task.Run(async () =>
             {
                 // Wait for all downloads to start.
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 2);
                 await Task.Delay(100).ConfigureAwait(false);
-                Assert.Equal(3, (int)MockFactory.TotalWaiting);
+                Assert.Equal(3, MockFactory.TotalWaiting);
                 MockFactory.Complete(2);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Done, 2);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 2);
-                Assert.Equal(1, (int)MockFactory.TotalWaiting);
+                Assert.Equal(1, MockFactory.TotalWaiting);
                 MockFactory.Complete(2);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Done, 4);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 1);
                 MockFactory.Complete(1);
                 return DownloadStatus.Success;
-            })));
+            }));
             await Task.WhenAll(tList);
 
             Assert.Equal(5, MockFactory.TotalCreated);
@@ -216,20 +211,20 @@ namespace HanumanInstitute.Downloads.Tests
             _options.ConcurrentDownloads = 3;
 
             var query = await GetQueryAsync(model);
-            var tList = new int[4].Select(x => model.DownloadAsync(query, DestFile)).ToList();
-            tList.Add(Task.Run((Func<Task<DownloadStatus>?>)(async () =>
+            var tList = new int[4].Select(_ => model.DownloadAsync(query, DestFile)).ToList();
+            tList.Add(Task.Run(async () =>
             {
                 // Wait for all downloads to start.
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 3);
                 await Task.Delay(100).ConfigureAwait(false);
-                Assert.Equal(1, (int)MockFactory.TotalWaiting);
+                Assert.Equal(1, MockFactory.TotalWaiting);
                 MockFactory.Complete(2);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Done, 2);
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, 2);
-                Assert.Equal(0, (int)MockFactory.TotalWaiting);
+                Assert.Equal(0, MockFactory.TotalWaiting);
                 MockFactory.Complete(2);
                 return DownloadStatus.Success;
-            })));
+            }));
             await Task.WhenAll(tList);
 
             Assert.Equal(4, MockFactory.TotalCreated);
@@ -262,13 +257,13 @@ namespace HanumanInstitute.Downloads.Tests
             _options.ConcurrentDownloads = maxCapacity;
 
             var query = await GetQueryAsync(model);
-            var tList = new int[maxCapacity].Select(x => model.DownloadAsync(query, DestFile)).ToList();
-            tList.Add(Task.Run((Func<Task<DownloadStatus>?>)(async () =>
+            var tList = new int[maxCapacity].Select(_ => model.DownloadAsync(query, DestFile)).ToList();
+            tList.Add(Task.Run(async () =>
             {
                 // Wait for all downloads to start.
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Running, maxCapacity);
                 await Task.Delay(100).ConfigureAwait(false);
-                Assert.Equal(0, (int)MockFactory.TotalWaiting);
+                Assert.Equal(0, MockFactory.TotalWaiting);
                 _options.ConcurrentDownloads -= 10; // The Wait() will only take effect after a download is completed.
                 MockFactory.Complete(2);
                 await Task.Delay(1000).ConfigureAwait(false);
@@ -279,7 +274,7 @@ namespace HanumanInstitute.Downloads.Tests
                 await WaitUntilStatus(FakeDownloadTask.FakeStatus.Done, 6);
                 MockFactory.Complete(maxCapacity - 6);
                 return DownloadStatus.Success;
-            })));
+            }));
             await Task.WhenAll(tList);
 
             Assert.Equal(maxCapacity, MockFactory.TotalCreated);
@@ -318,18 +313,18 @@ namespace HanumanInstitute.Downloads.Tests
         }
 
         [Fact]
-        public async void DownloadAsync_BeforeMuxing_StatusFinalizing()
+        public async void DownloadAsync_Muxing_StatusFinalizing()
         {
             using var model = SetupModel();
             SetDownload();
             DownloadStatus? status = null;
 
             var query = await GetQueryAsync(model);
-            await model.DownloadAsync(query, DestFile, (s, e) =>
+            await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.BeforeMuxing += (s, e) =>
+                e.Download.Muxing += (_, f) =>
                 {
-                    status = e.Download.Status;
+                    status = f.Download.Status;
                 };
             });
 
@@ -344,11 +339,11 @@ namespace HanumanInstitute.Downloads.Tests
             const int NewFileSize = 50000;
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.BeforeMuxing += (s, e) =>
+                e.Download.Muxing += (_, f) =>
                 {
-                    FileSystem.File.WriteAllBytes(e.Download.Destination, new byte[NewFileSize]);
+                    FileSystem.File.WriteAllBytes(f.Download.Destination, new byte[NewFileSize]);
                 };
             });
 
@@ -365,14 +360,14 @@ namespace HanumanInstitute.Downloads.Tests
             var status = new List<DownloadStatus>();
 
             var query = await GetQueryAsync(model);
-            await model.DownloadAsync(query, DestFile, (s, e) =>
+            await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.ProgressUpdated += (s, e) =>
+                e.Download.ProgressUpdated += (_, f) =>
                 {
                     called++;
-                    if (!status.Contains(e.Download.Status))
+                    if (!status.Contains(f.Download.Status))
                     {
-                        status.Add(e.Download.Status);
+                        status.Add(f.Download.Status);
                     }
                 };
             });
@@ -391,11 +386,11 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.ProgressUpdated += (s, e) =>
+                e.Download.ProgressUpdated += (_, f) =>
                 {
-                    e.Download.Cancel();
+                    f.Download.Cancel();
                 };
             });
 
@@ -410,14 +405,14 @@ namespace HanumanInstitute.Downloads.Tests
             IList<DownloadTaskFile>? tempFiles = null;
 
             var query = await GetQueryAsync(model);
-            await model.DownloadAsync(query, DestFile, (s, e) =>
+            await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.ProgressUpdated += (s, e) =>
+                e.Download.ProgressUpdated += (_, f) =>
                 {
                     if (tempFiles == null)
                     {
-                        tempFiles = e.Download.Files;
-                        e.Download.Cancel();
+                        tempFiles = f.Download.Files;
+                        f.Download.Cancel();
                     }
                 };
             });
@@ -433,11 +428,11 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.BeforeMuxing += (s, e) =>
+                e.Download.Muxing += (_, f) =>
                 {
-                    e.Download.Cancel();
+                    f.Download.Cancel();
                 };
             });
 
@@ -452,14 +447,14 @@ namespace HanumanInstitute.Downloads.Tests
             IList<DownloadTaskFile>? tempFiles = null;
 
             var query = await GetQueryAsync(model);
-            await model.DownloadAsync(query, DestFile, (s, e) =>
+            await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.BeforeMuxing += (s, e) =>
+                e.Download.Muxing += (_, f) =>
                 {
                     if (tempFiles == null)
                     {
-                        e.Download.Cancel();
-                        tempFiles = e.Download.Files;
+                        f.Download.Cancel();
+                        tempFiles = f.Download.Files;
                     }
                 };
             });
@@ -475,11 +470,11 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.ProgressUpdated += (s, e) =>
+                e.Download.ProgressUpdated += (_, f) =>
                 {
-                    e.Download.Fail();
+                    f.Download.Fail();
                 };
             });
 
@@ -493,11 +488,11 @@ namespace HanumanInstitute.Downloads.Tests
             SetDownload();
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
-                e.Download.BeforeMuxing += (s, e) =>
+                e.Download.Muxing += (_, f) =>
                 {
-                    e.Download.Fail();
+                    f.Download.Fail();
                 };
             });
 
@@ -513,12 +508,9 @@ namespace HanumanInstitute.Downloads.Tests
             var query = await GetQueryAsync(model);
             async Task<DownloadStatus> Act()
             {
-                return await model.DownloadAsync(query, DestFile, (s, e) =>
+                return await model.DownloadAsync(query, DestFile, (_, e) =>
                 {
-                    e.Download.ProgressUpdated += (s, e) =>
-                    {
-                        throw new Exception("BOOM!");
-                    };
+                    e.Download.ProgressUpdated += (_, _) => throw new Exception("BOOM!");
                 });
             }
 
@@ -535,12 +527,9 @@ namespace HanumanInstitute.Downloads.Tests
             var query = await GetQueryAsync(model);
             async Task<DownloadStatus> Act()
             {
-                return await model.DownloadAsync(query, DestFile, (s, e) =>
+                return await model.DownloadAsync(query, DestFile, (_, e) =>
                 {
-                    e.Download.BeforeMuxing += (s, e) =>
-                    {
-                        throw new Exception("BOOM!");
-                    };
+                    e.Download.Muxing += (_, _) => throw new Exception("BOOM!");
                 });
             }
 
@@ -569,7 +558,7 @@ namespace HanumanInstitute.Downloads.Tests
             IList<DownloadTaskFile>? tempFiles = null;
 
             var query = await GetQueryAsync(model);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            await model.DownloadAsync(query, DestFile, (_, e) =>
             {
                 tempFiles = e.Download.Files;
             });
@@ -589,7 +578,7 @@ namespace HanumanInstitute.Downloads.Tests
             IList<DownloadTaskFile>? tempFiles = null;
 
             var query = await GetQueryAsync(model, downloadVideo, downloadAudio);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
                 tempFiles = e.Download.Files;
             });
@@ -609,7 +598,7 @@ namespace HanumanInstitute.Downloads.Tests
             IList<DownloadTaskFile>? tempFiles = null;
 
             var query = await GetQueryAsync(model, downloadVideo, downloadAudio);
-            var result = await model.DownloadAsync(query, DestFile, (s, e) =>
+            var result = await model.DownloadAsync(query, DestFile, (_, e) =>
             {
                 tempFiles = e.Download.Files;
             });
@@ -627,7 +616,7 @@ namespace HanumanInstitute.Downloads.Tests
             var query = await GetQueryAsync(model, false, false);
             async Task<DownloadStatus> Act()
             {
-                return await model.DownloadAsync(query, DestFile, null);
+                return await model.DownloadAsync(query, DestFile);
             }
 
             await Assert.ThrowsAsync<ArgumentException>(Act);

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using HanumanInstitute.CommonTests;
+using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
@@ -24,7 +20,7 @@ namespace HanumanInstitute.Downloads.Tests
         private string _title = "Title";
         private StreamManifest? _streamInfo;
 
-        public bool ThrowError { get; set; } = false;
+        public bool ThrowError { get; set; }
 
         public void Configure(string url, string title, StreamManifest? streamInfo = null)
         {
@@ -34,21 +30,21 @@ namespace HanumanInstitute.Downloads.Tests
         }
 
         public Task<Video> QueryVideoAsync(VideoId videoId) => Task.FromResult(
-            new Video(_url, _title, "Author", new DateTimeOffset(), "description", new TimeSpan(), new ThumbnailSet(videoId), new List<string>(), new Engagement(0, 0, 0)));
+            new Video(_url, _title, new Author(new ChannelId(), "Author"), new DateTimeOffset(), "description", new TimeSpan(), new Thumbnail[] {}, new List<string>(), new Engagement(0, 0, 0)));
 
         public Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId) => Task.FromResult(
             _streamInfo ?? new StreamManifest(new List<IStreamInfo>()));
 
         public async Task DownloadAsync(IStreamInfo streamInfo, string filePath, Action<double>? progressCallback = null, CancellationToken cancellationToken = default)
         {
-            using var destination = _fileSystem.File.Create(filePath);
+            await using var destination = _fileSystem.File.Create(filePath);
             if (ThrowError)
             {
                 throw new HttpRequestException();
             }
 
-            using var stream = new MemoryStream(new byte[streamInfo.Size.TotalBytes]);
-            stream.Write(new byte[streamInfo.Size.TotalBytes]);
+            using var stream = new MemoryStream(new byte[streamInfo.Size.Bytes]);
+            stream.Write(new byte[streamInfo.Size.Bytes]);
             stream.Seek(0, SeekOrigin.Begin);
             await stream.CopyToAsync(
                 destination,
