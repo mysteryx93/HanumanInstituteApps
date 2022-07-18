@@ -1,4 +1,5 @@
-﻿using Splat;
+﻿using HanumanInstitute.FFmpeg;
+using Splat;
 using YoutubeExplode;
 
 namespace HanumanInstitute.Downloads;
@@ -10,7 +11,7 @@ public static class SplatContainerExtensions
     /// </summary>
     /// <param name="services">The IoC services container.</param>
     /// <param name="options">Download manager configuration.</param>
-    public static IMutableDependencyResolver AddCommonServices(this IMutableDependencyResolver services, IOptions<DownloadOptions>? options = null)
+    public static IMutableDependencyResolver AddDownloads(this IMutableDependencyResolver services, IOptions<DownloadOptions>? options = null)
     {
         services.CheckNotNull(nameof(services));
 

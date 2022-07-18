@@ -8,17 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.1">
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="12.2.19">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.69">
       <PrivateAssets>all</PrivateAssets>
@@ -30,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj" />
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -29,25 +29,25 @@ public class DownloadManager : IDownloadManager, IDisposable
     private readonly SemaphoreSlimDynamic _pool;
 
     /// <inheritdoc />
-    public async Task<Video> QueryVideoAsync(string url) =>
-        await QueryVideoAsync(new Uri(url)).ConfigureAwait(false);
+    public async Task<Video> QueryVideoAsync(string url, CancellationToken cancellationToken = default) =>
+        await QueryVideoAsync(new Uri(url), cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
-    public async Task<Video> QueryVideoAsync(Uri url)
+    public async Task<Video> QueryVideoAsync(Uri url, CancellationToken cancellationToken = default)
     {
         var id = ParseVideoId(url.CheckNotNull(nameof(url)));
-        return await _youTube.QueryVideoAsync(id).ConfigureAwait(false);
+        return await _youTube.QueryVideoAsync(id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<StreamManifest> QueryStreamInfoAsync(string url) =>
-        await QueryStreamInfoAsync(new Uri(url)).ConfigureAwait(false);
+    public async Task<StreamManifest> QueryStreamInfoAsync(string url, CancellationToken cancellationToken = default) =>
+        await QueryStreamInfoAsync(new Uri(url), cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
-    public async Task<StreamManifest> QueryStreamInfoAsync(Uri url)
+    public async Task<StreamManifest> QueryStreamInfoAsync(Uri url, CancellationToken cancellationToken = default)
     {
         var id = ParseVideoId(url.CheckNotNull(nameof(url)));
-        return await _youTube.QueryStreamInfoAsync(id).ConfigureAwait(false);
+        return await _youTube.QueryStreamInfoAsync(id, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

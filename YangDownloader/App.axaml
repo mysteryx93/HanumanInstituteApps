@@ -1,0 +1,86 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:yangDownloader="clr-namespace:HanumanInstitute.YangDownloader"
+             x:Class="HanumanInstitute.YangDownloader.App">
+    <Application.DataTemplates>
+        <yangDownloader:ViewLocator/>
+    </Application.DataTemplates>
+    <Application.Resources>
+        <Color x:Key="WindowBackgroundGradiant">#FFCDA791</Color>
+        <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%">
+            <GradientStop Color="White" Offset="0" />
+            <GradientStop Color="{StaticResource WindowBackgroundGradiant}" Offset="1" />
+        </LinearGradientBrush>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme Mode="Light" DensityStyle="Compact"/>
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
+        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
+        
+        <Style Selector="Window">
+            <Setter Property="UseLayoutRounding" Value="True" />
+        </Style>
+        <Style Selector="Grid.GradiantBackground">
+            <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}" />
+        </Style>
+        <Style Selector="Button.round">
+            <Setter Property="Height" Value="26" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="14" />
+        </Style>
+        <Style Selector="Button.round:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+        <Style Selector="ListBox">
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBoxItem > TextBlock">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.compact ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBox.compact ListBoxItem > TextBlock">
+            <Setter Property="Padding" Value="4" />
+        </Style>
+        <Style Selector="ComboBox.compact">
+            <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="ComboBox.compact ComboBoxItem">
+            <Setter Property="Padding" Value="4" />
+        </Style>
+        <Style Selector="TextBox.compact">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Padding" Value="4,2,4,2" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBox.compact:pointerover /template/ Border#PART_BorderElement, TextBox.compact:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        
+        <Style Selector="Button.link">
+            <Setter Property="Foreground" Value="Blue" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Content="{TemplateBinding Content}">
+                        <ContentPresenter.Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="Foreground" Value="{TemplateBinding Foreground}"/>
+                                <Setter Property="FontSize" Value="{TemplateBinding FontSize}"/>
+                                <Setter Property="TextDecorations" Value="Underline"/>
+                            </Style>
+                        </ContentPresenter.Styles>
+                    </ContentPresenter>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Application.Styles>
+</Application>

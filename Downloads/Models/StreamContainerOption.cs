@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
 namespace HanumanInstitute.Downloads;
 
 /// <summary>
@@ -10,6 +11,6 @@ public enum StreamContainerOption
     Best,
     MP4,
     WebM,
-    Tgpp,
+    //Tgpp,
     None
 }

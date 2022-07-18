@@ -15,17 +15,17 @@ public class YouTubeDownloader : IYouTubeDownloader
     }
 
     /// <inheritdoc />
-    public async Task<Video> QueryVideoAsync(VideoId videoId)
+    public async Task<Video> QueryVideoAsync(VideoId videoId, CancellationToken cancellationToken = default)
     {
         videoId.Value.CheckNotNullOrEmpty(nameof(videoId));
-        return await _youTube.Videos.GetAsync(videoId).ConfigureAwait(false);
+        return await _youTube.Videos.GetAsync(videoId, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId)
+    public async Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId, CancellationToken cancellationToken = default)
     {
         videoId.Value.CheckNotNullOrEmpty(nameof(videoId));
-        return await _youTube.Videos.Streams.GetManifestAsync(videoId).ConfigureAwait(false);
+        return await _youTube.Videos.Streams.GetManifestAsync(videoId, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

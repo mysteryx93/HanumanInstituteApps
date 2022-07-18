@@ -18,35 +18,39 @@ public interface IDownloadManager
     /// Returns information about specified video.
     /// </summary>
     /// <param name="url">The URL to probe.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>The download information.</returns>
     /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
     /// <exception cref="TaskCanceledException">Download was cancelled or timed out.</exception>
     /// <exception cref="UriFormatException">The Url is invalid.</exception>
-    Task<Video> QueryVideoAsync(string url);
+    Task<Video> QueryVideoAsync(string url, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns information about specified video.
     /// </summary>
     /// <param name="url">The URL to probe.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>The download information.</returns>
     /// <exception cref="HttpRequestException">There was an error while processing the request.</exception>
     /// <exception cref="TaskCanceledException">Download was cancelled or timed out.</exception>
     /// <exception cref="UriFormatException">The Url is invalid.</exception>
-    Task<Video> QueryVideoAsync(Uri url);
+    Task<Video> QueryVideoAsync(Uri url, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns streams information for specified video.
     /// </summary>
     /// <param name="url">The URL to probe.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>Information about available streams.</returns>
-    Task<StreamManifest> QueryStreamInfoAsync(string url);
+    Task<StreamManifest> QueryStreamInfoAsync(string url, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns streams information for specified video.
     /// </summary>
     /// <param name="url">The URL to probe.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>Information about available streams.</returns>
-    Task<StreamManifest> QueryStreamInfoAsync(Uri url);
+    Task<StreamManifest> QueryStreamInfoAsync(Uri url, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Analyzes download streams and returns the formats to downloads.

@@ -29,10 +29,10 @@ namespace HanumanInstitute.Downloads.Tests
             _streamInfo = streamInfo;
         }
 
-        public Task<Video> QueryVideoAsync(VideoId videoId) => Task.FromResult(
+        public Task<Video> QueryVideoAsync(VideoId videoId, CancellationToken cancellationToken = default) => Task.FromResult(
             new Video(_url, _title, new Author(new ChannelId(), "Author"), new DateTimeOffset(), "description", new TimeSpan(), new Thumbnail[] {}, new List<string>(), new Engagement(0, 0, 0)));
 
-        public Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId) => Task.FromResult(
+        public Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId, CancellationToken cancellationToken = default) => Task.FromResult(
             _streamInfo ?? new StreamManifest(new List<IStreamInfo>()));
 
         public async Task DownloadAsync(IStreamInfo streamInfo, string filePath, Action<double>? progressCallback = null, CancellationToken cancellationToken = default)

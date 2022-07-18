@@ -9,10 +9,12 @@ public interface IDownloadTask
     /// Starts the download.
     /// </summary>
     Task DownloadAsync();
+    
     /// <summary>
     /// Gets the destination path to store the file locally.
     /// </summary>
     string Destination { get; set; }
+    
     /// <summary>
     /// Gets the analyzed download query.
     /// </summary>
@@ -22,30 +24,37 @@ public interface IDownloadTask
     /// Gets the list of file streams being downloaded.
     /// </summary>
     IList<DownloadTaskFile> Files { get; }
+    
     /// <summary>
     /// Gets the download status.
     /// </summary>
     DownloadStatus Status { get; }
+    
     /// <summary>
     /// Cancels the download operation.
     /// </summary>
     void Cancel();
+    
     /// <summary>
     /// Marks the download operation as failed.
     /// </summary>
     void Fail();
+    
     /// <summary>
     /// Occurs before performing the muxing operation.
     /// </summary>
     event MuxeTaskEventHandler? Muxing;
+    
     /// <summary>
     /// Occurs when progress information is updated.
     /// </summary>
     event DownloadTaskEventHandler? ProgressUpdated;
+    
     /// <summary>
     /// Gets the progress of all streams as percentage.
     /// </summary>
     double ProgressValue { get; }
+    
     /// <summary>
     /// Gets or sets the progress of all streams as a string representation.
     /// </summary>

@@ -14,6 +14,7 @@ public class DownloadTaskFactory : IDownloadTaskFactory
         _youTube = youTube.CheckNotNull(nameof(youTube));
         _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
         _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
+        _mediaMuxer.Owner = this;
     }
 
     /// <inheritdoc />

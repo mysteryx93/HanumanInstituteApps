@@ -12,14 +12,18 @@ public interface IYouTubeDownloader
     /// Returns information about specified YouTube video.
     /// </summary>
     /// <param name="videoId">The id of the video.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>The video info.</returns>
-    Task<Video> QueryVideoAsync(VideoId videoId);
+    Task<Video> QueryVideoAsync(VideoId videoId, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Returns streams information for specified YouTube video.
     /// </summary>
     /// <param name="videoId">The id of the video.</param>
+    /// <param name="cancellationToken">A cancellation token allowing to cancel the operation.</param>
     /// <returns>Information about available streams.</returns>
-    Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId);
+    Task<StreamManifest> QueryStreamInfoAsync(VideoId videoId, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Download the actual stream which is identified by the specified metadata to the specified file.
     /// </summary>
