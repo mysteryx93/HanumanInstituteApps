@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace HanumanInstitute.BassAudio;
+﻿namespace HanumanInstitute.BassAudio;
 
 /// <summary>
 /// Encodes an audio using BASS.

@@ -32,7 +32,11 @@ public class DownloadTaskFile
     /// <summary>
     /// Gets the destination path to store the file locally.
     /// </summary>
-    public string Destination { get; }
+    public string Destination { get; set; }
+    /// <summary>
+    /// Gets the destination of the re-encoded file.
+    /// </summary>
+    public string? DestinationEncoded { get; set; }
     /// <summary>
     /// Gets the download stream.
     /// </summary>

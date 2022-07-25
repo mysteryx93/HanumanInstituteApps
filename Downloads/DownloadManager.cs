@@ -1,11 +1,12 @@
 ﻿using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
+
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace HanumanInstitute.Downloads;
 
 /// <inheritdoc cref="IDownloadManager"/>
-public class DownloadManager : IDownloadManager, IDisposable
+public sealed class DownloadManager : IDownloadManager, IDisposable
 {
     private readonly IDownloadTaskFactory _taskFactory;
     private readonly IOptions<DownloadOptions> _options;
@@ -13,7 +14,8 @@ public class DownloadManager : IDownloadManager, IDisposable
     private readonly IYouTubeStreamSelector _streamSelector;
     public const int MaxConcurrentDownloads = 50;
 
-    public DownloadManager(IDownloadTaskFactory taskFactory, IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector, IOptions<DownloadOptions> options)
+    public DownloadManager(IDownloadTaskFactory taskFactory, IYouTubeDownloader youTube, IYouTubeStreamSelector streamSelector,
+        IOptions<DownloadOptions> options)
     {
         _taskFactory = taskFactory.CheckNotNull(nameof(taskFactory));
         _youTube = youTube.CheckNotNull(nameof(youTube));
@@ -51,27 +53,29 @@ public class DownloadManager : IDownloadManager, IDisposable
     }
 
     /// <inheritdoc />
-    public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null)
+    public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo = true, bool downloadAudio = true,
+        DownloadOptions? options = null)
     {
         return _streamSelector.SelectStreams(streams, downloadVideo, downloadAudio, options);
     }
 
-    /// <inheritdoc />
-    public async Task<DownloadStatus> DownloadAsync(string downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null)
-    {
-        return await DownloadAsync(new Uri(downloadUrl), destination, downloadVideo, downloadAudio, options, taskCreatedCallback).ConfigureAwait(false);
-    }
+    // /// <inheritdoc />
+    // public Task<DownloadStatus> DownloadAsync(string downloadUrl, string destination, bool downloadVideo = true,
+    //     bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null) =>
+    //     DownloadAsync(new Uri(downloadUrl), destination, downloadVideo, downloadAudio, options, taskCreatedCallback);
+    //
+    // /// <inheritdoc />
+    // public async Task<DownloadStatus> DownloadAsync(Uri downloadUrl, string destination, bool downloadVideo = true,
+    //     bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null)
+    // {
+    //     var vInfo = await QueryStreamInfoAsync(downloadUrl).ConfigureAwait(false);
+    //     var streams = SelectStreams(vInfo, downloadVideo, downloadAudio, options);
+    //     return await DownloadAsync(streams, destination, taskCreatedCallback).ConfigureAwait(false);
+    // }
 
     /// <inheritdoc />
-    public async Task<DownloadStatus> DownloadAsync(Uri downloadUrl, string destination, bool downloadVideo = true, bool downloadAudio = true, DownloadOptions? options = null, DownloadTaskEventHandler? taskCreatedCallback = null)
-    {
-        var vInfo = await QueryStreamInfoAsync(downloadUrl).ConfigureAwait(false);
-        var streams = SelectStreams(vInfo, downloadVideo, downloadAudio, options);
-        return await DownloadAsync(streams, destination, taskCreatedCallback).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<DownloadStatus> DownloadAsync(StreamQueryInfo streamQuery, string destination, DownloadTaskEventHandler? taskCreatedCallback = null)
+    public async Task<DownloadStatus> DownloadAsync(StreamQueryInfo streamQuery, string destination,
+        DownloadTaskEventHandler? taskCreatedCallback = null)
     {
         destination.CheckNotNullOrEmpty(nameof(destination));
 
@@ -123,10 +127,9 @@ public class DownloadManager : IDownloadManager, IDisposable
         }
     }
 
-
     private bool _disposedValue;
     /// <inheritdoc cref="IDisposable"/>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (!_disposedValue)
         {
@@ -142,6 +145,6 @@ public class DownloadManager : IDownloadManager, IDisposable
     public void Dispose()
     {
         Dispose(true);
-        GC.SuppressFinalize(this);
+        // GC.SuppressFinalize(this);
     }
 }

@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.PowerliminalsPlayer.Models;
-using HanumanInstitute.PowerliminalsPlayer.Business;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
@@ -24,7 +16,7 @@ public class MainViewModel : ReactiveObject
     private readonly IDialogService _dialogService;
     private readonly IPathFixer _pathFixer;
 
-    public AppSettingsData AppData => _settings.Value;
+    public AppSettingsData AppSettings => _settings.Value;
 
     /// <summary>
     /// Initializes a new instance of the MainViewModel class.
@@ -37,8 +29,18 @@ public class MainViewModel : ReactiveObject
         _fileSystem = fileSystem;
         _dialogService = dialogService;
         _pathFixer = pathFixer;
+        _settings.Loaded += Settings_Loaded; 
+        Settings_Loaded(_settings, EventArgs.Empty);
 
-        this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(200)).Subscribe((_) => ReloadFiles());
+        this.WhenAnyValue(x => x.SearchText)
+            .Throttle(TimeSpan.FromMilliseconds(200))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe((_) => ReloadFiles());
+    }
+    
+    private void Settings_Loaded(object? sender, EventArgs e)
+    {
+        this.RaisePropertyChanged(nameof(AppSettings));
     }
 
     public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
@@ -103,7 +105,7 @@ public class MainViewModel : ReactiveObject
     public void LoadSettings()
     {
         _settings.Load();
-        this.RaisePropertyChanged(nameof(AppData));
+        this.RaisePropertyChanged(nameof(AppSettings));
         ReloadFiles();
     }
 
@@ -119,7 +121,7 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, AppData.Folders).ConfigureAwait(false);
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, AppSettings.Folders).ConfigureAwait(false);
         if (changed)
         {
             ReloadFiles();
@@ -133,8 +135,8 @@ public class MainViewModel : ReactiveObject
     public void ReloadFiles()
     {
         // If a folder is a sub-folder of another folder, remove it.
-        var folders = AppData.Folders.ToList();
-        var foldersSorted = AppData.Folders.OrderBy(x => x).ToList();
+        var folders = AppSettings.Folders.ToList();
+        var foldersSorted = AppSettings.Folders.OrderBy(x => x).ToList();
         foreach (var item in foldersSorted)
         {
             var matchList = foldersSorted.Where(x => x.StartsWith(item + _fileSystem.Path.DirectorySeparatorChar));
@@ -191,11 +193,11 @@ public class MainViewModel : ReactiveObject
         if (result.HasValue())
         {
             var newFolder = _fileSystem.Path.TrimEndingDirectorySeparator(result);
-            if (!AppData.Folders.Contains(newFolder))
+            if (!AppSettings.Folders.Contains(newFolder))
             {
-                AppData.Folders.Add(newFolder);
+                AppSettings.Folders.Add(newFolder);
             }
-            SelectedFolderIndex = AppData.Folders.Count - 1;
+            SelectedFolderIndex = AppSettings.Folders.Count - 1;
             ReloadFiles();
         }
     }
@@ -207,8 +209,8 @@ public class MainViewModel : ReactiveObject
     {
         if (SelectedFolderIndex > -1)
         {
-            AppData.Folders.RemoveAt(SelectedFolderIndex);
-            SelectedFolderIndex = Math.Min(SelectedFolderIndex, AppData.Folders.Count - 1);
+            AppSettings.Folders.RemoveAt(SelectedFolderIndex);
+            SelectedFolderIndex = Math.Min(SelectedFolderIndex, AppSettings.Folders.Count - 1);
             ReloadFiles();
         }
     }
@@ -241,7 +243,7 @@ public class MainViewModel : ReactiveObject
         }
     }
     public ICommand LoadPresetCommand => _loadPresetCommand ??= ReactiveCommand.Create(OnLoadPreset,
-        AppData.Presets.ToObservableChangeSet().Select(x => x.Any()));
+        AppSettings.Presets.ToObservableChangeSet().Select(x => x.Any()));
     private ICommand? _loadPresetCommand;
     private async void OnLoadPreset()
     {
@@ -266,7 +268,7 @@ public class MainViewModel : ReactiveObject
             if (preset == null)
             {
                 preset = new PresetItem();
-                AppData.Presets.Add(preset);
+                AppSettings.Presets.Add(preset);
             }
 
             Playlist.SaveAs(preset);
@@ -279,7 +281,7 @@ public class MainViewModel : ReactiveObject
     {
         if (!string.IsNullOrEmpty(name))
         {
-            return AppData.Presets.FirstOrDefault(p => p.Name == name);
+            return AppSettings.Presets.FirstOrDefault(p => p.Name == name);
         }
 
         return null;

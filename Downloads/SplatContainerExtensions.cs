@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.FFmpeg;
-using Splat;
+﻿using Splat;
 using YoutubeExplode;
 
 namespace HanumanInstitute.Downloads;

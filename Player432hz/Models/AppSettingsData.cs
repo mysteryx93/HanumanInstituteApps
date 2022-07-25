@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
-using ReactiveUI;
+using HanumanInstitute.Common.Avalonia.App;
 
 namespace HanumanInstitute.Player432hz.Models;
 
@@ -9,70 +9,21 @@ namespace HanumanInstitute.Player432hz.Models;
 /// </summary>
 [Serializable]
 [XmlRoot("Player432hz")]
-public class AppSettingsData : ReactiveObject
+public class AppSettingsData : SettingsDataBase
 {
     /// <summary>
     /// Gets or sets the list of configured playlists.
     /// </summary>
     [ValidateObject]
     [XmlElement("Playlist")]
-    public List<SettingsPlaylistItem> Playlists
-    {
-        get => _playlists;
-        set => this.RaiseAndSetIfChanged(ref _playlists, value);
-    }
-    internal List<SettingsPlaylistItem> _playlists = new();
-    
-    /// <summary>
-    /// Gets or sets the width of the main window.
-    /// </summary>
-    [Range(560, 10000)]
-    public double Width
-    {
-        get => _width;
-        set => this.RaiseAndSetIfChanged(ref _width, value);
-    }
-    internal double _width = 583;
-    
-    /// <summary>
-    /// Gets or sets the height of the main window.
-    /// </summary>
-    [Range(240, 10000)]
-    public double Height
-    {
-        get => _height;
-        set => this.RaiseAndSetIfChanged(ref _height, value);
-    }
-    internal double _height = 390;
-    
-    /// <summary>
-    /// Gets or sets the position of the main window.
-    /// </summary>
-    public PixelPoint Position
-    {
-        get => _position;
-        set => this.RaiseAndSetIfChanged(ref _position, value);
-    }
-    internal PixelPoint _position;
-    
+    [Reactive]
+    public List<SettingsPlaylistItem> Playlists { get; set; } = new();
+
+
     /// <summary>
     /// Gets or sets the playback volume.
     /// </summary>
     [Range(0, 100)]
-    public int Volume
-    {
-        get => _volume;
-        set => this.RaiseAndSetIfChanged(ref _volume, value);
-    } 
-    internal int _volume = 100;
-
-    /// <summary>
-    /// Gets or sets whether to display the About window on startup.
-    /// </summary>
-    public bool ShowInfoOnStartup
-    {
-        get => _showInfoOnStartup;
-        set => this.RaiseAndSetIfChanged(ref _showInfoOnStartup, value);
-    }
-    internal bool _showInfoOnStartup = true;
+    [Reactive]
+    public int Volume { get; set; } = 100;
 }

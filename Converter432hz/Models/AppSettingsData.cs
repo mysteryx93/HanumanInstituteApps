@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Serialization;
-using ReactiveUI;
+﻿using System.Xml.Serialization;
+using HanumanInstitute.Common.Avalonia.App;
 
 namespace HanumanInstitute.Converter432hz.Models;
 
@@ -9,47 +8,6 @@ namespace HanumanInstitute.Converter432hz.Models;
 /// </summary>
 [Serializable]
 [XmlRoot("Converter432hz")]
-public class AppSettingsData : ReactiveObject
+public class AppSettingsData : SettingsDataBase
 {
-    /// <summary>
-    /// Gets or sets the width of the main window.
-    /// </summary>
-    [Range(560, 10000)]
-    public double Width
-    {
-        get => _width;
-        set => this.RaiseAndSetIfChanged(ref _width, value, nameof(Width));
-    }
-    internal double _width = 583;
-    
-    /// <summary>
-    /// Gets or sets the height of the main window.
-    /// </summary>
-    [Range(240, 10000)]
-    public double Height
-    {
-        get => _height;
-        set => this.RaiseAndSetIfChanged(ref _height, value, nameof(Height));
-    }
-    internal double _height = 390;
-    
-    /// <summary>
-    /// Gets or sets the position of the main window.
-    /// </summary>
-    public PixelPoint Position
-    {
-        get => _position;
-        set => this.RaiseAndSetIfChanged(ref _position, value, nameof(Position));
-    }
-    internal PixelPoint _position;
-    
-    /// <summary>
-    /// Gets or sets whether to display the About window on startup.
-    /// </summary>
-    public bool ShowInfoOnStartup
-    {
-        get => _showInfoOnStartup;
-        set => this.RaiseAndSetIfChanged(ref _showInfoOnStartup, value);
-    }
-    internal bool _showInfoOnStartup = true;
 }

@@ -1,24 +1,18 @@
-﻿using System.Dynamic;
-using System.Threading.Tasks;
-using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Player432hz.Business;
-using HanumanInstitute.Player432hz.ViewModels;
-using Moq;
-using Xunit;
+﻿using HanumanInstitute.BassAudio;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
 public class PlayerViewModelTests
 {
     public FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
-    private FakeFileSystemService? _mockFileSystem;
+    private FakeFileSystemService _mockFileSystem;
 
     public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem);
-    private IPlaylistPlayer? _playlistPlayer;
+    private IPlaylistPlayer _playlistPlayer;
 
     public Mock<IPitchDetector> MockPitchDetector => _mockPitchDetector ??= CreatePitchDetector();
-    private Mock<IPitchDetector>? _mockPitchDetector;
+    private Mock<IPitchDetector> _mockPitchDetector;
     private Mock<IPitchDetector> CreatePitchDetector()
     {
         var mock = new Mock<IPitchDetector>();
@@ -28,7 +22,7 @@ public class PlayerViewModelTests
     }
 
     public IPlayerViewModel Model => _model ??= SetupModel();
-    private IPlayerViewModel? _model;
+    private IPlayerViewModel _model;
 
     private const string FileName1 = "file1", FileName2 = "file2", FileName3 = "file3";
     private int _nowPlayingChanged;

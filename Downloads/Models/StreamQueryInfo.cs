@@ -1,4 +1,5 @@
-﻿using YoutubeExplode.Videos.Streams;
+﻿using HanumanInstitute.BassAudio;
+using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads;
 
@@ -11,6 +12,7 @@ public class StreamQueryInfo
     /// Gets or sets the video stream info. It may contain both audio and video.
     /// </summary>
     public IVideoStreamInfo? Video { get; set; }
+
     /// <summary>
     /// Gets or sets the audio stream info. It may contain both audio and video.
     /// </summary>
@@ -20,6 +22,7 @@ public class StreamQueryInfo
     /// Gets or sets whether to download the video.
     /// </summary>
     public bool DownloadVideo { get; set; } = true;
+
     /// <summary>
     /// Gets or sets whether to download the audio.
     /// </summary>
@@ -29,10 +32,16 @@ public class StreamQueryInfo
     /// Gets the output video stream info.
     /// </summary>
     public IVideoStreamInfo? OutputVideo => DownloadVideo ? Video ?? Audio as IVideoStreamInfo : null;
+
     /// <summary>
     /// Gets the output audio stream info.
     /// </summary>
     public IAudioStreamInfo? OutputAudio => DownloadAudio ? Audio ?? Video as IAudioStreamInfo : null;
+
+    /// <summary>
+    /// Gets or sets optional audio encode settings, if we want to re-encode the audio.
+    /// </summary>
+    public EncodeSettings? EncodeAudio { get; set; }
 
     /// <summary>
     /// Gets or sets the file extension to save the media file as.

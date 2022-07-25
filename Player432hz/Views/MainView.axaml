@@ -7,24 +7,23 @@
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:common="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
         x:Class="HanumanInstitute.Player432hz.Views.MainView"
-        mc:Ignorable="d"
-        Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}"
+        mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="350"
         Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
+        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <i:Interaction.Behaviors>
-        <ia:EventTriggerBehavior EventName="Opened">
-            <ia:InvokeCommandAction Command="{Binding InitWindow}" />
-        </ia:EventTriggerBehavior>
-        <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettings}" />
-        </ia:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Opened">
+            <InvokeCommandAction Command="{Binding InitWindow}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Closing">
+            <InvokeCommandAction Command="{Binding SaveSettings}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
     <Window.Resources>
         <common:MediaTimeConverter x:Key="MediaTimeConverter" />
     </Window.Resources>
@@ -53,12 +52,12 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" Padding="14">
-                                <i:Interaction.Behaviors>
-                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                        <ia:InvokeCommandAction
+                                <Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="DoubleTapped">
+                                        <InvokeCommandAction
                                             Command="{Binding ViewModel.StartPlayList, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                    </ia:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
+                                    </EventTriggerBehavior>
+                                </Interaction.Behaviors>
                             </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -104,12 +103,12 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}">
-                                    <i:Interaction.Behaviors>
-                                        <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                            <ia:InvokeCommandAction
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="DoubleTapped">
+                                            <InvokeCommandAction
                                                 Command="{Binding ViewModel.StartPlayFile, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                                        </ia:EventTriggerBehavior>
-                                    </i:Interaction.Behaviors>
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
                                 </TextBlock>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -125,18 +124,18 @@
                                      Title="{Binding Player.NowPlayingTitle, Mode=TwoWay}"
                                      Pitch="{Binding Player.Pitch}" EffectsFloat="True"
                                      EffectsSampleRateConversion="4"
-                                     Volume="{Binding ViewModel.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
-                    <i:Interaction.Behaviors>
-                        <ia:EventTriggerBehavior EventName="MediaFinished">
-                            <ia:InvokeCommandAction Command="{Binding PlayNextCommand}" />
-                        </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
+                                     Volume="{Binding ViewModel.AppSettings.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="MediaFinished">
+                            <InvokeCommandAction Command="{Binding PlayNextCommand}" />
+                        </EventTriggerBehavior>
+                    </Interaction.Behaviors>
                 </bass:BassPlayerHost>
-                <i:Interaction.Behaviors>
-                    <ia:EventTriggerBehavior EventName="StopCommandExecuted">
-                        <ia:InvokeCommandAction Command="{Binding PlayNextCommand}" />
-                    </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="StopCommandExecuted">
+                        <InvokeCommandAction Command="{Binding PlayNextCommand}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
             </ui:MediaPlayer>
         </Grid>
     </Grid>

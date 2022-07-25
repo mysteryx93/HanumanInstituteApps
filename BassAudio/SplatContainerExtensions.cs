@@ -1,8 +1,10 @@
-﻿using System.IO.Abstractions;
-using Splat;
+﻿using Splat;
 
 namespace HanumanInstitute.BassAudio;
 
+/// <summary>
+/// Registers services into the IOC container. 
+/// </summary>
 public static class SplatContainerExtensions
 {
     /// <summary>

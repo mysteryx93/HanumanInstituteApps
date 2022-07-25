@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using HanumanInstitute.Player432hz.ViewModels;
-using Moq;
-using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -18,34 +12,34 @@ namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 public class PlaylistViewModelTests
 {
     public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
-    private IDialogService? _dialogService;
+    private IDialogService _dialogService;
 
     private T Init<T>(Func<T> func) => func();
 
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= Init(() =>
     {
         var mock = new Mock<IDialogManager>();
-        mock.Setup(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings>(It.IsAny<INotifyPropertyChanged>(),
-                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object?, string>?>()))
-            .Returns(Task.FromResult<object?>(null));
+        mock.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
+                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+            .Returns(Task.FromResult<object>(null));
         return mock;
     });
-    private Mock<IDialogManager>? _mockDialogManager;
+    private Mock<IDialogManager> _mockDialogManager;
 
     public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
-    private Mock<IFilesListViewModel>? _mockFileList;
+    private Mock<IFilesListViewModel> _mockFileList;
 
     public PlaylistViewModel Model => _model ??= new PlaylistViewModel(DialogService, MockFileList.Object);
-    private PlaylistViewModel? _model;
+    private PlaylistViewModel _model;
 
     public string DialogFolderPath = "C:\\";
 
     // Must be set before using Model.
     private void SetDialogFolder()
     {
-        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync<OpenFolderDialogSettings>(It.IsAny<INotifyPropertyChanged>(),
-                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object?, string>?>()))
-            .Returns(Task.FromResult<object?>(DialogFolderPath));
+        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
+                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+            .Returns(Task.FromResult<object>(DialogFolderPath));
     }
 
     private void AddFolders(int count)
@@ -73,7 +67,7 @@ public class PlaylistViewModelTests
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object?, string>?>()),
+                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
             Times.Once);
     }
 

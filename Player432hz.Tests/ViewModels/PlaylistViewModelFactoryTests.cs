@@ -1,14 +1,11 @@
 ﻿using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.Player432hz.ViewModels;
-using Xunit;
-using Moq;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
 public class PlaylistViewModelFactoryTests
 {
     public IPlaylistViewModelFactory Model => _model ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
-    private IPlaylistViewModelFactory? _model;
+    private IPlaylistViewModelFactory _model;
 
     private const string DefaultPlaylistName = "New Playlist";
 

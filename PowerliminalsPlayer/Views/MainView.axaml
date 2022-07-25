@@ -5,27 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        mc:Ignorable="d"
-        Title="Powerliminals Player" Width="730" Height="409" MinWidth="680" MinHeight="210"
+        mc:Ignorable="d" d:DesignHeight="380"
+        Title="Powerliminals Player" MinWidth="680" MinHeight="210" 
         Icon="/Assets/App.ico"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
+        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
         hic:PositionExtension.Enabled="False"
-        hic:PositionExtension.Position="{Binding AppData.Position, Mode=TwoWay}"
+        hic:PositionExtension.Position="{Binding AppSettings.Position, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <i:Interaction.Behaviors>
-        <ia:EventTriggerBehavior EventName="Opened">
-            <ia:InvokeCommandAction Command="{Binding InitWindow}" />
-        </ia:EventTriggerBehavior>
-        <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" CommandParameter="{x:Null}" />
-        </ia:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Opened">
+            <InvokeCommandAction Command="{Binding InitWindow}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Closing">
+            <InvokeCommandAction Command="{Binding SaveSettingsCommand}" CommandParameter="{x:Null}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>
@@ -35,7 +35,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Expander x:Name="FoldersExpander" Header="Folders" Height="48" Width="130"
                               Background="Transparent"
-                              TabIndex="1" FontWeight="Bold" IsExpanded="{Binding AppData.FoldersExpanded}">
+                              TabIndex="1" FontWeight="Bold" IsExpanded="{Binding AppSettings.FoldersExpanded}">
                         <Grid />
                     </Expander>
                     <Button Classes="round" TabIndex="2" Width="35" Margin="2,0,0,2"
@@ -62,7 +62,7 @@
             </Grid>
             <Grid Row="1">
                 <ListBox Classes="compact" TabIndex="5" Background="{x:Null}" Height="80"
-                         Items="{Binding AppData.Folders}" SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
+                         Items="{Binding AppSettings.Folders}" SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
                          IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
             </Grid>
             <Grid Row="2" ColumnDefinitions="150,*" Margin="0,2,0,2">
@@ -87,13 +87,13 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Display}">
-                                <i:Interaction.Behaviors>
-                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                        <ia:InvokeCommandAction
+                                <Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="DoubleTapped">
+                                        <InvokeCommandAction
                                             Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                             CommandParameter="{x:Null}" />
-                                    </ia:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
+                                    </EventTriggerBehavior>
+                                </Interaction.Behaviors>
                             </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -131,13 +131,13 @@
                                                    Loop="True" UseEffects="True" EffectsQuick="True"
                                                    EffectsAntiAlias="True">
                             </mediab:BassPlayerHost>
-                            <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="StopCommandExecuted">
-                                    <ia:InvokeCommandAction
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="StopCommandExecuted">
+                                    <InvokeCommandAction
                                         Command="{Binding ViewModel.RemoveMediaCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                         CommandParameter="{Binding}" />
-                                </ia:EventTriggerBehavior>
-                            </i:Interaction.Behaviors>
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
                         </media:MediaPlayer>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

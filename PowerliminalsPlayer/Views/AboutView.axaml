@@ -71,7 +71,7 @@
                 </TabControl>
             </StackPanel>
             <Grid VerticalAlignment="Bottom">
-                <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
+                <CheckBox Content="Do not show on startup" IsChecked="{Binding !AppSettings.ShowInfoOnStartup}" />
                 <Button HorizontalAlignment="Right" Width="100" Classes="round" 
                         Command="{Binding Close}" IsDefault="True" IsCancel="true">_Close</Button>
             </Grid>

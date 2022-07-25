@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.ComponentModel;
+using Avalonia.Controls;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;
@@ -38,7 +39,8 @@ public static class ViewModelLocator
         SplatRegistrations.Register<IMediaScript, MediaScript>();
             
         // ViewModels
-        SplatRegistrations.Register<MainViewModel>();
+        SplatRegistrations.Register<MainViewModel>("Init");
+        container.Register(() => Design.IsDesignMode ? new MainViewModelDesign() : Locator.Current.GetService<MainViewModel>("Init"));
         SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<EncodeSettingsViewModel>();
 

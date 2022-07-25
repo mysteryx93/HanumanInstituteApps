@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Svg.Skia;
+using Avalonia.Xaml.Interactions.Core;
+using Avalonia.Xaml.Interactivity;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -29,6 +31,7 @@ public abstract class CommonApplication<T> : Application
 #if DEBUG
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
         GC.KeepAlive(typeof(SvgImage));
+        GC.KeepAlive(typeof(EventTriggerBehavior));
 #endif
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.

@@ -3,52 +3,76 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
-        mc:Ignorable="d" MinWidth="350" MinHeight="220" MaxWidth="350" MaxHeight="220"
+        mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="365" Height="365" MaxHeight="365"
         x:Class="HanumanInstitute.YangDownloader.Views.EncodeSettingsView"
-        Title="Advanced Settings" CanResize="False" 
+        Title="Advanced Settings" CanResize="False"
         d:DataContext="{x:Static local:ViewModelLocator.EncodeSettings}">
     <Grid Classes="GradiantBackground">
         <Grid Margin="10">
             <StackPanel>
-                <StackPanel.Styles>
-                    <Style Selector="StackPanel">
-                        <Setter Property="Margin" Value="0,0,0,8"></Setter>
-                    </Style>
-                </StackPanel.Styles>
-                <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
-                <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
-                    <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.AntiAliasLength}" Classes="compact" />
+                <Grid Margin="0,2,0,2">
+                    <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
+                    <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                              Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
+                    </ComboBox>
+                </Grid>
+                <Grid Margin="0,2,0,2" Height="24">
+                    <Grid IsVisible="{Binding IsBitrateVisible}">
+                        <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
+                        <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                                  Items="{Binding BitrateList}"
+                                  SelectedItem="{Binding BitrateList.CurrentItem}">
+                        </ComboBox>
                     </Grid>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.Speed}" Classes="compact" />
+                </Grid>
+                <Grid Margin="0,2,0,2" Height="24">
+                    <Grid IsVisible="{Binding IsSampleRateVisible}">
+                        <TextBlock VerticalAlignment="Center">Sample rate</TextBlock>
+                        <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                                  Items="{Binding SampleRateList}"
+                                  SelectedItem="{Binding SampleRateList.CurrentItem}">
+                        </ComboBox>
                     </Grid>
-                </StackPanel>
-                <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Shift pitch from  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.PitchFrom}" Classes="compact" IsEnabled="{Binding !Settings.AutoDetectPitch}" />
+                </Grid>
+                <Grid Margin="0,2,0,2" Height="44">
+                    <Grid IsVisible="{Binding IsQualitySpeedVisible}">
+                        <TextBlock VerticalAlignment="Center">Speed</TextBlock>
+                        <Slider HorizontalAlignment="Center" Width="110" Minimum="0" Maximum="5"
+                                TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
+                                Value="{Binding Settings.QualityOrSpeed}">
+                        </Slider>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right">Quality</TextBlock>
                     </Grid>
-                    <TextBlock Text="  to  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.PitchTo}" Classes="compact" />
-                    </Grid>
-                    <TextBlock Text="  hz" VerticalAlignment="Center" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Max threads  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.MaxThreads}" Classes="compact" />
+                </Grid>
+                <CheckBox IsChecked="{Binding ShiftPitch}">Shift audio pitch</CheckBox>
+                <StackPanel IsVisible="{Binding ShiftPitch}">
+                    <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
+                        <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
+                        <Grid Width="80">
+                            <TextBox Text="{Binding Settings.AntiAliasLength}" Classes="compact" />
+                        </Grid>
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
+                    <Grid RowDefinitions="28,28" ColumnDefinitions="Auto,40,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}" Classes="compact"
+                                 IsEnabled="{Binding !Settings.AutoDetectPitch}" />
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" Classes="compact" />
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                     </Grid>
                 </StackPanel>
             </StackPanel>
-            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round" 
-                    Command="{Binding Close}" IsDefault="True" IsCancel="true">_Close</Button>
         </Grid>
+
+        <Button Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round"
+                Command="{Binding Close}" IsDefault="True" IsCancel="true">
+            _Close
+        </Button>
     </Grid>
 </Window>

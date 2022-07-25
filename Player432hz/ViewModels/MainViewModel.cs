@@ -18,8 +18,6 @@ public class MainViewModel : ReactiveObject
     private readonly IFilesListViewModel _filesListViewModel;
     private readonly IDialogService _dialogService;
 
-    public AppSettingsData AppData => _settings.Value;
-
     public MainViewModel(IPlaylistViewModelFactory playlistFactory, ISettingsProvider<AppSettingsData> settings,
         IFilesListViewModel filesListViewModel, IDialogService dialogService)
     {
@@ -34,6 +32,8 @@ public class MainViewModel : ReactiveObject
 
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe((_) => Playlists_CurrentChanged());
     }
+
+    public AppSettingsData AppSettings => _settings.Value;
     
     public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
     private ICommand? _initWindow;
@@ -47,36 +47,6 @@ public class MainViewModel : ReactiveObject
     }
 
     /// <summary>
-    /// Gets or sets the height of the main window.
-    /// </summary>
-    public double WindowHeight
-    {
-        get => _settings.Value.Height;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._height, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the width of the main window.
-    /// </summary>
-    public double WindowWidth
-    {
-        get => _settings.Value.Width;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._width, value);
-    }
-
-    public PixelPoint WindowPosition
-    {
-        get => _settings.Value.Position;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._position, value);
-    }
-
-    public int Volume
-    {
-        get => _settings.Value.Volume;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._volume, value);
-    }
-
-    /// <summary>
     /// Returns the list of playlists with selection properties that can be bound to the UI.
     /// </summary>
     public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } =
@@ -86,7 +56,7 @@ public class MainViewModel : ReactiveObject
     private ICommand? _startPlayList;
     private void StartPlayListImpl(TappedEventArgs e)
     {
-        _filesListViewModel.Files.CurrentItem = null;
+        _filesListViewModel.Files.CurrentPosition = -1;
         _filesListViewModel.PlayCommand.Execute(null);
     }
 
@@ -129,7 +99,7 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     private void Playlists_CurrentChanged()
     {
-        _filesListViewModel.SetPaths(Playlists.CurrentItem?.Folders?.Source);
+        _filesListViewModel.SetPaths(Playlists.CurrentItem?.Folders.Source);
     }
 
     /// <summary>
@@ -137,9 +107,7 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     private void Settings_Loaded(object? sender, EventArgs e)
     {
-        this.RaisePropertyChanged(nameof(WindowHeight));
-        this.RaisePropertyChanged(nameof(WindowWidth));
-
+        this.RaisePropertyChanged(nameof(AppSettings));
         var playlists = _settings.Value.Playlists;
         Playlists.Source.Clear();
         Playlists.Source.AddRange(playlists.Select(x => _playlistFactory.Create(x)));

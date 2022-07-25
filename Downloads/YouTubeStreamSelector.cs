@@ -1,9 +1,10 @@
-﻿using YoutubeExplode.Videos.Streams;
+﻿using HanumanInstitute.BassAudio;
+using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads;
 
 /// <inheritdoc />
-public class YouTubeStreamSelector : IYouTubeStreamSelector
+public sealed class YouTubeStreamSelector : IYouTubeStreamSelector
 {
     /// <inheritdoc />
     public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo, bool downloadAudio, DownloadOptions? options)
@@ -28,7 +29,8 @@ public class YouTubeStreamSelector : IYouTubeStreamSelector
             result.Audio = SelectBestAudio(streams, options);
         }
 
-        result.FileExtension = GetFinalExtension(result.OutputVideo, result.OutputAudio);
+        result.EncodeAudio = options.EncodeAudio?.Clone();
+        result.FileExtension = GetFinalExtension(result.OutputVideo, result.OutputAudio, result.EncodeAudio?.Format);
 
         return result;
     }
@@ -122,51 +124,6 @@ public class YouTubeStreamSelector : IYouTubeStreamSelector
         else if (stream is MuxedStreamInfo mInfo)
         {
             return vInfo?.VideoResolution.Height ?? mInfo.VideoQuality.MaxHeight;
-            //var q = vInfo?.VideoQuality ?? mInfo.VideoQuality;
-            //if (q == VideoQuality.High4320)
-            //{
-            //    return 4320;
-            //}
-            //else if (q == VideoQuality.High3072)
-            //{
-            //    return 3072;
-            //}
-            //else if (q == VideoQuality.High2160)
-            //{
-            //    return 2160;
-            //}
-            //else if (q == VideoQuality.High1440)
-            //{
-            //    return 1440;
-            //}
-            //else if (q == VideoQuality.High1080)
-            //{
-            //    return 1080;
-            //}
-            //else if (q == VideoQuality.High720)
-            //{
-            //    return 720;
-            //}
-            //else if (q == VideoQuality.Medium480)
-            //{
-            //    return 480;
-            //}
-            //else if (q == VideoQuality.Medium360)
-            //{
-            //    return 360;
-            //}
-            //else if (q == VideoQuality.Low240)
-            //{
-            //    return 240;
-            //}
-            //else if (q == VideoQuality.Low144)
-            //{
-            //    return 144;
-            //}
-            //else
-            //{
-            //    return 0;
-            //}
         }
         else
         {
@@ -177,67 +134,50 @@ public class YouTubeStreamSelector : IYouTubeStreamSelector
     /// <summary>
     /// Returns the file extension for specified video type.
     /// To avoid conflicting file names, the codec extension must be different than the final extension.
+    /// Optional EncodeAudio format is taken into account. 
     /// </summary>
     /// <param name="video">The video type to get file extension for.</param>
     /// <param name="audio">The audio type to get file extension for.</param>
+    /// <param name="encodeAudio">If re-encoding the audio, the format being re-encoded to.</param>
     /// <returns>The file extension.</returns>
-    private static string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio)
+    private static string GetFinalExtension(IVideoStreamInfo? video, IAudioStreamInfo? audio, EncodeFormat? encodeAudio)
     {
         if (video != null && audio == null)
         {
             // Video-only
-            if (video.Container == Container.WebM)
+            return 1 switch
             {
-                return "webm";
-            }
-            else if (video.Container == Container.Mp4)
-            {
-                return "mp4";
-            }
-            else if (video.Container == Container.Tgpp)
-            {
-                return "mp4"; // ?
-            }
+                _ when video.Container == Container.WebM => "webm",
+                _ when video.Container == Container.Mp4 => "mp4",
+                _ => "mkv"
+            };
         }
         else if (audio != null && video == null)
         {
             // Audio-only
-            if (audio.Container == Container.Mp4)
+            return 1 switch
             {
-                return "m4a";
-            }
-            else if (audio.Container == Container.Tgpp)
-            {
-                return "mp4v"; // ?
-            }
-            else if (audio.AudioCodec == AudioEncoding.Opus)
-            {
-                return "opus";
-            }
-            else if (audio.AudioCodec == AudioEncoding.Vorbis)
-            {
-                return "ogg";
-            }
+                _ when encodeAudio == EncodeFormat.Aac => "m4a",
+                _ when encodeAudio != null => encodeAudio.ToStringInvariant().ToLowerInvariant(),
+                _ when audio.Container == Container.Mp4 => "m4a",
+                _ when audio.AudioCodec == AudioEncoding.Opus => "opus",
+                _ when audio.AudioCodec == AudioEncoding.Vorbis => "ogg",
+                _ => "mkv"
+            };
         }
         else if (audio != null && video != null)
         {
             // Both
-            if (video.Container == Container.WebM && audio.Container == Container.WebM)
+            return 1 switch
             {
-                return "webm";
-            }
-            else if (video.Container == Container.Mp4 && audio.Container == Container.Mp4)
-            {
-                return "mp4";
-            }
-            else if (video.Container == Container.Tgpp && audio.Container == Container.Tgpp)
-            {
-                return "mp4"; // ?
-            }
-            else
-            {
-                return "mkv";
-            }
+                _ when video.Container == Container.WebM && (encodeAudio == null ?
+                    audio.Container == Container.WebM :
+                    encodeAudio is EncodeFormat.Ogg or EncodeFormat.Opus) => "webm",
+                _ when video.Container == Container.Mp4 && (encodeAudio == null ?
+                    audio.Container == Container.Mp4 :
+                    encodeAudio is EncodeFormat.Aac or EncodeFormat.Mp3 or EncodeFormat.Flac or EncodeFormat.Opus) => "mp4",
+                _ => "mkv"
+            };
         }
         return "mkv";
     }

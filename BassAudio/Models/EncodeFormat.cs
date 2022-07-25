@@ -24,5 +24,9 @@ public enum EncodeFormat
     /// <summary>
     /// OGG/Vorbis audio format, better quality than MP3.
     /// </summary>
-    Ogg
+    Ogg,
+    /// <summary>
+    /// AAC audio format, standard with MP4.
+    /// </summary>
+    Aac
 }

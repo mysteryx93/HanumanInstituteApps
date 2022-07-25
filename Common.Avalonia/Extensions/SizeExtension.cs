@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Layout;
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
@@ -21,10 +22,10 @@ public class SizeExtension : AvaloniaObject
     public static void SetTrackSize(AvaloniaObject d, bool value) => d.CheckNotNull(nameof(d)).SetValue(TrackSizeProperty, value);
     private static void OnTrackSizeChanged(AvaloniaPropertyChangedEventArgs<bool> e)
     {
-        if (e.Sender is Layoutable p)
+        if (e.Sender is Layoutable p && !Design.IsDesignMode)
         {
-            p.Width = GetWidth(p);
-            p.Height = GetHeight(p);
+            // p.Width = GetWidth(p);
+            // p.Height = GetHeight(p);
             p.GetObservable(Layoutable.WidthProperty).Subscribe((newValue) => SetWidth(p, newValue));
             p.GetObservable(Layoutable.HeightProperty).Subscribe((newValue) => SetHeight(p, newValue));
         }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Reflection;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Converter432hz.Views;
@@ -18,7 +17,6 @@ public class App : CommonApplication<MainView>
         
         if (!Avalonia.Controls.Design.IsDesignMode)
         {
-            Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
             BassDevice.Instance.Init();
         }
     }

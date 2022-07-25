@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 using HanumanInstitute.BassAudio;
-using ExtensionMethods = HanumanInstitute.Common.Services.ExtensionMethods;
 
-namespace HanumanInstitute.Converter432hz.Business;
+namespace HanumanInstitute.YangDownloader.Business;
 
 /// <summary>
 /// Exposes application dialogs in a strongly-typed way.
@@ -19,24 +18,12 @@ public static class DialogServiceExtensions
         EncodeSettings settings)
     {
         var vm = service.CreateViewModel<EncodeSettingsViewModel>();
-        // vm.Settings = settings.Clone();
-        vm.Settings.Rate = settings.Rate;
-        vm.Settings.Speed = settings.Speed;
-        vm.Settings.PitchFrom = settings.PitchFrom;
-        vm.Settings.PitchTo = settings.PitchTo;
-        vm.Settings.AntiAlias = settings.AntiAlias;
-        vm.Settings.AntiAliasLength = settings.AntiAliasLength;
-        vm.Settings.MaxThreads = settings.MaxThreads;
+        vm.Settings = settings.Clone();
+        //ExtensionMethods.CopyAll(settings, vm.Settings);
 
         if (await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false) == true)
         {
-            settings.Rate = vm.Settings.Rate;
-            settings.Speed = vm.Settings.Speed;
-            settings.PitchFrom = vm.Settings.PitchFrom;
-            settings.PitchTo = vm.Settings.PitchTo;
-            settings.AntiAlias = vm.Settings.AntiAlias;
-            settings.AntiAliasLength = vm.Settings.AntiAliasLength;
-            settings.MaxThreads = vm.Settings.MaxThreads;
+            ExtensionMethods.CopyAllFields(vm.Settings, settings);
         }
     }
 }

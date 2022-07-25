@@ -1,10 +1,12 @@
 ﻿
+using Avalonia.Controls;
+
 namespace HanumanInstitute.Converter432hz.Business;
 
 /// <summary>
 /// Contains custom application settings for 432hz Converter.
 /// </summary>
-public class AppSettingsProvider : SettingsProvider<AppSettingsData>
+public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
 {
     private readonly IAppPathService _appPath;
     private readonly IFileSystemService _fileSystem;
@@ -14,13 +16,17 @@ public class AppSettingsProvider : SettingsProvider<AppSettingsData>
     {
         _appPath = appPath;
         _fileSystem = fileSystem;
+
+        Load();
     }
 
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.
     /// </summary>
-    public sealed override AppSettingsData Load()
+    public override AppSettingsData Load()
     {
+        if (Design.IsDesignMode) { return GetDefault(); }
+
         // If upgrading from older version, move settings from old location to new location.
         if (!_fileSystem.File.Exists(_appPath.ConfigFile) && _fileSystem.File.Exists(_appPath.OldConfigFile))
         {
@@ -35,5 +41,9 @@ public class AppSettingsProvider : SettingsProvider<AppSettingsData>
     /// </summary>
     public override void Save() => Save(_appPath.ConfigFile);
 
-    protected override AppSettingsData GetDefault() => new AppSettingsData();
+    protected override AppSettingsData GetDefault() => new()
+    {
+        Width = 600,
+        Height = 400
+    };
 }

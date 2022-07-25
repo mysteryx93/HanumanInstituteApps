@@ -3,20 +3,35 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:common="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
+    xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
     xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
     x:Class="HanumanInstitute.YangDownloader.Views.MainView"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-    Height="332" Width="540"
+    MinHeight="260" MinWidth="580" d:DesignWidth="580" d:DesignHeight="260"
     Title="Yang YouTube Downloader" Icon="/Assets/App.ico" CanResize="False"
+    hic:SizeExtension.TrackSize="True"
+    hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
+    hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}">
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Opened">
+            <InvokeCommandAction Command="{Binding InitWindow}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Closing">
+            <InvokeCommandAction Command="{Binding SaveSettings}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
     <Grid Classes="GradiantBackground">
         <Grid Margin="10" RowDefinitions="Auto,*">
+            <Button Grid.Row="0" Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"  
+                    Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                <Svg Path="/Assets/information.svg" />
+            </Button>
             <StackPanel Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Preferred Video: " VerticalAlignment="Center" />
                     <ComboBox Classes="compact" Width="90" Items="{Binding PreferredVideo}" Margin="5,0,10,0"
-                              SelectedIndex="{Binding PreferredVideo.CurrentPosition}">
+                              SelectedItem="{Binding PreferredVideo.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Text}" />
@@ -25,7 +40,7 @@
                     </ComboBox>
                     <TextBlock Text="Audio: " VerticalAlignment="Center" />
                     <ComboBox Classes="compact" Width="90" Items="{Binding PreferredAudio}" Margin="5,0,10,0"
-                              SelectedIndex="{Binding PreferredAudio.CurrentPosition}">
+                              SelectedItem="{Binding PreferredAudio.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Text}" />
@@ -34,7 +49,7 @@
                     </ComboBox>
                     <TextBlock Text="Quality: " VerticalAlignment="Center" />
                     <ComboBox Classes="compact" Width="90" Items="{Binding MaxQuality}" Margin="5,0,0,0"
-                              SelectedIndex="{Binding MaxQuality.CurrentPosition}">
+                              SelectedItem="{Binding MaxQuality.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Text}" />
@@ -44,13 +59,13 @@
                 </StackPanel>
                 <Grid Margin="0,10,0,4" ColumnDefinitions="Auto,*">
                     <TextBlock Grid.Column="0" Text="Download URL:" VerticalAlignment="Center" Width="110" />
-                    <TextBox Grid.Column="1" Classes="compact" common:FocusExtensions.FocusOnLoaded="True"
+                    <TextBox Grid.Column="1" Classes="compact" hic:FocusExtensions.FocusOnLoaded="True"
                              Text="{Binding DownloadUrl}" />
                 </Grid>
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <TextBlock Grid.Column="0" Text="Save to Folder:  " VerticalAlignment="Center" Width="110" />
-                    <TextBox Grid.Column="1" Classes="compact" common:FocusExtensions.FocusOnLoaded="True"
-                             Text="{Binding DestinationFolder}" />
+                    <TextBox Grid.Column="1" Classes="compact" hic:FocusExtensions.FocusOnLoaded="True"
+                             Text="{Binding AppSettings.DestinationFolder}" />
                     <Button Classes="round" Grid.Column="2" Width="35"
                             Command="{Binding BrowseDestination, Mode=OneWay}">
                         <Svg Path="/Assets/folder.svg" />
@@ -59,9 +74,11 @@
                 <Grid Margin="0,5,0,5">
                     <Grid VerticalAlignment="Top">
                         <Button Classes="round" Content="_Query" HorizontalAlignment="Right" Width="80"
-                                IsDefault="True"
+                                IsDefault="True" Margin="0,0,102,0"
                                 Command="{Binding Query, Mode=OneWay}" />
-                        <TextBlock Text="{Binding Message, Mode=OneWay}" Foreground="#FFB20000" Margin="110,0,0,0" />
+                        <Button Classes="round" Content="_Download" HorizontalAlignment="Right" Width="100" 
+                                Command="{Binding Download, Mode=OneWay}" />
+                        <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}" Foreground="#FFB20000" Margin="110,0,0,0" VerticalAlignment="Center" />
                     </Grid>
                     <Grid Margin="0,5,0,0" IsVisible="{Binding DisplayDownloadInfo, Mode=OneWay}">
                         <StackPanel>
@@ -90,16 +107,14 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                                 IsVisible="{Binding AudioStreamInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                         <CheckBox Content="Re-encode" Margin="0,0,10,0"
-                                                  IsChecked="{Binding EncodeAudio}" />
+                                                  IsChecked="{Binding AppSettings.EncodeAudio, Mode=TwoWay}" />
                                         <Button Classes="round" Content="_Settings" Width="80"
-                                                IsEnabled="{Binding EncodeAudio}" />
+                                                IsEnabled="{Binding AppSettings.EncodeAudio}" 
+                                                Command="{Binding ShowEncodeSettings}"/>
                                     </StackPanel>
                                 </Grid>
                             </Grid>
                         </StackPanel>
-                        <Button Classes="round" Content="_Download" HorizontalAlignment="Right"
-                                VerticalAlignment="Center" Width="100"
-                                Command="{Binding Download, Mode=OneWay}" />
                     </Grid>
                 </Grid>
             </StackPanel>

@@ -3,6 +3,9 @@
 
 namespace HanumanInstitute.BassAudio;
 
+/// <summary>
+/// Reads media tags using BASS.
+/// </summary>
 public class TagsReader
 {
     private readonly int _chan;

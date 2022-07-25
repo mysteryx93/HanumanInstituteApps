@@ -5,7 +5,7 @@ using YoutubeExplode.Videos.Streams;
 namespace HanumanInstitute.Downloads;
 
 /// <inheritdoc />
-public class YouTubeDownloader : IYouTubeDownloader
+public sealed class YouTubeDownloader : IYouTubeDownloader
 {
     private readonly YoutubeClient _youTube;
 

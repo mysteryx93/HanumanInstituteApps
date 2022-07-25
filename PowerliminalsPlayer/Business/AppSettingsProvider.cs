@@ -1,7 +1,5 @@
-﻿using System.IO.Abstractions;
-using System.Xml.Serialization;
-using HanumanInstitute.Common.Services;
-using HanumanInstitute.PowerliminalsPlayer.Models;
+﻿using System.Xml.Serialization;
+using Avalonia.Controls;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
@@ -24,6 +22,8 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
 
     public override AppSettingsData Load()
     {
+        if (Design.IsDesignMode) { return GetDefault(); }
+        
         // If upgrading from older version, move settings from old location to new location.
         if (!_fileSystem.File.Exists(_appPath.ConfigFile) && _fileSystem.File.Exists(_appPath.OldConfigFile))
         {
@@ -36,5 +36,9 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
 
     public override void Save() => base.Save(_appPath.ConfigFile);
 
-    protected override AppSettingsData GetDefault() => new AppSettingsData();
+    protected override AppSettingsData GetDefault() => new() 
+    {
+        Width = 680,
+        Height = 380
+    };
 }

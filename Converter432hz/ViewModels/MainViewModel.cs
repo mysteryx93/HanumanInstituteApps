@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
-using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -24,13 +21,13 @@ public class MainViewModel : ReactiveObject
     private readonly IEnvironmentService _environment;
     private readonly IPitchDetector _pitchDetector;
 
-    public AppSettingsData AppData => _settings.Value;
+    public AppSettingsData AppSettings => _settings.Value;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IEncoderService encoder, IDialogService dialogService,
         IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, IEnvironmentService environment,
         IPitchDetector pitchDetector)
     {
-        _settings = settings.CheckNotNull(nameof(settings));
+        _settings = settings;
         Encoder = encoder;
         Encoder.Owner = this;
         _dialogService = dialogService;
@@ -39,6 +36,8 @@ public class MainViewModel : ReactiveObject
         _appPath = appPath;
         _environment = environment;
         _pitchDetector = pitchDetector;
+        _settings.Loaded += Settings_Loaded;
+        Settings_Loaded(_settings, EventArgs.Empty);
 
         Encoder.Settings.PitchTo = 432;
         Encoder.Settings.MaxThreads = Math.Min(64, _environment.ProcessorCount);
@@ -74,6 +73,11 @@ public class MainViewModel : ReactiveObject
         // combined.Add(SumEx.Sum(sourceObserve.Filter(x => x is FolderItem), x =>((FolderItem)x).Files.Count));
     }
     
+    private void Settings_Loaded(object? sender, EventArgs e)
+    {
+        this.RaisePropertyChanged(nameof(AppSettings));
+    }
+
     public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
     private ICommand? _initWindow;
     private async Task InitWindowImplAsync()
@@ -116,12 +120,6 @@ public class MainViewModel : ReactiveObject
     /// The encoder service.
     /// </summary>
     public IEncoderService Encoder { get; }
-
-    public PixelPoint WindowPosition
-    {
-        get => _settings.Value.Position;
-        set => this.RaiseAndSetIfChanged(ref _settings.Value._position, value, nameof(WindowPosition));
-    }
 
     /// <summary>
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
@@ -211,6 +209,7 @@ public class MainViewModel : ReactiveObject
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
+        { EncodeFormat.Aac, "AAC" },
         { EncodeFormat.Wav, "WAV" },
         { EncodeFormat.Flac, "FLAC" },
         { EncodeFormat.Ogg, "OGG" },

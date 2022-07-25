@@ -1,13 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Common.Services;
+﻿using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.Player432hz.Models;
-using HanumanInstitute.Player432hz.ViewModels;
-using Moq;
-using Xunit;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;

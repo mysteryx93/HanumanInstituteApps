@@ -1,10 +1,12 @@
-
 using System.Text.RegularExpressions;
 using ManagedBass;
 
 namespace HanumanInstitute.BassAudio;
 
-public static class BassExtensions
+/// <summary>
+/// Provides extension methods for BASS.
+/// </summary>
+internal static class BassExtensions
 {
     /// <summary>
     /// Checks whether a BASS handle is valid and throws an exception if it is 0.

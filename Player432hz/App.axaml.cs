@@ -17,7 +17,6 @@ public class App : CommonApplication<MainView>
 
         if (!Avalonia.Controls.Design.IsDesignMode)
         {
-            Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!.Load();
             BassDevice.Instance.Init();
         }
     }

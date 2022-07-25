@@ -137,5 +137,11 @@ public class EncodeSettings : ReactiveObject
     /// <summary>
     /// Returns a clone of the current class.
     /// </summary>
-    public EncodeSettings Clone() => (EncodeSettings)this.MemberwiseClone();
+    public EncodeSettings Clone()
+    {
+        // MemberwiseClone screws up Reactive object state.
+        var copy = new EncodeSettings();
+        ExtensionMethods.CopyAllFields(this, copy);
+        return copy;
+    }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a media file download task, which can consist of multiple download streams.
 /// </summary>
-public interface IDownloadTask
+public interface IDownloadTask : IDisposable
 {
     /// <summary>
     /// Starts the download.

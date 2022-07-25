@@ -46,7 +46,7 @@ public class SemaphoreSlimDynamic : SemaphoreSlim
     /// <param name="newSize">The new capacity of the SemaphoreSlim.</param>
     public void ChangeCapacity(int newSize)
     {
-        if (newSize < 1 || newSize > MaximumCapacity) { throw new ArgumentOutOfRangeException(nameof(newSize)); }
+        newSize.CheckRange(nameof(newSize), min: 1, max: MaximumCapacity);
 
         var adjust = 0;
         if (newSize != Capacity)

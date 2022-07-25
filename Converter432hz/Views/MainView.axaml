@@ -9,20 +9,20 @@
         Title="432hz Batch Converter" Icon="/Assets/App.ico"
         MinHeight="350" MinWidth="570" 
         hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppData.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppData.Height, Mode=TwoWay}"
+        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:bassAudio="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <i:Interaction.Behaviors>
-        <ia:EventTriggerBehavior EventName="Opened">
-            <ia:InvokeCommandAction Command="{Binding InitWindow}" />
-        </ia:EventTriggerBehavior>
-        <ia:EventTriggerBehavior EventName="Closing">
-            <ia:InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
-        </ia:EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Opened">
+            <InvokeCommandAction Command="{Binding InitWindow}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Closing">
+            <InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
     <Window.Resources>
         <hic:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>

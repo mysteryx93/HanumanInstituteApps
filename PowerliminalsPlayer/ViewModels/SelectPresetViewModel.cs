@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.PowerliminalsPlayer.Models;
 using ReactiveUI;
 using ICloseable = HanumanInstitute.MvvmDialogs.ICloseable;
 

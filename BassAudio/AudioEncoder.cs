@@ -13,6 +13,9 @@ public class AudioEncoder : IAudioEncoder
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
 
+    /// <summary>
+    /// Initializes a new instance of the AudioEncoder class.
+    /// </summary>
     public AudioEncoder(IPitchDetector pitchDetector, IFileSystemService fileSystem)
     {
         _pitchDetector = pitchDetector;

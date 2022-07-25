@@ -1,26 +1,32 @@
-﻿using System.Net.Http;
+﻿using System.IO;
+using System.Net.Http;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.FFmpeg;
+using ManagedBass;
 using YoutubeExplode.Videos.Streams;
+
 // ReSharper disable StringLiteralTypo
 
 namespace HanumanInstitute.Downloads;
 
-/// <inheritdoc />
-public class DownloadTask : IDownloadTask
+/// <inheritdoc cref="IDownloadTask" />
+public sealed class DownloadTask : IDownloadTask
 {
     private readonly IYouTubeDownloader _youTube;
     private readonly IFileSystemService _fileSystem;
     private readonly IMediaMuxer _mediaMuxer;
+    private readonly IAudioEncoder _audioEncoder;
 
-    public DownloadTask(IYouTubeDownloader youTube, IFileSystemService fileSystem, IMediaMuxer mediaMuxer,
+    public DownloadTask(IYouTubeDownloader youTube, IFileSystemService fileSystem, IMediaMuxer mediaMuxer, IAudioEncoder audioEncoder, 
         StreamQueryInfo streamsQuery, string destination)
     {
         Query = streamsQuery.CheckNotNull(nameof(streamsQuery));
         if (Query.OutputVideo == null && Query.OutputAudio == null) { throw new ArgumentException(Resources.RequestHasNoStream); }
 
-        _youTube = youTube.CheckNotNull(nameof(youTube));
-        _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
-        _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
+        _youTube = youTube;
+        _fileSystem = fileSystem;
+        _mediaMuxer = mediaMuxer;
+        _audioEncoder = audioEncoder;
 
         Destination = destination.CheckNotNullOrEmpty(nameof(destination));
     }
@@ -33,6 +39,7 @@ public class DownloadTask : IDownloadTask
     public IList<DownloadTaskFile> Files { get; } = new List<DownloadTaskFile>();
     private DownloadStatus _status = DownloadStatus.Waiting;
     private bool _isCalled;
+    private readonly CancellationTokenSource _cancelToken = new();
 
     /// <inheritdoc />
     public event MuxeTaskEventHandler? Muxing;
@@ -56,36 +63,7 @@ public class DownloadTask : IDownloadTask
         // Start download.
         Status = DownloadStatus.Initializing;
         _fileSystem.EnsureDirectoryExists(Destination);
-
-        // Query the download URL for the right file.
-        //StreamManifest? streams = null;
-        //try
-        //{
-        //    streams = await _youTube.QueryStreamInfoAsync(Url.AbsoluteUri).ConfigureAwait(false);
-        //}
-        //catch (HttpRequestException) { }
-        //catch (TaskCanceledException) { }
-
-        // Get the highest resolution format.
-        //IVideoStreamInfo? Query.Video = null;
-        //IAudioStreamInfo? Query.Audio = null;
-        //var isMuxed = false;
-        //if (streams != null)
-        //{
-        //    if (DownloadVideo)
-        //    {
-        //        Query.Video = _streamSelector.SelectQuery.Video(streams, _options);
-        //        isMuxed = Query.Video is MuxedStreamInfo;
-        //    }
-        //    if (DownloadAudio && !isMuxed)
-        //    {
-        //        Query.Audio = _streamSelector.SelectQuery.Audio(streams, _options);
-        //        if (!DownloadVideo)
-        //        {
-        //            isMuxed = Query.Audio is MuxedStreamInfo;
-        //        }
-        //    }
-        //}
+        await _fileSystem.File.WriteAllTextAsync(Destination, string.Empty).ConfigureAwait(false);
 
         // Make sure we could retrieve download streams.
         if (Query.Video == null && Query.Audio == null)
@@ -94,64 +72,70 @@ public class DownloadTask : IDownloadTask
             return;
         }
 
+        Task? taskVideo = null;
+        Task? taskAudio = null;
+
         // Add the best video stream.
         if (Query.Video != null)
         {
-            Files.Add(new DownloadTaskFile(true, Query.OutputAudio != null && Query.Audio == null, new Uri(Query.Video.Url),
-                _fileSystem.GetPathWithoutExtension(Destination) + ".tempvideo",
-                Query.Video, Query.Video.Size.Bytes));
+            var fileVideo = new DownloadTaskFile(true, Query.OutputAudio != null && Query.Audio == null, new Uri(Query.Video.Url),
+                Destination + ".tempvideo", Query.Video, Query.Video.Size.Bytes);
+            Files.Add(fileVideo);
+            taskVideo = DownloadFileAsync(fileVideo);
         }
 
         // Add the best audio stream.
         if (Query.Audio != null)
         {
-            Files.Add(new DownloadTaskFile(Query.OutputVideo != null && Query.Video == null, true, new Uri(Query.Audio.Url),
-                _fileSystem.GetPathWithoutExtension(Destination) + ".tempaudio",
-                Query.Audio, Query.Audio.Size.Bytes));
+            var fileAudio = new DownloadTaskFile(Query.OutputVideo != null && Query.Video == null, true, new Uri(Query.Audio.Url),
+                Destination + ".tempaudio", Query.Audio, Query.Audio.Size.Bytes);
+            Files.Add(fileAudio);
+            taskAudio = DownloadFileAsync(fileAudio);
+            if (Query.EncodeAudio != null)
+            {
+                taskAudio = await taskAudio.ContinueWith(_ =>
+                    EncodeAudioAsync(fileAudio, Query.EncodeAudio));
+            }
         }
 
         if (!IsCancelled)
         {
-            // Download all files.
-            var downloadTasks = Files.Select(DownloadFileAsync).ToArray();
-            await Task.WhenAll(downloadTasks).ConfigureAwait(false);
+            await (taskAudio ?? Task.CompletedTask).ConfigureAwait(false);
+            await (taskVideo ?? Task.CompletedTask).ConfigureAwait(false);
 
-            if (IsCompleted())
+            if (VerifyFiles())
             {
                 await DownloadCompletedAsync().ConfigureAwait(false);
             }
             else
             {
-                await Task.Delay(100).ConfigureAwait(false);
-                DeleteTempFiles();
+                Status = DownloadStatus.Failed;
             }
         }
+
+        await Task.Delay(100).ConfigureAwait(false);
+        DeleteTempFiles();
     }
 
     /// <summary>
     /// Returns whether all files are finished downloading.
     /// </summary>
-    private bool IsCompleted()
+    private bool VerifyFiles()
     {
-        if (!IsCancelled && Files.Count > 0)
+        if (IsCancelled || Files.Count <= 0) { return false; }
+
+        foreach (var item in Files)
         {
-            var result = true;
-            foreach (var item in Files)
+            if (!FileHasMinSize(item.Destination, item.Length) ||
+                (item.DestinationEncoded.HasValue() && !FileHasMinSize(item.DestinationEncoded)))
             {
-                var fileExists = _fileSystem.File.Exists(item.Destination);
-                if (!fileExists || _fileSystem.FileInfo.FromFileName(item.Destination).Length < item.Length)
-                {
-                    result = false;
-                }
-                // In case one file gets deleted before all streams complete.
-                if (!fileExists && item.Downloaded > 0)
-                {
-                    Status = DownloadStatus.Failed;
-                }
+                return false;
             }
-            return result;
         }
-        return false;
+        return true;
+
+        bool FileHasMinSize(string file, long minSize = 1) =>
+            _fileSystem.File.Exists(file) && _fileSystem.FileInfo.FromFileName(file).Length >= minSize;
     }
 
     /// <summary>
@@ -161,31 +145,49 @@ public class DownloadTask : IDownloadTask
     private async Task DownloadFileAsync(DownloadTaskFile fileInfo)
     {
         Status = DownloadStatus.Downloading;
-        using var cancelToken = new CancellationTokenSource();
 
         try
         {
             await _youTube.DownloadAsync(
-                (IStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, cancelToken.Token).ConfigureAwait(false);
+                (IStreamInfo)fileInfo.Stream, fileInfo.Destination, ProgressHandler, _cancelToken.Token).ConfigureAwait(false);
 
             void ProgressHandler(double percent)
             {
                 fileInfo.Downloaded = (long)(fileInfo.Length * percent);
                 UpdateProgress();
-
-                if (IsCancelled)
-                {
-                    try
-                    {
-                        cancelToken.Cancel();
-                    }
-                    catch (ObjectDisposedException) { } // In case task is already done.
-                }
             }
         }
+        catch (TaskCanceledException) { Status = DownloadStatus.Canceled; }
         catch (HttpRequestException) { Status = DownloadStatus.Failed; }
-        catch (TaskCanceledException) { Status = DownloadStatus.Failed; }
-        catch (System.IO.IOException) { Status = DownloadStatus.Failed; }
+        catch (IOException) { Status = DownloadStatus.Failed; }
+        catch (Exception)
+        {
+            Status = DownloadStatus.Failed;
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Re-encodes the audio based on Query.EncodeAudio.
+    /// </summary>
+    /// <param name="fileInfo">Information about the file stream downloaded.</param>
+    /// <param name="encodeSettings">The encoding settings.</param>
+    private async Task EncodeAudioAsync(DownloadTaskFile fileInfo, EncodeSettings encodeSettings)
+    {
+        var dest = fileInfo.Destination + ".encode";
+        fileInfo.DestinationEncoded = dest;
+        var item = new ProcessingItem(fileInfo.Destination, fileInfo.Destination) { Destination = dest };
+        try
+        {
+            await _audioEncoder.StartAsync(item, encodeSettings, _cancelToken.Token);
+        }
+        catch (FileNotFoundException) { Status = DownloadStatus.Failed; }
+        catch (BassException) { Status = DownloadStatus.Failed; }
+        catch (Exception ex)
+        {
+            Status = DownloadStatus.Failed;
+            throw;
+        }
     }
 
     /// <summary>
@@ -210,22 +212,28 @@ public class DownloadTask : IDownloadTask
                     _fileSystem.File.Move(videoFile.Destination, Destination);
                     Status = DownloadStatus.Success;
                 }
-                catch (System.IO.IOException) { Status = DownloadStatus.Failed; }
+                catch (IOException) { Status = DownloadStatus.Failed; }
                 catch (UnauthorizedAccessException) { Status = DownloadStatus.Failed; }
+                catch (Exception)
+                {
+                    Status = DownloadStatus.Failed;
+                    throw;
+                }
             }
             else
             {
                 // Extract one stream.
-                await MuxeStreams(Query.DownloadVideo ? videoFile.Destination : null, Query.DownloadAudio ? videoFile.Destination : null).ConfigureAwait(false);
+                await MuxeStreams(Query.DownloadVideo ? videoFile.DestinationEncoded ?? videoFile.Destination : null,
+                        Query.DownloadAudio ? videoFile.DestinationEncoded ?? videoFile.Destination : null)
+                    .ConfigureAwait(false);
             }
         }
         else
         {
             // Muxe normal streams.
-            await MuxeStreams(videoFile?.Destination, audioFile?.Destination).ConfigureAwait(false);
+            await MuxeStreams(videoFile?.DestinationEncoded ?? videoFile?.Destination, 
+                audioFile?.DestinationEncoded ?? audioFile?.Destination).ConfigureAwait(false);
         }
-
-        DeleteTempFiles();
     }
 
     private async Task MuxeStreams(string? videoFile, string? audioFile)
@@ -272,9 +280,17 @@ public class DownloadTask : IDownloadTask
     /// </summary>
     private void DeleteTempFiles()
     {
+        if (_fileSystem.File.Exists(Destination) && _fileSystem.FileInfo.FromFileName(Destination).Length == 0)
+        {
+            _fileSystem.File.Delete(Destination);
+        }
         foreach (var item in Files)
         {
             _fileSystem.DeleteFileSilent(item.Destination);
+            if (item.DestinationEncoded.HasValue())
+            {
+                _fileSystem.DeleteFileSilent(item.DestinationEncoded);
+            }
         }
     }
 
@@ -288,30 +304,28 @@ public class DownloadTask : IDownloadTask
 
             // Updates the status information.
             _status = value;
-            ProgressText = GetStatusText(value);
-            ProgressUpdated?.Invoke(this, new DownloadTaskEventArgs(this));
-
-            static string GetStatusText(DownloadStatus status)
+            ProgressText = value switch
             {
-                switch (status)
+                DownloadStatus.Waiting => Resources.StatusWaiting,
+                DownloadStatus.Initializing => Resources.StatusInitializing,
+                DownloadStatus.Downloading => Resources.StatusInitializing,
+                DownloadStatus.Success => Resources.StatusDone,
+                DownloadStatus.Finalizing => Resources.StatusFinalizing,
+                DownloadStatus.Canceled => Resources.StatusCanceled,
+                DownloadStatus.Failed => Resources.StatusFailed,
+                _ => string.Empty
+            };
+
+            if (_status is DownloadStatus.Canceled or DownloadStatus.Failed)
+            {
+                try
                 {
-                    case DownloadStatus.Waiting:
-                        return Resources.StatusWaiting;
-                    case DownloadStatus.Initializing:
-                    case DownloadStatus.Downloading:
-                        return Resources.StatusInitializing;
-                    case DownloadStatus.Success:
-                        return Resources.StatusDone;
-                    case DownloadStatus.Finalizing:
-                        return Resources.StatusFinalizing;
-                    case DownloadStatus.Canceled:
-                        return Resources.StatusCanceled;
-                    case DownloadStatus.Failed:
-                        return Resources.StatusFailed;
-                    default:
-                        return string.Empty;
+                    _cancelToken.Cancel();
                 }
+                catch (ObjectDisposedException) { } // In case task is already done.
             }
+
+            ProgressUpdated?.Invoke(this, new DownloadTaskEventArgs(this));
         }
     }
 
@@ -376,4 +390,25 @@ public class DownloadTask : IDownloadTask
     /// Returns whether the download was canceled or failed.
     /// </summary>
     private bool IsCancelled => (Status == DownloadStatus.Canceled || Status == DownloadStatus.Failed);
+
+    private bool _disposedValue;
+    /// <inheritdoc cref="IDisposable"/>
+    private void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                _cancelToken.Dispose();
+            }
+            _disposedValue = true;
+        }
+    }
+
+    /// <inheritdoc cref="IDisposable"/>
+    public void Dispose()
+    {
+        Dispose(true);
+        // GC.SuppressFinalize(this);
+    }
 }

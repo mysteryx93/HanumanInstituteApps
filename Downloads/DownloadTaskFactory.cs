@@ -1,23 +1,27 @@
-﻿using HanumanInstitute.FFmpeg;
+﻿using HanumanInstitute.BassAudio;
+using HanumanInstitute.FFmpeg;
 
 namespace HanumanInstitute.Downloads;
 
 /// <inheritdoc />
-public class DownloadTaskFactory : IDownloadTaskFactory
+public sealed class DownloadTaskFactory : IDownloadTaskFactory
 {
     private readonly IYouTubeDownloader _youTube;
     private readonly IFileSystemService _fileSystem;
     private readonly IMediaMuxer _mediaMuxer;
+    private readonly IAudioEncoder _audioEncoder;
 
-    public DownloadTaskFactory(IYouTubeDownloader youTube, IFileSystemService fileSystem, IMediaMuxer mediaMuxer)
+    public DownloadTaskFactory(IYouTubeDownloader youTube, IFileSystemService fileSystem, IMediaMuxer mediaMuxer,
+        IAudioEncoder audioEncoder)
     {
-        _youTube = youTube.CheckNotNull(nameof(youTube));
-        _fileSystem = fileSystem.CheckNotNull(nameof(fileSystem));
-        _mediaMuxer = mediaMuxer.CheckNotNull(nameof(mediaMuxer));
+        _youTube = youTube;
+        _fileSystem = fileSystem;
+        _mediaMuxer = mediaMuxer;
+        _audioEncoder = audioEncoder;
         _mediaMuxer.Owner = this;
     }
 
     /// <inheritdoc />
     public IDownloadTask Create(StreamQueryInfo streamQuery, string destination) =>
-        new DownloadTask(_youTube, _fileSystem, _mediaMuxer, streamQuery, destination);
+        new DownloadTask(_youTube, _fileSystem, _mediaMuxer, _audioEncoder, streamQuery, destination);
 }

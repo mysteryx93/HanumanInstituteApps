@@ -36,7 +36,7 @@ public class FileItem : ReactiveObject
             this.RaisePropertyChanged(nameof(Text));
         }
     }
-    private string _relativePath;
+    private string _relativePath = string.Empty;
 
     /// <summary>
     /// Gets or sets the file audio pitch.
