@@ -1,6 +1,4 @@
-using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using AboutView = HanumanInstitute.Player432hz.Views.AboutView;
 
 namespace HanumanInstitute.Player432hz;
 

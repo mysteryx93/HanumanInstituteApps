@@ -4,15 +4,19 @@
              xmlns:sty="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
              x:Class="HanumanInstitute.Player432hz.App">
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
     <Application.Styles>
-        <sty:FluentAvaloniaTheme PreferSystemTheme="False" SkipControls="NavigationView;DataGrid" />
+        <sty:FluentAvaloniaTheme PreferSystemTheme="False"
+                                 SkipControls="Slider;ProgressBar;DataGrid;ToggleSwitch;AutoCompleteBox;TreeView;SplitView;NumericUpDown;
+                                 Calendar;CalendarDatePicker;DatePicker;TimePicker;Menu;MenuItem;MenuFlyout;Flyout;GridSplitter;
+                                 SplitButton;ToggleSplitButton;DropDownButton;ContentDialog;PickerFlyoutBase;NavigationView;Frame;
+                                 TabView;XamlUICommand;CommandBar;CommandBarFlyout;MenuFlyout;ColorPicker;ColorPickerButton;InfoBar;InfoBadge" />
         <!-- <FluentTheme Mode="Light"/> -->
         <StyleInclude Source="avares://Common.Avalonia.App/Styles/CommonStyles.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
-        
+
         <!--<Style Selector="Window">
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>

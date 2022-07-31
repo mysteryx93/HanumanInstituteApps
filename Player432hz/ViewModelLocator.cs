@@ -4,7 +4,6 @@ using HanumanInstitute.BassAudio;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.Player432hz.Views;
 using Splat;
 
 namespace HanumanInstitute.Player432hz;
