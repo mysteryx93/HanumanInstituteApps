@@ -44,7 +44,6 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
     protected override AppSettingsData GetDefault() => new()
     {
         Width = 560,
-        Height = 350,
-        PitchTo = 432
+        Height = 350
     };
 }

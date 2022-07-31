@@ -57,14 +57,14 @@ public class AppSettingsData : SettingsDataBase
     /// </summary>
     [Reactive]
     [Range(1, 10000)]
-    public double PitchFrom { get; set; }
+    public double PitchFrom { get; set; } = 440;
 
     /// <summary>
     /// Gets or sets the pitch to shift to.
     /// </summary>
     [Reactive]
     [Range(1, 10000)]
-    public double PitchTo { get; set; }
+    public double PitchTo { get; set; } = 432;
 
     /// <summary>
     /// Creates a copy of this instance.
