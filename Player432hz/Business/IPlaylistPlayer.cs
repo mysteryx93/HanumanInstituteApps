@@ -26,7 +26,7 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// <summary>
     /// Gets or sets the pitch of the currently-playing file. Used to calculate the Pitch property.
     /// </summary>
-    double PitchFrom { get; set; }
+    double PitchFrom { get; }
     /// <summary>
     /// Starts the playback of specified list of media files.
     /// </summary>
@@ -37,4 +37,12 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// Starts playing the next media file from the list.
     /// </summary>
     void PlayNext();
+    /// <summary>
+    /// Applies settings to the active player.
+    /// </summary>
+    void ApplySettings();
+    /// <summary>
+    /// Gets application settings.
+    /// </summary>
+    public AppSettingsData Settings { get; }
 }

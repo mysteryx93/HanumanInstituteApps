@@ -34,16 +34,14 @@ public class EncodeSettingsViewModel : ReactiveObject, IModalDialogViewModel, IC
 
     public event EventHandler? RequestClose;
 
-    public EncodeSettings Settings
+    public EncodeSettings Settings { get; private set; } = default!;
+
+    public void SetSettings(EncodeSettings settings)
     {
-        get => _settings;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _settings, value);
-            ShiftPitch = Settings.AutoDetectPitch || Math.Abs(Settings.PitchFrom - Settings.PitchTo) > 0.001;
-        }
+        Settings = settings;
+        ShiftPitch = Settings.AutoDetectPitch || Math.Abs(Settings.PitchFrom - Settings.PitchTo) > 0.001;
+        this.RaisePropertyChanged(nameof(Settings));
     }
-    private EncodeSettings _settings = new EncodeSettings();
 
     public bool? DialogResult { get; set; }
 

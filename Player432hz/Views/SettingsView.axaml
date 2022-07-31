@@ -1,0 +1,61 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
+        mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="290" Height="290" MaxHeight="290"
+        x:Class="HanumanInstitute.Player432hz.Views.SettingsView"
+        Title="Settings" Classes="gradient"
+        CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}">
+    <Grid>
+        <Grid Margin="10">
+            <StackPanel>
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel">
+                        <Setter Property="Margin" Value="0,0,0,8"></Setter>
+                    </Style>
+                </StackPanel.Styles>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Theme" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="20,0,0,0">
+                        <ComboBox Width="130" Items="{Binding ThemeList}"
+                                  SelectedItem="{Binding ThemeList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
+                <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
+                <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
+                    <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
+                    <Grid Width="80">
+                        <TextBox Text="{Binding Settings.AntiAliasLength}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
+                    <Grid Width="80">
+                        <TextBox Text="{Binding Settings.Speed}" />
+                    </Grid>
+                </StackPanel>
+                <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
+                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
+                               HorizontalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}"
+                             IsEnabled="{Binding !Settings.AutoDetectPitch}" />
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
+                               HorizontalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" />
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Width="70" Classes="round" Command="{Binding Apply}" Content="Apply" />
+                <Button Width="70" Classes="round accent" Command="{Binding Ok}" IsDefault="True" Content="OK"
+                        Margin="5,0,5,0" />
+                <Button Width="70" Classes="round" Command="{Binding Cancel}" IsCancel="true" Content="Cancel" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

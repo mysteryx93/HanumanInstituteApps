@@ -11,11 +11,13 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
 {
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
+    private readonly ISettingsProvider<AppSettingsData> _settings;
 
-    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem)
+    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings)
     {
         _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
+        _settings = settings;
     }
 
     /// <summary>
@@ -35,18 +37,11 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
     [Reactive]
     public string NowPlayingTitle { get; set; } = string.Empty;
 
-    public double Pitch => 432.0 / PitchFrom;
+    [Reactive] public double PitchFrom { get; private set; } = 440;
 
-    public double PitchFrom
-    {
-        get => _pitchFrom;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _pitchFrom, value);
-            this.RaisePropertyChanged(nameof(Pitch));
-        }
-    }
-    private double _pitchFrom = 440.0;
+    [Reactive] public double Pitch { get; private set; } = 1;
+
+    public AppSettingsData Settings => _settings.Value;
 
     private readonly Random _random = new Random();
 
@@ -84,16 +79,35 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
                 pos = _random.Next(Files.Count);
             }
 
-            PitchFrom = _pitchDetector.GetPitch(Files[pos]);
-            
+            CalcPitch(Files[pos]);
+
             NowPlaying = string.Empty;
             NowPlaying = Files[pos];
             SetTitle();
         }
     }
 
+    private void CalcPitch(string filePath)
+    {
+        PitchFrom = _settings.Value.AutoDetectPitch ? _pitchDetector.GetPitch(filePath) : _settings.Value.PitchFrom;
+        SetTitle();
+        Pitch = _settings.Value.PitchTo / PitchFrom;
+    }
+
     private void SetTitle()
     {
-        NowPlayingTitle = !string.IsNullOrEmpty(NowPlaying) ? $"[{PitchFrom:F1}] " + _fileSystem.Path.GetFileName(NowPlaying) : string.Empty;
+        NowPlayingTitle = string.IsNullOrEmpty(NowPlaying) ?
+            string.Empty :
+            (Settings.AutoDetectPitch ? $"[{PitchFrom:F1}] " : "") +
+            _fileSystem.Path.GetFileName(NowPlaying);
+    }
+
+    public void ApplySettings()
+    {
+        if (NowPlaying.HasValue())
+        {
+            CalcPitch(NowPlaying);
+        }
+        this.RaisePropertyChanged(nameof(Settings));
     }
 }

@@ -1,24 +1,19 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:HanumanInstitute.Player432hz"
+             xmlns:sty="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
              x:Class="HanumanInstitute.Player432hz.App">
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-    <Application.Resources>
-        <Color x:Key="WindowBackgroundGradiant">#FFCDA791</Color>
-        <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%">
-            <GradientStop Color="White" Offset="0" />
-            <GradientStop Color="{StaticResource WindowBackgroundGradiant}" Offset="1" />
-        </LinearGradientBrush>
-    </Application.Resources>
-
     <Application.Styles>
-        <FluentTheme Mode="Light"/>
+        <sty:FluentAvaloniaTheme PreferSystemTheme="False" SkipControls="NavigationView;DataGrid" />
+        <!-- <FluentTheme Mode="Light"/> -->
+        <StyleInclude Source="avares://Common.Avalonia.App/Styles/CommonStyles.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
         
-        <Style Selector="Window">
+        <!--<Style Selector="Window">
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
         <Style Selector="Grid.GradiantBackground">
@@ -75,6 +70,14 @@
                     </ContentPresenter>
                 </ControlTemplate>
             </Setter>
-        </Style>
+        </Style>-->
     </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="WindowBackgroundGradient">Green</Color>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Common.Avalonia.App/Styles/CommonResources.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

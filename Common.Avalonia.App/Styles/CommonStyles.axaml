@@ -1,0 +1,82 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sty="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia">
+    <Design.PreviewWith>
+        <Border Padding="20" Width="600" Height="450">
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Window">
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+    <Style Selector="Window.gradient > Grid">
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
+    </Style>
+    
+    <Style Selector="Button.round">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="14" />
+    </Style>
+    <Style Selector="Button.round:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    
+    <Style Selector="ListBox">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem > TextBlock">
+        <Setter Property="Padding" Value="8,4,4,4" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <!--
+    <Style Selector="ListBox ListBoxItem">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem > TextBlock">
+        <Setter Property="Padding" Value="8,4,4,4" />
+    </Style>-->
+    
+    <Style Selector="TextBox">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style Selector="Button.icon">
+        <Setter Property="FontFamily" Value="avares://Common.Avalonia.App/Styles/HanumanInstituteAppIcons.otf#" />
+        <Setter Property="FontSize" Value="17" />
+    </Style>
+    
+    <Style Selector="Button.link">
+        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter Content="{TemplateBinding Content}">
+                    <ContentPresenter.Styles>
+                        <Style Selector="TextBlock">
+                            <Setter Property="Foreground" Value="{TemplateBinding Foreground}"/>
+                            <Setter Property="FontSize" Value="{TemplateBinding FontSize}"/>
+                            <Setter Property="TextDecorations" Value="Underline"/>
+                        </Style>
+                    </ContentPresenter.Styles>
+                </ContentPresenter>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

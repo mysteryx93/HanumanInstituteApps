@@ -34,7 +34,7 @@ public class MainViewModel : ReactiveObject
     }
 
     public AppSettingsData AppSettings => _settings.Value;
-    
+
     public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
     private ICommand? _initWindow;
     private async Task InitWindowImplAsync()
@@ -87,10 +87,10 @@ public class MainViewModel : ReactiveObject
         if (Playlists.CurrentPosition > -1)
         {
             Playlists.Source.RemoveAt(Playlists.CurrentPosition);
-            if (Playlists.CurrentPosition >= Playlists.Source.Count)
-            {
-                Playlists.MoveCurrentToLast();
-            }
+            // if (Playlists.CurrentPosition >= Playlists.Source.Count)
+            // {
+            //     Playlists.MoveCurrentToLast();
+            // }
         }
     }
 
@@ -131,20 +131,12 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
     private ICommand? _showAbout;
-    private async Task ShowAboutImplAsync()
-    {
-        var vm = _dialogService.CreateViewModel<AboutViewModel>();
-        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
-        _settings.Save();
-    }
-    
-    // /// <summary>
-    // /// Shows the Settings window.
-    // /// </summary>
-    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    // private ICommand? _showSettings;
-    // private Task ShowSettingsImplAsync()
-    // {
-    //
-    // }
+    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
+
+    /// <summary>
+    /// Shows the Settings window.
+    /// </summary>
+    public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    private ICommand? _showSettings;
+    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
 }

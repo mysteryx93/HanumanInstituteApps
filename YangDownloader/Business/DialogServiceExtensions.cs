@@ -18,7 +18,7 @@ public static class DialogServiceExtensions
         EncodeSettings settings)
     {
         var vm = service.CreateViewModel<EncodeSettingsViewModel>();
-        vm.Settings = settings.Clone();
+        vm.SetSettings(settings.Clone());
         //ExtensionMethods.CopyAll(settings, vm.Settings);
 
         if (await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false) == true)

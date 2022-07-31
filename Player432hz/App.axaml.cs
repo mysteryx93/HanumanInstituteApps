@@ -17,6 +17,9 @@ public class App : CommonApplication<MainView>
 
         if (!Avalonia.Controls.Design.IsDesignMode)
         {
+            var settings = Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
+            FluentTheme.Init(settings.Value.Theme);
+            
             BassDevice.Instance.Init();
         }
     }

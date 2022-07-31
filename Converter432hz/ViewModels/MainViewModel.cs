@@ -209,7 +209,7 @@ public class MainViewModel : ReactiveObject
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
-        { EncodeFormat.Aac, "AAC" },
+        { EncodeFormat.Aac, "AAC" }, //AAC file encoder creates no valid containers and no tags
         { EncodeFormat.Wav, "WAV" },
         { EncodeFormat.Flac, "FLAC" },
         { EncodeFormat.Ogg, "OGG" },

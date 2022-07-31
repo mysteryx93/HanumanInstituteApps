@@ -303,6 +303,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
                    EncodeFormat.Ogg => ".ogg",
                    EncodeFormat.Opus => ".opus",
                    EncodeFormat.Wav => ".wav",
+                   EncodeFormat.Aac => ".aac",
                    _ => ""
                };
     }

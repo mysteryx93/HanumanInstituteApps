@@ -1,8 +1,10 @@
-﻿using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App;
+﻿using Avalonia.Controls;
+using FluentAvalonia.Styling;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.Player432hz.Views;
 using Splat;
 
 namespace HanumanInstitute.Player432hz;
@@ -19,7 +21,7 @@ public static class ViewModelLocator
     static ViewModelLocator()
     {
         var container = Locator.CurrentMutable;
-            
+
         // Services
         container.AddCommonServices();
         container.AddBassAudio();
@@ -28,6 +30,7 @@ public static class ViewModelLocator
             dialogFactory: new DialogFactory().AddMessageBox()),
             viewModelFactory: t => Locator.Current.GetService(t)));
         container.Register(() => (IBassDevice)BassDevice.Instance);
+        container.RegisterLazySingleton(() => AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!);
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
@@ -35,9 +38,16 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IFilesListViewModel, FilesListViewModel>();
         SplatRegistrations.RegisterLazySingleton<IPlayerViewModel, PlayerViewModel>();
         SplatRegistrations.Register<AboutViewModel>();
+        // container.RegisterWithDesign<SettingsViewModel, SettingsViewModelDesign>();
+        SplatRegistrations.Register<SettingsViewModel>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new SettingsViewModelDesign() : Locator.Current.GetService<SettingsViewModel>("Init"));
 
         // Business
-        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
+        // container.RegisterWithDesign<ISettingsProvider<AppSettingsData>, AppSettingsProvider, AppSettingsProviderDesign>();
+        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.RegisterLazySingleton<IPlaylistPlayer, PlaylistPlayer>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
@@ -45,10 +55,22 @@ public static class ViewModelLocator
         SplatRegistrations.SetupIOC();
     }
 
+    // public static void RegisterWithDesign<TInterface, TDesign>(this IMutableDependencyResolver resolver)
+    //     where TDesign : TInterface, new() => RegisterWithDesign<TInterface, TInterface, TDesign>(resolver);
+    //
+    // public static void RegisterWithDesign<TInterface, TConcrete, TDesign>(this IMutableDependencyResolver resolver)
+    //     where TDesign : TInterface, new()
+    // {
+    //     SplatRegistrations.Register<TInterface, TConcrete>("Init");
+    //     resolver.Register<TInterface>(() =>
+    //         Design.IsDesignMode ? new TDesign() : Locator.Current.GetService<TInterface>("Init"));
+    // }
+
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static IFilesListViewModel FilesList => Locator.Current.GetService<IFilesListViewModel>()!;
     public static IPlayerViewModel Player => Locator.Current.GetService<IPlayerViewModel>()!;
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
+    public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
 
     public static void Cleanup()
     {

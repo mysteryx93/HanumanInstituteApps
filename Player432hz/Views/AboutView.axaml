@@ -6,12 +6,13 @@
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         mc:Ignorable="d" MinWidth="550" MinHeight="400" MaxWidth="550" MaxHeight="400"
         x:Class="HanumanInstitute.Player432hz.Views.AboutView"
-        Title="Information" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        Title="Information" Classes="gradient"
+        CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static local:ViewModelLocator.About}">
     <Window.Resources>
         <app:VersionConverter x:Key="VersionConverter" />
     </Window.Resources>
-    <Grid Classes="GradiantBackground">
+    <Grid>
         <Grid Margin="10,8,10,4">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

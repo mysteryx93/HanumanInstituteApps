@@ -2,8 +2,7 @@ using Avalonia.Markup.Xaml;
 
 namespace HanumanInstitute.Player432hz.Views;
 
-public partial class AboutView : CommonWindow<AboutViewModel>
+public partial class SettingsView : CommonWindow<SettingsViewModel>
 {
     protected override void Initialize() => AvaloniaXamlLoader.Load(this);
 }
-

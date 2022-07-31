@@ -29,4 +29,10 @@ public class SettingsDataBase : ReactiveObject
     /// </summary>
     [Reactive]
     public bool ShowInfoOnStartup { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the visual theme: Light or Dark.
+    /// </summary>
+    [Reactive]
+    public AppTheme Theme { get; set; }
 }

@@ -104,6 +104,7 @@ public class AudioEncoder : IAudioEncoder
                 EncodeFormat.Flac => BassEnc_Flac.Start(chanMix, options, flags, file.Destination).Valid(),
                 EncodeFormat.Ogg => BassEnc_Ogg.Start(chanMix, options, flags, file.Destination).Valid(),
                 EncodeFormat.Opus => BassEnc_Opus.Start(chanMix, options, flags, file.Destination).Valid(),
+                EncodeFormat.Aac => BassEnc_Acc.Start(chanMix, options, flags, file.Destination).Valid(),
                 _ => throw new ArgumentException(@"Invalid encode format.", nameof(settings.Format))
             };
 
@@ -164,6 +165,7 @@ public class AudioEncoder : IAudioEncoder
             EncodeFormat.Opus => $"--bitrate {bitrate}"
                 .AddTag("--title", tags.Title).AddTag("--artist", tags.Artist).AddTag("--album", tags.Album).AddTag("--date", tags.Year)
                 .AddTag("--comment", tags.Comment).AddTag("--tracknumber", tags.Track).AddTag("--genre", tags.Genre),
+            EncodeFormat.Aac => $"--bitrate {bitrate * 1024}",
             _ => ""
         };
     }
