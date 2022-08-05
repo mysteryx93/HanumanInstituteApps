@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace HanumanInstitute.PowerliminalsPlayer.Business;
+﻿namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
 /// <summary>
 /// Manages the file system paths used by the application.

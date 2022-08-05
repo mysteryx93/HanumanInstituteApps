@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
@@ -20,10 +21,10 @@ public interface IPlaylistViewModel
     /// <summary>
     /// Shows a folder picker and adds selected folder to the list.
     /// </summary>
-    ICommand AddFolderCommand { get; }
+    RxCommandUnit AddFolderCommand { get; }
 
     /// <summary>
     /// Removes selected folder from the list.
     /// </summary>
-    ICommand RemoveFolderCommand { get; }
+    RxCommandUnit RemoveFolderCommand { get; }
 }

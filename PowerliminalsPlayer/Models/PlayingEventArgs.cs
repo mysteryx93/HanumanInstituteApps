@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HanumanInstitute.PowerliminalsPlayer.Models;
+﻿namespace HanumanInstitute.PowerliminalsPlayer.Models;
 
 /// <summary>
 /// Contains playback event data.

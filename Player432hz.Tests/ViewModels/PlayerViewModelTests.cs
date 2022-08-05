@@ -8,8 +8,11 @@ public class PlayerViewModelTests
     public FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService _mockFileSystem;
 
-    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem);
+    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem, MockSettings);
     private IPlaylistPlayer _playlistPlayer;
+
+    public ISettingsProvider<AppSettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<AppSettingsData>();
+    private ISettingsProvider<AppSettingsData> _mockSettings;
 
     public Mock<IPitchDetector> MockPitchDetector => _mockPitchDetector ??= CreatePitchDetector();
     private Mock<IPitchDetector> _mockPitchDetector;
@@ -35,11 +38,6 @@ public class PlayerViewModelTests
             if (e.PropertyName == nameof(result.Player.NowPlaying))
             {
                 _nowPlayingChanged++;
-
-                if (string.IsNullOrEmpty(result.Player.NowPlaying))
-                {
-                    result.PlayNextCommand.Execute(null);
-                }
             }
         };
         return result;

@@ -11,4 +11,6 @@ global using HanumanInstitute.PowerliminalsPlayer.Business;
 global using HanumanInstitute.PowerliminalsPlayer.Models;
 global using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 global using HanumanInstitute.Validators;
+global using System.Reactive;
 global using ReactiveUI.Fody.Helpers;
+global using RxCommandUnit = ReactiveUI.ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>;

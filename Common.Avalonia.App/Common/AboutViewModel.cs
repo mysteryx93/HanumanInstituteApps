@@ -8,6 +8,10 @@ using ReactiveUI.Fody.Helpers;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
+/// <summary>
+/// Shared ViewModel for the information page.
+/// </summary>
+/// <typeparam name="TSettings">The data type of application settings.</typeparam>
 public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
     where TSettings : SettingsDataBase, new()
 {
@@ -21,6 +25,9 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     /// <inheritdoc />
     public bool? DialogResult { get; } = true;
     
+    /// <summary>
+    /// Initializes a new instance of the AboutViewModel class.
+    /// </summary>
     protected AboutViewModel(IEnvironmentService environment, IProcessService processService, ISettingsProvider<TSettings> settings,
         IUpdateService updateService)
     {

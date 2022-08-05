@@ -15,6 +15,7 @@ public interface ISerializationService
     /// <param name="dataToSerialize">The object to serialize.</param>
     /// <returns>An XML string containing serialized data.</returns>
     string Serialize<T>(T dataToSerialize);
+    
     /// <summary>
     /// Deserializes an object of specified type from a string.
     /// </summary>
@@ -23,6 +24,7 @@ public interface ISerializationService
     /// <exception cref="InvalidOperationException">An error occurred during deserialization. The original exception is available using the InnerException property.</exception>
     /// <returns>The deserialized object.</returns>
     T Deserialize<T>(string xmlText) where T : class, new();
+    
     /// <summary>
     /// Loads an object of specified type from an XML file.
     /// </summary>
@@ -31,6 +33,7 @@ public interface ISerializationService
     /// <exception cref="InvalidOperationException">An error occurred during deserialization. The original exception is available using the InnerException property.</exception>
     /// <returns>The object created from the file</returns>
     T DeserializeFromFile<T>(string path);
+    
     /// <summary>
     /// Saves an object to an xml file.
     /// </summary>

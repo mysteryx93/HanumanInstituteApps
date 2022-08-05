@@ -9,27 +9,26 @@ using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
-public class PlaylistViewModelTests
+public class PlaylistViewModelTests : TestsBase
 {
+    public PlaylistViewModelTests(ITestOutputHelper output) : base(output)
+    { }
+    
     public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
     private IDialogService _dialogService;
 
-    private T Init<T>(Func<T> func) => func();
-
-    public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= Init(() =>
+    public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= InitMock<IDialogManager>(mock =>
     {
-        var mock = new Mock<IDialogManager>();
         mock.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
                 It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
             .Returns(Task.FromResult<object>(null));
-        return mock;
     });
     private Mock<IDialogManager> _mockDialogManager;
 
     public Mock<IFilesListViewModel> MockFileList => _mockFileList ??= new Mock<IFilesListViewModel>();
     private Mock<IFilesListViewModel> _mockFileList;
 
-    public PlaylistViewModel Model => _model ??= new PlaylistViewModel(DialogService, MockFileList.Object);
+    public PlaylistViewModel Model => _model ??= new PlaylistViewModel(DialogService, MockFileList.Object, null, Mock.Of<INotifyPropertyChanged>());
     private PlaylistViewModel _model;
 
     public string DialogFolderPath = "C:\\";
@@ -100,7 +99,7 @@ public class PlaylistViewModelTests
         // var listCount = Model.Folders.Source.Count;
         SetDialogFolder();
 
-        Model.AddFolderCommand.Execute(null);
+        Model.AddFolderCommand.Execute();
 
         MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
     }

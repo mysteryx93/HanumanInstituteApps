@@ -81,6 +81,9 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     public ObservableCollection<ProcessingItem> ProcessingFiles { get; } = new();
 
     /// <inheritdoc />
+    public event EventHandler<FileItem>? FileCompleted;
+
+    /// <inheritdoc />
     public async Task RunAsync()
     {
         // if (!IsValidValue)
@@ -141,7 +144,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
         {
             if (source is FolderItem folder)
             {
-                foreach (var item in folder.Files)
+                foreach (var item in folder.Files.ToList())
                 {
                     await AddToPoolAsync(item).ConfigureAwait(false);
 
@@ -231,6 +234,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             {
                 _fileSystem.DeleteFileSilent(file.Destination);
             }
+            FileCompleted?.Invoke(this, file);
         }
     }
 
@@ -278,6 +282,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             }
         
             var vm = _dialogService.CreateViewModel<AskFileActionViewModel>();
+            vm.FilePath = item.Path;
             await _dialogService.ShowDialogAsync(Owner, vm).ConfigureAwait(false);
 
             // Cancel action must be applied before semaphore is released to avoid showing an extra dialog.

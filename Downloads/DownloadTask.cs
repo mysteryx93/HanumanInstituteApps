@@ -183,7 +183,7 @@ public sealed class DownloadTask : IDownloadTask
         }
         catch (FileNotFoundException) { Status = DownloadStatus.Failed; }
         catch (BassException) { Status = DownloadStatus.Failed; }
-        catch (Exception ex)
+        catch (Exception)
         {
             Status = DownloadStatus.Failed;
             throw;

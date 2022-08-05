@@ -36,7 +36,7 @@ public class MainViewModel : ReactiveObject
         _appPath = appPath;
         _environment = environment;
         _pitchDetector = pitchDetector;
-        _settings.Loaded += Settings_Loaded;
+        _settings.Changed += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
 
         Encoder.Settings.PitchTo = 432;
@@ -59,18 +59,16 @@ public class MainViewModel : ReactiveObject
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
 
-        // FilesLeftObservable = Encoder.Sources.AsObservableChangeSet().Transform(x => x switch
+        // _completedString = this.WhenAnyValue(x => x.FilesLeft, x => x.CompletedCount,
+        //     (left, completed) => left > 0 || completed > 0 ?
+        //         $"({completed} / {completed + left})" : string.Empty)
+        //     .ToProperty(this, x => x.CompletedString);
+
+        // Encoder.FileCompleted += (_, _) =>
         // {
-        //     FolderItem folder => folder.Files.Count,
-        //     _ => 1
-        // }).Sum(x => x);
-        // this.WhenAnyObservable(x => x.FilesLeftObservable).ToProperty(this, x => x.FilesLeft);
-        //
-        // FilesCompletedCount = Encoder.ProcessingFiles.Connect().Filter(x => x.Status == EncodeStatus.Completed).Count();
-        // var combined = new SourceList<IObservable<int>>();
-        // var sourceObserve = Encoder.Sources.Connect();
-        // combined.Add(sourceObserve.Filter(x => x is not FolderItem).Count());
-        // combined.Add(SumEx.Sum(sourceObserve.Filter(x => x is FolderItem), x =>((FolderItem)x).Files.Count));
+        //     CalcFilesLeft();
+        //     CalcCompleted();
+        // };
     }
     
     private void Settings_Loaded(object? sender, EventArgs e)
@@ -78,8 +76,8 @@ public class MainViewModel : ReactiveObject
         this.RaisePropertyChanged(nameof(AppSettings));
     }
 
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private ICommand? _initWindow;
+    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
+    private RxCommandUnit? _initWindow;
     private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
@@ -89,9 +87,23 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public int FilesLeft { get; private set; }
-
-    public IObservable<int> FilesLeftObservable { get; private set; }
+    // /// <summary>
+    // /// Gets the quantity of files left.
+    // /// </summary>
+    // [Reactive]
+    // public int FilesLeft { get; private set; }
+    //
+    // /// <summary>
+    // /// Gets the quantity of files completed.
+    // /// </summary>
+    // [Reactive]
+    // public int CompletedCount { get; private set; }
+    //
+    // /// <summary>
+    // /// Returns a string with "(CompletedCount / CompletedCount+FilesLeft)".
+    // /// </summary>
+    // public string CompletedString => _completedString.Value;
+    // private readonly ObservableAsPropertyHelper<string> _completedString;
 
     /// <summary>
     /// Gets whether Bitrate control should be visible.
@@ -111,11 +123,6 @@ public class MainViewModel : ReactiveObject
     public bool IsQualitySpeedVisible => _isQualitySpeedVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isQualitySpeedVisible;
 
-    // /// <summary>
-    // /// Gets the quantity of files completed.
-    // /// </summary>
-    // public IObservable<int> FilesCompletedCount { get; }
-
     /// <summary>
     /// The encoder service.
     /// </summary>
@@ -124,14 +131,14 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
     /// </summary>
-    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
-    private ICommand? _saveSettingsCommand;
+    public ReactiveCommand<CancelEventArgs, Unit> SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
+    private ReactiveCommand<CancelEventArgs, Unit>? _saveSettingsCommand;
     private void OnSaveSettings(CancelEventArgs e) => _settings.Save();
 
     [Reactive] public int SourcesSelectedIndex { get; set; }
 
-    public ICommand AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
-    private ICommand? _addFiles;
+    public RxCommandUnit AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
+    private RxCommandUnit? _addFiles;
     private async Task AddFilesImpl()
     {
         // throw new NotSupportedException();
@@ -149,6 +156,7 @@ public class MainViewModel : ReactiveObject
 
         var items = validFiles.Select(x => new FileItem(x, _fileSystem.Path.GetFileName(x))).ToList();
         ListExtensions.AddRange(Encoder.Sources, items);
+        //CalcFilesLeft();
 
         // Auto-detect pitch.
         await items.ForEachAsync(async x =>
@@ -164,8 +172,8 @@ public class MainViewModel : ReactiveObject
         }).ConfigureAwait(false);
     }
 
-    public ICommand AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
-    private ICommand? _addFolder;
+    public RxCommandUnit AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
+    private RxCommandUnit? _addFolder;
     private async Task AddFolderImpl()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
@@ -177,12 +185,13 @@ public class MainViewModel : ReactiveObject
             var files = _fileLocator.GetAudioFiles(folder);
             folderItem.Files.AddRange(files.Select(x => new FileItem(x.Path, _fileSystem.Path.Combine(folderName, x.RelativePath))));
             Encoder.Sources.Add(folderItem);
+            //CalcFilesLeft();
         }
     }
 
-    public ICommand RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl, 
+    public RxCommandUnit RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl, 
         this.WhenAnyValue(x => x.SourcesSelectedIndex, index => index > -1));
-    private ICommand? _removeFile;
+    private RxCommandUnit? _removeFile;
     private void RemoveFileImpl()
     {
         if (SourcesSelectedIndex > -1 && SourcesSelectedIndex < Encoder.Sources.Count)
@@ -190,12 +199,13 @@ public class MainViewModel : ReactiveObject
             var sel = SourcesSelectedIndex;
             Encoder.Sources.RemoveAt(sel);
             SourcesSelectedIndex = -1;
-            SourcesSelectedIndex = sel >= Encoder.Sources.Count ? Encoder.Sources.Count - 1 : sel; 
+            SourcesSelectedIndex = sel >= Encoder.Sources.Count ? Encoder.Sources.Count - 1 : sel;
+            //CalcFilesLeft();
         }
     }
 
-    public ICommand BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
-    private ICommand? _browseDestination;
+    public RxCommandUnit BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
+    private RxCommandUnit? _browseDestination;
     private async Task BrowseDestinationImpl()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Destination" };
@@ -205,6 +215,16 @@ public class MainViewModel : ReactiveObject
             Encoder.Destination = folder;
         }
     }
+
+    // private void CalcFilesLeft() => FilesLeft =
+    //     Encoder.Sources.Select(x => x switch
+    //     {
+    //         FolderItem folder => folder.Files.Count,
+    //         _ => 1
+    //     }).Sum(x => x);
+    //
+    // private void CalcCompleted() => CompletedCount =
+    //     Encoder.ProcessingFiles.Count(x => x.Status == EncodeStatus.Completed);
 
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
@@ -245,16 +265,16 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the advanced settings window.
     /// </summary>
-    public ICommand ShowAdvancedSettings => _showAdvancedSettings ??= ReactiveCommand.CreateFromTask(ShowAdvancedSettingsImpl);
-    private ICommand? _showAdvancedSettings;
+    public RxCommandUnit ShowAdvancedSettings => _showAdvancedSettings ??= ReactiveCommand.CreateFromTask(ShowAdvancedSettingsImpl);
+    private RxCommandUnit? _showAdvancedSettings;
     private Task ShowAdvancedSettingsImpl() =>
         _dialogService.ShowAdvancedSettingsAsync(this, Encoder.Settings);
 
     /// <summary>
     /// Starts the batch encoding job.
     /// </summary>
-    public ICommand StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImpl);
-    private ICommand? _startEncoding;
+    public RxCommandUnit StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImpl);
+    private RxCommandUnit? _startEncoding;
     private Task StartEncodingImpl()
     {
         Encoder.ProcessingFiles.Clear();
@@ -271,15 +291,15 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Cancels the batch encoding job.
     /// </summary>
-    public ICommand StopEncoding => _stopEncoding ??= ReactiveCommand.Create(StopEncodingImpl);
-    private ICommand? _stopEncoding;
+    public RxCommandUnit StopEncoding => _stopEncoding ??= ReactiveCommand.Create(StopEncodingImpl);
+    private RxCommandUnit? _stopEncoding;
     private void StopEncodingImpl() => Encoder.Cancel();
     
     /// <summary>
     /// Shows the About window.
     /// </summary>
-    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private ICommand? _showAbout;
+    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private RxCommandUnit? _showAbout;
     private async Task ShowAboutImplAsync()
     {
         var vm = _dialogService.CreateViewModel<AboutViewModel>();
@@ -290,8 +310,8 @@ public class MainViewModel : ReactiveObject
     // /// <summary>
     // /// Shows the Settings window.
     // /// </summary>
-    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    // private ICommand? _showSettings;
+    // public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    // private RxCommandUnit? _showSettings;
     // private Task ShowSettingsImplAsync()
     // {
     //

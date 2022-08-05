@@ -4,6 +4,9 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 using JetBrains.Annotations;
 
 namespace HanumanInstitute.Common.Avalonia;
@@ -34,7 +37,12 @@ public class CollectionView<T> : ICollectionView<T>
     
     private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        SetAndCoercePosition(CurrentPosition);
+        // Must clear selection first otherwise removing last item doesn't select the new selection.
+        var pos = CurrentPosition;
+        _currentPosition = -1;
+        OnPropertyChanged(nameof(CurrentPosition));
+        OnPropertyChanged(nameof(CurrentItem));
+        SetAndCoercePosition(pos);
     }
 
     /// <inheritdoc />
@@ -50,8 +58,8 @@ public class CollectionView<T> : ICollectionView<T>
         if (position > -1 || _currentPosition > -1)
         {
             _currentPosition = Math.Max(-1, Math.Min(Source.Count - 1, position));
-            OnPropertyChanged(nameof(CurrentItem));
             OnPropertyChanged(nameof(CurrentPosition));
+            OnPropertyChanged(nameof(CurrentItem));
         }
     }
 

@@ -1,10 +1,8 @@
-﻿using HanumanInstitute.Common.Services;
+﻿using Avalonia.Controls;
+using FluentAvalonia.Styling;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.PowerliminalsPlayer.Models;
-using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 using Splat;
 
 namespace HanumanInstitute.PowerliminalsPlayer;
@@ -29,14 +27,18 @@ public static class ViewModelLocator
                 dialogFactory: new DialogFactory().AddMessageBox()),
             viewModelFactory: t => Locator.Current.GetService(t)));
         container.RegisterLazySingleton<IBassDevice>(() => BassDevice.Instance);
-            
+        container.RegisterLazySingleton(() => AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!);
+
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
         SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<SelectPresetViewModel>();
+        SplatRegistrations.Register<SettingsViewModel>();
 
         // Business
-        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
+        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.RegisterLazySingleton<IPathFixer, AppPathFixer>();
             
@@ -46,6 +48,8 @@ public static class ViewModelLocator
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static SelectPresetViewModel SelectPreset => Locator.Current.GetService<SelectPresetViewModel>()!;
+    public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
+    public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
 
     public static void Cleanup()
     {

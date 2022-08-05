@@ -329,13 +329,13 @@ public class MainViewModelTests : TestsBase
         Assert.Equal(folder, Model.Encoder.Destination);
     }
 
-    [Fact]
-    public void FilesLeft_AddFile_Returns1()
-    {
-        var file1 = "/file1.mp3";
-
-        Model.Encoder.Sources.Add(new FileItem(file1, file1));
-        
-        Assert.Equal(1, Model.FilesLeft);
-    }
+    // [Fact]
+    // public void FilesLeft_AddFile_Returns1()
+    // {
+    //     var file1 = "/file1.mp3";
+    //
+    //     Model.Encoder.Sources.Add(new FileItem(file1, file1));
+    //     
+    //     Assert.Equal(1, Model.FilesLeft);
+    // }
 }

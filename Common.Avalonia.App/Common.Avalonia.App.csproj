@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <PackageReference Include="Avalonia" Version="0.10.17" />

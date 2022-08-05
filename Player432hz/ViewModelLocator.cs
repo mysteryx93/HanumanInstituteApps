@@ -37,10 +37,7 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IFilesListViewModel, FilesListViewModel>();
         SplatRegistrations.RegisterLazySingleton<IPlayerViewModel, PlayerViewModel>();
         SplatRegistrations.Register<AboutViewModel>();
-        // container.RegisterWithDesign<SettingsViewModel, SettingsViewModelDesign>();
-        SplatRegistrations.Register<SettingsViewModel>("Init");
-        container.Register(() => 
-            Design.IsDesignMode ? new SettingsViewModelDesign() : Locator.Current.GetService<SettingsViewModel>("Init"));
+        SplatRegistrations.Register<SettingsViewModel>();
 
         // Business
         // container.RegisterWithDesign<ISettingsProvider<AppSettingsData>, AppSettingsProvider, AppSettingsProviderDesign>();
@@ -70,6 +67,7 @@ public static class ViewModelLocator
     public static IPlayerViewModel Player => Locator.Current.GetService<IPlayerViewModel>()!;
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
+    public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
 
     public static void Cleanup()
     {

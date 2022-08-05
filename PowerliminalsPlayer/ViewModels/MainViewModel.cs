@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
+using Avalonia.Utilities;
 using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.MvvmDialogs;
@@ -16,7 +16,7 @@ public class MainViewModel : ReactiveObject
     private readonly IDialogService _dialogService;
     private readonly IPathFixer _pathFixer;
 
-    public AppSettingsData AppSettings => _settings.Value;
+    public AppSettingsData Settings => _settings.Value;
 
     /// <summary>
     /// Initializes a new instance of the MainViewModel class.
@@ -29,22 +29,25 @@ public class MainViewModel : ReactiveObject
         _fileSystem = fileSystem;
         _dialogService = dialogService;
         _pathFixer = pathFixer;
-        _settings.Loaded += Settings_Loaded; 
-        Settings_Loaded(_settings, EventArgs.Empty);
+
+        WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, MainViewModel>(
+            _settings, nameof(_settings.Changed),
+            (_, _) =>
+            {
+                this.RaisePropertyChanged(nameof(Settings));
+                this.RaisePropertyChanged(nameof(EffectsFloat));
+                this.RaisePropertyChanged(nameof(EffectsQuickAlgo));
+                this.RaisePropertyChanged(nameof(EffectsSampleRateConversion));
+            });
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe((_) => ReloadFiles());
     }
-    
-    private void Settings_Loaded(object? sender, EventArgs e)
-    {
-        this.RaisePropertyChanged(nameof(AppSettings));
-    }
 
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private ICommand? _initWindow;
+    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
+    private RxCommandUnit? _initWindow;
     private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
@@ -54,66 +57,50 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public string SearchText
-    {
-        get => _searchText;
-        set => this.RaiseAndSetIfChanged(ref _searchText, value);
-    }
-    private string _searchText = string.Empty;
+    [Reactive]
+    public string SearchText { get; set; } = string.Empty;
 
-    public int MasterVolume
-    {
-        get => _masterVolume;
-        set => this.RaiseAndSetIfChanged(ref _masterVolume, value);
-    }
-    private int _masterVolume = 100;
+    [Reactive]
+    public int MasterVolume { get; set; } = 100;
 
-    public int SelectedFolderIndex
-    {
-        get => _selectedFolderIndex;
-        set => this.RaiseAndSetIfChanged(ref _selectedFolderIndex, value);
-    }
-    private int _selectedFolderIndex = -1;
+    [Reactive]
+    public int SelectedFolderIndex { get; set; } = -1;
 
-    public bool IsPaused
-    {
-        get => _isPaused;
-        set => this.RaiseAndSetIfChanged(ref _isPaused, value);
-    }
-    private bool _isPaused;
+    [Reactive]
+    public bool IsPaused { get; set; }
 
     /// <summary>
     /// Gets or sets the currently selected preset.
     /// </summary>
-    public PresetItem Playlist
-    {
-        get => _playlist;
-        set => this.RaiseAndSetIfChanged(ref _playlist, value);
-    }
-    private PresetItem _playlist = new();
+    [Reactive]
+    public PresetItem Playlist { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the list of audio files within the folders.
     /// </summary>
+    [Reactive]
     public ICollectionView<FileItem> Files { get; private set; } = new CollectionView<FileItem>();
 
     /// <summary>
-    /// Loads the settings file.
+    /// Gets whether to use speed-shift quick algorithm based on settings.
     /// </summary>
-    // public ICommand LoadSettingsCommand => _loadSettingsCommand ??= ReactiveCommand.Create(LoadSettings);
-    // private ICommand? _loadSettingsCommand;
-    public void LoadSettings()
-    {
-        _settings.Load();
-        this.RaisePropertyChanged(nameof(AppSettings));
-        ReloadFiles();
-    }
+    public bool EffectsFloat => Settings.PerformanceQuality == 5;
+
+    /// <summary>
+    /// Gets whether to use speed-shift quick algorithm based on settings.
+    /// </summary>
+    public bool EffectsQuickAlgo => Settings.PerformanceQuality <= 2;
+
+    /// <summary>
+    /// Gets the speed-shift sample rate conversion to use based on settings.
+    /// </summary>
+    public int EffectsSampleRateConversion => Math.Max(4, Settings.PerformanceQuality);
 
     /// <summary>
     /// Saves the settings file.
     /// </summary>
-    public ICommand SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
-    private ICommand? _saveSettingsCommand;
+    public RxCommandUnit SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
+    private RxCommandUnit? _saveSettingsCommand;
     public void SaveSettings() => _settings.Save();
 
     /// <summary>
@@ -121,7 +108,7 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, AppSettings.Folders).ConfigureAwait(false);
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Folders).ConfigureAwait(false);
         if (changed)
         {
             ReloadFiles();
@@ -135,8 +122,8 @@ public class MainViewModel : ReactiveObject
     public void ReloadFiles()
     {
         // If a folder is a sub-folder of another folder, remove it.
-        var folders = AppSettings.Folders.ToList();
-        var foldersSorted = AppSettings.Folders.OrderBy(x => x).ToList();
+        var folders = Settings.Folders.ToList();
+        var foldersSorted = Settings.Folders.OrderBy(x => x).ToList();
         foreach (var item in foldersSorted)
         {
             var matchList = foldersSorted.Where(x => x.StartsWith(item + _fileSystem.Path.DirectorySeparatorChar));
@@ -172,9 +159,12 @@ public class MainViewModel : ReactiveObject
             fullPath.StartsWith(folder) ? fullPath[folder.Length..] : fullPath;
     }
 
-    public ICommand RemoveMediaCommand => _removeMediaCommand ??= ReactiveCommand.Create<PlayingItem>(OnRemoveMedia);
-    private ICommand? _removeMediaCommand;
-    public void OnRemoveMedia(PlayingItem? item)
+    /// <summary>
+    /// Stops playback of specified playback item and removes it from the list. 
+    /// </summary>
+    public ReactiveCommand<PlayingItem, Unit> RemoveMedia => _removeMedia ??= ReactiveCommand.Create<PlayingItem>(RemoveMediaImpl);
+    private ReactiveCommand<PlayingItem, Unit>? _removeMedia;
+    private void RemoveMediaImpl(PlayingItem? item)
     {
         if (item == null) { return; }
 
@@ -185,42 +175,47 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
-    private ICommand? _addFolderCommand;
-    private async Task OnAddFolder()
+    /// <summary>
+    /// Adds a folder to the list of sources.
+    /// </summary>
+    public RxCommandUnit AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
+    private RxCommandUnit? _addFolder;
+    private async Task AddFolderImpl()
     {
         var result = await _dialogService.ShowOpenFolderDialogAsync(this).ConfigureAwait(true);
         if (result.HasValue())
         {
             var newFolder = _fileSystem.Path.TrimEndingDirectorySeparator(result);
-            if (!AppSettings.Folders.Contains(newFolder))
+            if (!Settings.Folders.Contains(newFolder))
             {
-                AppSettings.Folders.Add(newFolder);
+                Settings.Folders.Add(newFolder);
             }
-            SelectedFolderIndex = AppSettings.Folders.Count - 1;
+            SelectedFolderIndex = Settings.Folders.Count - 1;
             ReloadFiles();
         }
     }
-    public ICommand RemoveFolderCommand => _removeFolderCommand ??= ReactiveCommand.Create(OnRemoveFolder,
+    
+    /// <summary>
+    /// Removes selected folder from the list of sources. 
+    /// </summary>
+    public RxCommandUnit RemoveFolder => _removeFolder ??= ReactiveCommand.Create(RemoveFolderImpl,
         this.WhenAnyValue(x => x.SelectedFolderIndex).Select(x => x > -1));
-    private ICommand? _removeFolderCommand;
-
-    private void OnRemoveFolder()
+    private RxCommandUnit? _removeFolder;
+    private void RemoveFolderImpl()
     {
         if (SelectedFolderIndex > -1)
         {
-            AppSettings.Folders.RemoveAt(SelectedFolderIndex);
-            SelectedFolderIndex = Math.Min(SelectedFolderIndex, AppSettings.Folders.Count - 1);
+            Settings.Folders.RemoveAt(SelectedFolderIndex);
+            SelectedFolderIndex = Math.Min(SelectedFolderIndex, Settings.Folders.Count - 1);
             ReloadFiles();
         }
     }
 
-    public void OnFilesListDoubleTap() => OnPlay();
-    public ICommand PlayCommand => _playCommand ??= ReactiveCommand.Create(OnPlay,
+    public void OnFilesListDoubleTap() => PlayImpl();
+    public RxCommandUnit Play => _play ??= ReactiveCommand.Create(PlayImpl,
         this.WhenAnyValue(x => x.Files.CurrentPosition).Select(x => x > -1));
-    private ICommand? _playCommand;
-
-    private void OnPlay()
+    private RxCommandUnit? _play;
+    private void PlayImpl()
     {
         if (Files.CurrentItem != null)
         {
@@ -242,10 +237,25 @@ public class MainViewModel : ReactiveObject
             Playlist.Files.Add(new PlayingItem(Files.CurrentItem.FullPath, Playlist.MasterVolume) { Speed = speed });
         }
     }
-    public ICommand LoadPresetCommand => _loadPresetCommand ??= ReactiveCommand.Create(OnLoadPreset,
-        AppSettings.Presets.ToObservableChangeSet().Select(x => x.Any()));
-    private ICommand? _loadPresetCommand;
-    private async void OnLoadPreset()
+    
+    /// <summary>
+    /// Clears all playing audios.
+    /// </summary>
+    public RxCommandUnit Clear => _clear ??= ReactiveCommand.Create(ClearImpl,
+        Playlist.Files.ToObservableChangeSet().ToCollection().Select(x => x.Any()));
+    private RxCommandUnit? _clear;
+    private void ClearImpl()
+    {
+        Playlist.Files.Clear();
+    } 
+    
+    /// <summary>
+    /// Shows the Load Preset dialog.
+    /// </summary>
+    public RxCommandUnit LoadPreset => _loadPreset ??= ReactiveCommand.CreateFromTask(LoadPresetImpl,
+        Settings.Presets.ToObservableChangeSet().Select(x => x.Any()));
+    private RxCommandUnit? _loadPreset;
+    private async Task LoadPresetImpl()
     {
         var loadItem = await _dialogService.ShowLoadPresetViewAsync(this).ConfigureAwait(true);
         if (loadItem != null)
@@ -256,10 +266,13 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public ICommand SavePresetCommand => _savePresetCommand ??= ReactiveCommand.Create(OnSavePreset,
-        Playlist.Files.ToObservableChangeSet().Select(x => x.Any()));
-    private ICommand? _savePresetCommand;
-    private async void OnSavePreset()
+    /// <summary>
+    /// Shows the Save Preset dialog.
+    /// </summary>
+    public RxCommandUnit SavePreset => _savePreset ??= ReactiveCommand.CreateFromTask(SavePresetImpl,
+        Playlist.Files.ToObservableChangeSet().ToCollection().Select(x => x.Any()));
+    private RxCommandUnit? _savePreset;
+    private async Task SavePresetImpl()
     {
         var saveName = await _dialogService.ShowSavePresetViewAsync(this).ConfigureAwait(true);
         if (!string.IsNullOrWhiteSpace(saveName))
@@ -268,7 +281,7 @@ public class MainViewModel : ReactiveObject
             if (preset == null)
             {
                 preset = new PresetItem();
-                AppSettings.Presets.Add(preset);
+                Settings.Presets.Add(preset);
             }
 
             Playlist.SaveAs(preset);
@@ -281,15 +294,18 @@ public class MainViewModel : ReactiveObject
     {
         if (!string.IsNullOrEmpty(name))
         {
-            return AppSettings.Presets.FirstOrDefault(p => p.Name == name);
+            return Settings.Presets.FirstOrDefault(p => p.Name == name);
         }
 
         return null;
     }
-    public ICommand PauseCommand => _pauseCommand ??= ReactiveCommand.Create(OnPause);
-    private ICommand? _pauseCommand;
-
-    private void OnPause()
+    
+    /// <summary>
+    /// Toggles the Play/Pause status of all playing audios.
+    /// </summary>
+    public RxCommandUnit Pause => _pause ??= ReactiveCommand.Create(PauseImpl);
+    private RxCommandUnit? _pause;
+    private void PauseImpl()
     {
         foreach (var item in Playlist.Files)
         {
@@ -298,26 +314,18 @@ public class MainViewModel : ReactiveObject
 
         IsPaused = !IsPaused;
     }
-    
+
     /// <summary>
     /// Shows the About window.
     /// </summary>
-    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private ICommand? _showAbout;
-    private async Task ShowAboutImplAsync()
-    {
-        var vm = _dialogService.CreateViewModel<AboutViewModel>();
-        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
-        _settings.Save();
-    }
-    
-    // /// <summary>
-    // /// Shows the Settings window.
-    // /// </summary>
-    // public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    // private ICommand? _showSettings;
-    // private Task ShowSettingsImplAsync()
-    // {
-    //
-    // }
+    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private RxCommandUnit? _showAbout;
+    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
+
+    /// <summary>
+    /// Shows the Settings window.
+    /// </summary>
+    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    private RxCommandUnit? _showSettings;
+    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
 }

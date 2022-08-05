@@ -5,9 +5,10 @@
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
         mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="365" Height="365" MaxHeight="365"
         x:Class="HanumanInstitute.YangDownloader.Views.EncodeSettingsView"
-        Title="Advanced Settings" CanResize="False"
+        Title="Advanced Settings" Classes="gradient"
+        CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         d:DataContext="{x:Static local:ViewModelLocator.EncodeSettings}">
-    <Grid Classes="GradiantBackground">
+    <Grid>
         <Grid Margin="10">
             <StackPanel>
                 <Grid Margin="0,2,0,2">

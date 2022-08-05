@@ -1,6 +1,4 @@
 ﻿using Avalonia.Markup.Xaml;
-using HanumanInstitute.Common.Avalonia;
-using HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Views;
 

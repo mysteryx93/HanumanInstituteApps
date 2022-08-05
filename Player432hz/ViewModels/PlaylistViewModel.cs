@@ -20,7 +20,7 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     private readonly INotifyPropertyChanged? _owner;
 
     public PlaylistViewModel(IDialogService dialogService, IFilesListViewModel fileListViewModel,
-        SettingsPlaylistItem? data = null, INotifyPropertyChanged? owner = null)
+        SettingsPlaylistItem? data, INotifyPropertyChanged? owner)
     {
         _dialogService = dialogService;
         _fileListViewModel = fileListViewModel;
@@ -52,8 +52,8 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     /// <summary>
     /// Shows a folder picker and adds selected folder to the list.
     /// </summary>
-    public ICommand AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
-    private ICommand? _addFolderCommand;
+    public RxCommandUnit AddFolderCommand => _addFolderCommand ??= ReactiveCommand.CreateFromTask(OnAddFolder);
+    private RxCommandUnit? _addFolderCommand;
     private async Task OnAddFolder()
     {
         var folderSettings = new OpenFolderDialogSettings();
@@ -69,10 +69,10 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     /// <summary>
     /// Removes selected folder from the list.
     /// </summary>
-    public ICommand RemoveFolderCommand =>
+    public RxCommandUnit RemoveFolderCommand =>
         _removeFolderCommand ??= ReactiveCommand.Create(OnRemoveFolder,
             this.WhenAnyValue(x => x.Folders.CurrentItem).Select(x => x != null));
-    private ICommand? _removeFolderCommand;
+    private RxCommandUnit? _removeFolderCommand;
     private void OnRemoveFolder()
     {
         if (Folders.CurrentPosition > -1)

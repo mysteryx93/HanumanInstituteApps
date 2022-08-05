@@ -8,18 +8,18 @@ public class FakeSettingsProvider<T> : ISettingsProvider<T>
 {
     public virtual T Value { get; set; } = new T();
 
-    public event EventHandler? Loaded;
+    public event EventHandler? Changed;
     public event EventHandler? Saved;
 
     public virtual T Load()
     {
-        Loaded?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 
     public virtual T Load(string path)
     {
-        Loaded?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
@@ -15,5 +16,5 @@ public interface IPlayerViewModel
     /// <summary>
     /// Plays the next file when playback ends.
     /// </summary>
-    ICommand PlayNextCommand { get; }
+    ReactiveCommand<EventArgs,Unit> PlayNextCommand { get; }
 }

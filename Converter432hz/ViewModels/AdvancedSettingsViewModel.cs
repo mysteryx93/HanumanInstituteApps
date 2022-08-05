@@ -18,8 +18,8 @@ public class AdvancedSettingsViewModel : ReactiveValidationObject, IModalDialogV
     /// <summary>
     /// Closes the window.
     /// </summary>
-    public ICommand Close => _close ??= ReactiveCommand.Create(CloseImpl);
-    private ICommand? _close;
+    public RxCommandUnit Close => _close ??= ReactiveCommand.Create(CloseImpl);
+    private RxCommandUnit? _close;
     private void CloseImpl()
     {
         if (Settings.Validate() == null)

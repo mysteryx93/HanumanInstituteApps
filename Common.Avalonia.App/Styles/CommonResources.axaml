@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:flu="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
 
-    <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%" Opacity=".25">
+    <LinearGradientBrush x:Key="WindowBackgroundBrush" EndPoint="50%,100%" StartPoint="50%,0%" Opacity=".20">
         <GradientStop Color="{DynamicResource Transparent}" Offset="0" />
-        <GradientStop Color="{DynamicResource WindowBackgroundGradient}" Offset="1" />
+        <GradientStop Color="{DynamicResource SystemAccentColor}" Offset="1" />
     </LinearGradientBrush>
 
     <SolidColorBrush x:Key="ButtonBackgroundApp" Color="{DynamicResource SystemAccentColorLight2}" Opacity=".35" />
@@ -44,4 +44,8 @@
     <SolidColorBrush x:Key="ButtonBorderBrushDisabledApp"
                      Color="{DynamicResource ControlFillColorTransparent}" Opacity=".35" />
     <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ButtonBorderBrushDisabledApp" />
+    
+    <StaticResource x:Key="ExpanderHeaderBackground" ResourceKey="SystemControlTransparentBrush" />
+    <StaticResource x:Key="ExpanderContentBackground" ResourceKey="SystemControlTransparentBrush" />
+    <StaticResource x:Key="ExpanderContentBorderBrush" ResourceKey="SystemControlTransparentBrush" />
 </ResourceDictionary>

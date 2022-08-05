@@ -1,18 +1,13 @@
-﻿using System;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
 
 public class PlayingItem : ReactiveObject
 {
+    [Reactive]
     [XmlIgnore]
-    public Guid Id
-    {
-        get => _id;
-        set => this.RaiseAndSetIfChanged(ref _id, value);
-    }
-    private Guid _id = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public string FullPath
     {
@@ -21,25 +16,18 @@ public class PlayingItem : ReactiveObject
     }
     private string _fullPath = string.Empty;
 
-    [XmlIgnore] public string FileName => System.IO.Path.GetFileName(FullPath);
+    [XmlIgnore]
+    public string FileName => System.IO.Path.GetFileName(FullPath);
 
+    [Reactive]
     [XmlElement("Volume")]
-    public double FullVolume
-    {
-        get => _fullVolume;
-        set => this.RaiseAndSetIfChanged(ref _fullVolume, value);
-    }
-    private double _fullVolume = 100;
+    public double FullVolume { get; set; } = 100;
 
     private double MasterVolume { get; set; } = -1;
     private bool _adjustingVolume;
 
-    public bool IsPlaying
-    {
-        get => _isPlaying;
-        set => this.RaiseAndSetIfChanged(ref _isPlaying, value);
-    }
-    private bool _isPlaying = true;
+    [Reactive]
+    public bool IsPlaying { get; set; } = true;
 
     public PlayingItem()
     {
@@ -69,7 +57,7 @@ public class PlayingItem : ReactiveObject
 
     public void AdjustVolume(double newMasterVolume)
     {
-        if (Math.Abs(MasterVolume - newMasterVolume) > .001)
+        if (newMasterVolume >= 0 && Math.Abs(MasterVolume - newMasterVolume) > .001)
         {
             _adjustingVolume = true;
             Volume = FullVolume * newMasterVolume / 100;
@@ -90,19 +78,15 @@ public class PlayingItem : ReactiveObject
     }
     private int _speed;
 
+    [Reactive]
     [XmlIgnore]
-    public double Rate
-    {
-        get => _rate;
-        private set => this.RaiseAndSetIfChanged(ref _rate, value);
-    }
-    private double _rate;
+    public double Rate { get; private set; }
 
     public PlayingItem Clone(double newMasterVolume)
     {
         //MemberwiseClone caused weird behaviors.
         //return (PlayingItem)this.MemberwiseClone();
-        
+
         // ReSharper disable once UseObjectOrCollectionInitializer
         var result = new PlayingItem(FullPath, MasterVolume);
         result._adjustingVolume = true;

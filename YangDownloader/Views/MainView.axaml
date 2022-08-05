@@ -9,7 +9,7 @@
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     MinHeight="260" MinWidth="580" d:DesignWidth="580" d:DesignHeight="260"
     Title="Yang YouTube Downloader" Icon="/Assets/App.ico" CanResize="False"
-    hic:SizeExtension.TrackSize="True"
+    hic:SizeExtension.TrackSize="True" Classes="gradient"
     hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
     hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}">
@@ -21,7 +21,7 @@
             <InvokeCommandAction Command="{Binding SaveSettings}" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
-    <Grid Classes="GradiantBackground">
+    <Grid>
         <Grid Margin="10" RowDefinitions="Auto,*">
             <Button Grid.Row="0" Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"  
                     Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">

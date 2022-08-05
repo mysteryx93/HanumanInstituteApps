@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO.Abstractions.TestingHelpers;
-using System.Threading.Tasks;
-using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.PowerliminalsPlayer.Models;
-using Moq;
-using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
 

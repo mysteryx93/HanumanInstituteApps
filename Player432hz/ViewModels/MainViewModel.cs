@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using Avalonia.Input;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
@@ -27,7 +26,7 @@ public class MainViewModel : ReactiveObject
         _filesListViewModel = filesListViewModel;
         _dialogService = dialogService;
 
-        _settings.Loaded += Settings_Loaded;
+        _settings.Changed += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
 
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe((_) => Playlists_CurrentChanged());
@@ -35,8 +34,8 @@ public class MainViewModel : ReactiveObject
 
     public AppSettingsData AppSettings => _settings.Value;
 
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private ICommand? _initWindow;
+    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
+    private RxCommandUnit? _initWindow;
     private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
@@ -52,23 +51,23 @@ public class MainViewModel : ReactiveObject
     public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } =
         new CollectionView<IPlaylistViewModel>();
 
-    public ICommand StartPlayList => _startPlayList ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayListImpl);
-    private ICommand? _startPlayList;
+    public ReactiveCommand<TappedEventArgs, Unit> StartPlayList => _startPlayList ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayListImpl);
+    private ReactiveCommand<TappedEventArgs, Unit>? _startPlayList;
     private void StartPlayListImpl(TappedEventArgs e)
     {
         _filesListViewModel.Files.CurrentPosition = -1;
-        _filesListViewModel.PlayCommand.Execute(null);
+        _filesListViewModel.PlayCommand.Execute();
     }
 
-    public ICommand StartPlayFile => _startPlayFile ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayFileImpl);
-    private ICommand? _startPlayFile;
-    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute(null);
+    public ReactiveCommand<TappedEventArgs, Unit> StartPlayFile => _startPlayFile ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayFileImpl);
+    private ReactiveCommand<TappedEventArgs, Unit>? _startPlayFile;
+    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute();
 
     /// <summary>
     /// Adds a new playlist to the list.
     /// </summary>
-    public ICommand AddPlaylist => _addPlaylist ??= ReactiveCommand.Create(AddPlaylistImpl);
-    private ICommand? _addPlaylist;
+    public RxCommandUnit AddPlaylist => _addPlaylist ??= ReactiveCommand.Create(AddPlaylistImpl);
+    private RxCommandUnit? _addPlaylist;
     private void AddPlaylistImpl()
     {
         var newPlaylist = _playlistFactory.Create();
@@ -79,9 +78,9 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Deletes selected playlist from the list.
     /// </summary>
-    public ICommand DeletePlaylist => _deletePlaylist ??= ReactiveCommand.Create(DeletePlaylistImpl,
+    public RxCommandUnit DeletePlaylist => _deletePlaylist ??= ReactiveCommand.Create(DeletePlaylistImpl,
         this.WhenAnyValue(x => x.Playlists.CurrentItem).Select(x => x != null));
-    private ICommand? _deletePlaylist;
+    private RxCommandUnit? _deletePlaylist;
     private void DeletePlaylistImpl()
     {
         if (Playlists.CurrentPosition > -1)
@@ -116,8 +115,8 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
     /// </summary>
-    public ICommand SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
-    private ICommand? _saveSettings;
+    public ReactiveCommand<CancelEventArgs, Unit> SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
+    private ReactiveCommand<CancelEventArgs, Unit>? _saveSettings;
     private void SaveSettingsImpl(CancelEventArgs e)
     {
         _settings.Value.Playlists.Clear();
@@ -129,14 +128,14 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the About window.
     /// </summary>
-    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private ICommand? _showAbout;
+    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private RxCommandUnit? _showAbout;
     private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
 
     /// <summary>
     /// Shows the Settings window.
     /// </summary>
-    public ICommand ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    private ICommand? _showSettings;
+    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    private RxCommandUnit? _showSettings;
     private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
 }

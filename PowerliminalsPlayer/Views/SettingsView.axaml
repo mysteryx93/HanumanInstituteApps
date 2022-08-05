@@ -2,9 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
-        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="290" Height="290" MaxHeight="290"
-        x:Class="HanumanInstitute.Player432hz.Views.SettingsView"
+        xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="210" Height="210" MaxHeight="210"
+        x:Class="HanumanInstitute.PowerliminalsPlayer.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static local:ViewModelLocator.Settings}">
@@ -30,25 +30,15 @@
                         <TextBox Text="{Binding Settings.AntiAliasLength}" />
                     </Grid>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.Speed}" />
-                    </Grid>
-                </StackPanel>
-                <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
-                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
-                               HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}"
-                             IsEnabled="{Binding !Settings.AutoDetectPitch}" />
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
-                               HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" />
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Performance" />
+                    <Slider Grid.Column="1" HorizontalAlignment="Center" Width="120" Minimum="0" Maximum="5"
+                            TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
+                            Value="{Binding Settings.PerformanceQuality}">
+                    </Slider>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="Quality" />
                 </Grid>
+
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <StackPanel.Styles>

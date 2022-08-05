@@ -21,8 +21,8 @@ public class PlayerViewModel : ReactiveObject, IPlayerViewModel
     /// <summary>
     /// Plays the next file when playback ends.
     /// </summary>
-    public ICommand PlayNextCommand => _playNextCommand ??= ReactiveCommand.Create<EventArgs>(OnPlayNext);
-    private ICommand? _playNextCommand; 
+    public ReactiveCommand<EventArgs, Unit> PlayNextCommand => _playNextCommand ??= ReactiveCommand.Create<EventArgs>(OnPlayNext);
+    private ReactiveCommand<EventArgs, Unit>? _playNextCommand; 
     private void OnPlayNext(EventArgs e)
     {
         Player.PlayNext();

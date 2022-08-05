@@ -1,10 +1,18 @@
-﻿using HanumanInstitute.MvvmDialogs;
+﻿using System.ComponentModel;
+using HanumanInstitute.MvvmDialogs;
 
 namespace HanumanInstitute.Player432hz.Tests.ViewModels;
 
-public class PlaylistViewModelFactoryTests
+public class PlaylistViewModelFactoryTests : TestsBase
 {
-    public IPlaylistViewModelFactory Model => _model ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
+    public PlaylistViewModelFactoryTests(ITestOutputHelper output) : base(output)
+    {
+    }
+    
+    public IPlaylistViewModelFactory Model => _model ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>())
+    {
+        OwnerViewModel = Mock.Of<INotifyPropertyChanged>()
+    };
     private IPlaylistViewModelFactory _model;
 
     private const string DefaultPlaylistName = "New Playlist";

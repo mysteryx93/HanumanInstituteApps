@@ -23,7 +23,7 @@ public static class DialogServiceExtensions
 
         if (await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false) == true)
         {
-            ExtensionMethods.CopyAllFields(vm.Settings, settings);
+            Cloning.CopyAllFields(vm.Settings, settings);
         }
     }
 }

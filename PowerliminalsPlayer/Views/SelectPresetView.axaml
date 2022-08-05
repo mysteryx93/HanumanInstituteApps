@@ -7,7 +7,7 @@
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         mc:Ignorable="d" Height="290" MinHeight="290" MaxHeight="290" Width="285" MinWidth="205" MaxWidth="205"
         CanResize="False" WindowStartupLocation="CenterOwner"
-        ShowInTaskbar="False" Icon="/Assets/App.ico"
+        ShowInTaskbar="False" Icon="/Assets/App.ico" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}">
@@ -18,15 +18,15 @@
     <Window.Title>
         <Binding Converter="{StaticResource BooleanToStringConverter}" Path="ModeSave" />
     </Window.Title>
-    <Grid Classes="GradiantBackground" RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*,Auto">
         <Grid Row="0">
-            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Classes="compact" Height="24"
+            <TextBox DockPanel.Dock="Top" x:Name="NameBox" Height="24"
                      Text="{Binding PresetName, Mode=TwoWay}" VerticalAlignment="Top" TabIndex="0"
                      Background="{x:Null}" IsVisible="{Binding ModeSave, Mode=OneWay}"
                      hic:FocusExtensions.SelectAllOnFocus="True" />
         </Grid>
         <Grid Row="1">
-            <ListBox x:Name="PresetList" Classes="compact" BorderThickness="0" TabIndex="1"
+            <ListBox x:Name="PresetList" BorderThickness="0" TabIndex="1"
                      Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                      Background="{x:Null}">
                 <ListBox.ItemTemplate>
@@ -47,9 +47,9 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button x:Name="DelButton" Classes="round" Content="Del" Width="40" TabIndex="2"
                     Command="{Binding DeleteCommand}" Margin="5,2,0,2" />
-            <Button x:Name="CancelButton" Classes="round" Content="_Cancel" Width="70" TabIndex="3" IsCancel="True"
+            <Button x:Name="CancelButton" Classes="round" Content="Cancel" Width="70" TabIndex="3" IsCancel="True"
                     Command="{Binding CancelCommand}" Margin="5,2,0,2" />
-            <Button x:Name="OkButton" Classes="round" Content="_OK" Width="70" TabIndex="4" IsDefault="True"
+            <Button x:Name="OkButton" Classes="round" Content="OK" Width="70" TabIndex="4" IsDefault="True"
                     Command="{Binding ConfirmCommand}" Margin="5,2,0,2" />
         </StackPanel>
     </Grid>

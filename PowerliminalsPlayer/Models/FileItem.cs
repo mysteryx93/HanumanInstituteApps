@@ -1,5 +1,4 @@
-﻿using System;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
 

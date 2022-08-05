@@ -67,23 +67,23 @@ public class SelectPresetViewModel : ReactiveObject, ICloseable, IModalDialogVie
         return this;
     }
 
-    public ICommand ConfirmCommand => _confirmCommand ??= ReactiveCommand.Create(OnConfirm,
+    public RxCommandUnit ConfirmCommand => _confirmCommand ??= ReactiveCommand.Create(OnConfirm,
         this.WhenAnyValue(x => x.ModeSave, x => x.PresetName, x => x.SelectedItem, (modeSave, presetName, selectedItem) =>
             modeSave ? !string.IsNullOrWhiteSpace(presetName) : selectedItem != null));
-    private ICommand? _confirmCommand;
+    private RxCommandUnit? _confirmCommand;
     private void OnConfirm()
     {
         DialogResult = true;
         RequestClose?.Invoke(this, EventArgs.Empty);
     }
 
-    public ICommand CancelCommand => _cancelCommand ??= ReactiveCommand.Create(OnCancel);
-    private ICommand? _cancelCommand;
+    public RxCommandUnit CancelCommand => _cancelCommand ??= ReactiveCommand.Create(OnCancel);
+    private RxCommandUnit? _cancelCommand;
     private void OnCancel() => RequestClose?.Invoke(this, EventArgs.Empty);
 
-    public ICommand DeleteCommand => _deleteCommand ??= ReactiveCommand.Create(OnDelete,
+    public RxCommandUnit DeleteCommand => _deleteCommand ??= ReactiveCommand.Create(OnDelete,
         this.WhenAnyValue(x => x.SelectedItem).Select(x => x != null));
-    private ICommand? _deleteCommand;
+    private RxCommandUnit? _deleteCommand;
     private void OnDelete()
     {
         if (SelectedItem != null)

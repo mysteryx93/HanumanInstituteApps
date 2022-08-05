@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Net.Http;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.BassAudio;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Business;
@@ -55,7 +53,7 @@ public class MainViewModel : ReactiveObject
         }
         MaxQuality = new ListItemCollectionView<int>(quality);
 
-        _settings.Loaded += Settings_Loaded;
+        _settings.Changed += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
         _downloadManager.DownloadAdded += DownloadManager_DownloadAdded;
 
@@ -77,8 +75,8 @@ public class MainViewModel : ReactiveObject
         this.RaisePropertyChanged(nameof(AppSettings));
     }
 
-    public ICommand SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
-    private ICommand? _saveSettings;
+    public ReactiveCommand<CancelEventArgs, Unit> SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
+    private ReactiveCommand<CancelEventArgs, Unit>? _saveSettings;
     private void SaveSettingsImpl(CancelEventArgs e)
     {
         AppSettings.PreferredVideo = PreferredVideo.SelectedValue;
@@ -88,8 +86,8 @@ public class MainViewModel : ReactiveObject
         _settings.Save();
     }
 
-    public ICommand InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private ICommand? _initWindow;
+    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
+    private RxCommandUnit? _initWindow;
     private async Task InitWindowImplAsync()
     {
         if (_settings.Value.ShowInfoOnStartup)
@@ -183,8 +181,8 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the open folder dialog to select destination. 
     /// </summary>
-    public ICommand BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
-    private ICommand? _browseDestination;
+    public RxCommandUnit BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
+    private RxCommandUnit? _browseDestination;
     private async Task BrowseDestinationImpl()
     {
         var options = new OpenFolderDialogSettings()
@@ -203,8 +201,8 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the encode settings window.
     /// </summary>
-    public ICommand ShowEncodeSettings => _showEncodeSettings ??= ReactiveCommand.CreateFromTask(ShowEncodeSettingsImpl);
-    private ICommand? _showEncodeSettings;
+    public RxCommandUnit ShowEncodeSettings => _showEncodeSettings ??= ReactiveCommand.CreateFromTask(ShowEncodeSettingsImpl);
+    private RxCommandUnit? _showEncodeSettings;
     private async Task ShowEncodeSettingsImpl()
     {
         await _dialogService.ShowEncodeSettingsAsync(this, AppSettings.EncodeSettings);
@@ -213,9 +211,9 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Queries download information and selects preferred streams.
     /// </summary>
-    public ICommand Query => _query ??= ReactiveCommand.CreateFromTask(QueryImpl,
+    public RxCommandUnit Query => _query ??= ReactiveCommand.CreateFromTask(QueryImpl,
         this.WhenAnyValue(x => x.DownloadUrl, url => !string.IsNullOrWhiteSpace(url)));
-    private ICommand? _query;
+    private RxCommandUnit? _query;
     private async Task QueryImpl()
     {
         // Reset.
@@ -310,9 +308,9 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Starts a download task.
     /// </summary>
-    public ICommand Download => _download ??= ReactiveCommand.CreateFromTask(DownloadImpl,
+    public RxCommandUnit Download => _download ??= ReactiveCommand.CreateFromTask(DownloadImpl,
         this.WhenAnyValue(x => x.IsDownloadValid));
-    private ICommand? _download;
+    private RxCommandUnit? _download;
     private async Task DownloadImpl()
     {
         if (string.IsNullOrWhiteSpace(AppSettings.DestinationFolder))
@@ -412,8 +410,8 @@ public class MainViewModel : ReactiveObject
     /// <summary>
     /// Shows the About window.
     /// </summary>
-    public ICommand ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private ICommand? _showAbout;
+    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
+    private RxCommandUnit? _showAbout;
     private async Task ShowAboutImplAsync()
     {
         var vm = _dialogService.CreateViewModel<AboutViewModel>();

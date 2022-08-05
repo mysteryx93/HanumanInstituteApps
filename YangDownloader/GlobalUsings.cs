@@ -13,4 +13,6 @@ global using HanumanInstitute.MvvmDialogs;
 global using HanumanInstitute.YangDownloader.Models;
 global using HanumanInstitute.YangDownloader.ViewModels;
 global using HanumanInstitute.YangDownloader.Properties;
+global using System.Reactive;
 global using ReactiveUI.Fody.Helpers;
+global using RxCommandUnit = ReactiveUI.ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>;

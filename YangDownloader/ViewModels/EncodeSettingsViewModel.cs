@@ -1,5 +1,4 @@
-﻿using System.Windows.Input;
-using HanumanInstitute.BassAudio;
+﻿using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Services.Validation;
 using ReactiveUI;
 
@@ -109,8 +108,8 @@ public class EncodeSettingsViewModel : ReactiveObject, IModalDialogViewModel, IC
     /// <summary>
     /// Closes the window.
     /// </summary>
-    public ICommand Close => _close ??= ReactiveCommand.Create(CloseImpl);
-    private ICommand? _close;
+    public RxCommandUnit Close => _close ??= ReactiveCommand.Create(CloseImpl);
+    private RxCommandUnit? _close;
     private void CloseImpl()
     {
         if (Settings.Validate() == null)

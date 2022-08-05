@@ -18,11 +18,11 @@ public static class DialogServiceExtensions
         EncodeSettings settings)
     {
         var vm = service.CreateViewModel<AdvancedSettingsViewModel>();
-        ExtensionMethods.CopyAllFields(settings, vm.Settings);
+        Cloning.CopyAllFields(settings, vm.Settings);
 
         if (await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false) == true)
         {
-            ExtensionMethods.CopyAllFields(vm.Settings, settings);
+            Cloning.CopyAllFields(vm.Settings, settings);
         }
     }
 }

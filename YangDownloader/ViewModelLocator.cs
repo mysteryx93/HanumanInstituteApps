@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;
@@ -45,7 +44,9 @@ public static class ViewModelLocator
         SplatRegistrations.Register<EncodeSettingsViewModel>();
 
         // Business
-        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
+        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
             
         SplatRegistrations.SetupIOC();
@@ -54,6 +55,7 @@ public static class ViewModelLocator
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static EncodeSettingsViewModel EncodeSettings => Locator.Current.GetService<EncodeSettingsViewModel>()!;
+    public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
 
     public static void Cleanup()
     {

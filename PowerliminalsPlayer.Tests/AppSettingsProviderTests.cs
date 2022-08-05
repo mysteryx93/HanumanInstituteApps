@@ -1,11 +1,5 @@
 ﻿using System.Linq;
-using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
-using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.PowerliminalsPlayer.Models;
-using Moq;
-using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
 

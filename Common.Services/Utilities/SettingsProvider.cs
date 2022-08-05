@@ -23,12 +23,21 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
     /// <summary>
     /// Gets or sets the current settings.
     /// </summary>
-    public T Value { get; set; } = new T();
+    public T Value
+    {
+        get => _value;
+        set
+        {
+            _value = value;
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+    private T _value = new T();
 
     /// <summary>
-    /// Occurs after settings are loaded.
+    /// Occurs when the Value property has changed.
     /// </summary>
-    public event EventHandler? Loaded;
+    public event EventHandler? Changed;
 
     /// <summary>
     /// Occurs after settings are saved.
@@ -56,7 +65,7 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
         catch (FileNotFoundException) { }
 
         Value = (result != null && result.Validate() == null) ? result : GetDefault();
-        Loaded?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke(this, EventArgs.Empty);
         return Value;
     }
 

@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Svg.Skia;
 using Avalonia.Xaml.Interactions.Core;
-using Avalonia.Xaml.Interactivity;
+using FluentAvalonia.Styling;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -32,25 +32,42 @@ public abstract class CommonApplication<T> : Application
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
         GC.KeepAlive(typeof(SvgImage));
         GC.KeepAlive(typeof(EventTriggerBehavior));
+
+        if (Design.IsDesignMode)
+        {
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
 #endif
+
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.
 
         // Set DefaultExceptionHelper now but we want to initialize ViewModelLocator later in parallel with View for faster startup.
         GlobalErrorHandler.BeginInit();
 
+        var tBackground = Task.Run(BackgroundInit);
+
         var desktop = DesktopLifetime;
         if (desktop != null)
         {
-            // Initialize View and ViewModel/ ViewModelLocator in parallel.
-            var t1 = Task.Run(InitViewModel);
+            var style = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>();
+            if (style != null)
+            {
+                style.RequestedTheme = GetTheme().ToString();
+            }
+
+            // Initialize View and ViewModel in parallel.
+            var t2 = Task.Run(InitViewModel);
             desktop.MainWindow = Activator.CreateInstance<T>();
-            await t1.ConfigureAwait(true);
-            desktop.MainWindow.DataContext = t1.Result;
+            await t2.ConfigureAwait(true);
+            desktop.MainWindow.DataContext = t2.Result;
         }
 
-        GlobalErrorHandler.EndInit(Locator.Current.GetService<IDialogService>()!, desktop?.MainWindow.DataContext as INotifyPropertyChanged);
+        GlobalErrorHandler.EndInit(Locator.Current.GetService<IDialogService>()!,
+            desktop?.MainWindow.DataContext as INotifyPropertyChanged);
 
+        await tBackground.ConfigureAwait(true);
         base.OnFrameworkInitializationCompleted();
     }
 
@@ -58,5 +75,16 @@ public abstract class CommonApplication<T> : Application
     /// Initializes the ViewModel.
     /// </summary>
     /// <returns>The new ViewModel.</returns>
-    protected virtual INotifyPropertyChanged? InitViewModel() => null;
+    protected abstract INotifyPropertyChanged? InitViewModel();
+
+    /// <summary>
+    /// Returns the application theme from the configuration file.
+    /// </summary>
+    /// <returns>The application theme to initialize.</returns>
+    protected abstract AppTheme GetTheme();
+
+    /// <summary>
+    /// Initializes additional tasks in a background thread while the application loads, if not in design-mode. 
+    /// </summary>
+    protected virtual void BackgroundInit() { }
 }

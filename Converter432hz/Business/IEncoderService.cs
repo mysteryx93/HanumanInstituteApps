@@ -10,9 +10,13 @@ namespace HanumanInstitute.Converter432hz.Business;
 public interface IEncoderService : IReactiveObject, IValidatableViewModel
 {
     /// <summary>
+    /// Occurs when a file has completed encoding. It will be triggered for both success and failure.
+    /// </summary>
+    event EventHandler<FileItem>? FileCompleted;
+    /// <summary>
     /// Gets or sets the ViewModel owning this service.
     /// </summary>
-    public INotifyPropertyChanged Owner { get; set; }
+    INotifyPropertyChanged Owner { get; set; }
     /// <summary>
     /// Gets or sets the list of files and folders to encode.
     /// </summary>

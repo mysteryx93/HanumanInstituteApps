@@ -18,7 +18,7 @@ public interface ISettingsProvider<T>
     /// <summary>
     /// Occurs after settings are loaded.
     /// </summary>
-    event EventHandler? Loaded;
+    event EventHandler? Changed;
 
     /// <summary>
     /// Occurs after settings are saved.

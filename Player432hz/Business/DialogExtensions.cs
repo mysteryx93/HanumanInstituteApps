@@ -3,7 +3,7 @@ using HanumanInstitute.MvvmDialogs;
 
 namespace HanumanInstitute.Player432hz.Business;
 
-public static class DialogServiceExtensions
+public static class DialogExtensions
 {
     public static Task ShowAboutAsync(this IDialogService service, INotifyPropertyChanged owner)
     {

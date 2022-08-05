@@ -6,17 +6,18 @@
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         mc:Ignorable="d" d:DesignHeight="380"
-        Title="Powerliminals Player" MinWidth="680" MinHeight="210" 
-        Icon="/Assets/App.ico"
+        Title="Powerliminals Player" MinWidth="680" MinHeight="210"
+        Icon="/Assets/App.ico" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         xmlns:mediab="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
+        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
+        hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
         hic:PositionExtension.Enabled="False"
-        hic:PositionExtension.Position="{Binding AppSettings.Position, Mode=TwoWay}"
+        hic:PositionExtension.Position="{Binding Settings.Position, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Opened">
@@ -29,24 +30,21 @@
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>
-    <Grid Classes="GradiantBackground" ColumnDefinitions="*,302">
+    <Grid ColumnDefinitions="*,302">
         <Grid Column="0" Margin="10,5,10,5" RowDefinitions="48,Auto,Auto,*,30">
             <Grid Row="0">
                 <StackPanel Orientation="Horizontal">
-                    <Expander x:Name="FoldersExpander" Header="Folders" Height="48" Width="130"
-                              Background="Transparent"
-                              TabIndex="1" FontWeight="Bold" IsExpanded="{Binding AppSettings.FoldersExpanded}">
-                        <Grid />
-                    </Expander>
+                    <Expander x:Name="FoldersExpander" Header="Folders" Height="90" Width="130" VerticalAlignment="Top"
+                              TabIndex="1" FontWeight="Bold" IsExpanded="{Binding Settings.FoldersExpanded}" />
                     <Button Classes="round" TabIndex="2" Width="35" Margin="2,0,0,2"
-                            VerticalAlignment="Bottom" Command="{Binding AddFolderCommand}"
+                            VerticalAlignment="Bottom" Command="{Binding AddFolder}"
                             IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}">
-                        <Svg Path="/Assets/plus.svg" />
+                        <ui:SymbolIcon Symbol="Add" FontSize="20" />
                     </Button>
                     <Button Classes="round" TabIndex="3" Width="35" Margin="0,0,0,2"
-                            VerticalAlignment="Bottom" Command="{Binding RemoveFolderCommand}"
+                            VerticalAlignment="Bottom" Command="{Binding RemoveFolder}"
                             IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}">
-                        <Svg Path="/Assets/minus.svg" />
+                        <ui:SymbolIcon Symbol="Remove" FontSize="20" />
                     </Button>
                 </StackPanel>
                 <Grid HorizontalAlignment="Right" Width="100">
@@ -55,29 +53,32 @@
                             Maximum="100" LargeChange="10" SmallChange="1" TickFrequency="10"
                             Value="{Binding Playlist.MasterVolume, Mode=TwoWay}" TabIndex="5" />
                 </Grid>
-                <Button Classes="round" Width="35" HorizontalAlignment="Right" Margin="0,0,110,0" 
+                <Button Classes="round icon" Width="35" HorizontalAlignment="Right" Margin="0,0,148,0" Content="I"
                         Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
-                    <Svg Path="/Assets/information.svg" />
+                </Button>
+                <Button Classes="round" Width="35" HorizontalAlignment="Right" Margin="0,0,110,0"
+                        Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                    <ui:SymbolIcon Symbol="Settings" FontSize="20" />
                 </Button>
             </Grid>
             <Grid Row="1">
-                <ListBox Classes="compact" TabIndex="5" Background="{x:Null}" Height="80"
-                         Items="{Binding AppSettings.Folders}" SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
+                <ListBox TabIndex="5" Background="{x:Null}" Height="80"
+                         Items="{Binding Settings.Folders}"
+                         SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
                          IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
             </Grid>
             <Grid Row="2" ColumnDefinitions="150,*" Margin="0,2,0,2">
                 <Grid Column="0">
                     <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
-                    <Button Classes="round" Content="_Play" Margin="50,0,0,0"
-                            Command="{Binding PlayCommand}" TabIndex="6" Width="75" />
+                    <Button Classes="round" Content="Play" Margin="50,0,0,0"
+                            Command="{Binding Play}" TabIndex="6" Width="75" />
                 </Grid>
                 <Grid Column="1">
-                    <TextBox Classes="compact" TabIndex="7"
-                             Text="{Binding SearchText, Mode=TwoWay}" />
+                    <TextBox TabIndex="7" Text="{Binding SearchText, Mode=TwoWay}" />
                 </Grid>
             </Grid>
             <Grid Row="3">
-                <ListBox Classes="compact" Items="{Binding Files.Source}"
+                <ListBox Items="{Binding Files.Source}"
                          SelectedItem="{Binding Files.CurrentItem, Mode=TwoWay}" TabIndex="8" Background="{x:Null}">
                     <ListBox.Styles>
                         <Style Selector="ListBoxItem">
@@ -90,7 +91,7 @@
                                 <Interaction.Behaviors>
                                     <EventTriggerBehavior EventName="DoubleTapped">
                                         <InvokeCommandAction
-                                            Command="{Binding ViewModel.PlayCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                            Command="{Binding ViewModel.Play, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                             CommandParameter="{x:Null}" />
                                     </EventTriggerBehavior>
                                 </Interaction.Behaviors>
@@ -100,13 +101,17 @@
                 </ListBox>
             </Grid>
             <Grid Row="4">
-                <Button Classes="round" Content="_Load Preset" HorizontalAlignment="Right"
-                        Width="100" TabIndex="10" Margin="0,0,100,0" Command="{Binding LoadPresetCommand}" />
-                <Button Classes="round" Content="_Save As..." HorizontalAlignment="Right"
-                        Width="100" TabIndex="11" Command="{Binding SavePresetCommand}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Classes="round" Content="Clear"
+                            Width="70" TabIndex="9" Command="{Binding Clear}" />
+                    <Button Classes="round" Content="Load Preset" Margin="3,0,3,0"
+                            Width="95" TabIndex="10" Command="{Binding LoadPreset}" />
+                    <Button Classes="round" Content="Save As..." 
+                            Width="95" TabIndex="11" Command="{Binding SavePreset}" />
+                </StackPanel>
                 <Button Classes="round" Width="85" TabIndex="9"
                         Content="{Binding IsPaused, Converter={StaticResource BooleanToStringConverter}}"
-                        Command="{Binding PauseCommand}" />
+                        Command="{Binding Pause}" />
                 <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" FontWeight="Bold">
                     <!--
             <Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals"
@@ -118,7 +123,7 @@
             </Grid>
         </Grid>
         <ScrollViewer Grid.Column="1" TabIndex="12">
-            <ItemsControl Items="{Binding Playlist.Files}" Margin="0,0,16,0">
+            <ItemsControl Items="{Binding Playlist.Files}" Margin="0,0,10,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <media:MediaPlayer IsLoopVisible="False">
@@ -128,13 +133,17 @@
                                                    SpeedInt="{Binding Speed, Mode=TwoWay}"
                                                    IsPlaying="{Binding IsPlaying, Mode=TwoWay}"
                                                    PositionRefreshMilliseconds="500" VolumeBoost="0.4"
-                                                   Loop="True" UseEffects="True" EffectsQuick="True"
-                                                   EffectsAntiAlias="True">
+                                                   Loop="True" UseEffects="True"
+                                                   EffectsFloat="{Binding ViewModel.EffectsFloat, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                   EffectsQuick="{Binding ViewModel.EffectsQuickAlgo, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                   EffectsSampleRateConversion="{Binding ViewModel.EffectsSampleRateConversion, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                   EffectsAntiAlias="{Binding ViewModel.Settings.AntiAlias, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                   EffectsAntiAliasLength="{Binding ViewModel.Settings.AntiAliasLength, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
                             </mediab:BassPlayerHost>
                             <Interaction.Behaviors>
                                 <EventTriggerBehavior EventName="StopCommandExecuted">
                                     <InvokeCommandAction
-                                        Command="{Binding ViewModel.RemoveMediaCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        Command="{Binding ViewModel.RemoveMedia, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                         CommandParameter="{Binding}" />
                                 </EventTriggerBehavior>
                             </Interaction.Behaviors>

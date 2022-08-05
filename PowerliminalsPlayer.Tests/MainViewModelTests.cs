@@ -1,22 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using System.Threading.Tasks;
-using HanumanInstitute.Common.Avalonia.App.Tests;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using HanumanInstitute.PowerliminalsPlayer.Business;
-using HanumanInstitute.PowerliminalsPlayer.Models;
-using HanumanInstitute.PowerliminalsPlayer.ViewModels;
-using HanumanInstitute.Validators;
-using Moq;
-using Xunit;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -117,7 +106,7 @@ public class MainViewModelTests
     public void SearchText_ChangeOnce_DoNotCallFileSystemImmediately()
     {
         var mockFile = SetupMockFileSystem();
-        Model.AppSettings.Folders.Add("D:\\");
+        Model.Settings.Folders.Add("D:\\");
 
         Model.SearchText = "text";
 
@@ -131,7 +120,7 @@ public class MainViewModelTests
     public async Task SearchText_ChangeOnce_CallFileSystemAfterDelay(string text)
     {
         var mockFile = SetupMockFileSystem();
-        Model.AppSettings.Folders.Add("D:\\");
+        Model.Settings.Folders.Add("D:\\");
 
         Model.SearchText = text;
 
@@ -143,7 +132,7 @@ public class MainViewModelTests
     public async Task SearchText_ChangeMultipleTimes_CallFileSystemOnceAfterDelay()
     {
         var mockFile = SetupMockFileSystem();
-        Model.AppSettings.Folders.Add("D:\\");
+        Model.Settings.Folders.Add("D:\\");
 
         Model.SearchText = "a";
         Model.SearchText = "";
@@ -170,8 +159,8 @@ public class MainViewModelTests
         MockFileSystem.File.Create("/2/aaa.mp3".ReplaceDirectorySeparator());
         MockFileSystem.File.Create("/2/bbb.mp3".ReplaceDirectorySeparator());
         MockFileSystem.File.Create("/2/sub/abc.mp3".ReplaceDirectorySeparator());
-        Model.AppSettings.Folders.Add("/1".ReplaceDirectorySeparator());
-        Model.AppSettings.Folders.Add("/2".ReplaceDirectorySeparator());
+        Model.Settings.Folders.Add("/1".ReplaceDirectorySeparator());
+        Model.Settings.Folders.Add("/2".ReplaceDirectorySeparator());
 
         Model.SearchText = text;
 
@@ -184,7 +173,7 @@ public class MainViewModelTests
     {
         MockFileSystem.EnsureDirectoryExists("/1/".ReplaceDirectorySeparator());
         MockFileSystem.File.Create("/1/not_audio.dll".ReplaceDirectorySeparator());
-        Model.AppSettings.Folders.Add("/1".ReplaceDirectorySeparator());
+        Model.Settings.Folders.Add("/1".ReplaceDirectorySeparator());
 
         Model.SearchText = "";
 
@@ -193,19 +182,9 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void Load_Default_CallSettingsLoad()
-    {
-        Model.AppSettings.Folders.Add("D:\\");
-
-        Model.LoadSettings();
-
-        _mockAppSettings.Verify(x => x.Load(), Times.Once);
-    }
-
-    [Fact]
     public void SaveSettingsCommand_Default_CallSettingsSave()
     {
-        Model.AppSettings.Folders.Add("D:\\");
+        Model.Settings.Folders.Add("D:\\");
 
         Model.SaveSettings();
 
@@ -220,7 +199,7 @@ public class MainViewModelTests
         var fileB = new PlayingItem("b");
         Model.Playlist.Files.Add(fileB);
 
-        Model.RemoveMediaCommand.ExecuteIfCan(fileB);
+        Model.RemoveMedia.ExecuteIfCan(fileB);
 
         Assert.Single(Model.Playlist.Files);
         Assert.Equal(fileA, Model.Playlist.Files.Single());
@@ -232,7 +211,7 @@ public class MainViewModelTests
         var file = new PlayingItem("a");
         Model.Playlist.Files.Add(file);
 
-        Model.RemoveMediaCommand.ExecuteIfCan(file);
+        Model.RemoveMedia.ExecuteIfCan(file);
 
         Assert.Empty(Model.Playlist.Files);
         Assert.False(Model.IsPaused);
@@ -244,7 +223,7 @@ public class MainViewModelTests
         var file = new PlayingItem("a");
         Model.Playlist.Files.Add(file);
 
-        Model.RemoveMediaCommand.Execute();
+        Model.RemoveMedia.Execute();
 
         Assert.Single(Model.Playlist.Files);
     }
@@ -254,7 +233,7 @@ public class MainViewModelTests
     {
         var file = new PlayingItem("a");
 
-        Model.RemoveMediaCommand.Execute(file);
+        Model.RemoveMedia.Execute(file);
 
         Assert.Empty(Model.Playlist.Files);
     }
@@ -266,9 +245,9 @@ public class MainViewModelTests
     {
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
 
-        Assert.Empty(Model.AppSettings.Folders);
+        Assert.Empty(Model.Settings.Folders);
     }
 
     [Theory]
@@ -278,9 +257,9 @@ public class MainViewModelTests
     {
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolderCommand.ExecuteIfCan();
+        Model.AddFolder.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Folders);
+        Assert.Single(Model.Settings.Folders);
     }
 
     [Fact]
@@ -288,10 +267,10 @@ public class MainViewModelTests
     {
         SetDialogManagerOpenFolder("/NewFolder/");
 
-        Model.AddFolderCommand.ExecuteIfCan();
+        Model.AddFolder.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Folders);
-        Assert.False(Model.AppSettings.Folders.Single().EndsWith(Path.DirectorySeparatorChar));
+        Assert.Single(Model.Settings.Folders);
+        Assert.False(Model.Settings.Folders.Single().EndsWith(Path.DirectorySeparatorChar));
     }
     
     [Theory]
@@ -303,7 +282,7 @@ public class MainViewModelTests
         AddFile("/NewFolder/" + fileName);
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolderCommand.ExecuteIfCan();
+        Model.AddFolder.ExecuteIfCan();
 
         Assert.Single(Model.Files);
         Assert.EndsWith(fileName, Model.Files.Single().FullPath);
@@ -318,7 +297,7 @@ public class MainViewModelTests
         AddFile("/NewFolder/" + fileName);
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolderCommand.ExecuteIfCan();
+        Model.AddFolder.ExecuteIfCan();
 
         Assert.Single(Model.Files);
         Assert.Equal(fileName, Model.Files.Single().Display);
@@ -331,9 +310,9 @@ public class MainViewModelTests
     {
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolderCommand.ExecuteIfCan();
+        Model.AddFolder.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Folders);
+        Assert.Single(Model.Settings.Folders);
         Assert.Empty(Model.Files);
     }
     
@@ -343,12 +322,12 @@ public class MainViewModelTests
     public void AddFolderCommand_Duplicate_DoNotAddDuplicate(string folder1, string folder2)
     {
         SetDialogManagerOpenFolder(folder1);
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
         SetDialogManagerOpenFolder(folder2);
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
 
-        Assert.Single(Model.AppSettings.Folders);
-        Assert.Equal(folder1.ReplaceDirectorySeparator(), Model.AppSettings.Folders.Single());
+        Assert.Single(Model.Settings.Folders);
+        Assert.Equal(folder1.ReplaceDirectorySeparator(), Model.Settings.Folders.Single());
         Assert.Empty(Model.Files);
     }
     
@@ -360,9 +339,9 @@ public class MainViewModelTests
         AddFile("/Dir/Sub/File1.mp3");
         
         SetDialogManagerOpenFolder(dir1);
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
         SetDialogManagerOpenFolder(dir2);
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
 
         Assert.Single(Model.Files);
     }
@@ -374,7 +353,7 @@ public class MainViewModelTests
         AddFile("/File1.mp3");
         
         SetDialogManagerOpenFolder(root);
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
 
         Assert.Single(Model.Files);
     }
@@ -382,10 +361,10 @@ public class MainViewModelTests
     [Fact]
     public void AddFolderCommand_Add_SelectNewItem()
     {
-        Model.AppSettings.Folders.Add("/a");
+        Model.Settings.Folders.Add("/a");
         
         SetDialogManagerOpenFolder("/b");
-        Model.AddFolderCommand.Execute();
+        Model.AddFolder.Execute();
 
         Assert.Equal(1, Model.SelectedFolderIndex);
     }
@@ -393,40 +372,40 @@ public class MainViewModelTests
     [Fact]
     public void RemoveFolderCommand_EmptyList_DoNothing()
     {
-        Model.RemoveFolderCommand.Execute();
+        Model.RemoveFolder.Execute();
         
-        Assert.Empty(Model.AppSettings.Folders);
+        Assert.Empty(Model.Settings.Folders);
     }
     
     [Fact]
     public void RemoveFolderCommand_NoSelection_DoNothing()
     {
-        Model.AppSettings.Folders.Add("/");
+        Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = -1;
         
-        Model.RemoveFolderCommand.Execute();
+        Model.RemoveFolder.Execute();
         
-        Assert.Single(Model.AppSettings.Folders);
+        Assert.Single(Model.Settings.Folders);
     }
 
     [Fact]
     public void RemoveFolderCommand_UniqueSelection_RemoveItem()
     {
-        Model.AppSettings.Folders.Add("/");
+        Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = 0;
         
-        Model.RemoveFolderCommand.Execute();
+        Model.RemoveFolder.Execute();
         
-        Assert.Empty(Model.AppSettings.Folders);
+        Assert.Empty(Model.Settings.Folders);
     }
     
     [Fact]
     public void RemoveFolderCommand_UniqueSelection_ResetSelection()
     {
-        Model.AppSettings.Folders.Add("/");
+        Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = 0;
         
-        Model.RemoveFolderCommand.Execute();
+        Model.RemoveFolder.Execute();
         
         Assert.Equal(-1, Model.SelectedFolderIndex);
     }
@@ -438,12 +417,12 @@ public class MainViewModelTests
     [InlineData(2, 1)]
     public void RemoveFolderCommand_Selection_SelectOther(int selStart, int selNext)
     {
-        Model.AppSettings.Folders.Add("/a");
-        Model.AppSettings.Folders.Add("/b");
-        Model.AppSettings.Folders.Add("/c");
+        Model.Settings.Folders.Add("/a");
+        Model.Settings.Folders.Add("/b");
+        Model.Settings.Folders.Add("/c");
         Model.SelectedFolderIndex = selStart;
         
-        Model.RemoveFolderCommand.Execute();
+        Model.RemoveFolder.Execute();
 
         Assert.Equal(selNext, Model.SelectedFolderIndex);
     }
@@ -454,7 +433,7 @@ public class MainViewModelTests
         AddFilesAndLoad(1);
         Model.Files.CurrentPosition = -1;
         
-        Model.PlayCommand.Execute();
+        Model.Play.Execute();
         
         Assert.Empty(Model.Playlist.Files);
     }
@@ -467,7 +446,7 @@ public class MainViewModelTests
         AddFilesAndLoad(2);
         Model.Files.CurrentPosition = selectedIndex;
         
-        Model.PlayCommand.Execute();
+        Model.Play.Execute();
         
         Assert.Single(Model.Playlist.Files);
         Assert.Equal(Model.Files.Source[selectedIndex].FullPath, Model.Playlist.Files.First().FullPath);
@@ -493,7 +472,7 @@ public class MainViewModelTests
         
         for (var i = 0; i < times; i++)
         {
-            Model.PlayCommand.Execute();
+            Model.Play.Execute();
         }
         
         Assert.Equal(expectedSpeed, Model.Playlist.Files.Last().Speed);
@@ -517,11 +496,11 @@ public class MainViewModelTests
         var speedList = fileSpeeds.Split(',').Select(int.Parse);
         foreach (var speed in speedList)
         {
-            Model.PlayCommand.Execute();
+            Model.Play.Execute();
             Model.Playlist.Files.Last().Speed = speed;
         }
         
-        Model.PlayCommand.Execute();
+        Model.Play.Execute();
         
         Assert.Equal(expectedSpeed, Model.Playlist.Files.Last().Speed);
     }
@@ -531,10 +510,10 @@ public class MainViewModelTests
     {
         AddFilesAndLoad(2);
         Model.Files.CurrentPosition = 0;
-        Model.PlayCommand.Execute();
+        Model.Play.Execute();
 
         Model.Files.CurrentPosition = 1;
-        Model.PlayCommand.Execute();
+        Model.Play.Execute();
         
         Assert.Equal(0, Model.Playlist.Files.Last().Speed);
     }
@@ -542,7 +521,7 @@ public class MainViewModelTests
     [Fact]
     public void LoadPresetCommand_NoPreset_CanExecuteFalse()
     {
-        var result = Model.LoadPresetCommand.CanExecute();
+        var result = Model.LoadPreset.CanExecute();
 
         Assert.False(result);
     }
@@ -554,18 +533,18 @@ public class MainViewModelTests
     {
         var presetName = "init";
         Model.Playlist.Name = presetName;
-        Model.AppSettings.Presets.Add(new PresetItem(presetName));
+        Model.Settings.Presets.Add(new PresetItem(presetName));
         SelectPresetViewModel vm = null;
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
             .Returns<INotifyPropertyChanged, INotifyPropertyChanged>((_, viewModel) =>
             {
                 vm = (SelectPresetViewModel)viewModel;
-                vm.SelectedItem = Model.AppSettings.Presets.First();
+                vm.SelectedItem = Model.Settings.Presets.First();
                 vm.DialogResult = dialogResult;
                 return Task.CompletedTask;
             });
 
-        Model.LoadPresetCommand.Execute();
+        Model.LoadPreset.Execute();
 
         Assert.Equal(presetName, Model.Playlist.Name);
         Assert.False(vm.ModeSave);
@@ -578,10 +557,10 @@ public class MainViewModelTests
     {
         var volume = 80;
         var preset = new PresetItem(presetName) { MasterVolume = 80};
-        Model.AppSettings.Presets.Add(preset);
+        Model.Settings.Presets.Add(preset);
         SetDialogManagerLoadPreset(preset);
 
-        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.LoadPreset.ExecuteIfCan();
 
         Assert.Equal(presetName, Model.Playlist.Name);
         Assert.Equal(volume, Model.Playlist.MasterVolume);
@@ -594,10 +573,10 @@ public class MainViewModelTests
         var volume = 80;
         preset.Files.Add(new PlayingItem("/File1", volume));
         preset.Files.Add(new PlayingItem("/File2", volume));
-        Model.AppSettings.Presets.Add(preset);
+        Model.Settings.Presets.Add(preset);
         SetDialogManagerLoadPreset(preset);
 
-        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.LoadPreset.ExecuteIfCan();
 
         Assert.NotEmpty(Model.Playlist.Files);
         Assert.True(Model.Playlist.Files.Count == 2);
@@ -611,11 +590,11 @@ public class MainViewModelTests
         var volume = 80;
         var preset = new PresetItem("a") { MasterVolume = volume };
         preset.Files.Add(new PlayingItem("/File1", volume));
-        Model.AppSettings.Presets.Add(preset);
+        Model.Settings.Presets.Add(preset);
         SetDialogManagerLoadPreset(preset);
 
         var newVolume = 40;
-        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.LoadPreset.ExecuteIfCan();
         Model.Playlist.MasterVolume = newVolume;
 
         await Task.Delay(120);
@@ -627,13 +606,13 @@ public class MainViewModelTests
     {
         var volume = 80;
         var preset = new PresetItem("a") { MasterVolume = volume };
-        Model.AppSettings.Presets.Add(preset);
+        Model.Settings.Presets.Add(preset);
         SetDialogManagerLoadPreset(preset);
 
-        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.LoadPreset.ExecuteIfCan();
         Model.Playlist.MasterVolume = 20;
 
-        Assert.Equal(volume, Model.AppSettings.Presets.First().MasterVolume);
+        Assert.Equal(volume, Model.Settings.Presets.First().MasterVolume);
     }
     
     [Fact]
@@ -642,19 +621,19 @@ public class MainViewModelTests
         var volume = 80;
         var preset = new PresetItem("a");
         preset.Files.Add(new PlayingItem("/file1", volume));
-        Model.AppSettings.Presets.Add(preset);
+        Model.Settings.Presets.Add(preset);
         SetDialogManagerLoadPreset(preset);
 
-        Model.LoadPresetCommand.ExecuteIfCan();
+        Model.LoadPreset.ExecuteIfCan();
         Model.Playlist.Files.First().Volume = 20;
 
-        Assert.Equal(volume, Model.AppSettings.Presets.First().Files.First().Volume);
+        Assert.Equal(volume, Model.Settings.Presets.First().Files.First().Volume);
     }
 
     [Fact]
     public void SavedPresetCommand_NoFilePlaying_CanExecuteFalse()
     {
-        var result = Model.SavePresetCommand.CanExecute();
+        var result = Model.SavePreset.CanExecute();
 
         Assert.False(result);
     }
@@ -665,8 +644,8 @@ public class MainViewModelTests
         var playing = new PlayingItem("/File1");
         Model.Playlist.Files.Add(playing);
         
-        Model.RemoveMediaCommand.Execute(playing);
-        var result = Model.SavePresetCommand.CanExecute();
+        Model.RemoveMedia.Execute(playing);
+        var result = Model.SavePreset.CanExecute();
 
         Assert.False(result);
     }
@@ -686,9 +665,9 @@ public class MainViewModelTests
                 return Task.CompletedTask;
             });
 
-        Model.SavePresetCommand.Execute();
+        Model.SavePreset.Execute();
 
-        Assert.Empty(Model.AppSettings.Presets);
+        Assert.Empty(Model.Settings.Presets);
         Assert.True(vm.ModeSave);
     }
     
@@ -701,11 +680,11 @@ public class MainViewModelTests
         Model.Playlist.Files.Add(new PlayingItem("/File1"));
         SetDialogManagerSavePreset(presetName);
 
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Presets);
-        Assert.Equal(presetName, Model.AppSettings.Presets.First().Name);
-        Assert.Equal(volume, Model.AppSettings.Presets.First().MasterVolume);
+        Assert.Single(Model.Settings.Presets);
+        Assert.Equal(presetName, Model.Settings.Presets.First().Name);
+        Assert.Equal(volume, Model.Settings.Presets.First().MasterVolume);
     }
     
     [Fact]
@@ -717,11 +696,11 @@ public class MainViewModelTests
         Model.Playlist.Files.Add(new PlayingItem("/File2", volume));
         SetDialogManagerSavePreset(presetName);
 
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Presets);
-        Assert.True(Model.AppSettings.Presets.First().Files.Count == 2);
-        Assert.All(Model.AppSettings.Presets.First().Files, x => Assert.Equal(volume, x.Volume));
+        Assert.Single(Model.Settings.Presets);
+        Assert.True(Model.Settings.Presets.First().Files.Count == 2);
+        Assert.All(Model.Settings.Presets.First().Files, x => Assert.Equal(volume, x.Volume));
     }
     
     [Fact]
@@ -730,16 +709,16 @@ public class MainViewModelTests
         var presetName = "Preset";
         Model.Playlist.Files.Add(new PlayingItem("/File1"));
         SetDialogManagerSavePreset(presetName);
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
 
         var newFile = "/File2";
         Model.Playlist.Files.Clear();
         Model.Playlist.Files.Add(new PlayingItem(newFile));
         SetDialogManagerSavePreset(presetName);
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
 
-        Assert.Single(Model.AppSettings.Presets);
-        Assert.Equal(newFile, Model.AppSettings.Presets.Single().Files.Single().FullPath);
+        Assert.Single(Model.Settings.Presets);
+        Assert.Equal(newFile, Model.Settings.Presets.Single().Files.Single().FullPath);
     }
     
     [Fact]
@@ -752,7 +731,7 @@ public class MainViewModelTests
         SetDialogManagerSavePreset(presetName);
 
         var newVolume = 40;
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
         Model.Playlist.MasterVolume = newVolume;
 
         await Task.Delay(120);
@@ -768,10 +747,10 @@ public class MainViewModelTests
         Model.Playlist.MasterVolume = volume;
         SetDialogManagerSavePreset(presetName);
 
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
         Model.Playlist.MasterVolume = 20;
 
-        Assert.Equal(volume, Model.AppSettings.Presets.First().MasterVolume);
+        Assert.Equal(volume, Model.Settings.Presets.First().MasterVolume);
     }
     
     [Fact]
@@ -783,11 +762,11 @@ public class MainViewModelTests
         Model.Playlist.Files.Add(new PlayingItem("/File2", volume));
         SetDialogManagerSavePreset(presetName);
 
-        Model.SavePresetCommand.ExecuteIfCan();
+        Model.SavePreset.ExecuteIfCan();
         Model.Playlist.Files[0].Volume = 20;
         Model.Playlist.Files[1].Volume = 20;
 
-        Assert.All(Model.AppSettings.Presets.First().Files, x => Assert.Equal(volume, x.Volume));
+        Assert.All(Model.Settings.Presets.First().Files, x => Assert.Equal(volume, x.Volume));
     }
 
     [Fact]
@@ -796,7 +775,7 @@ public class MainViewModelTests
         Model.Playlist.Files.Add(new PlayingItem("/file1.mp3"));
         Model.Playlist.Files.Add(new PlayingItem("/file2.mp3") { IsPlaying = true });
         
-        Model.PauseCommand.ExecuteIfCan();
+        Model.Pause.ExecuteIfCan();
 
         Assert.True(Model.IsPaused);
         Assert.All(Model.Playlist.Files, x => Assert.False(x.IsPlaying));
@@ -809,7 +788,7 @@ public class MainViewModelTests
         Model.Playlist.Files.Add(new PlayingItem("/file2.mp3"));
         Model.IsPaused = true;
         
-        Model.PauseCommand.ExecuteIfCan();
+        Model.Pause.ExecuteIfCan();
 
         Assert.False(Model.IsPaused);
         Assert.All(Model.Playlist.Files, x => Assert.True(x.IsPlaying));

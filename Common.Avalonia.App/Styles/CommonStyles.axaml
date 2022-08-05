@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:ui="using:FluentAvalonia.UI.Controls"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:media="https://github.com/mysteryx93/MediaPlayerUI.NET">
     <Design.PreviewWith>
         <Border Padding="20" Width="600" Height="450">
         </Border>
@@ -28,23 +29,18 @@
         <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
     </Style>
     <Style Selector="ListBox ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="MinHeight" Value="24" />
         <Setter Property="Padding" Value="0" />
     </Style>
     <Style Selector="ListBox ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Margin" Value="0" />
     </Style>
     <Style Selector="ListBox ListBoxItem > TextBlock">
         <Setter Property="Padding" Value="8,4,4,4" />
         <Setter Property="Background" Value="Transparent" />
     </Style>
-    <!--
-    <Style Selector="ListBox ListBoxItem">
-        <Setter Property="Padding" Value="0" />
-    </Style>
-    <Style Selector="ListBox ListBoxItem > TextBlock">
-        <Setter Property="Padding" Value="8,4,4,4" />
-    </Style>-->
     
     <Style Selector="TextBox">
         <Setter Property="Height" Value="26" />
@@ -53,6 +49,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     
+
     <Style Selector="Button.icon">
         <Setter Property="FontFamily" Value="avares://Common.Avalonia.App/Styles/HanumanInstituteAppIcons.otf#" />
         <Setter Property="FontSize" Value="17" />
@@ -60,5 +57,12 @@
     
     <Style Selector="ui|HyperlinkButton">
         <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="media|MediaPlayer TextBlock">
+        <Setter Property="Foreground" Value="Black" />
+    </Style>
+    <Style Selector="media|MediaPlayer Label">
+        <Setter Property="Foreground" Value="Black" />
     </Style>
 </Styles>

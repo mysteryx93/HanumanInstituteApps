@@ -35,6 +35,7 @@ public class AppSettingsData : SettingsDataBase
     /// <summary>
     /// Gets or sets the Anti-Alias filter length. 
     /// </summary>
+    [Reactive]
     [Range(minimum: 8, maximum: 128)]
     public int AntiAliasLength { get; set; } = 32;
 
@@ -64,15 +65,4 @@ public class AppSettingsData : SettingsDataBase
     [Reactive]
     [Range(1, 10000)]
     public double PitchTo { get; set; } = 432;
-
-    /// <summary>
-    /// Creates a copy of this instance.
-    /// </summary>
-    /// <returns>The cloned data.</returns>
-    public AppSettingsData Clone()
-    {
-        var obj = new AppSettingsData();
-        ExtensionMethods.CopyAllFields(this, obj);
-        return obj;
-    }
 }

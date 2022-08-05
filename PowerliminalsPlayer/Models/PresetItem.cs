@@ -1,23 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reactive.Linq;
 using System.Xml.Serialization;
-using HanumanInstitute.Common.Avalonia;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
 
 public class PresetItem : ReactiveObject
 {
-    public string Name
-    {
-        get => _name;
-        set => this.RaiseAndSetIfChanged(ref _name, value);
-    }
-    private string _name = string.Empty;
-        
+    [Reactive]
+    public string Name { get; set; } = string.Empty;
+
+    [Reactive]
     [XmlElement("File")]
-    public ObservableCollectionWithRange<PlayingItem> Files { get; private set; } = new();
+    public ObservableCollectionWithRange<PlayingItem> Files { get; set; } = new();
 
     public PresetItem()
     {
@@ -39,12 +34,8 @@ public class PresetItem : ReactiveObject
         }
     }
 
-    public double MasterVolume
-    {
-        get => _masterVolume;
-        set => this.RaiseAndSetIfChanged(ref _masterVolume, value);
-    }
-    private double _masterVolume = 100;
+    [Reactive]
+    public double MasterVolume { get; set; } = 100;
 
     /// <summary>
     /// Copies this preset into specified preset object.

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using MessagePack;
 
 // ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;

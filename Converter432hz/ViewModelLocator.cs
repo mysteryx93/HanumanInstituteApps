@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
@@ -40,7 +41,9 @@ public static class ViewModelLocator
         SplatRegistrations.Register<AdvancedSettingsViewModel>();
 
         // Business
-        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>();
+        SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
         SplatRegistrations.Register<IEncoderService, EncoderService>();
@@ -52,7 +55,8 @@ public static class ViewModelLocator
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static AskFileActionViewModel AskFileAction => Locator.Current.GetService<AskFileActionViewModel>()!;
     public static AdvancedSettingsViewModel AdvancedSettings => Locator.Current.GetService<AdvancedSettingsViewModel>()!;
-    
+    public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
+
     public static void Cleanup()
     {
     }

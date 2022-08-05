@@ -22,9 +22,9 @@ public class AskFileActionViewModel : ReactiveObject, IModalDialogViewModel, ICl
 
     public bool ApplyToAll { get; set; }
 
-    public ICommand Ok => _ok ??= ReactiveCommand.Create(OkImpl, 
+    public RxCommandUnit Ok => _ok ??= ReactiveCommand.Create(OkImpl, 
         this.WhenAnyValue(x => x.Items.SelectedValue, x => x != FileExistsAction.Ask));
-    private ICommand? _ok;
+    private RxCommandUnit? _ok;
     private void OkImpl()
     {
         DialogResult = true;
