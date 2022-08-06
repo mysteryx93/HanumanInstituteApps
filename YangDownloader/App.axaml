@@ -7,7 +7,7 @@
         <yangDownloader:ViewLocator />
     </Application.DataTemplates>
     <Application.Styles>
-        <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="#7c1fe6"
+        <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="#e50000"
                                 SkipControls="ProgressBar;DataGrid;ToggleSwitch;AutoCompleteBox;TreeView;SplitView;NumericUpDown;
                                  Calendar;CalendarDatePicker;DatePicker;TimePicker;Menu;MenuItem;MenuFlyout;Flyout;GridSplitter;
                                  SplitButton;ToggleSplitButton;DropDownButton;ContentDialog;PickerFlyoutBase;NavigationView;Frame;

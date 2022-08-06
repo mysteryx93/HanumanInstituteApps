@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Linq;
-using System.Net;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -33,11 +32,9 @@ public class MainViewModelTests : TestsBase
     public Mock<IAudioEncoder> MockAudioEncoder => _mockAudioEncoder ??= new Mock<IAudioEncoder>();
     private Mock<IAudioEncoder> _mockAudioEncoder;
 
-    public Mock<IAppPathService> MockAppPath => _mockAppPath ??= Init(() =>
+    public Mock<IAppPathService> MockAppPath => _mockAppPath ??= InitMock<IAppPathService>(mock =>
     {
-        var mock = new Mock<IAppPathService>();
         mock.Setup(x => x.AudioExtensions).Returns(new[] { "mp3" });
-        return mock;
     });
     private Mock<IAppPathService> _mockAppPath;
 
@@ -243,7 +240,7 @@ public class MainViewModelTests : TestsBase
     [Fact]
     public void RemoveFile_Init_CanExecuteFalse()
     {
-        Assert.False(Model.RemoveFile.CanExecute(null));
+        Assert.False(Model.RemoveFile.CanExecute());
     }
     
     [Fact]
@@ -254,7 +251,7 @@ public class MainViewModelTests : TestsBase
         SetOpenFilesResult(new[] { file1 });
         Model.SourcesSelectedIndex = 0;
 
-        Assert.True(Model.RemoveFile.CanExecute(null));
+        Assert.True(Model.RemoveFile.CanExecute());
     }
     
     [Fact]
@@ -267,7 +264,7 @@ public class MainViewModelTests : TestsBase
         
         Model.RemoveFile.Execute();
 
-        Assert.False(Model.RemoveFile.CanExecute(null));
+        Assert.False(Model.RemoveFile.CanExecute());
     }
     
     [Fact]

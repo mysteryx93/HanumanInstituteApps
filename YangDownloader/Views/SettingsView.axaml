@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="290" Height="290" MaxHeight="290"
+        x:Class="HanumanInstitute.YangDownloader.Views.SettingsView"
+        Title="Settings" Classes="gradient"
+        CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}">
+    <Grid>
+        <Grid Margin="10">
+            <StackPanel>
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel">
+                        <Setter Property="Margin" Value="0,0,0,8"></Setter>
+                    </Style>
+                </StackPanel.Styles>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Theme" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="20,0,0,0">
+                        <ComboBox Width="130" Items="{Binding ThemeList}"
+                                  SelectedItem="{Binding ThemeList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Margin" Value="3,0,0,0" />
+                    </Style>
+                </StackPanel.Styles>
+                <Button Width="65" Classes="round" Command="{Binding RestoreDefault}" Content="Default" />
+                <Button Width="65" Classes="round" Command="{Binding Apply}" Content="Apply" />
+                <Button Width="65" Classes="round accent" Command="{Binding Ok}" IsDefault="True" Content="OK" />
+                <Button Width="65" Classes="round" Command="{Binding Cancel}" IsCancel="true" Content="Cancel" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

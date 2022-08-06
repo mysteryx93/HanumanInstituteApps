@@ -30,7 +30,6 @@ public abstract class CommonApplication<T> : Application
     {
 #if DEBUG
         // Required by Avalonia XAML editor to recognize custom XAML namespaces. Until they fix the problem.
-        GC.KeepAlive(typeof(SvgImage));
         GC.KeepAlive(typeof(EventTriggerBehavior));
 
         if (Design.IsDesignMode)

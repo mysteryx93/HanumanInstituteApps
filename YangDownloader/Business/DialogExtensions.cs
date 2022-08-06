@@ -18,12 +18,20 @@ public static class DialogServiceExtensions
         EncodeSettings settings)
     {
         var vm = service.CreateViewModel<EncodeSettingsViewModel>();
-        vm.SetSettings(settings.Clone());
-        //ExtensionMethods.CopyAll(settings, vm.Settings);
+        vm.SetSettings(settings);
 
-        if (await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false) == true)
-        {
-            Cloning.CopyAllFields(vm.Settings, settings);
-        }
+        await service.ShowDialogAsync(ownerViewModel, vm).ConfigureAwait(false);
+    }
+    
+    public static Task ShowAboutAsync(this IDialogService service, INotifyPropertyChanged owner)
+    {
+        var vm = service.CreateViewModel<AboutViewModel>();
+        return service.ShowDialogAsync(owner, vm);
+    }
+
+    public static Task<bool?> ShowSettingsAsync(this IDialogService service, INotifyPropertyChanged owner, AppSettingsData settings)
+    {
+        var vm = service.CreateViewModel<SettingsViewModel>();
+        return service.ShowDialogAsync(owner, vm);
     }
 }

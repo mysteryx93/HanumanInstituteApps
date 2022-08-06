@@ -14,3 +14,4 @@ global using HanumanInstitute.Validators;
 global using System.Reactive;
 global using ReactiveUI.Fody.Helpers;
 global using RxCommandUnit = ReactiveUI.ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit>;
+global using static System.FormattableString; 

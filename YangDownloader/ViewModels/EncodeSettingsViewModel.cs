@@ -1,10 +1,11 @@
 ﻿using HanumanInstitute.BassAudio;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
 using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class EncodeSettingsViewModel : ReactiveObject, IModalDialogViewModel, ICloseable
+public class EncodeSettingsViewModel : OkCancelViewModel
 {
     public EncodeSettingsViewModel()
     {
@@ -31,18 +32,23 @@ public class EncodeSettingsViewModel : ReactiveObject, IModalDialogViewModel, IC
             .ToProperty(this, x => x.IsQualitySpeedVisible);
     }
 
-    public event EventHandler? RequestClose;
-
     public EncodeSettings Settings { get; private set; } = default!;
+
+    private EncodeSettings _source = default!;
 
     public void SetSettings(EncodeSettings settings)
     {
-        Settings = settings;
+        _source = settings;
+        Settings = Cloning.ShallowClone(settings);
         ShiftPitch = Settings.AutoDetectPitch || Math.Abs(Settings.PitchFrom - Settings.PitchTo) > 0.001;
         this.RaisePropertyChanged(nameof(Settings));
     }
 
-    public bool? DialogResult { get; set; }
+    protected override bool SaveSettings()
+    {
+        Cloning.CopyAllFields(Settings, _source);
+        return true;
+    } 
 
     public bool ShiftPitch
     {
@@ -104,18 +110,17 @@ public class EncodeSettingsViewModel : ReactiveObject, IModalDialogViewModel, IC
         { 256, "256 kbps" },
         { 320, "320 kbps" }
     };
-
+    
     /// <summary>
-    /// Closes the window.
+    /// Restores default settings.
     /// </summary>
-    public RxCommandUnit Close => _close ??= ReactiveCommand.Create(CloseImpl);
-    private RxCommandUnit? _close;
-    private void CloseImpl()
+    public RxCommandUnit RestoreDefault => _restoreDefault ??= ReactiveCommand.Create(RestoreDefaultImpl);
+    private RxCommandUnit? _restoreDefault;
+    /// <summary>
+    /// When overriden in a derived class, restores default settings.
+    /// </summary>
+    private void RestoreDefaultImpl()
     {
-        if (Settings.Validate() == null)
-        {
-            DialogResult = true;
-            RequestClose?.Invoke(this, EventArgs.Empty);
-        }
+        
     }
 }

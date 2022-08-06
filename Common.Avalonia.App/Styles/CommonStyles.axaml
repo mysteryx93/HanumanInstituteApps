@@ -49,10 +49,40 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     
-
+    <Style Selector="ComboBox">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="8,1,0,1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style Selector="ComboBox ComboBoxItem">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="8,1,4,1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    
     <Style Selector="Button.icon">
         <Setter Property="FontFamily" Value="avares://Common.Avalonia.App/Styles/HanumanInstituteAppIcons.otf#" />
         <Setter Property="FontSize" Value="17" />
+    </Style>
+
+    <!--Use Classes="RadioButtonListBox" in any ListBox to represent its items as RadioButtons-->
+    <Style Selector="ListBox.RadioButtonListBox">
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="ListBox.RadioButtonListBox ListBoxItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border Background="Transparent">
+                        <RadioButton Content="{TemplateBinding ContentPresenter.Content}"  
+                                     VerticalAlignment="Center"
+                                     IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     
     <Style Selector="ui|HyperlinkButton">

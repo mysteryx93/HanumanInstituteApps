@@ -29,7 +29,7 @@ public sealed class YouTubeStreamSelector : IYouTubeStreamSelector
             result.Audio = SelectBestAudio(streams, options);
         }
 
-        result.EncodeAudio = options.EncodeAudio?.Clone();
+        result.EncodeAudio = Cloning.ShallowClone(options.EncodeAudio);
         result.FileExtension = GetFinalExtension(result.OutputVideo, result.OutputAudio, result.EncodeAudio?.Format);
 
         return result;

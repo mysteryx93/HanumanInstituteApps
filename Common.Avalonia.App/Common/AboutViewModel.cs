@@ -83,8 +83,8 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     /// <summary>
     /// Checks GitHub releases for an application update.
     /// </summary>
-    public ICommand CheckForUpdates => _checkForUpdates ??= ReactiveCommand.CreateFromTask(CheckForUpdatesImpl);
-    private ICommand? _checkForUpdates;
+    public RxCommandUnit CheckForUpdates => _checkForUpdates ??= ReactiveCommand.CreateFromTask(CheckForUpdatesImpl);
+    private RxCommandUnit? _checkForUpdates;
     private async Task CheckForUpdatesImpl()
     {
         CheckForUpdateText = "Checking for updates...";
@@ -95,17 +95,10 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     }
 
     /// <summary>
-    /// Opens specified URL in the default browser.
-    /// </summary>
-    public ICommand OpenBrowser => _openBrowser ??= ReactiveCommand.Create<string>(OpenBrowserImpl);
-    private ICommand? _openBrowser;
-    private void OpenBrowserImpl(string url) => _processService.OpenBrowserUrl(url);
-
-    /// <summary>
     /// Closes the window.
     /// </summary>
-    public ICommand Close => _close ??= ReactiveCommand.Create(CloseImpl);
-    private ICommand? _close;
+    public RxCommandUnit Close => _close ??= ReactiveCommand.Create(CloseImpl);
+    private RxCommandUnit? _close;
     private void CloseImpl()
     {
         RequestClose?.Invoke(this, EventArgs.Empty);

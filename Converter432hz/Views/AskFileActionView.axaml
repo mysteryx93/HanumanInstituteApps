@@ -3,16 +3,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
-        mc:Ignorable="d" CanResize="False"
+        mc:Ignorable="d" Classes="gradient"
         x:Class="HanumanInstitute.Converter432hz.Views.AskFileActionView"
-        Title="File Conflict" MinWidth="380" Width="380" MaxWidth="380" MinHeight="255" Height="255" MaxHeight="255"
-        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" 
+        Title="File Conflict" MinWidth="380" Width="380" MinHeight="260" Height="260"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         d:DataContext="{x:Static local:ViewModelLocator.AskFileAction}">
-    <Grid Classes="GradiantBackground">
+    <Grid>
         <Grid Margin="10">
             <StackPanel>
                 <TextBlock Text="Destination file already exists:" />
-                <TextBox Text="{Binding FilePath}" Classes="compact" IsReadOnly="True"></TextBox>
+                <TextBox Text="{Binding FilePath}" IsReadOnly="True" />
                 <TextBlock Text="What would you like to do?" Margin="0,10,0,2" />
                 <ListBox Items="{Binding Items}"
                          SelectedItem="{Binding Items.CurrentItem}"
@@ -20,7 +20,9 @@
             </StackPanel>
             <CheckBox IsChecked="{Binding ApplyToAll}" VerticalAlignment="Bottom">Apply to all files</CheckBox>
             <Button Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsDefault="True"
-                    Command="{Binding Ok}" Classes="round">_OK</Button>
+                    Command="{Binding Ok}" Classes="round">
+                OK
+            </Button>
         </Grid>
     </Grid>
 </Window>

@@ -13,14 +13,14 @@
             <StackPanel>
                 <Grid Margin="0,2,0,2">
                     <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
-                    <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                    <ComboBox HorizontalAlignment="Right" Width="110" 
                               Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsBitrateVisible}">
                         <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
-                        <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                        <ComboBox HorizontalAlignment="Right" Width="110" 
                                   Items="{Binding BitrateList}"
                                   SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>
@@ -29,7 +29,7 @@
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsSampleRateVisible}">
                         <TextBlock VerticalAlignment="Center">Sample rate</TextBlock>
-                        <ComboBox HorizontalAlignment="Right" Width="110" Classes="compact"
+                        <ComboBox HorizontalAlignment="Right" Width="110" 
                                   Items="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>
@@ -51,7 +51,7 @@
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
                         <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
                         <Grid Width="80">
-                            <TextBox Text="{Binding Settings.AntiAliasLength}" Classes="compact" />
+                            <TextBox Text="{Binding Settings.AntiAliasLength}"  />
                         </Grid>
                     </StackPanel>
                     <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
@@ -59,21 +59,25 @@
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
                                    HorizontalAlignment="Center" />
-                        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}" Classes="compact"
+                        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}" 
                                  IsEnabled="{Binding !Settings.AutoDetectPitch}" />
                         <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
                                    HorizontalAlignment="Center" />
-                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" Classes="compact" />
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}"  />
                         <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                     </Grid>
                 </StackPanel>
             </StackPanel>
         </Grid>
 
-        <Button Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round"
-                Command="{Binding Close}" IsDefault="True" IsCancel="true">
-            _Close
-        </Button>
+        <StackPanel Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Button Width="80" Classes="round" Content="Default"
+                    Command="{Binding RestoreDefault}" IsDefault="True" IsCancel="true" />
+            <Button Width="80" Classes="round accent" Content="OK" Margin="3,0,3,0" 
+                    Command="{Binding Ok}" IsDefault="True" />
+            <Button Width="80" Classes="round" Content="Cancel"
+                    Command="{Binding Cancel}" IsCancel="true" />
+        </StackPanel>
     </Grid>
 </Window>

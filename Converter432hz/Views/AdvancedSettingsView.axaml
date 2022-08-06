@@ -3,11 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
-        mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="270" Height="270" MaxHeight="270"
+        mc:Ignorable="d" Classes="gradient"
+        MinWidth="280" Width="280" MaxWidth="280" MinHeight="270" Height="270" MaxHeight="270"
         x:Class="HanumanInstitute.Converter432hz.Views.AdvancedSettingsView"
         Title="Advanced Settings" CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         d:DataContext="{x:Static local:ViewModelLocator.AdvancedSettings}">
-    <Grid Classes="GradiantBackground">
+    <Grid>
         <Grid Margin="10">
             <StackPanel>
                 <StackPanel.Styles>
@@ -19,35 +20,37 @@
                 <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
                     <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
                     <Grid Width="80">
-                        <TextBox Text="{Binding Settings.AntiAliasLength}" Classes="compact" />
+                        <TextBox Text="{Binding Settings.AntiAliasLength}" />
                     </Grid>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
                     <Grid Width="80">
-                        <TextBox Text="{Binding Settings.Speed}" Classes="compact" />
+                        <TextBox Text="{Binding Settings.Speed}" />
                     </Grid>
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
                 <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}" Classes="compact"
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
+                               HorizontalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}"
                              IsEnabled="{Binding !Settings.AutoDetectPitch}" />
                     <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" Classes="compact" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
+                               HorizontalAlignment="Center" />
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" />
                     <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                 </Grid>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Max threads  " VerticalAlignment="Center" />
                     <Grid Width="80">
-                        <TextBox Text="{Binding Settings.MaxThreads}" Classes="compact" />
+                        <TextBox Text="{Binding Settings.MaxThreads}" />
                     </Grid>
                 </StackPanel>
             </StackPanel>
-            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round" 
-                    Command="{Binding Close}" IsDefault="True" IsCancel="true">_Close</Button>
+            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="100" Classes="round"
+                    Command="{Binding Close}" IsDefault="True" IsCancel="true" Content="Close" />
         </Grid>
     </Grid>
 </Window>

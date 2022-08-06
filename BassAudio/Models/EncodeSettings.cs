@@ -133,15 +133,4 @@ public class EncodeSettings : ReactiveObject
         0 => 3, // 0.659 sec, 29637331 bytes
         _ => 5
     };
-
-    /// <summary>
-    /// Returns a clone of the current class.
-    /// </summary>
-    public EncodeSettings Clone()
-    {
-        // MemberwiseClone screws up Reactive object state.
-        var copy = new EncodeSettings();
-        Cloning.CopyAllFields(this, copy);
-        return copy;
-    }
 }

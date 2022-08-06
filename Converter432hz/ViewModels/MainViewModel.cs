@@ -300,20 +300,13 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
     private RxCommandUnit? _showAbout;
-    private async Task ShowAboutImplAsync()
-    {
-        var vm = _dialogService.CreateViewModel<AboutViewModel>();
-        await _dialogService.ShowDialogAsync(this, vm).ConfigureAwait(false);
-        _settings.Save();
-    }
+    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
     
-    // /// <summary>
-    // /// Shows the Settings window.
-    // /// </summary>
-    // public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    // private RxCommandUnit? _showSettings;
-    // private Task ShowSettingsImplAsync()
-    // {
-    //
-    // }
+    /// <summary>
+    /// Shows the Settings window.
+    /// </summary>
+    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
+    private RxCommandUnit? _showSettings;
+    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
+
 }

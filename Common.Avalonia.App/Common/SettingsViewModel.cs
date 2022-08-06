@@ -1,7 +1,6 @@
 using System.Windows.Input;
 using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Services;
-using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.Common.Avalonia.App;
@@ -10,16 +9,16 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// Shared ViewModel for the settings page.
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
-public abstract class SettingsViewModel<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
+public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
     where TSettings : SettingsDataBase, new()
 {
-    protected readonly FluentAvaloniaTheme _fluentTheme;
-    protected readonly ISettingsProvider<TSettings> _settingsProvider;
+    private readonly FluentAvaloniaTheme _fluentTheme;
+    private readonly ISettingsProvider<TSettings> _settingsProvider;
 
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    public SettingsViewModel(ISettingsProvider<TSettings> settingsProvider, FluentAvaloniaTheme fluentTheme)
+    protected SettingsViewModel(ISettingsProvider<TSettings> settingsProvider, FluentAvaloniaTheme fluentTheme)
     {
         _settingsProvider = settingsProvider;
         _fluentTheme = fluentTheme;
@@ -28,51 +27,30 @@ public abstract class SettingsViewModel<TSettings> : ReactiveObject, IModalDialo
         ThemeList.SelectedValue = Settings.Theme;
     }
 
-    /// <inheritdoc />
-    public event EventHandler? RequestClose;
-
-    /// <inheritdoc />
-    public bool? DialogResult { get; private set; }
-
     /// <summary>
     /// Returns a copy of application settings that are being edited.
     /// </summary>
     public TSettings Settings { get; }
 
-    private bool SaveSettings()
+    /// <inheritdoc />
+    protected override bool SaveSettings()
     {
-        if (Validate())
-        {
-            DialogResult = true;
+        DialogResult = true;
 
-            Settings.Theme = ThemeList.SelectedValue;
-            _settingsProvider.Value = Settings;
-            _fluentTheme.RequestedTheme = Settings.Theme.ToString();
+        Settings.Theme = ThemeList.SelectedValue;
+        _settingsProvider.Value = Settings;
+        _fluentTheme.RequestedTheme = Settings.Theme.ToString();
 
-            OnSaved();
-            _settingsProvider.Save();
-            return true;
-        }
-        return false;
+        _settingsProvider.Save();
+        return true;
     }
-    
+
     /// <summary>
-    /// When overriden in a derived class, customizes the way settings are cloned for editing.
+    /// Customizes the way settings are cloned before editing a copy.
     /// </summary>
     /// <param name="value">The settings object to clone.</param>
     /// <returns>The cloned object.</returns>
     protected virtual TSettings CloneSettings(TSettings value) => Cloning.ShallowClone(value);
-
-    /// <summary>
-    /// When overriden in a derived class, validates the data before saving.
-    /// </summary>
-    /// <returns>True if data is valid and ready to save, otherwise false to cancel the save.</returns>
-    protected virtual bool Validate() => true;
-
-    /// <summary>
-    /// Occurs after settings are saved.
-    /// </summary>
-    protected virtual void OnSaved() { }
 
     /// <summary>
     /// Gets the list of themes for display.
@@ -87,37 +65,10 @@ public abstract class SettingsViewModel<TSettings> : ReactiveObject, IModalDialo
     /// <summary>
     /// Restores default settings.
     /// </summary>
-    public ICommand RestoreDefault => _restoreDefault ??= ReactiveCommand.Create(RestoreDefaultImpl);
-    private ICommand? _restoreDefault;
+    public RxCommandUnit RestoreDefault => _restoreDefault ??= ReactiveCommand.Create(RestoreDefaultImpl);
+    private RxCommandUnit? _restoreDefault;
     /// <summary>
     /// When overriden in a derived class, restores default settings.
     /// </summary>
     protected abstract void RestoreDefaultImpl();
-
-    /// <summary>
-    /// Applies changes without closing the window.
-    /// </summary>
-    public ICommand Apply => _apply ??= ReactiveCommand.Create(ApplyImpl);
-    private ICommand? _apply;
-    private void ApplyImpl() => SaveSettings();
-
-    /// <summary>
-    /// Saves changes and closes the window.
-    /// </summary>
-    public ICommand Ok => _ok ??= ReactiveCommand.Create(OkImpl);
-    private ICommand? _ok;
-    private void OkImpl()
-    {
-        if (SaveSettings())
-        {
-            RequestClose?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    /// <summary>
-    /// Closes the window without saving.
-    /// </summary>
-    public ICommand Cancel => _cancel ??= ReactiveCommand.Create(CancelImpl);
-    private ICommand? _cancel;
-    private void CancelImpl() => RequestClose?.Invoke(this, EventArgs.Empty);
 }

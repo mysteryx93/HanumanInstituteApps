@@ -52,7 +52,7 @@ public class PlaylistViewModelTests : TestsBase
     [Fact]
     public void CanAddFolderCommand_ReturnsTrue()
     {
-        var result = Model.AddFolderCommand.CanExecute(null);
+        var result = Model.AddFolderCommand.CanExecute();
 
         Assert.True(result);
     }
@@ -62,7 +62,7 @@ public class PlaylistViewModelTests : TestsBase
     {
         SetDialogFolder();
         
-        Model.AddFolderCommand.Execute(null);
+        Model.AddFolderCommand.Execute();
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
@@ -76,7 +76,7 @@ public class PlaylistViewModelTests : TestsBase
         var listCount = Model.Folders.Source.Count;
         // MockDialogService.ShowFolderBrowserDialog() returns false by default.
 
-        Model.AddFolderCommand.Execute(null);
+        Model.AddFolderCommand.Execute();
 
         Assert.Equal(listCount, Model.Folders.Source.Count);
     }
@@ -87,7 +87,7 @@ public class PlaylistViewModelTests : TestsBase
         SetDialogFolder();
         var listCount = Model.Folders.Source.Count;
 
-        Model.AddFolderCommand.Execute(null);
+        Model.AddFolderCommand.Execute();
 
         Assert.Equal(listCount + 1, Model.Folders.Source.Count);
         Assert.Equal(DialogFolderPath, Model.Folders.Source.Last());
@@ -116,7 +116,7 @@ public class PlaylistViewModelTests : TestsBase
         AddFolders(2); // List contains 2 elements.
         Model.Folders.CurrentPosition = selectedIndex;
 
-        var result = Model.RemoveFolderCommand.CanExecute(null);
+        var result = Model.RemoveFolderCommand.CanExecute();
 
         Assert.Equal(expected, result);
     }
@@ -127,7 +127,7 @@ public class PlaylistViewModelTests : TestsBase
         var listCount = 2;
         AddFolders(listCount);
 
-        Model.RemoveFolderCommand.Execute(null);
+        Model.RemoveFolderCommand.Execute();
 
         Assert.Equal(listCount, Model.Folders.Source.Count);
     }
@@ -135,7 +135,7 @@ public class PlaylistViewModelTests : TestsBase
     [Fact]
     public void RemoveFolderCommand_EmptyList_NoAction()
     {
-        Model.RemoveFolderCommand.Execute(null);
+        Model.RemoveFolderCommand.Execute();
 
         Assert.Empty(Model.Folders.Source);
     }
@@ -151,7 +151,7 @@ public class PlaylistViewModelTests : TestsBase
         Model.Folders.CurrentPosition = selectedIndex;
         var selectedItem = Model.Folders.CurrentItem;
 
-        Model.RemoveFolderCommand.Execute(null);
+        Model.RemoveFolderCommand.Execute();
 
         Assert.Equal(listCount - 1, Model.Folders.Source.Count);
         Assert.DoesNotContain(selectedItem, Model.Folders.Source);
@@ -166,7 +166,7 @@ public class PlaylistViewModelTests : TestsBase
         AddFolders(count);
         Model.Folders.CurrentPosition = sel;
 
-        Model.RemoveFolderCommand.Execute(null);
+        Model.RemoveFolderCommand.Execute();
 
         Assert.Equal(newSel, Model.Folders.CurrentPosition);
     }
@@ -178,7 +178,7 @@ public class PlaylistViewModelTests : TestsBase
         Model.Folders.MoveCurrentToFirst();
         MockFileList.Reset();
 
-        Model.RemoveFolderCommand.Execute(null);
+        Model.RemoveFolderCommand.Execute();
 
         MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
     }
