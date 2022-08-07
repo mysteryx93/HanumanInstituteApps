@@ -31,6 +31,14 @@ I can play 25 audios with ~3% CPU usage.
 
 [[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/Powerliminals-Player) [[Download]](https://sourceforge.net/projects/powerliminals-player/files/) [[Get the Powerliminals Pack]](https://www.spiritualselftransformation.com/powerliminals-nonrivalry)
 
+### Yang YouTube Downloader: Downloads best-quality audio and video from YouTube
+
+Did you know that neither YTD Video Downloader nor clipconverter.cc give you the optimal audios and videos from YouTube? These tools give you an 128kb AAC audio, while there is a better audio available: 160kb Opus. Similarly, while these tools give you an MP4 file, YouTube also provides videos in WebM format which is "sometimes" of higher quality than MP4. The Natural Grounding Player will download the best audio available and the best video available.
+
+While WebM compresses data better than MP4, some of the YouTube videos are 40-60% smaller in WebM format than MP4 which leads to lower quality. It will download WebM only if it is no more than 35% smaller than MP4, and get the 256kb ACC audio if available. Since WebM format needs Opus audio, it combines with the best audio (AAC) into a MKV file while allows mixing any audio and video formats (but may lower compatibility).
+
+This downloader also allows re-encoding audios with all the same features as the 432hz Batch Converter.
+
 
 ## Legacy Apps
 
@@ -59,14 +67,6 @@ Here's a sample video <a href="https://www.spiritualselftransformation.com/files
 [How to Rip and Optimize VCDs](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/How-to-Rip-VCDs)
 
 [How to Rip and Optimize DVDs](https://github.com/mysteryx93/NaturalGroundingPlayer/wiki/How-to-Rip-DVDs)
-
-### Yang YouTube Downloader
-
-**Currently broken.**
-
-Did you know that neither YTD Video Downloader nor clipconverter.cc give you the optimal audios and videos from YouTube? These tools give you an 128kb AAC audio, while there are better audios available: 128kb Vorbis, 160kb Opus and 256kb ACC. Similarly, while these tools give you an MP4 file, YouTube also provides videos in WebM format which is "sometimes" of higher quality than MP4. The Natural Grounding Player will download the best audio available and the best video available.
-
-While WebM compresses data better than MP4, some of the YouTube videos are 40-60% smaller in WebM format than MP4 which leads to lower quality. It will download WebM only if it is no more than 35% smaller than MP4, and get the 256kb ACC audio if available. Since WebM format needs Vorbis or Opus audio, it combines with the best audio (AAC) into a MKV file while allows mixing any audio and video formats (but may lower compatibility).
 
 ## License
 
