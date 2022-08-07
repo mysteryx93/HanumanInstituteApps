@@ -6,3 +6,6 @@
 
 ./publish-win PowerliminalsPlayer win-x64
 ./publish-win PowerliminalsPlayer win-x86
+
+./publish-win YangDownloader win-x64
+./publish-win YangDownloader win-x86

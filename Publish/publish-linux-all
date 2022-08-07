@@ -6,3 +6,6 @@
 
 ./publish-linux PowerliminalsPlayer linux-x64
 ./publish-linux PowerliminalsPlayer linux-arm64
+
+./publish-linux YangDownloader linux-x64
+./publish-linux YangDownloader linux-arm64

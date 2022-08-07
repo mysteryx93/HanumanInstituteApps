@@ -6,3 +6,6 @@
 
 ./publish-osx PowerliminalsPlayer osx-x64
 # ./publish-osx PowerliminalsPlayer osx-arm64
+
+./publish-osx YangDownloader osx-x64
+# ./publish-osx YangDownloader osx-arm64
