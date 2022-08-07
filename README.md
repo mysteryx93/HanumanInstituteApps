@@ -39,6 +39,7 @@ This downloader allows you to get either the MP4 or VP9 videos, and the AAC or O
 
 Yang YouTube Downloader also allows to re-encode audios with all the same features as 432hz Batch Converter!
 
+[[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/Yang-YouTube-Downloader) [[Download]](https://sourceforge.net/projects/yangdownloader/files/)
 
 ## Legacy Apps
 
