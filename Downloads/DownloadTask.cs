@@ -174,9 +174,22 @@ public sealed class DownloadTask : IDownloadTask
     /// <param name="encodeSettings">The encoding settings.</param>
     private async Task EncodeAudioAsync(DownloadTaskFile fileInfo, EncodeSettings encodeSettings)
     {
-        var dest = fileInfo.Destination + ".encode";
+        // We must first muxe the audio into a container so that BASS can read it.
+        var audioInfo = (IAudioStreamInfo)fileInfo.Stream;
+        var dest = fileInfo.Destination + (audioInfo.Container == Container.WebM ? ".opus" : ".m4a");
+        fileInfo.DestinationMuxed = dest;
+        var muxeStatus = _mediaMuxer.Muxe(null, fileInfo.Destination, dest, 
+            new ProcessOptionsEncoder(ProcessDisplayMode.None));
+        if (muxeStatus != CompletionStatus.Success)
+        {
+            Status = DownloadStatus.Failed;
+            return;
+        }
+        
+        // Encode the audio.
+        dest = fileInfo.Destination + ".encode";
         fileInfo.DestinationEncoded = dest;
-        var item = new ProcessingItem(fileInfo.Destination, fileInfo.Destination) { Destination = dest };
+        var item = new ProcessingItem(fileInfo.DestinationMuxed, fileInfo.Destination) { Destination = dest };
         try
         {
             await _audioEncoder.StartAsync(item, encodeSettings, _cancelToken.Token);
@@ -287,6 +300,10 @@ public sealed class DownloadTask : IDownloadTask
         foreach (var item in Files)
         {
             _fileSystem.DeleteFileSilent(item.Destination);
+            if (item.DestinationMuxed.HasValue())
+            {
+                _fileSystem.DeleteFileSilent(item.DestinationMuxed);
+            }
             if (item.DestinationEncoded.HasValue())
             {
                 _fileSystem.DeleteFileSilent(item.DestinationEncoded);

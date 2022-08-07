@@ -34,6 +34,10 @@ public class DownloadTaskFile
     /// </summary>
     public string Destination { get; set; }
     /// <summary>
+    /// Gets the destination of the muxed file ready to re-encode.
+    /// </summary>
+    public string? DestinationMuxed { get; set; }
+    /// <summary>
     /// Gets the destination of the re-encoded file.
     /// </summary>
     public string? DestinationEncoded { get; set; }
