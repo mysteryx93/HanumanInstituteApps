@@ -13,7 +13,7 @@
         hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
-        xmlns:bassAudio="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
+        xmlns:bass="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <Interaction.Behaviors>
@@ -70,27 +70,23 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
                 </StackPanel>
-                <DataGrid Classes="NoSelect" Margin="0,20,0,0" CanUserSortColumns="False" RowHeight="24"
-                          HeadersVisibility="None"
-                          Items="{Binding Encoder.ProcessingFiles}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="File" Width="*" Binding="{Binding Text, Mode=OneWay}"
-                                            IsReadOnly="True" />
-                        <DataGridTemplateColumn Width="120">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="bassAudio:ProcessingItem">
-                                    <Grid>
-                                        <ProgressBar Value="{Binding ProgressPercent, Mode=OneWay}"
-                                                     Maximum="1" Height="24" Background="Transparent"
-                                                     Foreground="#0078d7" />
-                                        <TextBlock Text="{Binding Status, Mode=OneWay}" VerticalAlignment="Center"
-                                                   Margin="12,0,0,0" />
-                                    </Grid>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <ScrollViewer Margin="0,20,0,0">
+                    <ItemsRepeater Items="{Binding Encoder.ProcessingFiles}">
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate DataType="{x:Type bass:ProcessingItem}">
+                                <Grid ColumnDefinitions="*,120,8">
+                                    <TextBlock Grid.Column="0" Text="{Binding Text}" Margin="0,0,8,0" />
+                                    <ProgressBar Grid.Column="1" Value="{Binding ProgressPercent, Mode=OneWay}"
+                                                 Maximum="1" Height="24" Background="Transparent" MinWidth="0"
+                                                 Foreground="#0078d7" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Status, Mode=OneWay}" 
+                                               VerticalAlignment="Center" Margin="12,0,0,0" />
+                                    <Grid Column="2" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,0,0">
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
