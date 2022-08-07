@@ -39,8 +39,6 @@ public class MainViewModel : ReactiveObject
         _settings.Changed += Settings_Loaded;
         Settings_Loaded(_settings, EventArgs.Empty);
 
-        Encoder.Settings.PitchTo = 432;
-        Encoder.Settings.MaxThreads = Math.Min(64, _environment.ProcessorCount);
         FormatsList.SelectedValue = EncodeFormat.Mp3;
         BitrateList.SelectedValue = 0;
         SampleRateList.SelectedValue = 48000;
@@ -70,6 +68,8 @@ public class MainViewModel : ReactiveObject
         //     CalcCompleted();
         // };
     }
+
+    private AppSettingsData Settings => _settings.Value;
     
     private void Settings_Loaded(object? sender, EventArgs e)
     {
@@ -263,14 +263,6 @@ public class MainViewModel : ReactiveObject
     };
 
     /// <summary>
-    /// Shows the advanced settings window.
-    /// </summary>
-    public RxCommandUnit ShowAdvancedSettings => _showAdvancedSettings ??= ReactiveCommand.CreateFromTask(ShowAdvancedSettingsImpl);
-    private RxCommandUnit? _showAdvancedSettings;
-    private Task ShowAdvancedSettingsImpl() =>
-        _dialogService.ShowAdvancedSettingsAsync(this, Encoder.Settings);
-
-    /// <summary>
     /// Starts the batch encoding job.
     /// </summary>
     public RxCommandUnit StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImpl);
@@ -279,11 +271,10 @@ public class MainViewModel : ReactiveObject
     {
         Encoder.ProcessingFiles.Clear();
 
-        Encoder.Settings.Format = FormatsList.SelectedValue;
-        Encoder.Settings.Bitrate = BitrateList.SelectedValue;
-        Encoder.Settings.SampleRate = SampleRateList.SelectedValue;
+        Settings.Encode.Format = FormatsList.SelectedValue;
+        Settings.Encode.Bitrate = BitrateList.SelectedValue;
+        Settings.Encode.SampleRate = SampleRateList.SelectedValue;
         Encoder.FileExistsAction = FileExistsActionList.SelectedValue;
-        Encoder.Settings.PitchTo = 432;
 
         return Encoder.RunAsync();
     }
@@ -308,5 +299,4 @@ public class MainViewModel : ReactiveObject
     public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
     private RxCommandUnit? _showSettings;
     private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
-
 }

@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="210" Height="210" MaxHeight="210"
         x:Class="HanumanInstitute.PowerliminalsPlayer.Views.SettingsView"
         Title="Settings" Classes="gradient"
@@ -26,9 +27,7 @@
                 <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
                 <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
                     <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.AntiAliasLength}" />
-                    </Grid>
+                    <NumericUpDown Value="{Binding Settings.AntiAliasLength}" Width="80" Minimum="8" Maximum="128" />
                 </StackPanel>
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Performance" />

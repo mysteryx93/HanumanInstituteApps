@@ -13,6 +13,18 @@ namespace HanumanInstitute.YangDownloader.Models;
 public class AppSettingsData : SettingsDataBase
 {
     /// <summary>
+    /// Gets or sets the destination folder where to save downloaded files.
+    /// </summary>
+    [Reactive]
+    public string DestinationFolder { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the path of FFmpeg.
+    /// </summary>
+    [Reactive]
+    public string FFmpegPath { get; set; } = "ffmpeg";
+    
+    /// <summary>
     /// Gets or sets the preferred video stream format.
     /// </summary>
     [Reactive]
@@ -29,12 +41,6 @@ public class AppSettingsData : SettingsDataBase
     /// </summary>
     [Reactive]
     public int MaxQuality { get; set; }
-
-    /// <summary>
-    /// Gets or sets the destination folder where to save downloaded files.
-    /// </summary>
-    [Reactive]
-    public string DestinationFolder { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets whether to re-encode audio.

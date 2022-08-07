@@ -96,13 +96,8 @@
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid>
                         <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold">Settings</TextBlock>
-                        <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                                Content="I" Margin="0,0,38,0"
+                        <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top" Content="I" 
                                 Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-                        <Button Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                                Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
-                            <ui:SymbolIcon Symbol="Settings" FontSize="20" />
-                        </Button>
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
@@ -132,13 +127,13 @@
                             <TextBlock VerticalAlignment="Center">Speed</TextBlock>
                             <Slider HorizontalAlignment="Center" Width="110" Minimum="0" Maximum="5"
                                     TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
-                                    Value="{Binding Encoder.Settings.QualityOrSpeed}">
+                                    Value="{Binding Settings.Encode.QualityOrSpeed}">
                             </Slider>
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right">Quality</TextBlock>
                         </Grid>
                     </Grid>
                     <Button Classes="round" Width="100" HorizontalAlignment="Center" Margin="0,5"
-                            Command="{Binding ShowAdvancedSettings}">
+                            Command="{Binding ShowSettings}">
                         Advanced
                     </Button>
                 </StackPanel>

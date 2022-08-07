@@ -65,7 +65,7 @@ public class SelectPresetViewModelTests
         Model.RequestClose += (_, _) => called++; 
         
         Model.Load(false);
-        Model.CancelCommand.Execute();
+        Model.CancelCommand.Execute().Subscribe();
         
         Assert.Equal(1, called);
     }
@@ -74,7 +74,7 @@ public class SelectPresetViewModelTests
     public void CancelCommand_NoSelection_DialogResultFalse()
     {
         Model.Load(false);
-        Model.CancelCommand.Execute();
+        Model.CancelCommand.Execute().Subscribe();
         
         Assert.False(Model.DialogResult);
     }
@@ -97,7 +97,7 @@ public class SelectPresetViewModelTests
         AddPreset();
 
         Model.Load(false);
-        Model.ConfirmCommand.Execute();
+        Model.ConfirmCommand.Execute().Subscribe();
         
         Assert.True(Model.DialogResult);
         Assert.NotNull(Model.SelectedItem);
@@ -111,7 +111,7 @@ public class SelectPresetViewModelTests
 
         Model.Load(true);
         Model.PresetName = name;
-        Model.ConfirmCommand.Execute();
+        Model.ConfirmCommand.Execute().Subscribe();
         
         Assert.True(Model.DialogResult);
         Assert.Equal(name, Model.PresetName);

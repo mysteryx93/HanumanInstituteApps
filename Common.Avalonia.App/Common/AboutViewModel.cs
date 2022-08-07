@@ -41,7 +41,7 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
         // Start in constructor to save time.
         if (!Design.IsDesignMode)
         {
-            CheckForUpdates.Execute();
+            CheckForUpdates.Execute().Subscribe();
         }
     }
 
@@ -102,5 +102,6 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     private void CloseImpl()
     {
         RequestClose?.Invoke(this, EventArgs.Empty);
+        _settings.Save();
     }
 }

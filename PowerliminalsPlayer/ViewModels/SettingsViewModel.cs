@@ -9,7 +9,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, FluentAvaloniaTheme fluentTheme) :
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme) :
         base(settingsProvider, fluentTheme)
     {
     }

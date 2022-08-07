@@ -26,27 +26,23 @@
                 <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
                 <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
                     <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.AntiAliasLength}" />
-                    </Grid>
+                    <NumericUpDown Value="{Binding Settings.AntiAliasLength}" Width="80" Minimum="8" Maximum="128" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
-                    <Grid Width="80">
-                        <TextBox Text="{Binding Settings.Speed}" />
-                    </Grid>
+                    <NumericUpDown Value="{Binding Settings.Speed}" Width="80" Minimum="0.01" Maximum="100" />
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
                 <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
                                HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}"
-                             IsEnabled="{Binding !Settings.AutoDetectPitch}" />
+                    <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Settings.PitchFrom}"
+                             IsEnabled="{Binding !Settings.AutoDetectPitch}" Minimum="1" Maximum="10000" />
                     <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
                                HorizontalAlignment="Center" />
-                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}" />
+                    <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.PitchTo}" Minimum="1" Maximum="10000" />
                     <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                 </Grid>
             </StackPanel>

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Models;
 using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
@@ -51,11 +50,6 @@ public class MainViewModelTests : TestsBase
 
     public ISettingsProvider<AppSettingsData> FakeSettings => _fakeSettings ??= new FakeSettingsProvider<AppSettingsData>();
     private ISettingsProvider<AppSettingsData> _fakeSettings;
-
-    protected void SetBrowseDestination(string value) =>
-        MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
-            .Returns(Task.FromResult((object)value));
 
     protected void SetQueryError(Exception ex) =>
         MockDownloadManager.Setup(x => x.QueryStreamInfoAsync(It.IsAny<Uri>(), It.IsAny<CancellationToken>()))
@@ -115,44 +109,6 @@ public class MainViewModelTests : TestsBase
         Assert.Empty(Model.DownloadUrl);
         Assert.False(Model.Query.CanExecute());
         Assert.False(Model.Download.CanExecute());
-    }
-
-    [Fact]
-    public void BrowseDestination_Cancel_DisplayOpenFolder()
-    {
-        var dest = "/MyDest";
-        Model.AppSettings.DestinationFolder = dest;
-        SetBrowseDestination(null);
-
-        Model.BrowseDestination.Execute();
-
-        Assert.Equal(dest, Model.AppSettings.DestinationFolder);
-        MockDialogManager.Verify(
-            x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public void BrowseDestination_Select_SetNewDestinationAndResetError()
-    {
-        var dest = "/MyDest";
-        SetBrowseDestination(dest);
-
-        Model.BrowseDestination.Execute();
-
-        Assert.Equal(dest, Model.AppSettings.DestinationFolder);
-    }
-
-    [Fact]
-    public void BrowseDestination_Select_ResetError()
-    {
-        Model.ErrorMessage = "Error";
-        SetBrowseDestination("/MyDest");
-
-        Model.BrowseDestination.Execute();
-
-        Assert.Empty(Model.ErrorMessage);
     }
 
     [Fact]
@@ -336,10 +292,10 @@ public class MainViewModelTests : TestsBase
     [InlineData("Video.mp4", "/Out/Video.mp4.mp4")]
     public void Download_WithTitle_SetDestination(string title, string expectedDest)
     {
-        Model.AppSettings.DestinationFolder = "/Out";
+        Model.Settings.DestinationFolder = "/Out";
         SetVideoStream(Container.Mp4);
         SetTitle(title);
-        FakeFileSystem.Directory.CreateDirectory(Model.AppSettings.DestinationFolder);
+        FakeFileSystem.Directory.CreateDirectory(Model.Settings.DestinationFolder);
         var outDest = string.Empty;
         MockDownloadManager.Setup(x =>
                 x.DownloadAsync(It.IsAny<StreamQueryInfo>(), It.IsAny<string>(), It.IsAny<DownloadTaskEventHandler>()))
@@ -362,10 +318,10 @@ public class MainViewModelTests : TestsBase
     [InlineData("My File.mp4", "/Out/My File.mp4.mp4", null, "/Out/My File.mp4 (2).mp4")]
     public void Download_FileExists_SetDestinationWithNumber(string title, string exists1, string exists2, string expectedDest)
     {
-        Model.AppSettings.DestinationFolder = "/Out";
+        Model.Settings.DestinationFolder = "/Out";
         SetVideoStream(Container.Mp4);
         SetTitle(title);
-        FakeFileSystem.Directory.CreateDirectory(Model.AppSettings.DestinationFolder);
+        FakeFileSystem.Directory.CreateDirectory(Model.Settings.DestinationFolder);
         FakeFileSystem.File.Create(exists1);
         if (exists2 != null)
         {

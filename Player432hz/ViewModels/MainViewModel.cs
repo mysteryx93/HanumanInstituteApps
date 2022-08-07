@@ -56,12 +56,12 @@ public class MainViewModel : ReactiveObject
     private void StartPlayListImpl(TappedEventArgs e)
     {
         _filesListViewModel.Files.CurrentPosition = -1;
-        _filesListViewModel.PlayCommand.Execute();
+        _filesListViewModel.PlayCommand.Execute().Subscribe();
     }
 
     public ReactiveCommand<TappedEventArgs, Unit> StartPlayFile => _startPlayFile ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayFileImpl);
     private ReactiveCommand<TappedEventArgs, Unit>? _startPlayFile;
-    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute();
+    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute().Subscribe();
 
     /// <summary>
     /// Adds a new playlist to the list.

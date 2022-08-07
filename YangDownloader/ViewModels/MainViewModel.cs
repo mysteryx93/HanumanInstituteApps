@@ -64,24 +64,24 @@ public class MainViewModel : ReactiveObject
             .ToProperty(this, x => x.HasDownloads);
     }
 
-    public AppSettingsData AppSettings => _settings.Value;
+    public AppSettingsData Settings => _settings.Value;
 
     private void Settings_Loaded(object? sender, EventArgs e)
     {
-        PreferredVideo.SelectedValue = AppSettings.PreferredVideo;
-        PreferredAudio.SelectedValue = AppSettings.PreferredAudio;
-        MaxQuality.SelectedValue = AppSettings.MaxQuality;
+        PreferredVideo.SelectedValue = Settings.PreferredVideo;
+        PreferredAudio.SelectedValue = Settings.PreferredAudio;
+        MaxQuality.SelectedValue = Settings.MaxQuality;
 
-        this.RaisePropertyChanged(nameof(AppSettings));
+        this.RaisePropertyChanged(nameof(Settings));
     }
 
     public ReactiveCommand<CancelEventArgs, Unit> SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
     private ReactiveCommand<CancelEventArgs, Unit>? _saveSettings;
     private void SaveSettingsImpl(CancelEventArgs e)
     {
-        AppSettings.PreferredVideo = PreferredVideo.SelectedValue;
-        AppSettings.PreferredAudio = PreferredAudio.SelectedValue;
-        AppSettings.MaxQuality = MaxQuality.SelectedValue;
+        Settings.PreferredVideo = PreferredVideo.SelectedValue;
+        Settings.PreferredAudio = PreferredAudio.SelectedValue;
+        Settings.MaxQuality = MaxQuality.SelectedValue;
 
         _settings.Save();
     }
@@ -179,33 +179,13 @@ public class MainViewModel : ReactiveObject
     protected bool IsDownloadValid { get; private set; }
 
     /// <summary>
-    /// Shows the open folder dialog to select destination. 
-    /// </summary>
-    public RxCommandUnit BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
-    private RxCommandUnit? _browseDestination;
-    private async Task BrowseDestinationImpl()
-    {
-        var options = new OpenFolderDialogSettings()
-        {
-            Title = "Select destination folder",
-            InitialDirectory = AppSettings.DestinationFolder
-        };
-        var result = await _dialogService.ShowOpenFolderDialogAsync(this, options).ConfigureAwait(false);
-        if (result != null)
-        {
-            AppSettings.DestinationFolder = result;
-            ErrorMessage = "";
-        }
-    }
-
-    /// <summary>
     /// Shows the encode settings window.
     /// </summary>
     public RxCommandUnit ShowEncodeSettings => _showEncodeSettings ??= ReactiveCommand.CreateFromTask(ShowEncodeSettingsImpl);
     private RxCommandUnit? _showEncodeSettings;
     private async Task ShowEncodeSettingsImpl()
     {
-        await _dialogService.ShowEncodeSettingsAsync(this, AppSettings.EncodeSettings);
+        await _dialogService.ShowEncodeSettingsAsync(this, Settings.EncodeSettings);
     }
 
     /// <summary>
@@ -313,12 +293,12 @@ public class MainViewModel : ReactiveObject
     private RxCommandUnit? _download;
     private async Task DownloadImpl()
     {
-        if (string.IsNullOrWhiteSpace(AppSettings.DestinationFolder))
+        if (string.IsNullOrWhiteSpace(Settings.DestinationFolder))
         {
             ErrorMessage = Resources.DestinationMissing;
             return;
         }
-        else if (!_fileSystem.Directory.Exists(AppSettings.DestinationFolder))
+        else if (!_fileSystem.Directory.Exists(Settings.DestinationFolder))
         {
             ErrorMessage = Resources.DestinationDoesNotExist;
             return;
@@ -347,7 +327,7 @@ public class MainViewModel : ReactiveObject
             var fileName = string.IsNullOrWhiteSpace(VideoTitle) ? Resources.DefaultFileName : _fileSystem.SanitizeFileName(VideoTitle);
             
             // Avoid conflicting file names by adding (2) after file name.
-            var destination = _fileSystem.Path.Combine(AppSettings.DestinationFolder, fileName);
+            var destination = _fileSystem.Path.Combine(Settings.DestinationFolder, fileName);
             var suffix = "." + query.FileExtension;
             var i = 1;
             while (_fileSystem.File.Exists(destination + suffix))
@@ -401,7 +381,7 @@ public class MainViewModel : ReactiveObject
             PreferredAudio = PreferredAudio.CurrentItem!.Value,
             MaxQuality = MaxQuality.CurrentItem!.Value,
             ConcurrentDownloads = 2,
-            EncodeAudio = AppSettings.EncodeAudio ? AppSettings.EncodeSettings : null
+            EncodeAudio = Settings.EncodeAudio ? Settings.EncodeSettings : null
         };
 
     private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) =>

@@ -19,7 +19,7 @@ public class MainViewModelTests : TestsBase
     private MainViewModel _model;
 
     public IEncoderService Encoder =>
-        _encoder ??= new EncoderService(FileSystem, DialogService, MockAudioEncoder.Object, new FakeDispatcher());
+        _encoder ??= new EncoderService(FileSystem, DialogService, MockAudioEncoder.Object, new FakeDispatcher(), MockSettingsProvider);
     private IEncoderService _encoder;
 
     public IFileLocator FileLocator => _fileLocator ??= new FileLocator(MockAppPath.Object, FileSystem);
@@ -137,7 +137,7 @@ public class MainViewModelTests : TestsBase
     {
         SetOpenFilesResult(Array.Empty<string>());
 
-        Model.AddFiles.Execute();
+        Model.AddFiles.Execute().Subscribe();
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFileDialogSettings>(),
@@ -155,7 +155,7 @@ public class MainViewModelTests : TestsBase
         FileSystem.File.WriteAllText(file2, string.Empty);
         SetOpenFilesResult(new[] { file1, file2 });
 
-        Model.AddFiles.Execute();
+        Model.AddFiles.Execute().Subscribe();
 
         Assert.Equal(2, Model.Encoder.Sources.Count);
         Assert.Equal(file1, Encoder.Sources[0].Path);
@@ -170,7 +170,7 @@ public class MainViewModelTests : TestsBase
         FileSystem.File.WriteAllText(file2, string.Empty);
         SetOpenFilesResult(new[] { file1, file2 });
 
-        Model.AddFiles.Execute();
+        Model.AddFiles.Execute().Subscribe();
 
         Assert.Single(Model.Encoder.Sources);
         Assert.Equal(file2, Encoder.Sources[0].Path);
@@ -185,7 +185,7 @@ public class MainViewModelTests : TestsBase
         MockPitchDetector.Setup(x => x.GetPitchAsync(It.IsAny<string>()))
             .Returns(Task.FromException<float>(new Exception()));
 
-        Model.AddFiles.Execute();
+        Model.AddFiles.Execute().Subscribe();
 
         Assert.Single(Model.Encoder.Sources);
         Assert.Equal(file1, Encoder.Sources[0].Path);
@@ -196,7 +196,7 @@ public class MainViewModelTests : TestsBase
     {
         SetOpenFolderResult(null);
 
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
@@ -216,7 +216,7 @@ public class MainViewModelTests : TestsBase
         FileSystem.File.WriteAllText(file2, string.Empty);
         SetOpenFolderResult(folder);
 
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Single(Model.Encoder.Sources);
         var f = (FolderItem)Encoder.Sources[0];
@@ -232,7 +232,7 @@ public class MainViewModelTests : TestsBase
         SetOpenFilesResult(new[] { file1 });
         Model.SourcesSelectedIndex = -1;
 
-        Model.RemoveFile.Execute();
+        Model.RemoveFile.Execute().Subscribe();
 
         Assert.Single(Model.Encoder.Sources);
     }
@@ -262,7 +262,7 @@ public class MainViewModelTests : TestsBase
         SetOpenFilesResult(new[] { file1 });
         Model.SourcesSelectedIndex = 0;
         
-        Model.RemoveFile.Execute();
+        Model.RemoveFile.Execute().Subscribe();
 
         Assert.False(Model.RemoveFile.CanExecute());
     }
@@ -275,7 +275,7 @@ public class MainViewModelTests : TestsBase
         SetOpenFilesResult(new[] { file1 });
         Model.SourcesSelectedIndex = 0;
 
-        Model.RemoveFile.Execute();
+        Model.RemoveFile.Execute().Subscribe();
 
         Assert.Empty(Model.Encoder.Sources);
         Assert.Equal(-1, Model.SourcesSelectedIndex);
@@ -292,7 +292,7 @@ public class MainViewModelTests : TestsBase
         SetOpenFilesResult(files);
         Model.SourcesSelectedIndex = selection;
 
-        Model.RemoveFile.Execute();
+        Model.RemoveFile.Execute().Subscribe();
 
         Assert.Equal(2, Model.Encoder.Sources.Count);
         Assert.Equal(newSelection, Model.SourcesSelectedIndex);
@@ -306,7 +306,7 @@ public class MainViewModelTests : TestsBase
         Model.Encoder.Destination = dest;
         SetOpenFolderResult(null);
 
-        Model.BrowseDestination.Execute();
+        Model.BrowseDestination.Execute().Subscribe();
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
@@ -321,7 +321,7 @@ public class MainViewModelTests : TestsBase
         var folder = "/output";
         SetOpenFolderResult(folder);
 
-        Model.BrowseDestination.Execute();
+        Model.BrowseDestination.Execute().Subscribe();
 
         Assert.Equal(folder, Model.Encoder.Destination);
     }

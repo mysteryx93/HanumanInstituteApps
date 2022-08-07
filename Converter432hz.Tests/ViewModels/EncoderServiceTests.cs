@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using Xunit.Abstractions;
 // ReSharper disable RedundantArgumentDefaultValue
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PossibleMultipleEnumeration
@@ -17,7 +15,7 @@ public class EncoderServiceTests : TestsBase
     { }
 
     public EncoderService Model => _model ??= 
-        new EncoderService(FakeFileSystem, DialogService, MockEncoder.Object, new FakeDispatcher())
+        new EncoderService(FakeFileSystem, DialogService, MockEncoder.Object, new FakeDispatcher(), MockSettingsProvider)
         {
             Owner = Mock.Of<INotifyPropertyChanged>(),
             DelayBeforeStart = 5
@@ -39,6 +37,12 @@ public class EncoderServiceTests : TestsBase
         return result;
     });
     private Mock<IAudioEncoder> _mockEncoder;
+    
+    public AppSettingsData Settings { get; set; } = new();
+    
+    public ISettingsProvider<AppSettingsData> MockSettingsProvider => _mockSettingsProvider ??=
+        Mock.Of<ISettingsProvider<AppSettingsData>>(x => x.Value == Settings);
+    private ISettingsProvider<AppSettingsData> _mockSettingsProvider;
 
     public FakeFileSystemService FakeFileSystem => _fakeFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService _fakeFileSystem;
@@ -294,8 +298,8 @@ public class EncoderServiceTests : TestsBase
     public async Task RunAsync_FolderTwoFilesCompleteOne_FolderContainsOneFile()
     {
         var folder1 = AddSourceFolder(1);
-        var file1 = AddSourceFile(1, folder1);
-        var file2 = AddSourceFile(2, folder1);
+        AddSourceFile(1, folder1);
+        AddSourceFile(2, folder1);
         SetValidDestination();
         var count = -1;
         Model.FileCompleted += (_, _) =>
@@ -356,7 +360,7 @@ public class EncoderServiceTests : TestsBase
     {
         var file = new FileItem(filePath, filePath);
         Model.Sources.Add(file);
-        Model.Settings.Format = format;
+        Settings.Encode.Format = format;
         SetValidDestination("/");
 
         await Model.RunAsync();
@@ -579,7 +583,7 @@ public class EncoderServiceTests : TestsBase
             AddSourceFile(i);
         }
         SetValidDestination();
-        Model.Settings.MaxThreads = 8;
+        Settings.MaxThreads = 8;
 
         await Model.RunAsync();
 
@@ -599,18 +603,18 @@ public class EncoderServiceTests : TestsBase
             var file = AddSourceFile(i);
             await CreateFileAsync(file.RelativePath);
         }
-        Model.Settings.MaxThreads = 8;
+        Settings.MaxThreads = 8;
         Model.FileExistsAction = FileExistsAction.Ask;
         var callCount = 0;
         MockDialogManager.Setup(x =>
                 x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
-            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel viewModel) =>
+            .Returns(async (INotifyPropertyChanged _, IModalDialogViewModel _) =>
             {
                 callCount++;     
                 await Task.Delay(1000);
             });
         
-        var t1 = Model.RunAsync();
+        var _ = Model.RunAsync();
         await Task.Delay(200);
 
         Assert.Equal(1, callCount);
@@ -628,7 +632,7 @@ public class EncoderServiceTests : TestsBase
             var file = AddSourceFile(i);
             await CreateFileAsync(file.RelativePath);
         }
-        Model.Settings.MaxThreads = 8;
+        Settings.MaxThreads = 8;
         Model.FileExistsAction = FileExistsAction.Ask;
         var callCount = 0;
         MockDialogManager.Setup(x =>
@@ -663,7 +667,7 @@ public class EncoderServiceTests : TestsBase
             var file = AddSourceFile(i);
             await CreateFileAsync(file.RelativePath);
         }
-        Model.Settings.MaxThreads = 8;
+        Settings.MaxThreads = 8;
         Model.FileExistsAction = FileExistsAction.Ask;
         MockDialogManager.Setup(x =>
                 x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<AskFileActionViewModel>()))
@@ -692,7 +696,7 @@ public class EncoderServiceTests : TestsBase
             var file = AddSourceFile(i);
             await CreateFileAsync(file.RelativePath);
         }
-        Model.Settings.MaxThreads = 8;
+        Settings.MaxThreads = 8;
         Model.FileExistsAction = FileExistsAction.Ask;
         var callCount = 0;
         MockDialogManager.Setup(x =>
@@ -721,10 +725,10 @@ public class EncoderServiceTests : TestsBase
     [Fact]
     public void SettingsPitch_SetFromTo_PitchCalculated()
     {
-        Model.Settings.PitchFrom = 400;
-        Model.Settings.PitchTo = 420;
+        Settings.Encode.PitchFrom = 400;
+        Settings.Encode.PitchTo = 420;
 
-        Assert.Equal(420.0 / 400, Model.Settings.Pitch);
+        Assert.Equal(420.0 / 400, Settings.Encode.Pitch);
     }
     
     

@@ -26,10 +26,6 @@ public interface IEncoderService : IReactiveObject, IValidatableViewModel
     /// </summary>
     string Destination { get; set; }
     /// <summary>
-    /// Gets or sets encoding settings.
-    /// </summary>
-    EncodeSettings Settings { get; set; }
-    /// <summary>
     /// Gets or sets the action to take when the destination file already exists.
     /// </summary>
     FileExistsAction FileExistsAction { get; set; }

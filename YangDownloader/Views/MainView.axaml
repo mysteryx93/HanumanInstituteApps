@@ -11,8 +11,8 @@
     MinHeight="260" MinWidth="590" d:DesignWidth="590" d:DesignHeight="260"
     Title="Yang YouTube Downloader" Icon="/Assets/App.ico" CanResize="False"
     hic:SizeExtension.TrackSize="True" Classes="gradient"
-    hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
-    hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
+    hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
+    hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Opened">
@@ -67,15 +67,6 @@
                     <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True"
                              Text="{Binding DownloadUrl}" />
                 </Grid>
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <TextBlock Grid.Column="0" Text="Save to Folder:  " VerticalAlignment="Center" Width="110" />
-                    <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True"
-                             Text="{Binding AppSettings.DestinationFolder}" />
-                    <Button Classes="round" Grid.Column="2" Width="35"
-                            Command="{Binding BrowseDestination, Mode=OneWay}">
-                        <ui:SymbolIcon Symbol="OpenFolder" FontSize="20" />
-                    </Button>
-                </Grid>
                 <Grid Margin="0,5,0,5">
                     <Grid VerticalAlignment="Top">
                         <Button Classes="round" Content="Query" HorizontalAlignment="Right" Width="80"
@@ -113,9 +104,9 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                                 IsVisible="{Binding AudioStreamInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                         <CheckBox Content="Re-encode" Margin="0,0,10,0"
-                                                  IsChecked="{Binding AppSettings.EncodeAudio, Mode=TwoWay}" />
+                                                  IsChecked="{Binding Settings.EncodeAudio, Mode=TwoWay}" />
                                         <Button Classes="round" Content="Settings" Width="80"
-                                                IsEnabled="{Binding AppSettings.EncodeAudio}"
+                                                IsEnabled="{Binding Settings.EncodeAudio}"
                                                 Command="{Binding ShowEncodeSettings}" />
                                     </StackPanel>
                                 </Grid>

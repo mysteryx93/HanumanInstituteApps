@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using FluentAvalonia.Styling;
 using HanumanInstitute.BassAudio;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -29,7 +30,8 @@ public static class ViewModelLocator
             dialogFactory: new DialogFactory().AddMessageBox()),
             viewModelFactory: t => Locator.Current.GetService(t)));
         container.Register(() => (IBassDevice)BassDevice.Instance);
-        container.RegisterLazySingleton(() => AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!);
+        container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
+            new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
             
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();

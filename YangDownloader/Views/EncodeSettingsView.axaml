@@ -69,15 +69,14 @@
                     </Grid>
                 </StackPanel>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Width="80" Classes="round" Content="Default"
+                        Command="{Binding RestoreDefault}" IsDefault="True" IsCancel="true" />
+                <Button Width="80" Classes="round accent" Content="OK" Margin="3,0,3,0" 
+                        Command="{Binding Ok}" IsDefault="True" />
+                <Button Width="80" Classes="round" Content="Cancel"
+                        Command="{Binding Cancel}" IsCancel="true" />
+            </StackPanel>
         </Grid>
-
-        <StackPanel Orientation="Horizontal" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Button Width="80" Classes="round" Content="Default"
-                    Command="{Binding RestoreDefault}" IsDefault="True" IsCancel="true" />
-            <Button Width="80" Classes="round accent" Content="OK" Margin="3,0,3,0" 
-                    Command="{Binding Ok}" IsDefault="True" />
-            <Button Width="80" Classes="round" Content="Cancel"
-                    Command="{Binding Cancel}" IsCancel="true" />
-        </StackPanel>
     </Grid>
 </Window>

@@ -12,13 +12,13 @@ namespace HanumanInstitute.Common.Avalonia.App;
 public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
     where TSettings : SettingsDataBase, new()
 {
-    private readonly FluentAvaloniaTheme _fluentTheme;
-    private readonly ISettingsProvider<TSettings> _settingsProvider;
+    private readonly IFluentAvaloniaTheme _fluentTheme;
+    protected readonly ISettingsProvider<TSettings> _settingsProvider;
 
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    protected SettingsViewModel(ISettingsProvider<TSettings> settingsProvider, FluentAvaloniaTheme fluentTheme)
+    protected SettingsViewModel(ISettingsProvider<TSettings> settingsProvider, IFluentAvaloniaTheme fluentTheme)
     {
         _settingsProvider = settingsProvider;
         _fluentTheme = fluentTheme;

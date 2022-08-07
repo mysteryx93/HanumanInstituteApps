@@ -94,13 +94,6 @@ public class EncodeSettings : ReactiveObject
     private double _pitchTo = 440;
 
     /// <summary>
-    /// Gets or sets the maximum amount of simultaneous encodes.
-    /// </summary>
-    [Reactive]
-    [Range(1, 64)]
-    public int MaxThreads { get; set; } = 1;
-
-    /// <summary>
     /// Gets or sets whether to focus on quality or speed. 0 = fastest, 4 = best quality, 2 = default.
     /// </summary>
     [Range(0, 5)]

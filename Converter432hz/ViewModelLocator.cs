@@ -34,14 +34,14 @@ public static class ViewModelLocator
         container.Register<IBassDevice>(() => BassDevice.Instance);
         container.Register<IDispatcher>(() => Dispatcher.UIThread);
         SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
-        container.RegisterLazySingleton(() => AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!);
+        container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
+            new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
 
         // ViewModels
         SplatRegistrations.Register<MainViewModel>();
         SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<SettingsViewModel>();
         SplatRegistrations.Register<AskFileActionViewModel>();
-        SplatRegistrations.Register<AdvancedSettingsViewModel>();
         
         // Business
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
@@ -57,7 +57,6 @@ public static class ViewModelLocator
     public static MainViewModel Main => Locator.Current.GetService<MainViewModel>()!;
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static AskFileActionViewModel AskFileAction => Locator.Current.GetService<AskFileActionViewModel>()!;
-    public static AdvancedSettingsViewModel AdvancedSettings => Locator.Current.GetService<AdvancedSettingsViewModel>()!;
     public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
     public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
 

@@ -48,7 +48,15 @@
         <Setter Property="Padding" Value="4,2,4,2" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    
+
+    <Style Selector="NumericUpDown">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="ShowButtonSpinner" Value="False" />
+    </Style>
+
     <Style Selector="ComboBox">
         <Setter Property="Height" Value="26" />
         <Setter Property="MinHeight" Value="26" />

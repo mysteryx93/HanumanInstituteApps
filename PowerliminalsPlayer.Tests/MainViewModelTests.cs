@@ -223,7 +223,7 @@ public class MainViewModelTests
         var file = new PlayingItem("a");
         Model.Playlist.Files.Add(file);
 
-        Model.RemoveMedia.Execute();
+        Model.RemoveMedia.Execute().Subscribe();
 
         Assert.Single(Model.Playlist.Files);
     }
@@ -245,7 +245,7 @@ public class MainViewModelTests
     {
         SetDialogManagerOpenFolder(folder);
 
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Empty(Model.Settings.Folders);
     }
@@ -322,9 +322,9 @@ public class MainViewModelTests
     public void AddFolderCommand_Duplicate_DoNotAddDuplicate(string folder1, string folder2)
     {
         SetDialogManagerOpenFolder(folder1);
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
         SetDialogManagerOpenFolder(folder2);
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Single(Model.Settings.Folders);
         Assert.Equal(folder1.ReplaceDirectorySeparator(), Model.Settings.Folders.Single());
@@ -339,9 +339,9 @@ public class MainViewModelTests
         AddFile("/Dir/Sub/File1.mp3");
         
         SetDialogManagerOpenFolder(dir1);
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
         SetDialogManagerOpenFolder(dir2);
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Single(Model.Files);
     }
@@ -353,7 +353,7 @@ public class MainViewModelTests
         AddFile("/File1.mp3");
         
         SetDialogManagerOpenFolder(root);
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Single(Model.Files);
     }
@@ -364,7 +364,7 @@ public class MainViewModelTests
         Model.Settings.Folders.Add("/a");
         
         SetDialogManagerOpenFolder("/b");
-        Model.AddFolder.Execute();
+        Model.AddFolder.Execute().Subscribe();
 
         Assert.Equal(1, Model.SelectedFolderIndex);
     }
@@ -372,7 +372,7 @@ public class MainViewModelTests
     [Fact]
     public void RemoveFolderCommand_EmptyList_DoNothing()
     {
-        Model.RemoveFolder.Execute();
+        Model.RemoveFolder.Execute().Subscribe();
         
         Assert.Empty(Model.Settings.Folders);
     }
@@ -383,7 +383,7 @@ public class MainViewModelTests
         Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = -1;
         
-        Model.RemoveFolder.Execute();
+        Model.RemoveFolder.Execute().Subscribe();
         
         Assert.Single(Model.Settings.Folders);
     }
@@ -394,7 +394,7 @@ public class MainViewModelTests
         Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = 0;
         
-        Model.RemoveFolder.Execute();
+        Model.RemoveFolder.Execute().Subscribe();
         
         Assert.Empty(Model.Settings.Folders);
     }
@@ -405,7 +405,7 @@ public class MainViewModelTests
         Model.Settings.Folders.Add("/");
         Model.SelectedFolderIndex = 0;
         
-        Model.RemoveFolder.Execute();
+        Model.RemoveFolder.Execute().Subscribe();
         
         Assert.Equal(-1, Model.SelectedFolderIndex);
     }
@@ -422,7 +422,7 @@ public class MainViewModelTests
         Model.Settings.Folders.Add("/c");
         Model.SelectedFolderIndex = selStart;
         
-        Model.RemoveFolder.Execute();
+        Model.RemoveFolder.Execute().Subscribe();
 
         Assert.Equal(selNext, Model.SelectedFolderIndex);
     }
@@ -433,7 +433,7 @@ public class MainViewModelTests
         AddFilesAndLoad(1);
         Model.Files.CurrentPosition = -1;
         
-        Model.Play.Execute();
+        Model.Play.Execute().Subscribe();
         
         Assert.Empty(Model.Playlist.Files);
     }
@@ -446,7 +446,7 @@ public class MainViewModelTests
         AddFilesAndLoad(2);
         Model.Files.CurrentPosition = selectedIndex;
         
-        Model.Play.Execute();
+        Model.Play.Execute().Subscribe();
         
         Assert.Single(Model.Playlist.Files);
         Assert.Equal(Model.Files.Source[selectedIndex].FullPath, Model.Playlist.Files.First().FullPath);
@@ -472,7 +472,7 @@ public class MainViewModelTests
         
         for (var i = 0; i < times; i++)
         {
-            Model.Play.Execute();
+            Model.Play.Execute().Subscribe();
         }
         
         Assert.Equal(expectedSpeed, Model.Playlist.Files.Last().Speed);
@@ -496,11 +496,11 @@ public class MainViewModelTests
         var speedList = fileSpeeds.Split(',').Select(int.Parse);
         foreach (var speed in speedList)
         {
-            Model.Play.Execute();
+            Model.Play.Execute().Subscribe();
             Model.Playlist.Files.Last().Speed = speed;
         }
         
-        Model.Play.Execute();
+        Model.Play.Execute().Subscribe();
         
         Assert.Equal(expectedSpeed, Model.Playlist.Files.Last().Speed);
     }
@@ -510,10 +510,10 @@ public class MainViewModelTests
     {
         AddFilesAndLoad(2);
         Model.Files.CurrentPosition = 0;
-        Model.Play.Execute();
+        Model.Play.Execute().Subscribe();
 
         Model.Files.CurrentPosition = 1;
-        Model.Play.Execute();
+        Model.Play.Execute().Subscribe();
         
         Assert.Equal(0, Model.Playlist.Files.Last().Speed);
     }
@@ -544,7 +544,7 @@ public class MainViewModelTests
                 return Task.CompletedTask;
             });
 
-        Model.LoadPreset.Execute();
+        Model.LoadPreset.Execute().Subscribe();
 
         Assert.Equal(presetName, Model.Playlist.Name);
         Assert.False(vm.ModeSave);
@@ -644,7 +644,7 @@ public class MainViewModelTests
         var playing = new PlayingItem("/File1");
         Model.Playlist.Files.Add(playing);
         
-        Model.RemoveMedia.Execute(playing);
+        Model.RemoveMedia.Execute(playing).Subscribe();
         var result = Model.SavePreset.CanExecute();
 
         Assert.False(result);
@@ -665,7 +665,7 @@ public class MainViewModelTests
                 return Task.CompletedTask;
             });
 
-        Model.SavePreset.Execute();
+        Model.SavePreset.Execute().Subscribe();
 
         Assert.Empty(Model.Settings.Presets);
         Assert.True(vm.ModeSave);

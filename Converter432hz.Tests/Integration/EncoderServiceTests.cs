@@ -2,10 +2,8 @@
 using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
-using HanumanInstitute.Common.Avalonia.App.Tests;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using Xunit.Abstractions;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Converter432hz.Tests.Integration;
@@ -15,8 +13,14 @@ public class EncoderServiceTests : TestsBase
     public EncoderServiceTests(ITestOutputHelper output) : base(output)
     { }
 
-    public EncoderService Model => _model ??= new EncoderService(FileSystem, DialogService, BassEncoder, new FakeDispatcher());
+    public EncoderService Model => _model ??= new EncoderService(FileSystem, DialogService, BassEncoder, new FakeDispatcher(), MockSettingsProvider);
     private EncoderService _model;
+    
+    public AppSettingsData AppSettings { get; set; } = new();
+    
+    public ISettingsProvider<AppSettingsData> MockSettingsProvider => _mockSettingsProvider ??=
+        Mock.Of<ISettingsProvider<AppSettingsData>>(x => x.Value == AppSettings);
+    private ISettingsProvider<AppSettingsData> _mockSettingsProvider;
     
     public IAudioEncoder BassEncoder => _bassEncoder ??= new AudioEncoder(PitchDetector, FileSystem);
     private IAudioEncoder _bassEncoder;
@@ -33,6 +37,8 @@ public class EncoderServiceTests : TestsBase
 
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
+    
+    
 
     private object ViewModelFactory(Type type) => (type) switch
     {

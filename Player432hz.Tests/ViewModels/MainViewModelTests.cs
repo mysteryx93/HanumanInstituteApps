@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using ReactiveUI;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -45,7 +46,7 @@ public class MainViewModelTests
     [Fact]
     public void AddPlaylistCommand_Execute_SelectedIndexSet()
     {
-        Model.AddPlaylist.Execute();
+        Model.AddPlaylist.Execute().Subscribe();
 
         Assert.Equal(0, Model.Playlists.CurrentPosition);
     }
@@ -73,7 +74,7 @@ public class MainViewModelTests
         var listCount = 2;
         AddPlaylists(listCount);
 
-        Model.DeletePlaylist.Execute();
+        Model.DeletePlaylist.Execute().Subscribe();
 
         Assert.Equal(listCount, Model.Playlists.Source.Count);
     }
@@ -81,7 +82,7 @@ public class MainViewModelTests
     [Fact]
     public void DeletePlaylistCommand_EmptyList_NoAction()
     {
-        Model.DeletePlaylist.Execute();
+        Model.DeletePlaylist.Execute().Subscribe();
 
         Assert.Empty(Model.Playlists.Source);
     }
@@ -97,7 +98,7 @@ public class MainViewModelTests
         Model.Playlists.CurrentPosition = selectedIndex;
         var selectedItem = Model.Playlists.CurrentItem;
 
-        Model.DeletePlaylist.Execute();
+        Model.DeletePlaylist.Execute().Subscribe();
 
         Assert.Equal(listCount - 1, Model.Playlists.Source.Count);
         Assert.DoesNotContain(selectedItem, Model.Playlists.Source);
@@ -112,7 +113,7 @@ public class MainViewModelTests
         AddPlaylists(count);
         Model.Playlists.CurrentPosition = sel;
 
-        Model.DeletePlaylist.Execute();
+        Model.DeletePlaylist.Execute().Subscribe();
 
         Assert.Equal(newSel, Model.Playlists.CurrentPosition);
     }
@@ -124,7 +125,7 @@ public class MainViewModelTests
         Model.Playlists.MoveCurrentToFirst();
         MockFileList.Reset();
 
-        Model.DeletePlaylist.Execute();
+        Model.DeletePlaylist.Execute().Subscribe();
 
         MockFileList.Verify(x => x.SetPaths(It.IsAny<IEnumerable<string>>()), Times.Once);
     }
@@ -180,7 +181,7 @@ public class MainViewModelTests
     {
         AddPlaylists(2);
 
-        Model.SaveSettings.Execute(null);
+        Model.SaveSettings.Execute().Subscribe();
 
         Assert.Equal(2, MockSettings.Value.Playlists.Count);
     }
@@ -191,7 +192,7 @@ public class MainViewModelTests
         AddPlaylists(1);
         Model.Playlists.Source[0].Folders.Source.Add("a");
 
-        Model.SaveSettings.Execute(null);
+        Model.SaveSettings.Execute().Subscribe();
 
         Assert.NotNull(MockSettings.Value.Playlists);
         Assert.Single(MockSettings.Value.Playlists[0].Folders);

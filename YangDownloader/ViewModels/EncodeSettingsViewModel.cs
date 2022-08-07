@@ -32,6 +32,7 @@ public class EncodeSettingsViewModel : OkCancelViewModel
             .ToProperty(this, x => x.IsQualitySpeedVisible);
     }
 
+    [Reactive]
     public EncodeSettings Settings { get; private set; } = default!;
 
     private EncodeSettings _source = default!;
@@ -48,7 +49,7 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     {
         Cloning.CopyAllFields(Settings, _source);
         return true;
-    } 
+    }
 
     public bool ShiftPitch
     {
@@ -121,6 +122,15 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     /// </summary>
     private void RestoreDefaultImpl()
     {
-        
+        Settings.Format = EncodeFormat.Mp3;
+        Settings.Bitrate = 0;
+        Settings.SampleRate = 0;
+        Settings.QualityOrSpeed = 5; 
+        ShiftPitch = false;
+        Settings.AntiAlias = false;
+        Settings.AntiAliasLength = 32;
+        Settings.AutoDetectPitch = true;
+        Settings.PitchFrom = 440;
+        Settings.PitchTo = 432;
     }
 }

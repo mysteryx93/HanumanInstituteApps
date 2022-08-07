@@ -15,14 +15,17 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     private readonly IDialogService _dialogService;
     private readonly IAudioEncoder _audioEncoder;
     private readonly IDispatcher _dispatcher;
+    private readonly ISettingsProvider<AppSettingsData> _settingsProvider;
     private CancellationTokenSource? _cancelTokenSource;
-
-    public EncoderService(IFileSystemService fileSystem, IDialogService dialogService, IAudioEncoder audioEncoder, IDispatcher dispatcher)
+    
+    public EncoderService(IFileSystemService fileSystem, IDialogService dialogService, IAudioEncoder audioEncoder, IDispatcher dispatcher, 
+        ISettingsProvider<AppSettingsData> settingsProvider)
     {
         _fileSystem = fileSystem;
         _dialogService = dialogService;
         _audioEncoder = audioEncoder;
         _dispatcher = dispatcher;
+        _settingsProvider = settingsProvider;
 
         // var sourceNotEmpty = Sources
         //     .ToObservableChangeSet(x => x.Path)
@@ -54,16 +57,14 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     //     get { return _isValid.Value; }
     // }
 
+    private AppSettingsData Settings => _settingsProvider.Value;
+
     /// <inheritdoc />
     public ObservableCollection<FileItem> Sources { get; } = new();
 
     /// <inheritdoc />
     [Reactive]
     public string Destination { get; set; } = string.Empty;
-
-    /// <inheritdoc />
-    [Reactive]
-    public EncodeSettings Settings { get; set; } = new();
 
     /// <inheritdoc />
     [Reactive]
@@ -217,7 +218,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             file.Status = EncodeStatus.Processing;
             file.IsFileCreated = true;
 
-            await _audioEncoder.StartAsync(file, Settings, cancellationToken);
+            await _audioEncoder.StartAsync(file, Settings.Encode, cancellationToken);
             file.ProgressPercent = 0;
         }
         catch (OperationCanceledException)
@@ -246,7 +247,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
     private async Task SetDestination(ProcessingItem item, CancellationToken cancellationToken = default)
     {
         var destPath = _fileSystem.Path.Combine(Destination, item.RelativePath);
-        destPath = ChangeExtension(destPath, Settings.Format);
+        destPath = ChangeExtension(destPath, Settings.Encode.Format);
         var destExists = _fileSystem.File.Exists(destPath);
         item.Destination = destPath;
         if (destExists && FileExistsAction == FileExistsAction.Ask)
