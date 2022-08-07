@@ -53,6 +53,10 @@ public class EncoderServiceTests : TestsBase
         Model.Sources.Add(new FileItem("SourceLong.mp3", "SourceLong.mp3"));
         Model.Sources.Add(new FileItem("SourceShort.mp3", "SourceShort.mp3"));
         Model.Destination = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly()!.Location)!, "out");
+        if (!Directory.Exists(Model.Destination))
+        {
+            Directory.CreateDirectory(Model.Destination);
+        }
         Model.FileExistsAction = FileExistsAction.Overwrite;
     
         var t1 = Model.RunAsync();

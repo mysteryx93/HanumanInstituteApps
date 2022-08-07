@@ -27,7 +27,7 @@ public static class ViewModelLocator
         container.AddBassAudio();
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
             viewLocator: new ViewLocator(),
-            dialogFactory: new DialogFactory().AddMessageBox()),
+            dialogFactory: new DialogFactory().AddFluent()),
             viewModelFactory: t => Locator.Current.GetService(t)));
         container.Register(() => (IBassDevice)BassDevice.Instance);
         container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
