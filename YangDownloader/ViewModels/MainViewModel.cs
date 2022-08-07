@@ -122,7 +122,7 @@ public class MainViewModel : ReactiveObject
     /// Gets or sets the URL to download.
     /// </summary>
     [Reactive]
-    public string DownloadUrl { get; set; } = "https://www.youtube.com/watch?v=4OqXWzekVw4"; // string.Empty;
+    public string DownloadUrl { get; set; } = string.Empty;
     private Uri? _downloadUri;
 
     /// <summary>
