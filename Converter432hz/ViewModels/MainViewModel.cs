@@ -133,7 +133,11 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public ReactiveCommand<CancelEventArgs, Unit> SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
     private ReactiveCommand<CancelEventArgs, Unit>? _saveSettingsCommand;
-    private void OnSaveSettings(CancelEventArgs e) => _settings.Save();
+    private void OnSaveSettings(CancelEventArgs e)
+    {
+        _settings.Save();  
+        StopEncoding.Execute().Subscribe();
+    } 
 
     [Reactive] public int SourcesSelectedIndex { get; set; }
 
