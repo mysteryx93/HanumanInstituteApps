@@ -9,7 +9,7 @@
     x:Class="HanumanInstitute.YangDownloader.Views.MainView"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     MinHeight="260" MinWidth="590" d:DesignWidth="590" d:DesignHeight="260"
-    Title="Yang YouTube Downloader" Icon="/Assets/App.ico" CanResize="False"
+    Title="Yang YouTube Downloader" Icon="/Assets/App.ico"
     hic:SizeExtension.TrackSize="True" Classes="gradient"
     hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
     hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
