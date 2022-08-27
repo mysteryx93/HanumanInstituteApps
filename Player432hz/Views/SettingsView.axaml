@@ -39,17 +39,24 @@
                                HorizontalAlignment="Center" />
                     <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Settings.PitchFrom}"
                              IsEnabled="{Binding !Settings.AutoDetectPitch}" Minimum="1" Maximum="10000" />
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text=" Hz" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
                                HorizontalAlignment="Center" />
                     <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.PitchTo}" Minimum="1" Maximum="10000" />
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text=" Hz" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Foreground="Red" Margin="12,0,0,0"
-                               Text="{Binding Player.PitchErrorHz, StringFormat={}{0:F2}hz}"
+                               Text="{Binding Player.PitchErrorHz, StringFormat={}{0:F2} Hz}"
                                IsVisible="{Binding Player.PitchError, Converter={x:Static ObjectConverters.IsNotNull}}" />
                 </Grid>
                 <CheckBox IsChecked="{Binding Settings.RoundPitch}" Content="Round pitch for quality" />
                 <CheckBox IsChecked="{Binding Settings.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
+                    <TextBlock Text="Device Sample Rate" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="10,0,0,0">
+                        <ComboBox Width="115" Items="{Binding DeviceSampleRateList}"
+                                  SelectedItem="{Binding DeviceSampleRateList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <StackPanel.Styles>

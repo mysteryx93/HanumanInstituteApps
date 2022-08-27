@@ -46,7 +46,9 @@ public class ListItemCollectionView<T> : CollectionView<ListItem<T>>
     public T? SelectedValue
     {
         get => CurrentItem != null ? CurrentItem.Value : default;
-        set => CurrentItem = Source.FirstOrDefault(x => x.Value?.Equals(value) == true);
+        set => CurrentItem = value != null ? 
+            Source.FirstOrDefault(x => x.Value?.Equals(value) == true) :
+            Source.FirstOrDefault(x => x.Value == null);
     }
 
     protected override void OnPropertyChanged(string? propertyName = null)

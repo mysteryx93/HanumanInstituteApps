@@ -68,7 +68,7 @@ public class AppSettingsData : SettingsDataBase
     public double PitchTo { get; set; } = 432;
 
     /// <summary>
-    /// Gets or sets whether to round the pitch to the nearest fraction when pitch-shifting for quality. 
+    /// Gets or sets whether to round the pitch to the nearest fraction when pitch-shifting for enhanced quality. 
     /// </summary>
     [Reactive]
     public bool RoundPitch { get; set; } = true;
@@ -78,4 +78,10 @@ public class AppSettingsData : SettingsDataBase
     /// </summary>
     [Reactive]
     public bool SkipTempo { get; set; }
+    
+    /// <summary>
+    /// On Linux, sets the device output sample rate. On other platforms, null = auto-detected.
+    /// </summary>
+    [Reactive]
+    public int? DeviceSampleRate { get; set; }
 }

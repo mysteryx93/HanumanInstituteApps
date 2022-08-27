@@ -125,6 +125,7 @@
                                      EffectsRoundPitch="{Binding Player.Settings.RoundPitch}"
                                      EffectsSkipTempo="{Binding Player.Settings.SkipTempo}"
                                      PitchError="{Binding Player.PitchError, Mode=OneWayToSource}"
+                                     DeviceSampleRate="{Binding Player.Settings.DeviceSampleRate}"
                                      Volume="{Binding ViewModel.AppSettings.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <Interaction.Behaviors>
                         <EventTriggerBehavior EventName="MediaFinished">

@@ -1,27 +1,52 @@
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
-using HanumanInstitute.MediaPlayer.Avalonia.Bass;
-using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
 /// <inheritdoc />
 public class SettingsViewModel : SettingsViewModel<AppSettingsData>
 {
-    private readonly IPlaylistPlayer _player;
-    public IPlaylistPlayer Player => _player;
-    
     public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player) :
         base(settingsProvider, fluentTheme)
     {
-        _player = player;
+        Player = player;
+        DeviceSampleRateList.SelectedValue = Settings.DeviceSampleRate;
+        IsDeviceSampleRateVisible = OperatingSystem.IsLinux();
     }
     
+    public IPlaylistPlayer Player { get; }
+
     /// <inheritdoc />
     protected override bool SaveSettings()
     {
+        Settings.DeviceSampleRate = DeviceSampleRateList.SelectedValue;
         return base.SaveSettings();
     }
+
+    /// <summary>
+    /// Gets or sets whether the Device Sample Rate option is visible. On Linux only, as it cannot be auto-detected.
+    /// </summary>
+    public bool IsDeviceSampleRateVisible { get; }
+    
+    /// <summary>
+    /// Gets the list of device output sample rates for display.
+    /// </summary>
+    public ListItemCollectionView<int?> DeviceSampleRateList { get; } = new()
+    {
+        { null, "Auto" },
+        { 8000, "8000 Hz" },
+        { 11025, "11,025 Hz" },
+        { 16000, "16,000 Hz" },
+        { 22050, "22,050 Hz" },
+        { 44100, "44,100 Hz" },
+        { 48000, "48,000 Hz" },
+        { 88200, "88,200 Hz" },
+        { 96000, "96,000 Hz" },
+        { 176400, "176,400 Hz" },
+        { 192000, "192,000 Hz" },
+        { 352800, "352,800 Hz" },
+        { 384000, "384,000 Hz" }
+    };
 
     /// <inheritdoc />
     protected override bool Validate() => Settings.Validate() == null;
@@ -37,5 +62,6 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         Settings.PitchTo = 432;
         Settings.RoundPitch = true;
         Settings.SkipTempo = false;
+        Settings.DeviceSampleRate = null;
     }
 }
