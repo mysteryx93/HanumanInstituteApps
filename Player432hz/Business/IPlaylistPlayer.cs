@@ -28,6 +28,14 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// </summary>
     double PitchFrom { get; }
     /// <summary>
+    /// Gets the pitch rounding error when TempoCompensation = Optimized.
+    /// </summary>
+    double? PitchError { get; set; }
+    /// <summary>
+    /// Gets the pitch rounding error in Hz. 
+    /// </summary>
+    double? PitchErrorHz { get; }
+    /// <summary>
     /// Starts the playback of specified list of media files.
     /// </summary>
     /// <param name="list">The list of file paths to play.</param>

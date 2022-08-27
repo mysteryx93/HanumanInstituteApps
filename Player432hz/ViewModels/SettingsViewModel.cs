@@ -1,18 +1,32 @@
-using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
+/// <inheritdoc />
 public class SettingsViewModel : SettingsViewModel<AppSettingsData>
 {
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme) :
+    private readonly IPlaylistPlayer _player;
+    public IPlaylistPlayer Player => _player;
+    
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player) :
         base(settingsProvider, fluentTheme)
     {
+        _player = player;
+    }
+    
+    /// <inheritdoc />
+    protected override bool SaveSettings()
+    {
+        return base.SaveSettings();
     }
 
+    /// <inheritdoc />
     protected override bool Validate() => Settings.Validate() == null;
 
+    /// <inheritdoc />
     protected override void RestoreDefaultImpl()
     {
         Settings.AntiAlias = false;
@@ -21,5 +35,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         Settings.AutoDetectPitch = true;
         Settings.PitchFrom = 440;
         Settings.PitchTo = 432;
+        Settings.RoundPitch = true;
+        Settings.SkipTempo = false;
     }
 }

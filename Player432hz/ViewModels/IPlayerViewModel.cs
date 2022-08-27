@@ -12,9 +12,9 @@ public interface IPlayerViewModel
     /// Gets an instance of IPlaylistPlayer that can be bound to the UI for playback.
     /// </summary>
     IPlaylistPlayer Player { get; }
-
+    
     /// <summary>
     /// Plays the next file when playback ends.
     /// </summary>
-    ReactiveCommand<EventArgs,Unit> PlayNextCommand { get; }
+    RxCommandUnit PlayNextCommand { get; }
 }

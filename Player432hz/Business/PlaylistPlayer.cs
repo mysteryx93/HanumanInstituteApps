@@ -1,12 +1,11 @@
 ﻿using System.Linq;
+using Avalonia.Utilities;
 using HanumanInstitute.BassAudio;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.Business;
 
-/// <summary>
-/// Manages the playback of a list of media files.
-/// </summary>
+/// <inheritdoc cref="IPlaylistPlayer" />
 public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
 {
     private readonly IPitchDetector _pitchDetector;
@@ -18,38 +17,53 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
         _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
         _settings = settings;
+        WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, PlaylistPlayer>(settings, nameof(settings.Saved),
+            (_, _) =>
+            {
+                ApplySettings();
+            });
     }
 
-    /// <summary>
-    /// Gets the list of files currently playing.
-    /// </summary>
+    /// <inheritdoc />
     public IList<string> Files { get; } = new List<string>();
 
-    /// <summary>
-    /// Gets the path of the file currently playing.
-    /// </summary>
+    /// <inheritdoc />
     [Reactive]
     public string NowPlaying { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets the display title of the file currently playing.
-    /// </summary>
+    /// <inheritdoc />
     [Reactive]
     public string NowPlayingTitle { get; set; } = string.Empty;
 
-    [Reactive] public double PitchFrom { get; private set; } = 440;
+    /// <inheritdoc />
+    [Reactive]
+    public double PitchFrom { get; private set; } = 440;
 
-    [Reactive] public double Pitch { get; private set; } = 1;
+    /// <inheritdoc />
+    [Reactive]
+    public double Pitch { get; private set; } = 1;
 
+    /// <inheritdoc />
+    public double? PitchError
+    {
+        get => _pitchError;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _pitchError, value);
+            this.RaisePropertyChanged(nameof(PitchErrorHz));
+        }
+    }
+    private double? _pitchError;
+
+    /// <inheritdoc />
+    public double? PitchErrorHz => PitchError * PitchFrom;
+
+    /// <inheritdoc />
     public AppSettingsData Settings => _settings.Value;
 
     private readonly Random _random = new Random();
 
-    /// <summary>
-    /// Starts the playback of specified list of media files.
-    /// </summary>
-    /// <param name="list">The list of file paths to play.</param>
-    /// <param name="current">If specified, playback will start with specified file.</param>
+    /// <inheritdoc />
     public void Play(IEnumerable<string>? list, string? current)
     {
         Files.Clear();
@@ -58,7 +72,11 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
             Files.AddRange(list);
         }
         NowPlaying = string.Empty;
-        NowPlaying = current ?? string.Empty;
+        if (current.HasValue())
+        {
+            CalcPitch(current);
+            NowPlaying = current;
+        }
         SetTitle();
         if (string.IsNullOrEmpty(current))
         {
@@ -66,9 +84,7 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
         }
     }
 
-    /// <summary>
-    /// Starts playing the next media file from the list.
-    /// </summary>
+    /// <inheritdoc />
     public void PlayNext()
     {
         if (Files.Any())
@@ -102,6 +118,7 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
             _fileSystem.Path.GetFileName(NowPlaying);
     }
 
+    /// <inheritdoc />
     public void ApplySettings()
     {
         if (NowPlaying.HasValue())

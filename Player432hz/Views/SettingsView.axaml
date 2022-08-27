@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
-        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="290" Height="290" MaxHeight="290"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="390" Height="390" MaxHeight="390"
         x:Class="HanumanInstitute.Player432hz.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -33,7 +33,7 @@
                     <NumericUpDown Value="{Binding Settings.Speed}" Width="80" Minimum="0.01" Maximum="100" />
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
-                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
+                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto,Auto" Margin="0,0,0,8">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
                                HorizontalAlignment="Center" />
@@ -44,7 +44,12 @@
                                HorizontalAlignment="Center" />
                     <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.PitchTo}" Minimum="1" Maximum="10000" />
                     <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Foreground="Red" Margin="12,0,0,0"
+                               Text="{Binding Player.PitchErrorHz, StringFormat={}{0:F2}hz}"
+                               IsVisible="{Binding Player.PitchError, Converter={x:Static ObjectConverters.IsNotNull}}" />
                 </Grid>
+                <CheckBox IsChecked="{Binding Settings.RoundPitch}" Content="Round pitch for quality" />
+                <CheckBox IsChecked="{Binding Settings.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <StackPanel.Styles>

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
 namespace HanumanInstitute.Player432hz.Models;
 
@@ -65,4 +66,16 @@ public class AppSettingsData : SettingsDataBase
     [Reactive]
     [Range(1, 10000)]
     public double PitchTo { get; set; } = 432;
+
+    /// <summary>
+    /// Gets or sets whether to round the pitch to the nearest fraction when pitch-shifting for quality. 
+    /// </summary>
+    [Reactive]
+    public bool RoundPitch { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether to skip tempo adjustment for maximum audio quality. 
+    /// </summary>
+    [Reactive]
+    public bool SkipTempo { get; set; }
 }

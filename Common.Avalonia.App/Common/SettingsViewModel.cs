@@ -1,5 +1,3 @@
-using System.Windows.Input;
-using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Services;
 using ReactiveUI;
 
@@ -38,7 +36,7 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
         DialogResult = true;
 
         Settings.Theme = ThemeList.SelectedValue;
-        _settingsProvider.Value = Settings;
+        Cloning.CopyAllFields(Settings, _settingsProvider.Value);
         _fluentTheme.RequestedTheme = Settings.Theme.ToString();
 
         _settingsProvider.Save();

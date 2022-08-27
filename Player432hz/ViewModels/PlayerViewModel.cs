@@ -1,16 +1,11 @@
-﻿using System.Windows.Input;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.ViewModels;
 
-/// <summary>
-/// Represents the media player.
-/// </summary>
+/// <inheritdoc cref="IPlayerViewModel" />
 public class PlayerViewModel : ReactiveObject, IPlayerViewModel
 {
-    /// <summary>
-    /// Gets an instance of IPlaylistPlayer that can be bound to the UI for playback.
-    /// </summary>
+    /// <inheritdoc />
     public IPlaylistPlayer Player { get; }
 
     public PlayerViewModel(IPlaylistPlayer player)
@@ -18,13 +13,8 @@ public class PlayerViewModel : ReactiveObject, IPlayerViewModel
         Player = player;
     }
 
-    /// <summary>
-    /// Plays the next file when playback ends.
-    /// </summary>
-    public ReactiveCommand<EventArgs, Unit> PlayNextCommand => _playNextCommand ??= ReactiveCommand.Create<EventArgs>(OnPlayNext);
-    private ReactiveCommand<EventArgs, Unit>? _playNextCommand; 
-    private void OnPlayNext(EventArgs e)
-    {
-        Player.PlayNext();
-    }
+    /// <inheritdoc />
+    public RxCommandUnit PlayNextCommand => _playNextCommand ??= ReactiveCommand.Create(PlayNextImpl);
+    private RxCommandUnit? _playNextCommand; 
+    private void PlayNextImpl() => Player.PlayNext();
 }

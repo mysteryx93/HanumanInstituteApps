@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Svg.Skia;
 using Avalonia.Xaml.Interactions.Core;
 using FluentAvalonia.Styling;
 using HanumanInstitute.MvvmDialogs;
