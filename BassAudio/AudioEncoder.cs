@@ -24,7 +24,7 @@ public class AudioEncoder : IAudioEncoder
 
     /// <inheritdoc />
     public async Task StartAsync(ProcessingItem file, EncodeSettings settings, CancellationToken cancellationToken = default) =>
-        await Task.Run(() => Start(file, settings, cancellationToken), default).ConfigureAwait(false);
+        await Task.Run(() => Start(file, settings, cancellationToken), default);
 
     /// <inheritdoc />
     public void Start(ProcessingItem file, EncodeSettings settings, CancellationToken cancellationToken = default)

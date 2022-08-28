@@ -1,4 +1,6 @@
-﻿using ManagedBass;
+﻿using LazyCache;
+using ManagedBass;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.BassAudio;
@@ -7,21 +9,32 @@ namespace HanumanInstitute.BassAudio;
 public class PitchDetector : IPitchDetector
 {
     private readonly IFileSystemService _fileSystem;
+    private readonly IAppCache _cache;
+    private readonly TimeSpan _cacheExpiration = TimeSpan.FromDays(1);
+    private const string CachePrefix = "BassAudio.PitchDetector: ";
 
     /// <summary>
     /// Initializes a new instance of the PitchDetector class.
     /// </summary>
-    public PitchDetector(IFileSystemService fileSystem)
+    public PitchDetector(IFileSystemService fileSystem, IAppCache cache)
     {
         _fileSystem = fileSystem;
+        _cache = cache;
     }
 
     /// <inheritdoc />
-    public async Task<float> GetPitchAsync(string filePath) =>
-        await Task.Run(() => GetPitch(filePath), default).ConfigureAwait(false);
+    public Task<float> GetPitchAsync(string filePath) =>
+        _cache.GetOrAddAsync(CachePrefix + filePath,
+            () => Task.FromResult(GetPitchInternal(filePath)),
+            _cacheExpiration);
 
     /// <inheritdoc />
-    public float GetPitch(string filePath)
+    public float GetPitch(string filePath) =>
+        _cache.GetOrAdd(CachePrefix + filePath, 
+            () => GetPitchInternal(filePath),
+            _cacheExpiration);
+    
+    private float GetPitchInternal(string filePath)
     {
         if (!_fileSystem.File.Exists(filePath))
         {

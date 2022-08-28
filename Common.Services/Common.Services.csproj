@@ -44,5 +44,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
   </ItemGroup>
-
 </Project>

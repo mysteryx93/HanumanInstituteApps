@@ -1,7 +1,7 @@
 ﻿namespace HanumanInstitute.BassAudio;
 
 /// <summary>
-/// Provides audio pitch-detection.
+/// Provides audio pitch-detection. The data is cached for 1 day.
 /// </summary>
 public interface IPitchDetector
 {

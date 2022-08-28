@@ -25,6 +25,7 @@
     <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\LazyCache.Splat\LazyCache.Splat.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
