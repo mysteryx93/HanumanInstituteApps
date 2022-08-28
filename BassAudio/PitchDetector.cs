@@ -23,16 +23,18 @@ public class PitchDetector : IPitchDetector
     }
 
     /// <inheritdoc />
-    public Task<float> GetPitchAsync(string filePath) =>
+    public Task<float> GetPitchAsync(string filePath, bool useCache = true) => useCache ?
         _cache.GetOrAddAsync(CachePrefix + filePath,
             () => Task.FromResult(GetPitchInternal(filePath)),
-            _cacheExpiration);
+            _cacheExpiration) :
+        Task.Run(() => GetPitchInternal(filePath));
 
     /// <inheritdoc />
-    public float GetPitch(string filePath) =>
-        _cache.GetOrAdd(CachePrefix + filePath, 
+    public float GetPitch(string filePath, bool useCache = true) => useCache ? 
+            _cache.GetOrAdd(CachePrefix + filePath, 
             () => GetPitchInternal(filePath),
-            _cacheExpiration);
+            _cacheExpiration) :
+            GetPitchInternal(filePath);
     
     private float GetPitchInternal(string filePath)
     {
