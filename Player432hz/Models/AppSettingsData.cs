@@ -83,5 +83,5 @@ public class AppSettingsData : SettingsDataBase
     /// On Linux, sets the device output sample rate. On other platforms, null = auto-detected.
     /// </summary>
     [Reactive]
-    public int? DeviceSampleRate { get; set; }
+    public int? OutputSampleRate { get; set; }
 }

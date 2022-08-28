@@ -10,7 +10,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         base(settingsProvider, fluentTheme)
     {
         Player = player;
-        DeviceSampleRateList.SelectedValue = Settings.DeviceSampleRate;
+        OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;
         IsDeviceSampleRateVisible = OperatingSystem.IsLinux();
     }
     
@@ -19,7 +19,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
     /// <inheritdoc />
     protected override bool SaveSettings()
     {
-        Settings.DeviceSampleRate = DeviceSampleRateList.SelectedValue;
+        Settings.OutputSampleRate = OutputSampleRateList.SelectedValue;
         return base.SaveSettings();
     }
 
@@ -31,7 +31,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
     /// <summary>
     /// Gets the list of device output sample rates for display.
     /// </summary>
-    public ListItemCollectionView<int?> DeviceSampleRateList { get; } = new()
+    public ListItemCollectionView<int?> OutputSampleRateList { get; } = new()
     {
         { null, "Auto" },
         { 8000, "8000 Hz" },
@@ -62,6 +62,6 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         Settings.PitchTo = 432;
         Settings.RoundPitch = true;
         Settings.SkipTempo = false;
-        Settings.DeviceSampleRate = null;
+        Settings.OutputSampleRate = null;
     }
 }

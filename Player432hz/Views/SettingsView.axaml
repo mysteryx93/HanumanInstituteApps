@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
-        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="390" Height="390" MaxHeight="390"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="370" Height="370" MaxHeight="370"
         x:Class="HanumanInstitute.Player432hz.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -51,10 +51,10 @@
                 <CheckBox IsChecked="{Binding Settings.RoundPitch}" Content="Round pitch for quality" />
                 <CheckBox IsChecked="{Binding Settings.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
                 <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
-                    <TextBlock Text="Device Sample Rate" VerticalAlignment="Center" />
+                    <TextBlock Text="Output sample rate" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="10,0,0,0">
-                        <ComboBox Width="115" Items="{Binding DeviceSampleRateList}"
-                                  SelectedItem="{Binding DeviceSampleRateList.CurrentItem}" />
+                        <ComboBox Width="115" Items="{Binding OutputSampleRateList}"
+                                  SelectedItem="{Binding OutputSampleRateList.CurrentItem}" />
                     </Grid>
                 </StackPanel>
             </StackPanel>
