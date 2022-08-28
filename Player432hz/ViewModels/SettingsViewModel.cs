@@ -62,6 +62,6 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         Settings.PitchTo = 432;
         Settings.RoundPitch = true;
         Settings.SkipTempo = false;
-        Settings.OutputSampleRate = null;
+        OutputSampleRateList.SelectedValue = null;
     }
 }
