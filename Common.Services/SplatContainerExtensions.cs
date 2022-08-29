@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Net.Http;
 using Splat;
 
 namespace HanumanInstitute.Common.Services;
@@ -13,6 +14,7 @@ public static class SplatContainerExtensions
     {
         services.CheckNotNull(nameof(services));
 
+        services.Register(() => new HttpClient());
         SplatRegistrations.RegisterLazySingleton<ISerializationService, SerializationService>();
         SplatRegistrations.RegisterLazySingleton<IFileSystemService, FileSystemService>();
         SplatRegistrations.RegisterLazySingleton<IFileSystem, FileSystem>();

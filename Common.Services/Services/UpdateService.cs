@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using LazyCache;
 
 namespace HanumanInstitute.Common.Services;
 
@@ -7,12 +8,16 @@ namespace HanumanInstitute.Common.Services;
 public class UpdateService : IUpdateService
 {
     private readonly ISyndicationFeedService _feedService;
-    private readonly HttpClient _httpClient = new HttpClient();
+    private readonly HttpClient _httpClient;
+    private readonly IAppCache _cache;
     private bool _init = false;
+    private const string CacheKey = "UpdateService.GetLatestVersion";
 
-    public UpdateService(ISyndicationFeedService feedService)
+    public UpdateService(ISyndicationFeedService feedService, HttpClient httpClient, IAppCache cache)
     {
         _feedService = feedService;
+        _httpClient = httpClient;
+        _cache = cache;
     }
 
     /// <inheritdoc />
@@ -27,9 +32,12 @@ public class UpdateService : IUpdateService
     /// <inheritdoc />
     public Task<Version?> GetLatestVersionAsync() => 
         Task.Run(GetLatestVersion);
-    
+
     /// <inheritdoc />
-    public Version? GetLatestVersion()
+    public Version? GetLatestVersion() =>
+        _cache.GetOrAdd(CacheKey, GetLatestVersionImpl, TimeSpan.FromHours(1));
+    
+    private Version? GetLatestVersionImpl()
     {
         if (!FileFormat.HasValue())
         {
