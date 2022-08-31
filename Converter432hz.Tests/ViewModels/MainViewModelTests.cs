@@ -54,7 +54,7 @@ public class MainViewModelTests : TestsBase
     public Mock<IPitchDetector> MockPitchDetector => _mockPitchDetector ??= Init(() =>
     {
         var mock = new Mock<IPitchDetector>();
-        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>())).Returns(Task.FromResult(440f));
+        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>(), It.IsAny<bool>())).Returns(Task.FromResult(440f));
         return mock;
     });
     private Mock<IPitchDetector> _mockPitchDetector;
@@ -182,7 +182,7 @@ public class MainViewModelTests : TestsBase
         var file1 = "/file1.mp3";
         FileSystem.File.WriteAllText(file1, string.Empty);
         SetOpenFilesResult(new[] { file1 });
-        MockPitchDetector.Setup(x => x.GetPitchAsync(It.IsAny<string>()))
+        MockPitchDetector.Setup(x => x.GetPitchAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns(Task.FromException<float>(new Exception()));
 
         Model.AddFiles.Execute().Subscribe();

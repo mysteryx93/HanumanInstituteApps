@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 using HanumanInstitute.Common.Avalonia.App;
-using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
 namespace HanumanInstitute.Player432hz.Models;
 

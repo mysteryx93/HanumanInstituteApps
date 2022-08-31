@@ -21,8 +21,10 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
         _settingsProvider = settingsProvider;
         _fluentTheme = fluentTheme;
 
+        // ReSharper disable once VirtualMemberCallInConstructor
         Settings = CloneSettings(_settingsProvider.Value);
         ThemeList.SelectedValue = Settings.Theme;
+        CheckForUpdateList.SelectedValue = Settings.CheckForUpdates;
     }
 
     /// <summary>
@@ -36,6 +38,7 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
         DialogResult = true;
 
         Settings.Theme = ThemeList.SelectedValue;
+        Settings.CheckForUpdates = CheckForUpdateList.SelectedValue;
         Cloning.CopyAllFields(Settings, _settingsProvider.Value);
         _fluentTheme.RequestedTheme = Settings.Theme.ToString();
 
@@ -58,6 +61,18 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
         { AppTheme.Light, "Light" },
         { AppTheme.Dark, "Dark" },
         { AppTheme.HighContrast, "HighContrast" }
+    };
+
+    /// <summary>
+    /// Gets the list of update intervals for display.
+    /// </summary>
+    public ListItemCollectionView<UpdateInterval> CheckForUpdateList { get; } = new()
+    {
+        { UpdateInterval.Daily, "Daily" },
+        { UpdateInterval.Weekly, "Weekly" },
+        { UpdateInterval.Biweekly, "Biweekly" },
+        { UpdateInterval.Monthly, "Monthly" },
+        { UpdateInterval.Never, "Never" }
     };
 
     /// <summary>

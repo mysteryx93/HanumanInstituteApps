@@ -11,8 +11,8 @@
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:flu="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
+        hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
+        hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}" Classes="gradient">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Opened">
@@ -126,7 +126,7 @@
                                      EffectsSkipTempo="{Binding Player.Settings.SkipTempo}"
                                      PitchError="{Binding Player.PitchError, Mode=OneWayToSource}"
                                      OutputSampleRate="{Binding Player.Settings.OutputSampleRate}"
-                                     Volume="{Binding ViewModel.AppSettings.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
+                                     Volume="{Binding ViewModel.Settings.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
                     <Interaction.Behaviors>
                         <EventTriggerBehavior EventName="MediaFinished">
                             <InvokeCommandAction Command="{Binding PlayNextCommand}" />

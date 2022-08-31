@@ -20,6 +20,7 @@ public class ProcessService : IProcessService
     /// <inheritdoc />
     public ProcessWrapper[] GetProcessesByName(string appName) => Process.GetProcessesByName(appName).Select(p => new ProcessWrapper(p)).ToArray();
     
+    /// <inheritdoc />
     public void OpenBrowserUrl(string url)
     {
         try

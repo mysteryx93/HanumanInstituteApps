@@ -45,10 +45,10 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// Starts playing the next media file from the list.
     /// </summary>
     void PlayNext();
-    /// <summary>
-    /// Applies settings to the active player.
-    /// </summary>
-    void ApplySettings();
+    // /// <summary>
+    // /// Applies settings to the active player.
+    // /// </summary>
+    // void ApplySettings();
     /// <summary>
     /// Gets application settings.
     /// </summary>

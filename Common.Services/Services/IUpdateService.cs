@@ -9,6 +9,11 @@ public interface IUpdateService
     /// Gets the repo in which to look for releases.
     /// </summary>
     string GitRepo { get; set; }
+
+    /// <summary>
+    /// Gets the link to view the latest version.
+    /// </summary>
+    string GetDownloadInfoLink();
     
     /// <summary>
     /// Gets the download file format to look for in each releases. {0} will be replaced by the version number without 'v'.

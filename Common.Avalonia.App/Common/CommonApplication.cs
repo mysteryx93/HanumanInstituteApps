@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -13,9 +14,9 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// <summary>
 /// Common application class that handles creating the View and ViewModel in parallel.
 /// </summary>
-/// <typeparam name="T">The data type of the main Window.</typeparam>
-public abstract class CommonApplication<T> : Application
-    where T : Window
+/// <typeparam name="TMain">The data type of the main Window.</typeparam>
+public abstract class CommonApplication<TMain> : Application
+    where TMain : Window
 {
     /// <summary>
     /// Returns the <see cref="IClassicDesktopStyleApplicationLifetime" />.
@@ -45,6 +46,7 @@ public abstract class CommonApplication<T> : Application
         GlobalErrorHandler.BeginInit();
 
         var tBackground = Task.Run(BackgroundInit);
+        var dialogService = Locator.Current.GetService<IDialogService>()!;
 
         var desktop = DesktopLifetime;
         if (desktop != null)
@@ -52,17 +54,16 @@ public abstract class CommonApplication<T> : Application
             var style = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>();
             if (style != null)
             {
-                style.RequestedTheme = GetTheme().ToString();
+                style.RequestedTheme = await AppStarter.AppThemeLoader!.ConfigureAwait(true);
+                AppStarter.AppThemeLoader = null;
             }
 
-            // Initialize View and ViewModel in parallel.
-            var t2 = Task.Run(InitViewModel);
-            desktop.MainWindow = Activator.CreateInstance<T>();
-            await t2.ConfigureAwait(true);
-            desktop.MainWindow.DataContext = t2.Result;
+            var vm = InitViewModel();
+            dialogService.Show(null, vm);
+            desktop.MainWindow = desktop.Windows[0];
         }
 
-        GlobalErrorHandler.EndInit(Locator.Current.GetService<IDialogService>()!,
+        GlobalErrorHandler.EndInit(dialogService,
             desktop?.MainWindow.DataContext as INotifyPropertyChanged);
 
         await tBackground.ConfigureAwait(true);
@@ -73,13 +74,13 @@ public abstract class CommonApplication<T> : Application
     /// Initializes the ViewModel.
     /// </summary>
     /// <returns>The new ViewModel.</returns>
-    protected abstract INotifyPropertyChanged? InitViewModel();
+    protected abstract INotifyPropertyChanged InitViewModel();
 
-    /// <summary>
-    /// Returns the application theme from the configuration file.
-    /// </summary>
-    /// <returns>The application theme to initialize.</returns>
-    protected abstract AppTheme GetTheme();
+    // /// <summary>
+    // /// Returns the application theme from the configuration file.
+    // /// </summary>
+    // /// <returns>The application theme to initialize.</returns>
+    // protected abstract AppTheme GetTheme();
 
     /// <summary>
     /// Initializes additional tasks in a background thread while the application loads, if not in design-mode. 

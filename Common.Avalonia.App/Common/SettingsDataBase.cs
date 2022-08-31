@@ -35,4 +35,16 @@ public class SettingsDataBase : ReactiveObject
     /// </summary>
     [Reactive]
     public AppTheme Theme { get; set; }
+
+    /// <summary>
+    /// Gets or sets when to automatically check for updates.
+    /// </summary>
+    [Reactive]
+    public UpdateInterval CheckForUpdates { get; set; } = UpdateInterval.Weekly;
+    
+    /// <summary>
+    /// Gets or sets the date of the last check for updates.
+    /// </summary>
+    [Reactive]
+    public DateTime? LastCheckForUpdate { get; set; }
 }

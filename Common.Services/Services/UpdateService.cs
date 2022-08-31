@@ -10,7 +10,7 @@ public class UpdateService : IUpdateService
     private readonly ISyndicationFeedService _feedService;
     private readonly HttpClient _httpClient;
     private readonly IAppCache _cache;
-    private bool _init = false;
+    private bool _init;
     private const string CacheKey = "UpdateService.GetLatestVersion";
 
     public UpdateService(ISyndicationFeedService feedService, HttpClient httpClient, IAppCache cache)
@@ -22,6 +22,9 @@ public class UpdateService : IUpdateService
 
     /// <inheritdoc />
     public string GitRepo { get; set; } = "https://github.com/mysteryx93/NaturalGroundingPlayer";
+
+    /// <inheritdoc />
+    public string GetDownloadInfoLink() => GitRepo + "/releases";
 
     /// <inheritdoc />
     public string FileFormat { get; set; } = string.Empty;

@@ -16,7 +16,7 @@ public abstract class SettingsProviderDesign<T> : ISettingsProvider<T>
 
 #pragma warning disable 67
     public event EventHandler? Changed;
-    public event EventHandler? Saved;
+    public event EventHandler? Saving;
 #pragma warning restore
 
     /// <inheritdoc />

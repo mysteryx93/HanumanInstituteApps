@@ -16,14 +16,14 @@ public interface ISettingsProvider<T>
     T Value { get; set; }
 
     /// <summary>
-    /// Occurs after settings are loaded.
+    /// Occurs after settings are loaded or the settings object reference is changed.
     /// </summary>
     event EventHandler? Changed;
 
     /// <summary>
-    /// Occurs after settings are saved.
+    /// Occurs when saving settings.
     /// </summary>
-    event EventHandler? Saved;
+    event EventHandler? Saving;
 
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.

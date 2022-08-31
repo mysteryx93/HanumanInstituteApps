@@ -10,7 +10,8 @@ public class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args) => AppStarter.Start<App>(args, 
+    public static void Main(string[] args) => AppStarter.Start<App>(args,
+        () => ViewModelLocator.SettingsProvider.Value.Theme,
         () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);
 
     // Avalonia configuration, don't remove; also used by visual designer.

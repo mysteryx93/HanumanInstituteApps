@@ -42,7 +42,7 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
     /// <summary>
     /// Occurs after settings are saved.
     /// </summary>
-    public event EventHandler? Saved;
+    public event EventHandler? Saving;
 
     /// <summary>
     /// Loads settings data. Must be implemented in derived class. 
@@ -82,12 +82,13 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
     /// <exception cref="ValidationException">Settings contain validation errors.</exception>
     public void Save(string path)
     {
+        Saving?.Invoke(this, EventArgs.Empty);
+
         // Saving?.Invoke(this, new EventArgs());
         if (Value == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
         if (Value.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
         _serialization.SerializeToFile(Value, path);
-        Saved?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

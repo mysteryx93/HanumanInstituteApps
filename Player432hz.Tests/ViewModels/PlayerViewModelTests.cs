@@ -19,8 +19,8 @@ public class PlayerViewModelTests
     private Mock<IPitchDetector> CreatePitchDetector()
     {
         var mock = new Mock<IPitchDetector>();
-        mock.Setup(x => x.GetPitch(It.IsAny<string>())).Returns(440f);
-        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>())).Returns(Task.FromResult(440f));
+        mock.Setup(x => x.GetPitch(It.IsAny<string>(), It.IsAny<bool>())).Returns(440f);
+        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>(), It.IsAny<bool>())).Returns(Task.FromResult(440f));
         return mock;
     }
 

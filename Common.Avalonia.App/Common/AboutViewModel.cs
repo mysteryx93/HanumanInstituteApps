@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
@@ -13,9 +12,9 @@ namespace HanumanInstitute.Common.Avalonia.App;
 public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
     where TSettings : SettingsDataBase, new()
 {
+    private readonly IAppInfo _appInfo;
     private readonly IEnvironmentService _environment;
     private readonly ISettingsProvider<TSettings> _settings;
-    private readonly IProcessService _processService;
     private readonly IUpdateService _updateService;
 
     /// <inheritdoc />
@@ -26,15 +25,15 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     /// <summary>
     /// Initializes a new instance of the AboutViewModel class.
     /// </summary>
-    protected AboutViewModel(IEnvironmentService environment, IProcessService processService, ISettingsProvider<TSettings> settings,
+    protected AboutViewModel(IAppInfo appInfo, IEnvironmentService environment, ISettingsProvider<TSettings> settings,
         IUpdateService updateService)
     {
+        _appInfo = appInfo;
         _environment = environment;
-        _processService = processService;
         _settings = settings;
         _updateService = updateService;
         // ReSharper disable once VirtualMemberCallInConstructor
-        _updateService.FileFormat = UpdateFileFormat;
+        _updateService.FileFormat = _appInfo.GitHubFileFormat;
 
         // Start in constructor to save time.
         if (!Design.IsDesignMode)
@@ -46,22 +45,17 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     /// <summary>
     /// Returns application settings.
     /// </summary>
-    public SettingsDataBase AppSettings => _settings.Value;
-
-    /// <summary>
-    /// Returns the format of files released on GitHub. 
-    /// </summary>
-    public abstract string UpdateFileFormat { get; }
+    public SettingsDataBase Settings => _settings.Value;
 
     /// <summary>
     /// Returns the name of the application.
     /// </summary>
-    public abstract string AppName { get; }
+    public string AppName => _appInfo.AppName;
 
     /// <summary>
     /// Returns the description of the application.
     /// </summary>
-    public abstract string AppDescription { get; }
+    public string AppDescription => _appInfo.AppDescription;
 
     /// <summary>
     /// Returns the version of the application.

@@ -1,27 +1,27 @@
 ﻿using System.Linq;
 using Avalonia.Utilities;
 using HanumanInstitute.BassAudio;
+using HanumanInstitute.Common.Avalonia.App;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432hz.Business;
 
 /// <inheritdoc cref="IPlaylistPlayer" />
-public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
+public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
 {
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
-    private readonly ISettingsProvider<AppSettingsData> _settings;
 
-    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings)
+    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings) :
+        base(settings)
     {
         _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
-        _settings = settings;
-        WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, PlaylistPlayer>(settings, nameof(settings.Saved),
-            (_, _) =>
-            {
-                ApplySettings();
-            });
+        // WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, PlaylistPlayer>(settings, nameof(settings.Changed),
+        //     (_, _) =>
+        //     {
+        //         ApplySettings();
+        //     });
     }
 
     /// <inheritdoc />
@@ -118,13 +118,22 @@ public class PlaylistPlayer : ReactiveObject, IPlaylistPlayer
             _fileSystem.Path.GetFileName(NowPlaying);
     }
 
-    /// <inheritdoc />
-    public void ApplySettings()
+    protected override void ApplySettings()
     {
         if (NowPlaying.HasValue())
         {
             CalcPitch(NowPlaying);
         }
-        this.RaisePropertyChanged(nameof(Settings));
     }
+    
+
+    // /// <inheritdoc />
+    // public void ApplySettings()
+    // {
+    //     if (NowPlaying.HasValue())
+    //     {
+    //         CalcPitch(NowPlaying);
+    //     }
+    //     this.RaisePropertyChanged(nameof(Settings));
+    // }
 }

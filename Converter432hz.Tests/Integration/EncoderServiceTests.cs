@@ -4,6 +4,10 @@ using System.Linq;
 using System.Reflection;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Converter432hz.Tests.Integration;
