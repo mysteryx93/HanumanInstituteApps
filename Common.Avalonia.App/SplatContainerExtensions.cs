@@ -15,7 +15,7 @@ public static class SplatContainerExtensions
     {
         services.CheckNotNull(nameof(services));
 
-        SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
+        // SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
         services.Register<IAppUpdateService>(() => new AppUpdateService<TSettings>(
             GetService<ISettingsProvider<TSettings>>(), 
             GetService<IDialogService>(),

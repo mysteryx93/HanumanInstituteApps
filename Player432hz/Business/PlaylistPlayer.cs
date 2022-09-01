@@ -17,11 +17,6 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     {
         _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
-        // WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, PlaylistPlayer>(settings, nameof(settings.Changed),
-        //     (_, _) =>
-        //     {
-        //         ApplySettings();
-        //     });
     }
 
     /// <inheritdoc />
@@ -57,9 +52,6 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
 
     /// <inheritdoc />
     public double? PitchErrorHz => PitchError * PitchFrom;
-
-    /// <inheritdoc />
-    public AppSettingsData Settings => _settings.Value;
 
     private readonly Random _random = new Random();
 

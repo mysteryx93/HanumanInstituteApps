@@ -25,6 +25,7 @@ public static class ViewModelLocator
         var container = Locator.CurrentMutable;
             
         // Services
+        container.AddCommonAvaloniaApp<AppSettingsData>();
         container.AddCommonServices()
             .AddBassAudio()
             .AddDownloads();
@@ -50,6 +51,7 @@ public static class ViewModelLocator
         SplatRegistrations.Register<EncodeSettingsViewModel>();
 
         // Business
+        SplatRegistrations.RegisterLazySingleton<IAppInfo, AppInfo>();
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
         container.Register(() => 
             Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));

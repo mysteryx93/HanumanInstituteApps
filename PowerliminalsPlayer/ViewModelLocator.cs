@@ -22,6 +22,7 @@ public static class ViewModelLocator
         var container = Locator.CurrentMutable;
             
         // Services
+        container.AddCommonAvaloniaApp<AppSettingsData>();
         container.AddCommonServices();
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
                 viewLocator: new ViewLocator(),
@@ -38,6 +39,7 @@ public static class ViewModelLocator
         SplatRegistrations.Register<SettingsViewModel>();
 
         // Business
+        SplatRegistrations.RegisterLazySingleton<IAppInfo, AppInfo>();
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
         container.Register(() => 
             Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));

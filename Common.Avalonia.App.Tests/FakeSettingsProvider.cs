@@ -9,7 +9,7 @@ public class FakeSettingsProvider<T> : ISettingsProvider<T>
     public virtual T Value { get; set; } = new T();
 
     public event EventHandler? Changed;
-    public event EventHandler? Saved;
+    public event EventHandler? Saving;
 
     public virtual T Load()
     {
@@ -25,11 +25,11 @@ public class FakeSettingsProvider<T> : ISettingsProvider<T>
 
     public virtual void Save()
     {
-        Saved?.Invoke(this, EventArgs.Empty);
+        Saving?.Invoke(this, EventArgs.Empty);
     }
 
     public virtual void Save(string path)
     {
-        Saved?.Invoke(this, EventArgs.Empty);
+        Saving?.Invoke(this, EventArgs.Empty);
     }
 }

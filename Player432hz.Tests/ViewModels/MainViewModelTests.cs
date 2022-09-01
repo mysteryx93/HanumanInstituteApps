@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using ReactiveUI;
@@ -18,13 +19,16 @@ public class MainViewModelTests
     public PlaylistViewModelFactory Factory => _factory ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
     private PlaylistViewModelFactory _factory;
 
-    public MainViewModel Model => _model ??= new MainViewModel(Factory, MockSettings, MockFileList.Object, DialogService);
+    public MainViewModel Model => _model ??= new MainViewModel(MockSettings, MockAppUpdate.Object, Factory, MockFileList.Object, DialogService);
     private MainViewModel _model;
     
-    protected Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
+    public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
 
-    protected IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
+    public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();
+    private Mock<IAppUpdateService> _mockAppUpdate;
+
+    public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);
     private IDialogService _dialogService;
 
     private void AddPlaylists(int count)
@@ -177,22 +181,22 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void SaveSettingsCommand_WithPlaylists_FillSettings()
+    public void ViewClosed_WithPlaylists_FillSettings()
     {
         AddPlaylists(2);
 
-        Model.SaveSettings.Execute().Subscribe();
+        Model.ViewClosed();
 
         Assert.Equal(2, MockSettings.Value.Playlists.Count);
     }
 
     [Fact]
-    public void SaveSettingsCommand_WithFolders_FillSettingsFolders()
+    public void ViewClosed_WithFolders_FillSettingsFolders()
     {
         AddPlaylists(1);
         Model.Playlists.Source[0].Folders.Source.Add("a");
 
-        Model.SaveSettings.Execute().Subscribe();
+        Model.ViewClosed();
 
         Assert.NotNull(MockSettings.Value.Playlists);
         Assert.Single(MockSettings.Value.Playlists[0].Folders);

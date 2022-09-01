@@ -12,6 +12,7 @@ public class Program
     // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args) => AppStarter.Start<App>(args, 
+        () => ViewModelLocator.SettingsProvider.Value.Theme,
         () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);
 
     // Avalonia configuration, don't remove; also used by visual designer.

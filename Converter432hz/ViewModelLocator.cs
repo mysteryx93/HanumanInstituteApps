@@ -23,7 +23,7 @@ public static class ViewModelLocator
         var container = Locator.CurrentMutable;
             
         // Services
-        container.AddCommonAvaloniaApp();
+        container.AddCommonAvaloniaApp<AppSettingsData>();
         container.AddCommonServices();
         container.AddBassAudio();
         
@@ -33,7 +33,6 @@ public static class ViewModelLocator
                 dialogFactory: new DialogFactory().AddFluent())));
         container.Register<IBassDevice>(() => BassDevice.Instance);
         container.Register<IDispatcher>(() => Dispatcher.UIThread);
-        SplatRegistrations.RegisterLazySingleton<GlobalErrorHandler>();
         container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
             new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
 
@@ -44,6 +43,7 @@ public static class ViewModelLocator
         SplatRegistrations.Register<AskFileActionViewModel>();
         
         // Business
+        SplatRegistrations.RegisterLazySingleton<IAppInfo, AppInfo>();
         SplatRegistrations.RegisterLazySingleton<ISettingsProvider<AppSettingsData>, AppSettingsProvider>("Init");
         container.Register(() => 
             Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
