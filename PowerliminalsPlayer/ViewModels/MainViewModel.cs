@@ -1,44 +1,31 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
-using Avalonia.Utilities;
 using DynamicData;
 using DynamicData.Binding;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
-public class MainViewModel : ReactiveObject
+public class MainViewModel : MainViewModelBase<AppSettingsData>
 {
     private readonly IAppPathService _appPath;
-    private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IFileSystemService _fileSystem;
     private readonly IDialogService _dialogService;
     private readonly IPathFixer _pathFixer;
 
-    public AppSettingsData Settings => _settings.Value;
-
     /// <summary>
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
-    public MainViewModel(IAppPathService appPath, ISettingsProvider<AppSettingsData> appSettings,
-        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer)
+    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IAppPathService appPath, 
+        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer) :
+        base(settings, appUpdateService)
     {
         _appPath = appPath;
-        _settings = appSettings;
         _fileSystem = fileSystem;
         _dialogService = dialogService;
         _pathFixer = pathFixer;
-
-        WeakEventHandlerManager.Subscribe<ISettingsProvider<AppSettingsData>, EventArgs, MainViewModel>(
-            _settings, nameof(_settings.Changed),
-            (_, _) =>
-            {
-                this.RaisePropertyChanged(nameof(Settings));
-                this.RaisePropertyChanged(nameof(EffectsFloat));
-                this.RaisePropertyChanged(nameof(EffectsQuickAlgo));
-                this.RaisePropertyChanged(nameof(EffectsSampleRateConversion));
-            });
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(200))
@@ -46,15 +33,13 @@ public class MainViewModel : ReactiveObject
             .Subscribe((_) => ReloadFiles());
     }
 
-    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private RxCommandUnit? _initWindow;
-    private async Task InitWindowImplAsync()
+    /// <inheritdoc />
+    protected override void ApplySettings()
     {
-        if (_settings.Value.ShowInfoOnStartup)
-        {
-            await Task.Delay(1).ConfigureAwait(true); // work-around rendering bug in Avalonia v0.10.15
-            await ShowAboutImplAsync().ConfigureAwait(false);
-        }
+        this.RaisePropertyChanged(nameof(Settings));
+        this.RaisePropertyChanged(nameof(EffectsFloat));
+        this.RaisePropertyChanged(nameof(EffectsQuickAlgo));
+        this.RaisePropertyChanged(nameof(EffectsSampleRateConversion));
     }
 
     [Reactive]
@@ -97,13 +82,6 @@ public class MainViewModel : ReactiveObject
     public int EffectsSampleRateConversion => Math.Max(4, Settings.PerformanceQuality);
 
     /// <summary>
-    /// Saves the settings file.
-    /// </summary>
-    public RxCommandUnit SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create(SaveSettings);
-    private RxCommandUnit? _saveSettingsCommand;
-    public void SaveSettings() => _settings.Save();
-
-    /// <summary>
     /// Prompts to fix invalid paths, if any.
     /// </summary>
     public async Task PromptFixPathsAsync()
@@ -112,7 +90,7 @@ public class MainViewModel : ReactiveObject
         if (changed)
         {
             ReloadFiles();
-            SaveSettings();
+            _settings.Save();
         }
     }
 
@@ -286,7 +264,7 @@ public class MainViewModel : ReactiveObject
 
             Playlist.SaveAs(preset);
             preset.Name = saveName;
-            SaveSettings();
+            _settings.Save();
         }
     }
 
@@ -315,17 +293,9 @@ public class MainViewModel : ReactiveObject
         IsPaused = !IsPaused;
     }
 
-    /// <summary>
-    /// Shows the About window.
-    /// </summary>
-    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private RxCommandUnit? _showAbout;
-    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
+    /// <inheritdoc />
+    protected override Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
 
-    /// <summary>
-    /// Shows the Settings window.
-    /// </summary>
-    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    private RxCommandUnit? _showSettings;
-    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
+    /// <inheritdoc />
+    protected override Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using LazyCache;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ public class EncoderServiceTests : TestsBase
     public IAudioEncoder BassEncoder => _bassEncoder ??= new AudioEncoder(PitchDetector, FileSystem);
     private IAudioEncoder _bassEncoder;
 
-    public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem);
+    public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem, AppCache);
     private IPitchDetector _pitchDetector;
 
     public FileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
@@ -42,7 +43,8 @@ public class EncoderServiceTests : TestsBase
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
     
-    
+    public IAppCache AppCache => _appCache ??= new CachingService();
+    private IAppCache _appCache;
 
     private object ViewModelFactory(Type type) => (type) switch
     {

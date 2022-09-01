@@ -22,8 +22,7 @@ public abstract class BaseWithSettings<TSettings> : ReactiveObject, IDisposable
         
         _settings.Changed += Settings_Loaded;
         _settings.Saving += Settings_Saving;
-        // Dispatcher.UIThread.Post(ConvertFromSettings);
-        Task.Run(ConvertFromSettings);
+        Dispatcher.UIThread.Post(ConvertFromSettings);
     }
     
     private void Settings_Loaded(object? sender, EventArgs e)

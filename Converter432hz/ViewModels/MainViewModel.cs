@@ -1,7 +1,6 @@
-﻿using System.ComponentModel;
-using System.Linq;
-using System.Windows.Input;
+﻿using System.Linq;
 using DynamicData;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -11,9 +10,8 @@ namespace HanumanInstitute.Converter432hz.ViewModels;
 /// <summary>
 /// Represents the main application window.
 /// </summary>
-public class MainViewModel : ReactiveObject
+public class MainViewModel : MainViewModelBase<AppSettingsData>
 {
-    private readonly ISettingsProvider<AppSettingsData> _settings;
     private readonly IDialogService _dialogService;
     private readonly IFileSystemService _fileSystem;
     private readonly IFileLocator _fileLocator;
@@ -23,11 +21,12 @@ public class MainViewModel : ReactiveObject
 
     public AppSettingsData AppSettings => _settings.Value;
 
-    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IEncoderService encoder, IDialogService dialogService,
+    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IEncoderService encoder,
+        IDialogService dialogService,
         IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, IEnvironmentService environment,
-        IPitchDetector pitchDetector)
+        IPitchDetector pitchDetector) :
+        base(settings, appUpdateService)
     {
-        _settings = settings;
         Encoder = encoder;
         Encoder.Owner = this;
         _dialogService = dialogService;
@@ -36,8 +35,6 @@ public class MainViewModel : ReactiveObject
         _appPath = appPath;
         _environment = environment;
         _pitchDetector = pitchDetector;
-        _settings.Changed += Settings_Loaded;
-        Settings_Loaded(_settings, EventArgs.Empty);
 
         FormatsList.SelectedValue = EncodeFormat.Mp3;
         BitrateList.SelectedValue = 0;
@@ -67,24 +64,6 @@ public class MainViewModel : ReactiveObject
         //     CalcFilesLeft();
         //     CalcCompleted();
         // };
-    }
-
-    private AppSettingsData Settings => _settings.Value;
-    
-    private void Settings_Loaded(object? sender, EventArgs e)
-    {
-        this.RaisePropertyChanged(nameof(AppSettings));
-    }
-
-    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private RxCommandUnit? _initWindow;
-    private async Task InitWindowImplAsync()
-    {
-        if (_settings.Value.ShowInfoOnStartup)
-        {
-            await Task.Delay(1).ConfigureAwait(true); // work-around rendering bug in Avalonia v0.10.15
-            await ShowAboutImplAsync().ConfigureAwait(false);
-        }
     }
 
     // /// <summary>
@@ -128,18 +107,8 @@ public class MainViewModel : ReactiveObject
     /// </summary>
     public IEncoderService Encoder { get; }
 
-    /// <summary>
-    /// Before settings are saved, convert the list of PlaylistViewModel back into playlists.
-    /// </summary>
-    public ReactiveCommand<CancelEventArgs, Unit> SaveSettingsCommand => _saveSettingsCommand ??= ReactiveCommand.Create<CancelEventArgs>(OnSaveSettings);
-    private ReactiveCommand<CancelEventArgs, Unit>? _saveSettingsCommand;
-    private void OnSaveSettings(CancelEventArgs e)
-    {
-        _settings.Save();  
-        StopEncoding.Execute().Subscribe();
-    } 
-
-    [Reactive] public int SourcesSelectedIndex { get; set; }
+    [Reactive]
+    public int SourcesSelectedIndex { get; set; }
 
     public RxCommandUnit AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
     private RxCommandUnit? _addFiles;
@@ -193,7 +162,7 @@ public class MainViewModel : ReactiveObject
         }
     }
 
-    public RxCommandUnit RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl, 
+    public RxCommandUnit RemoveFile => _removeFile ??= ReactiveCommand.Create(RemoveFileImpl,
         this.WhenAnyValue(x => x.SourcesSelectedIndex, index => index > -1));
     private RxCommandUnit? _removeFile;
     private void RemoveFileImpl()
@@ -289,18 +258,17 @@ public class MainViewModel : ReactiveObject
     public RxCommandUnit StopEncoding => _stopEncoding ??= ReactiveCommand.Create(StopEncodingImpl);
     private RxCommandUnit? _stopEncoding;
     private void StopEncodingImpl() => Encoder.Cancel();
+
+    /// <inheritdoc />
+    protected override Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
+
+    /// <inheritdoc />
+    protected override Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
     
-    /// <summary>
-    /// Shows the About window.
-    /// </summary>
-    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private RxCommandUnit? _showAbout;
-    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
-    
-    /// <summary>
-    /// Shows the Settings window.
-    /// </summary>
-    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    private RxCommandUnit? _showSettings;
-    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
+    /// <inheritdoc />
+    public override void ViewClosed()
+    {
+        StopEncoding.Execute().Subscribe();
+        base.ViewClosed();
+    }
 }

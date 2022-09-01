@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -74,8 +75,11 @@ public class MainViewModelTests
     protected IPathFixer PathFixer => _pathFixer ??= new AppPathFixer(MockFileSystem, DialogService, MockAppSettings.Object); 
     private IPathFixer _pathFixer;
 
-    protected MainViewModel Model => _model ??= new MainViewModel(AppPath, MockAppSettings.Object, MockFileSystem, DialogService, PathFixer);
+    protected MainViewModel Model => _model ??= new MainViewModel(MockAppSettings.Object, MockAppUpdate.Object, AppPath, MockFileSystem, DialogService, PathFixer);
     private MainViewModel _model;
+    
+    public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();
+    private Mock<IAppUpdateService> _mockAppUpdate;
     
     protected void SetDialogManagerOpenFolder(string result) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(
@@ -182,11 +186,11 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void SaveSettingsCommand_Default_CallSettingsSave()
+    public void ViewClosed_Default_CallSettingsSave()
     {
         Model.Settings.Folders.Add("D:\\");
 
-        Model.SaveSettings();
+        Model.ViewClosed();
 
         _mockAppSettings.Verify(x => x.Save(), Times.Once);
     }

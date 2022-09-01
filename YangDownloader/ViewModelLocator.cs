@@ -7,6 +7,7 @@ using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.YangDownloader.Business;
+using LazyCache.Splat;
 using Splat;
 
 namespace HanumanInstitute.YangDownloader;
@@ -26,9 +27,10 @@ public static class ViewModelLocator
             
         // Services
         container.AddCommonAvaloniaApp<AppSettingsData>();
-        container.AddCommonServices()
-            .AddBassAudio()
-            .AddDownloads();
+        container.AddCommonServices();
+        container.AddBassAudio();
+        container.AddDownloads();
+        container.AddLazyCache();
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
             viewLocator: new ViewLocator(),
             dialogFactory: new DialogFactory().AddFluent()),

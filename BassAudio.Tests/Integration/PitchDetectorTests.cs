@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
+using LazyCache;
 using ManagedBass;
 using Xunit.Abstractions;
 
@@ -16,11 +17,14 @@ public class PitchDetectorTests : TestsBase
     private PitchDetector _model;
     private PitchDetector SetupModel()
     {
-        return new PitchDetector(FileSystem);
+        return new PitchDetector(FileSystem, AppCache);
     }
 
     public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
     private IFileSystemService _fileSystem;
+    
+    public IAppCache AppCache => _appCache ??= new CachingService();
+    private IAppCache _appCache;
 
     [Theory]
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/INNA/Inna/")]

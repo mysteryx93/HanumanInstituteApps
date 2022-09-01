@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -14,7 +15,7 @@ public class MainViewModelTests : TestsBase
     }
 
     public MainViewModel Model => _model ??=
-        new MainViewModel(MockSettingsProvider, Encoder, DialogService, FileSystem,
+        new MainViewModel(MockSettingsProvider, MockAppUpdate.Object, Encoder, DialogService, FileSystem,
             FileLocator, MockAppPath.Object, new FakeEnvironmentService(), MockPitchDetector.Object);
     private MainViewModel _model;
 
@@ -24,6 +25,9 @@ public class MainViewModelTests : TestsBase
 
     public IFileLocator FileLocator => _fileLocator ??= new FileLocator(MockAppPath.Object, FileSystem);
     private IFileLocator _fileLocator;
+    
+    public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();
+    private Mock<IAppUpdateService> _mockAppUpdate;
 
     public AppSettingsData AppSettings { get; set; } = new();
 

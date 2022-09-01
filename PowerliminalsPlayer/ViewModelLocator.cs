@@ -4,6 +4,7 @@ using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using LazyCache.Splat;
 using Splat;
 
 namespace HanumanInstitute.PowerliminalsPlayer;
@@ -24,6 +25,7 @@ public static class ViewModelLocator
         // Services
         container.AddCommonAvaloniaApp<AppSettingsData>();
         container.AddCommonServices();
+        container.AddLazyCache();
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
                 viewLocator: new ViewLocator(),
                 dialogFactory: new DialogFactory().AddFluent()),

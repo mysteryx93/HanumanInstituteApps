@@ -5,6 +5,7 @@ using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using LazyCache.Splat;
 using Splat;
 
 namespace HanumanInstitute.Converter432hz;
@@ -26,7 +27,8 @@ public static class ViewModelLocator
         container.AddCommonAvaloniaApp<AppSettingsData>();
         container.AddCommonServices();
         container.AddBassAudio();
-        
+        container.AddLazyCache();
+
         container.Register<IDialogService>(() => new DialogService(
             viewModelFactory: x => Locator.Current.GetService(x), 
             dialogManager: new DialogManager(viewLocator: new ViewLocator(),

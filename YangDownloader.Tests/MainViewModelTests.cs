@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.YangDownloader.Models;
 using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
@@ -18,7 +19,7 @@ public class MainViewModelTests : TestsBase
     public MainViewModel Model => _model ??= Init(() =>
     {
         SetTitle();
-        return new MainViewModel(MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, FakeSettings)
+        return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem)
         {
             DownloadUrl = "https://www.youtube.com/watch?v=4OqXWzekVw4"
         };
@@ -50,6 +51,10 @@ public class MainViewModelTests : TestsBase
 
     public ISettingsProvider<AppSettingsData> FakeSettings => _fakeSettings ??= new FakeSettingsProvider<AppSettingsData>();
     private ISettingsProvider<AppSettingsData> _fakeSettings;
+    
+    public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();
+    private Mock<IAppUpdateService> _mockAppUpdate;
+
 
     protected void SetQueryError(Exception ex) =>
         MockDownloadManager.Setup(x => x.QueryStreamInfoAsync(It.IsAny<Uri>(), It.IsAny<CancellationToken>()))
@@ -97,7 +102,7 @@ public class MainViewModelTests : TestsBase
     [Fact]
     public void Constructor_Valid_HasInitialState()
     {
-        _model = new MainViewModel(MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, FakeSettings);
+        _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem);
 
         Assert.NotEmpty(Model.PreferredVideo);
         Assert.Equal(0, Model.PreferredVideo.CurrentPosition);

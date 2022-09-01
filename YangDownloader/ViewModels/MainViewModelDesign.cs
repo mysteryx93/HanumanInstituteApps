@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Downloads;
+﻿using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Downloads;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 
@@ -6,8 +7,10 @@ namespace HanumanInstitute.YangDownloader.ViewModels;
 
 public class MainViewModelDesign : MainViewModel
 {
-    public MainViewModelDesign() : base(Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(),
-        new DialogService(), Locator.Current.GetService<IFileSystemService>()!, Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!)
+    public MainViewModelDesign() : base(Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!,
+        Locator.Current.GetService<IAppUpdateService>()!,
+        Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(),
+        new DialogService(), Locator.Current.GetService<IFileSystemService>()!)
     {
         DisplayDownloadInfo = true;
         VideoTitle = "This is a very long title! This is a very long title! This is a very long title! ";

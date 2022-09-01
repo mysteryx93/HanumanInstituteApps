@@ -1,32 +1,30 @@
-﻿using System.ComponentModel;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
-using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class MainViewModel : ReactiveObject
+public class MainViewModel : MainViewModelBase<AppSettingsData>
 {
     private readonly IDownloadManager _downloadManager;
     private readonly IYouTubeStreamSelector _streamSelector;
     private readonly IDialogService _dialogService;
     private readonly IFileSystemService _fileSystem;
-    private readonly ISettingsProvider<AppSettingsData> _settings;
 
-    public MainViewModel(IDownloadManager downloadManager, IYouTubeStreamSelector streamSelector, IDialogService dialogService,
-        IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings)
+    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
+        IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem) :
+        base(settings, appUpdateService)
     {
         _downloadManager = downloadManager;
         _streamSelector = streamSelector;
         _dialogService = dialogService;
         _fileSystem = fileSystem;
-        _settings = settings;
 
         PreferredVideo = new ListItemCollectionView<StreamContainerOption>()
         {
@@ -53,8 +51,6 @@ public class MainViewModel : ReactiveObject
         }
         MaxQuality = new ListItemCollectionView<int>(quality);
 
-        _settings.Changed += Settings_Loaded;
-        Settings_Loaded(_settings, EventArgs.Empty);
         _downloadManager.DownloadAdded += DownloadManager_DownloadAdded;
 
         _hasDownloads = Downloads
@@ -64,37 +60,18 @@ public class MainViewModel : ReactiveObject
             .ToProperty(this, x => x.HasDownloads);
     }
 
-    public AppSettingsData Settings => _settings.Value;
-
-    private void Settings_Loaded(object? sender, EventArgs e)
+    protected override void ConvertFromSettings()
     {
         PreferredVideo.SelectedValue = Settings.PreferredVideo;
         PreferredAudio.SelectedValue = Settings.PreferredAudio;
         MaxQuality.SelectedValue = Settings.MaxQuality;
-
-        this.RaisePropertyChanged(nameof(Settings));
     }
 
-    public ReactiveCommand<CancelEventArgs, Unit> SaveSettings => _saveSettings ??= ReactiveCommand.Create<CancelEventArgs>(SaveSettingsImpl);
-    private ReactiveCommand<CancelEventArgs, Unit>? _saveSettings;
-    private void SaveSettingsImpl(CancelEventArgs e)
+    protected override void ConvertToSettings()
     {
         Settings.PreferredVideo = PreferredVideo.SelectedValue;
         Settings.PreferredAudio = PreferredAudio.SelectedValue;
         Settings.MaxQuality = MaxQuality.SelectedValue;
-
-        _settings.Save();
-    }
-
-    public RxCommandUnit InitWindow => _initWindow ??= ReactiveCommand.CreateFromTask(InitWindowImplAsync);
-    private RxCommandUnit? _initWindow;
-    private async Task InitWindowImplAsync()
-    {
-        if (_settings.Value.ShowInfoOnStartup)
-        {
-            await Task.Delay(1).ConfigureAwait(true);
-            await ShowAboutImplAsync().ConfigureAwait(false);
-        }
     }
 
     /// <summary>
@@ -325,7 +302,7 @@ public class MainViewModel : ReactiveObject
         {
             var query = _downloadManager.SelectStreams(streams, DownloadVideo, DownloadAudio, GetDownloadOptions());
             var fileName = string.IsNullOrWhiteSpace(VideoTitle) ? Resources.DefaultFileName : _fileSystem.SanitizeFileName(VideoTitle);
-            
+
             // Avoid conflicting file names by adding (2) after file name.
             var destination = _fileSystem.Path.Combine(Settings.DestinationFolder, fileName);
             var suffix = "." + query.FileExtension;
@@ -336,7 +313,7 @@ public class MainViewModel : ReactiveObject
                 suffix = $" ({i}).{query.FileExtension}";
             }
             destination += suffix;
-            
+
             var _ = _downloadManager.DownloadAsync(query, destination).ConfigureAwait(false);
         }
     }
@@ -374,30 +351,21 @@ public class MainViewModel : ReactiveObject
         DisplayDownloadInfo = false;
     }
 
-    private DownloadOptions GetDownloadOptions() =>
-        new()
-        {
-            PreferredVideo = PreferredVideo.CurrentItem!.Value,
-            PreferredAudio = PreferredAudio.CurrentItem!.Value,
-            MaxQuality = MaxQuality.CurrentItem!.Value,
-            ConcurrentDownloads = 2,
-            EncodeAudio = Settings.EncodeAudio ? Settings.EncodeSettings : null
-        };
+    private DownloadOptions GetDownloadOptions() => new()
+    {
+        PreferredVideo = PreferredVideo.CurrentItem!.Value,
+        PreferredAudio = PreferredAudio.CurrentItem!.Value,
+        MaxQuality = MaxQuality.CurrentItem!.Value,
+        ConcurrentDownloads = 2,
+        EncodeAudio = Settings.EncodeAudio ? Settings.EncodeSettings : null
+    };
 
     private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) =>
         Downloads.Add(new DownloadItem(e.Download, VideoTitle));
 
-    /// <summary>
-    /// Shows the About window.
-    /// </summary>
-    public RxCommandUnit ShowAbout => _showAbout ??= ReactiveCommand.CreateFromTask(ShowAboutImplAsync);
-    private RxCommandUnit? _showAbout;
-    private Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
+    /// <inheritdoc />
+    protected override Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);
 
-    /// <summary>
-    /// Shows the Settings window.
-    /// </summary>
-    public RxCommandUnit ShowSettings => _showSettings ??= ReactiveCommand.CreateFromTask(ShowSettingsImplAsync);
-    private RxCommandUnit? _showSettings;
-    private Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
+    /// <inheritdoc />
+    protected override Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
 }
