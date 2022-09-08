@@ -30,6 +30,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
 
     protected override void RestoreDefaultImpl()
     {
+        CheckForUpdateList.SelectedValue = UpdateInterval.Biweekly;
         Settings.FFmpegPath = "ffmpeg";
         TestFFmpegImpl();
     }

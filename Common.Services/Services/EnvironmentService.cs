@@ -32,4 +32,10 @@ public class EnvironmentService : IEnvironmentService
     public DateTime UtcNow => DateTime.UtcNow;
     /// <inheritdoc />
     public int ProcessorCount => Environment.ProcessorCount;
+    /// <inheritdoc />
+    public bool IsLinux => OperatingSystem.IsLinux();
+    /// <inheritdoc />
+    public bool IsWindows => OperatingSystem.IsWindows();
+    /// <inheritdoc />
+    public bool IsMacOS => OperatingSystem.IsMacOS();
 }

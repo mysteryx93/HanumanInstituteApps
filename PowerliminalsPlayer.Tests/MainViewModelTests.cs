@@ -190,7 +190,7 @@ public class MainViewModelTests
     {
         Model.Settings.Folders.Add("D:\\");
 
-        Model.ViewClosed();
+        Model.OnClosed();
 
         _mockAppSettings.Verify(x => x.Save(), Times.Once);
     }

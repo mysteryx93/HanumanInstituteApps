@@ -2,8 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         x:Class="HanumanInstitute.Converter432hz.Views.MainView"
         mc:Ignorable="d" Classes="gradient"
         Title="432hz Batch Converter" Icon="/Assets/App.ico"
@@ -16,14 +14,6 @@
         xmlns:bass="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <Interaction.Behaviors>
-        <EventTriggerBehavior EventName="Opened">
-            <InvokeCommandAction Command="{Binding InitWindow}" />
-        </EventTriggerBehavior>
-        <EventTriggerBehavior EventName="Closing">
-            <InvokeCommandAction Command="{Binding SaveSettingsCommand}" />
-        </EventTriggerBehavior>
-    </Interaction.Behaviors>
     <Window.Resources>
         <hic:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>
@@ -39,7 +29,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Column="0" Grid.Row="0">
                 <Grid>
-                    <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="DemiBold">Sources</TextBlock>
+                    <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="DemiBold" Text="Sources " />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,2">
                         <Button Classes="round" Width="85" Command="{Binding AddFiles}">Add Files</Button>
                         <Button Classes="round" Width="85" Command="{Binding AddFolder}" Margin="3,0,3,0">Add Folder</Button>
@@ -54,7 +44,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <TextBlock FontSize="16" FontWeight="DemiBold" Margin="0,10,0,2">Destination Folder</TextBlock>
+                <TextBlock FontSize="16" FontWeight="DemiBold" Margin="0,10,0,2" Text="Destination Folder" />
                 <Grid IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -91,19 +81,19 @@
             <Grid Grid.Column="1" Grid.Row="0" Margin="20,0,0,0">
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid>
-                        <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold">Settings</TextBlock>
+                        <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold" Text="Settings" />
                         <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top" Content="I" 
                                 Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                     </Grid>
                     <Grid Margin="0,2,0,2">
-                        <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
+                        <TextBlock VerticalAlignment="Center" Text="Output Format" />
                         <ComboBox HorizontalAlignment="Right" Width="100"
                                   Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <Grid IsVisible="{Binding IsBitrateVisible}">
-                            <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
+                            <TextBlock VerticalAlignment="Center" Text="Bitrate" />
                             <ComboBox HorizontalAlignment="Right" Width="100"
                                       Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                             </ComboBox>
@@ -111,8 +101,8 @@
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <Grid IsVisible="{Binding IsSampleRateVisible}">
-                            <TextBlock VerticalAlignment="Center">Sample rate</TextBlock>
-                            <ComboBox HorizontalAlignment="Right" Width="100"
+                            <TextBlock VerticalAlignment="Center" Text="Sample rate" />
+                            <ComboBox HorizontalAlignment="Right" Width="115"
                                       Items="{Binding SampleRateList}"
                                       SelectedItem="{Binding SampleRateList.CurrentItem}">
                             </ComboBox>
@@ -120,12 +110,12 @@
                     </Grid>
                     <Grid Margin="0,2,0,2" Height="54">
                         <Grid IsVisible="{Binding IsQualitySpeedVisible}">
-                            <TextBlock VerticalAlignment="Center">Speed</TextBlock>
+                            <TextBlock VerticalAlignment="Center" Text="Speed" />
                             <Slider HorizontalAlignment="Center" Width="110" Minimum="0" Maximum="5"
                                     TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
                                     Value="{Binding Settings.Encode.QualityOrSpeed}">
                             </Slider>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right">Quality</TextBlock>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Text="Quality" />
                         </Grid>
                     </Grid>
                     <Button Classes="round" Width="100" HorizontalAlignment="Center" Margin="0,5"
@@ -136,7 +126,7 @@
             </Grid>
             <Grid Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center">When destination file exists</TextBlock>
+                    <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center" Text="When destination file exists" />
                     <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center"
                               Items="{Binding FileExistsActionList}"
                               SelectedItem="{Binding FileExistsActionList.CurrentItem, Mode=TwoWay}">

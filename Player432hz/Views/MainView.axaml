@@ -14,14 +14,6 @@
         hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}" Classes="gradient">
-    <Interaction.Behaviors>
-        <EventTriggerBehavior EventName="Opened">
-            <InvokeCommandAction Command="{Binding InitWindow}" />
-        </EventTriggerBehavior>
-        <EventTriggerBehavior EventName="Closing">
-            <InvokeCommandAction Command="{Binding SaveSettings}" />
-        </EventTriggerBehavior>
-    </Interaction.Behaviors>
     <Grid>
         <Grid Margin="10,6,10,10" ColumnDefinitions="150,*" RowDefinitions="*,40">
             <Grid Column="0">

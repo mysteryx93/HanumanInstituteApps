@@ -69,8 +69,9 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
     public ListItemCollectionView<UpdateInterval> CheckForUpdateList { get; } = new()
     {
         { UpdateInterval.Daily, "Daily" },
-        { UpdateInterval.Weekly, "Weekly" },
         { UpdateInterval.Biweekly, "Biweekly" },
+        { UpdateInterval.Weekly, "Weekly" },
+        { UpdateInterval.Bimonthly, "Bimonthly" },
         { UpdateInterval.Monthly, "Monthly" },
         { UpdateInterval.Never, "Never" }
     };

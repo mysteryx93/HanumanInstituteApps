@@ -185,7 +185,7 @@ public class MainViewModelTests
     {
         AddPlaylists(2);
 
-        Model.ViewClosed();
+        Model.OnClosed();
 
         Assert.Equal(2, MockSettings.Value.Playlists.Count);
     }
@@ -196,7 +196,7 @@ public class MainViewModelTests
         AddPlaylists(1);
         Model.Playlists.Source[0].Folders.Source.Add("a");
 
-        Model.ViewClosed();
+        Model.OnClosed();
 
         Assert.NotNull(MockSettings.Value.Playlists);
         Assert.Single(MockSettings.Value.Playlists[0].Folders);

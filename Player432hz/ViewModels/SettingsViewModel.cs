@@ -6,12 +6,12 @@ namespace HanumanInstitute.Player432hz.ViewModels;
 /// <inheritdoc />
 public class SettingsViewModel : SettingsViewModel<AppSettingsData>
 {
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player) :
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player, IEnvironmentService environment) :
         base(settingsProvider, fluentTheme)
     {
         Player = player;
         OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;
-        IsDeviceSampleRateVisible = OperatingSystem.IsLinux();
+        IsDeviceSampleRateVisible = environment.IsLinux;
     }
     
     public IPlaylistPlayer Player { get; }
@@ -54,6 +54,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
     /// <inheritdoc />
     protected override void RestoreDefaultImpl()
     {
+        CheckForUpdateList.SelectedValue = UpdateInterval.Biweekly;
         Settings.AntiAlias = false;
         Settings.AntiAliasLength = 32;
         Settings.Speed = 1;

@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432hz"
-        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="320" Height="320" MaxHeight="320"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="395" Height="395" MaxHeight="395"
         x:Class="HanumanInstitute.Converter432hz.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -23,7 +23,12 @@
                                   SelectedItem="{Binding ThemeList.CurrentItem}" />
                     </Grid>
                 </StackPanel>
-                    <CheckBox IsChecked="{Binding Settings.Encode.AntiAlias}">Apply anti-alias filter</CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}"
+                              SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
+                </StackPanel>
+                <CheckBox IsChecked="{Binding Settings.Encode.AntiAlias}">Apply anti-alias filter</CheckBox>
                 <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.Encode.AntiAlias}">
                     <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
                     <NumericUpDown Value="{Binding Settings.Encode.AntiAliasLength}" Width="80" Minimum="8" Maximum="128" />
@@ -33,7 +38,7 @@
                     <NumericUpDown Value="{Binding Settings.Encode.Speed}" Width="80" Minimum="0.01" Maximum="100" />
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.Encode.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
-                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto" Margin="0,0,0,8">
+                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
                                HorizontalAlignment="Center" />
@@ -45,6 +50,8 @@
                     <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.Encode.PitchTo}" Minimum="1" Maximum="10000" />
                     <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                 </Grid>
+                <CheckBox IsChecked="{Binding Settings.Encode.RoundPitch}" Content="Round pitch for quality" />
+                <CheckBox IsChecked="{Binding Settings.Encode.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Max threads  " VerticalAlignment="Center" />
                     <NumericUpDown Value="{Binding Settings.MaxThreads}" Width="80" Minimum="1" Maximum="64" />

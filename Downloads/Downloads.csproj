@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.4.1">
+    <PackageReference Include="PropertyChanged.Fody" Version="4.0.1">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.69">

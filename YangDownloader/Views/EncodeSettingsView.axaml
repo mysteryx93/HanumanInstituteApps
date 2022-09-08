@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
-        mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="365" Height="365" MaxHeight="365"
+        mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="420" Height="420" MaxHeight="420"
         x:Class="HanumanInstitute.YangDownloader.Views.EncodeSettingsView"
         Title="Advanced Settings" Classes="gradient"
         CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -12,14 +12,14 @@
         <Grid Margin="10">
             <StackPanel>
                 <Grid Margin="0,2,0,2">
-                    <TextBlock VerticalAlignment="Center">Output Format</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="Output Format" />
                     <ComboBox HorizontalAlignment="Right" Width="110" 
                               Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsBitrateVisible}">
-                        <TextBlock VerticalAlignment="Center">Bitrate</TextBlock>
+                        <TextBlock VerticalAlignment="Center" Text="Bitrate" />
                         <ComboBox HorizontalAlignment="Right" Width="110" 
                                   Items="{Binding BitrateList}"
                                   SelectedItem="{Binding BitrateList.CurrentItem}">
@@ -28,7 +28,7 @@
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsSampleRateVisible}">
-                        <TextBlock VerticalAlignment="Center">Sample rate</TextBlock>
+                        <TextBlock VerticalAlignment="Center" Text="Sample rate" />
                         <ComboBox HorizontalAlignment="Right" Width="110" 
                                   Items="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
@@ -37,12 +37,12 @@
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="44">
                     <Grid IsVisible="{Binding IsQualitySpeedVisible}">
-                        <TextBlock VerticalAlignment="Center">Speed</TextBlock>
+                        <TextBlock VerticalAlignment="Center" Text="Speed" />
                         <Slider HorizontalAlignment="Center" Width="110" Minimum="0" Maximum="5"
                                 TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
                                 Value="{Binding Settings.QualityOrSpeed}">
                         </Slider>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right">Quality</TextBlock>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Text="Quality" />
                     </Grid>
                 </Grid>
                 <CheckBox IsChecked="{Binding ShiftPitch}">Shift audio pitch</CheckBox>
@@ -67,6 +67,8 @@
                         <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}"  />
                         <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
                     </Grid>
+                    <CheckBox IsChecked="{Binding Settings.RoundPitch}" Content="Round pitch for quality" />
+                    <CheckBox IsChecked="{Binding Settings.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">

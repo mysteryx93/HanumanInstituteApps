@@ -24,6 +24,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
     /// <inheritdoc />
     protected override void RestoreDefaultImpl()
     {
+        CheckForUpdateList.SelectedValue = UpdateInterval.Biweekly;
         Settings.Encode.AntiAlias = false;
         Settings.Encode.AntiAliasLength = 32;
         Settings.Encode.Speed = 1;

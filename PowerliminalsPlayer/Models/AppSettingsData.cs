@@ -47,4 +47,10 @@ public class AppSettingsData : SettingsDataBase
     [Reactive]
     [Range(minimum: 0, maximum: 5)]
     public int PerformanceQuality { get; set; } = 2;
+
+    /// <summary>
+    /// On Linux, sets the device output sample rate. On other platforms, null = auto-detected.
+    /// </summary>
+    [Reactive]
+    public int? OutputSampleRate { get; set; }
 }

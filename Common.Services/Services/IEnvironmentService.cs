@@ -55,4 +55,11 @@ public interface IEnvironmentService
     /// <summary>Gets the number of processors on the current machine.</summary>
     /// <returns>The 32-bit signed integer that specifies the number of processors on the current machine. There is no default. If the current machine contains multiple processor groups, this property returns the number of logical processors that are available for use by the common language runtime (CLR).</returns>
     int ProcessorCount { get; }
+    /// <summary>Indicates whether the current application is running on Linux.</summary>
+    bool IsLinux { get; }
+    /// <summary>Indicates whether the current application is running on Windows.</summary>
+    bool IsWindows { get; }
+    /// <summary>Indicates whether the current application is running on MacOS.</summary>
+    // ReSharper disable once InconsistentNaming
+    bool IsMacOS { get; }
 }

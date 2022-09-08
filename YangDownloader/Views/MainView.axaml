@@ -14,14 +14,6 @@
     hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
     hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}">
-    <Interaction.Behaviors>
-        <EventTriggerBehavior EventName="Opened">
-            <InvokeCommandAction Command="{Binding InitWindow}" />
-        </EventTriggerBehavior>
-        <EventTriggerBehavior EventName="Closing">
-            <InvokeCommandAction Command="{Binding SaveSettings}" />
-        </EventTriggerBehavior>
-    </Interaction.Behaviors>
     <Grid>
         <Grid Margin="10" RowDefinitions="Auto,*">
             <Button Grid.Row="0" Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"

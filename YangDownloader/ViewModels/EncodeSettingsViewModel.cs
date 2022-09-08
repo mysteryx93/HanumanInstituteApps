@@ -98,8 +98,18 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     public ListItemCollectionView<int> SampleRateList { get; } = new()
     {
         { 0, "Source" },
-        { 44100, "44100hz" },
-        { 48000, "48000hz" }
+        { 8000, "8000 Hz" },
+        { 11025, "11,025 Hz" },
+        { 16000, "16,000 Hz" },
+        { 22050, "22,050 Hz" },
+        { 44100, "44,100 Hz" },
+        { 48000, "48,000 Hz" },
+        { 88200, "88,200 Hz" },
+        { 96000, "96,000 Hz" },
+        { 176400, "176,400 Hz" },
+        { 192000, "192,000 Hz" },
+        { 352800, "352,800 Hz" },
+        { 384000, "384,000 Hz" }
     };
 
     public ListItemCollectionView<int> BitrateList { get; } = new()

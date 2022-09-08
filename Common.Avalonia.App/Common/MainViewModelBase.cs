@@ -28,11 +28,11 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
     /// <summary>
     /// On startup, show About window and/or check for updates. 
     /// </summary>
-    public virtual async void ViewLoaded()
+    public virtual async void OnLoaded()
     {
         if (_settings.Value.ShowInfoOnStartup)
         {
-            await Task.Delay(1).ConfigureAwait(true);
+            await Task.Delay(400).ConfigureAwait(true);
             ShowAbout.Execute().Subscribe();
             _settings.Save();
         }
@@ -66,7 +66,7 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
     /// <summary>
     /// Unregister events when the View is closed.
     /// </summary>
-    public virtual void ViewClosed()
+    public virtual void OnClosed()
     {
         _settings.Save();
         Dispose();
