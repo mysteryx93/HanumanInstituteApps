@@ -7,11 +7,7 @@
         <local:ViewLocator/>
     </Application.DataTemplates>
     <Application.Styles>
-        <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="Coral"
-                                 SkipControls="ProgressBar;DataGrid;ToggleSwitch;AutoCompleteBox;TreeView;SplitView;
-                                 Calendar;CalendarDatePicker;DatePicker;TimePicker;Menu;MenuItem;MenuFlyout;Flyout;GridSplitter;
-                                 SplitButton;ToggleSplitButton;DropDownButton;ContentDialog;PickerFlyoutBase;NavigationView;Frame;
-                                 TabView;XamlURCommand;CommandBar;CommandBarFlyout;MenuFlyout;ColorPicker;ColorPickerButton;InfoBar;InfoBadge" />
+        <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="Coral" />
         <StyleInclude Source="avares://Common.Avalonia.App/Styles/CommonStyles.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
         <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />

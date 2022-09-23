@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="FluentAvaloniaUI" Version="1.4.2" />
+    <PackageReference Include="FluentAvaloniaUI" Version="1.4.3" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.4.1" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="1.4.1" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
@@ -49,7 +49,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0-rc.1.22426.10" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

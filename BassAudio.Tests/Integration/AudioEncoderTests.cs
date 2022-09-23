@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using LazyCache;
 using ManagedBass;
+using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using Xunit.Abstractions;
 // ReSharper disable MemberCanBePrivate.Global
@@ -224,6 +227,42 @@ public class AudioEncoderTests : TestsBase
         Bass.StreamFree(chan);
         Assert.Equal(sampleRate > 0 ? sampleRate : sourceSampleRate, chanInfo.Frequency);
     }
+    
+    [Theory]
+    [InlineData(EncodeFormat.Wav, 0)]
+    [InlineData(EncodeFormat.Wav, 8)]
+    [InlineData(EncodeFormat.Wav, 16)]
+    [InlineData(EncodeFormat.Wav, 24)]
+    [InlineData(EncodeFormat.Wav, 32)]
+    [InlineData(EncodeFormat.Flac, 0)]
+    [InlineData(EncodeFormat.Flac, 8)]
+    [InlineData(EncodeFormat.Flac, 16)]
+    [InlineData(EncodeFormat.Flac, 24)]
+    [InlineData(EncodeFormat.Flac, 32)]
+    public async Task Start_Bits_CreateFileWithBits(EncodeFormat format, int bits)
+    {
+        var file = CreateSourceShort(format);
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Format = format;
+        Settings.Bitrate = 128;
+        Settings.BitsPerSample = bits;
+        Settings.PitchTo = 432;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        var chan = Bass.CreateStream(file.Destination);
+        var chanInfo = Bass.ChannelGetInfo(chan);
+        Bass.StreamFree(chan);
+        Output.WriteLine(chanInfo.Resolution.ToString());
+        Assert.Equal(bits switch
+        {
+            0 => Resolution.Short,
+            8 => Resolution.Byte,
+            16 => Resolution.Short,
+            _ => Resolution.Float
+        }, chanInfo.Resolution);
+    }
 
     [Theory]
     [InlineData(null)]
@@ -401,5 +440,65 @@ public class AudioEncoderTests : TestsBase
         var dstTag = GetTag(tagName, file.Destination);
         Output.WriteLine($"Output = {dstTag}");
         Assert.Equal(srcTag, dstTag);
+    }
+    
+    [Fact]
+    [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
+    public async Task Start_RoundPitch_CreateDifferentOutput()
+    {
+        var file1 = CreateSourceShort(EncodeFormat.Wav);
+        var file2 = CreateSourceShort(EncodeFormat.Wav);
+        file1.Destination = file1.Destination.Replace("out", "out1"); 
+        file2.Destination = file1.Destination.Replace("out", "out2"); 
+        FileSystem.DeleteFileSilent(file1.Destination);
+        FileSystem.DeleteFileSilent(file2.Destination);
+        Settings.Format = EncodeFormat.Wav;
+        Settings.RoundPitch = false;
+        
+        await Model.StartAsync(file1, Settings);
+        Settings.RoundPitch = true;
+        await Model.StartAsync(file2, Settings);
+
+        Assert.False(File.ReadAllBytes(file1.Destination).SequenceEqual(File.ReadAllBytes(file2.Destination)));
+    }
+    
+    [Theory]
+    [InlineData(0)] // Pitch
+    [InlineData(1)] // Speed
+    // [InlineData(2)] // Rate
+    [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
+    public async Task Start_SkipTempo_CreateDifferentDuration(int test)
+    {
+        var file1 = CreateSourceShort(EncodeFormat.Wav);
+        var file2 = CreateSourceShort(EncodeFormat.Wav);
+        file1.Destination = file1.Destination.Replace("out", "out1"); 
+        file2.Destination = file1.Destination.Replace("out", "out2"); 
+        FileSystem.DeleteFileSilent(file1.Destination);
+        FileSystem.DeleteFileSilent(file2.Destination);
+        Settings.Format = EncodeFormat.Wav;
+        Settings.AutoDetectPitch = false;
+        if (test == 0)
+        {
+            Settings.PitchTo = 220;
+        }
+        else if (test == 1)
+        {
+            Settings.Speed = 1.1;
+        }
+        Settings.SkipTempo = false;
+        
+        await Model.StartAsync(file1, Settings);
+        Settings.SkipTempo = true;
+        await Model.StartAsync(file2, Settings);
+
+        var chan = Bass.CreateStream(file1.Destination);
+        var length1 = Bass.ChannelGetLength(chan);
+        Bass.StreamFree(chan);
+        chan = Bass.CreateStream(file2.Destination);
+        var length2 = Bass.ChannelGetLength(chan);
+        Bass.StreamFree(chan);
+        Output.WriteLine(length1.ToStringInvariant());
+        Output.WriteLine(length2.ToStringInvariant());
+        Assert.NotEqual(length1, length2);
     }
 }

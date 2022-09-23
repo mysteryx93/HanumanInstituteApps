@@ -38,6 +38,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
 
         FormatsList.SelectedValue = EncodeFormat.Mp3;
         BitrateList.SelectedValue = 0;
+        BitsPerSampleList.SelectedValue = 16;
         SampleRateList.SelectedValue = 48000;
         FileExistsActionList.SelectedValue = FileExistsAction.Ask;
         SourcesSelectedIndex = -1;
@@ -49,6 +50,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
 
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
+        _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
+            .ToProperty(this, x => x.IsBitsPerSampleVisible);
         _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
             .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
@@ -89,6 +92,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// </summary>
     public bool IsBitrateVisible => _isBitrateVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
+
+    /// <summary>
+    /// Gets whether Bits Per Sample control should be visible.
+    /// </summary>
+    public bool IsBitsPerSampleVisible => _isBitsPerSampleVisible.Value;
+    private readonly ObservableAsPropertyHelper<bool> _isBitsPerSampleVisible;
 
     /// <summary>
     /// Gets whether SampleRate control should be visible.
@@ -234,6 +243,14 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         { 192, "192 kbps" },
         { 256, "256 kbps" },
         { 320, "320 kbps" }
+    };
+    
+    public ListItemCollectionView<int> BitsPerSampleList { get; } = new()
+    {
+        { 8, "8-bits" },
+        { 16, "16-bits" },
+        { 24, "24-bits" },
+        { 32, "32-bits" }
     };
 
     public ListItemCollectionView<FileExistsAction> FileExistsActionList { get; } = new()

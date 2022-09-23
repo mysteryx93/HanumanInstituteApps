@@ -19,6 +19,11 @@ public class EncodeSettingsViewModel : OkCancelViewModel
         this.WhenAnyValue(x => x.BitrateList.SelectedValue)
             .BindTo(this, x => x.Settings.Bitrate);
 
+        this.WhenAnyValue(x => x.Settings.BitsPerSample)
+            .BindTo(this, x => x.BitsPerSampleList.SelectedValue);
+        this.WhenAnyValue(x => x.BitsPerSampleList.SelectedValue)
+            .BindTo(this, x => x.Settings.BitsPerSample);
+
         this.WhenAnyValue(x => x.Settings.SampleRate)
             .BindTo(this, x => x.SampleRateList.SelectedValue);
         this.WhenAnyValue(x => x.SampleRateList.SelectedValue)
@@ -26,6 +31,8 @@ public class EncodeSettingsViewModel : OkCancelViewModel
 
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
+        _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
+            .ToProperty(this, x => x.IsBitsPerSampleVisible);
         _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
             .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
@@ -72,6 +79,12 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     /// </summary>
     public bool IsBitrateVisible => _isBitrateVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
+    
+    /// <summary>
+    /// Gets whether Bits Per Sample control should be visible.
+    /// </summary>
+    public bool IsBitsPerSampleVisible => _isBitsPerSampleVisible.Value;
+    private readonly ObservableAsPropertyHelper<bool> _isBitsPerSampleVisible;
 
     /// <summary>
     /// Gets whether SampleRate control should be visible.
@@ -120,6 +133,14 @@ public class EncodeSettingsViewModel : OkCancelViewModel
         { 192, "192 kbps" },
         { 256, "256 kbps" },
         { 320, "320 kbps" }
+    };
+    
+    public ListItemCollectionView<int> BitsPerSampleList { get; } = new()
+    {
+        { 8, "8-bits" },
+        { 16, "16-bits" },
+        { 24, "24-bits" },
+        { 32, "32-bits" }
     };
     
     /// <summary>

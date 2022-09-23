@@ -17,14 +17,17 @@
                               Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                     </ComboBox>
                 </Grid>
-                <Grid Margin="0,2,0,2" Height="24">
-                    <Grid IsVisible="{Binding IsBitrateVisible}">
-                        <TextBlock VerticalAlignment="Center" Text="Bitrate" />
-                        <ComboBox HorizontalAlignment="Right" Width="110" 
-                                  Items="{Binding BitrateList}"
-                                  SelectedItem="{Binding BitrateList.CurrentItem}">
-                        </ComboBox>
-                    </Grid>
+                <Grid Margin="0,2,0,2" Height="24" IsVisible="{Binding IsBitrateVisible}">
+                    <TextBlock VerticalAlignment="Center" Text="Bitrate" />
+                    <ComboBox HorizontalAlignment="Right" Width="110" 
+                              Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
+                    </ComboBox>
+                </Grid>
+                <Grid Margin="0,2,0,2" Height="24" IsVisible="{Binding IsBitsPerSampleVisible}">
+                    <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
+                    <ComboBox HorizontalAlignment="Right" Width="110" 
+                              Items="{Binding BitsPerSampleList}" SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
+                    </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsSampleRateVisible}">

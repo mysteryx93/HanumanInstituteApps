@@ -21,6 +21,12 @@ public class EncodeSettings : ReactiveObject
     public int Bitrate { get; set; }
     
     /// <summary>
+    /// Gets or sets the encoding bits per sample for WAV or FLAC formats. Valid values are 0 (auto), 8, 16, 24 or 32.
+    /// </summary>
+    [Reactive]
+    public int BitsPerSample { get; set; }
+    
+    /// <summary>
     /// Gets or sets the encoding sample rate.
     /// </summary>
     [Reactive]
@@ -126,4 +132,16 @@ public class EncodeSettings : ReactiveObject
         0 => 3, // 0.659 sec, 29637331 bytes
         _ => 5
     };
+
+    /// <summary>
+    /// Gets or sets whether to round the pitch to the nearest fraction when pitch-shifting for improved quality. 
+    /// </summary>
+    [Reactive]
+    public bool RoundPitch { get; set; } = true;
+    
+    /// <summary>
+    /// Defines the EffectsSkipTempo property. 
+    /// </summary>
+    [Reactive]
+    public bool SkipTempo { get; set; }
 }

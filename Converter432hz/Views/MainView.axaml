@@ -69,7 +69,7 @@
                                     <ProgressBar Grid.Column="1" Value="{Binding ProgressPercent, Mode=OneWay}"
                                                  Maximum="1" Height="24" Background="Transparent" MinWidth="0"
                                                  Foreground="#0078d7" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Status, Mode=OneWay}" 
+                                    <TextBlock Grid.Column="1" Text="{Binding Status, Mode=OneWay}"
                                                VerticalAlignment="Center" Margin="12,0,0,0" />
                                     <Grid Column="2" />
                                 </Grid>
@@ -82,7 +82,8 @@
                 <StackPanel IsEnabled="{Binding !Encoder.IsProcessing}">
                     <Grid>
                         <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold" Text="Settings" />
-                        <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top" Content="I" 
+                        <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Content="I"
                                 Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
                     </Grid>
                     <Grid Margin="0,2,0,2">
@@ -91,22 +92,25 @@
                                   Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
-                    <Grid Margin="0,2,0,2">
-                        <Grid IsVisible="{Binding IsBitrateVisible}">
-                            <TextBlock VerticalAlignment="Center" Text="Bitrate" />
-                            <ComboBox HorizontalAlignment="Right" Width="100"
-                                      Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
-                            </ComboBox>
-                        </Grid>
+                    <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitrateVisible}">
+                        <TextBlock VerticalAlignment="Center" Text="Bitrate" />
+                        <ComboBox HorizontalAlignment="Right" Width="100"
+                                  Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
+                        </ComboBox>
                     </Grid>
-                    <Grid Margin="0,2,0,2">
-                        <Grid IsVisible="{Binding IsSampleRateVisible}">
-                            <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                            <ComboBox HorizontalAlignment="Right" Width="115"
-                                      Items="{Binding SampleRateList}"
-                                      SelectedItem="{Binding SampleRateList.CurrentItem}">
-                            </ComboBox>
-                        </Grid>
+                    <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitsPerSampleVisible}">
+                        <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
+                        <ComboBox HorizontalAlignment="Right" Width="100"
+                                  Items="{Binding BitsPerSampleList}"
+                                  SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
+                        </ComboBox>
+                    </Grid>
+                    <Grid Margin="0,2,0,2" IsVisible="{Binding IsSampleRateVisible}">
+                        <TextBlock VerticalAlignment="Center" Text="Sample rate" />
+                        <ComboBox HorizontalAlignment="Right" Width="115"
+                                  Items="{Binding SampleRateList}"
+                                  SelectedItem="{Binding SampleRateList.CurrentItem}">
+                        </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" Height="54">
                         <Grid IsVisible="{Binding IsQualitySpeedVisible}">
@@ -126,7 +130,8 @@
             </Grid>
             <Grid Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center" Text="When destination file exists" />
+                    <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center"
+                               Text="When destination file exists" />
                     <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center"
                               Items="{Binding FileExistsActionList}"
                               SelectedItem="{Binding FileExistsActionList.CurrentItem, Mode=TwoWay}">

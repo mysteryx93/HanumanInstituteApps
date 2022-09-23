@@ -28,4 +28,10 @@ public class FakeEnvironmentService : IEnvironmentService
     public DateTime UtcNow { get; set; } = new DateTime(2019, 01, 01);
 
     public int ProcessorCount { get; set; } = 2;
+    
+    public bool IsLinux => true;
+
+    public bool IsWindows => false;
+
+    public bool IsMacOS => false;
 }
