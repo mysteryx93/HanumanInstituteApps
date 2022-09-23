@@ -115,8 +115,8 @@ public class AudioEncoder : IAudioEncoder
                     8 => EncodeFlags.ConvertFloatTo8BitInt,
                     16 => EncodeFlags.ConvertFloatTo16BitInt,
                     24 => EncodeFlags.ConvertFloatTo24Bit,
-                    // 32 => EncodeFlags.ConvertFloatTo32Bit,
-                    _ => 0
+                    32 => 0,
+                    _ => EncodeFlags.ConvertFloatTo16BitInt,
                 };
             }
             var encHandle = settings.Format switch

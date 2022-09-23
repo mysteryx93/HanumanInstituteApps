@@ -254,14 +254,8 @@ public class AudioEncoderTests : TestsBase
         var chan = Bass.CreateStream(file.Destination);
         var chanInfo = Bass.ChannelGetInfo(chan);
         Bass.StreamFree(chan);
-        Output.WriteLine(chanInfo.Resolution.ToString());
-        Assert.Equal(bits switch
-        {
-            0 => Resolution.Short,
-            8 => Resolution.Byte,
-            16 => Resolution.Short,
-            _ => Resolution.Float
-        }, chanInfo.Resolution);
+        Output.WriteLine(chanInfo.OriginalResolution.ToString());
+        Assert.Equal(bits > 0 ? bits : 16, chanInfo.OriginalResolution);
     }
 
     [Theory]
