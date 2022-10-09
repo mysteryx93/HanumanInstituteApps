@@ -273,6 +273,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
 
         Settings.Encode.Format = FormatsList.SelectedValue;
         Settings.Encode.Bitrate = BitrateList.SelectedValue;
+        Settings.Encode.BitsPerSample = BitsPerSampleList.SelectedValue;
         Settings.Encode.SampleRate = SampleRateList.SelectedValue;
         Encoder.FileExistsAction = FileExistsActionList.SelectedValue;
 

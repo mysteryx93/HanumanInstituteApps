@@ -61,17 +61,22 @@
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
                 </StackPanel>
                 <ScrollViewer Margin="0,20,0,0">
-                    <ItemsRepeater Items="{Binding Encoder.ProcessingFiles}">
+                    <ItemsRepeater Items="{Binding Encoder.ProcessingFiles}" Grid.IsSharedSizeScope="True">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate DataType="{x:Type bass:ProcessingItem}">
-                                <Grid ColumnDefinitions="*,120,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="ProcessingCol1" Width="*" />
+                                        <ColumnDefinition SharedSizeGroup="ProcessingCol2" Width="120" />
+                                        <ColumnDefinition SharedSizeGroup="ProcessingCol3" Width="8" />
+                                    </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="{Binding Text}" Margin="0,0,8,0" />
                                     <ProgressBar Grid.Column="1" Value="{Binding ProgressPercent, Mode=OneWay}"
                                                  Maximum="1" Height="24" Background="Transparent" MinWidth="0"
                                                  Foreground="#0078d7" />
                                     <TextBlock Grid.Column="1" Text="{Binding Status, Mode=OneWay}"
                                                VerticalAlignment="Center" Margin="12,0,0,0" />
-                                    <Grid Column="2" />
+                                    <Grid Column="2" MinWidth="8" />
                                 </Grid>
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>

@@ -39,7 +39,9 @@ public static class ViewModelLocator
             new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
 
         // ViewModels
-        SplatRegistrations.Register<MainViewModel>();
+        SplatRegistrations.Register<MainViewModel>("Init");
+        container.Register(() => 
+            Design.IsDesignMode ? new MainViewModelDesign() : Locator.Current.GetService<MainViewModel>("Init"));
         SplatRegistrations.Register<AboutViewModel>();
         SplatRegistrations.Register<SettingsViewModel>();
         SplatRegistrations.Register<AskFileActionViewModel>();

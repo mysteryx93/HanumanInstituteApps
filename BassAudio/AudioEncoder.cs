@@ -75,11 +75,11 @@ public class AudioEncoder : IAudioEncoder
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoUseAAFilter, settings.AntiAlias ? 1 : 0);
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoAAFilterLength, settings.AntiAliasLength);
 
-            // In BASS, 2x speed is 100 (+100%), whereas our Speed property is 2. Need to convert.
-            // speed 1=0, 2=100, 3=200, 4=300, .5=-100, .25=-300
-            Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / pitch * settings.Speed - 1.0) * 100.0);
-            Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoFrequency,
-                chanInfo.Frequency * pitch * settings.Rate);
+            // // In BASS, 2x speed is 100 (+100%), whereas our Speed property is 2. Need to convert.
+            // // speed 1=0, 2=100, 3=200, 4=300, .5=-100, .25=-300
+            // Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / pitch * settings.Speed - 1.0) * 100.0);
+            // Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoFrequency,
+            //     chanInfo.Frequency * pitch * settings.Rate);
             
             // Optimized pitch shifting for increased quality
             // 1. Rate shift to Output * Pitch (rounded)
@@ -93,7 +93,7 @@ public class AudioEncoder : IAudioEncoder
             var t = r / settings.Speed;
 
             // 1. Rate Shift (lossless)
-            Bass.ChannelSetAttribute(chanOut, ChannelAttribute.Frequency, sampleRate * r);
+            Bass.ChannelSetAttribute(chan, ChannelAttribute.Frequency, chanInfo.Frequency * r);
             // 2. Resampling to output in _chanMix constructor
             // 3. Tempo adjustment
             Bass.ChannelSetAttribute(chanOut, ChannelAttribute.Tempo,

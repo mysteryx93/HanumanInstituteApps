@@ -324,7 +324,7 @@ public class AudioEncoderTests : TestsBase
     [InlineData(1)]
     [InlineData(420)]
     [InlineData(432)]
-    [InlineData(528.0 / 440)]
+    [InlineData(528)]
     [InlineData(10000)]
     public async Task Start_Pitch_CreateFile(double pitch)
     {
