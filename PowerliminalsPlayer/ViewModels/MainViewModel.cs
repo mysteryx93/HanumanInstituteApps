@@ -161,9 +161,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private async Task AddFolderImpl()
     {
         var result = await _dialogService.ShowOpenFolderDialogAsync(this).ConfigureAwait(true);
-        if (result.HasValue())
+        if (result != null)
         {
-            var newFolder = _fileSystem.Path.TrimEndingDirectorySeparator(result);
+            var newFolder = _fileSystem.Path.TrimEndingDirectorySeparator(result.LocalPath);
             if (!Settings.Folders.Contains(newFolder))
             {
                 Settings.Folders.Add(newFolder);

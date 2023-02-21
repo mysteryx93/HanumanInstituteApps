@@ -133,10 +133,10 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
                 new FileFilter("All files", "*")
             }
         };
-        var files = await _dialogService.ShowOpenFilesDialogAsync(this, settings);
-        var validFiles = files.Where(x => _fileSystem.File.Exists(x)).ToList();
+        var files = await _dialogService.ShowOpenFilesDialogAsync(this, settings).ConfigureAwait(true);
+        var validFiles = files.Where(x => _fileSystem.File.Exists(x.LocalPath)).ToList();
 
-        var items = validFiles.Select(x => new FileItem(x, _fileSystem.Path.GetFileName(x))).ToList();
+        var items = validFiles.Select(x => new FileItem(x.LocalPath, _fileSystem.Path.GetFileName(x.LocalPath))).ToList();
         ListExtensions.AddRange(Encoder.Sources, items);
         //CalcFilesLeft();
 
@@ -145,7 +145,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         {
             try
             {
-                x.Pitch = await _pitchDetector.GetPitchAsync(x.Path);
+                x.Pitch = await _pitchDetector.GetPitchAsync(x.Path).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -159,12 +159,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private async Task AddFolderImpl()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
-        var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings);
+        var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
         if (folder != null)
         {
-            var folderName = _fileSystem.Path.GetFileName(folder.TrimEnd(_environment.DirectorySeparatorChar));
-            var folderItem = new FolderItem(folder, _environment.DirectorySeparatorChar + folderName);
-            var files = _fileLocator.GetAudioFiles(folder);
+            var folderName = _fileSystem.Path.GetFileName(folder.LocalPath.TrimEnd(_environment.DirectorySeparatorChar));
+            var folderItem = new FolderItem(folder.LocalPath, _environment.DirectorySeparatorChar + folderName);
+            var files = _fileLocator.GetAudioFiles(folder.LocalPath);
             folderItem.Files.AddRange(files.Select(x => new FileItem(x.Path, _fileSystem.Path.Combine(folderName, x.RelativePath))));
             Encoder.Sources.Add(folderItem);
             //CalcFilesLeft();
@@ -191,10 +191,10 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private async Task BrowseDestinationImpl()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Destination" };
-        var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings);
+        var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
         if (folder != null)
         {
-            Encoder.Destination = folder;
+            Encoder.Destination = folder.LocalPath;
         }
     }
 

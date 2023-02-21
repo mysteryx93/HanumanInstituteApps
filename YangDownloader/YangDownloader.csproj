@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
@@ -39,17 +39,17 @@
     <ProjectReference Include="..\Downloads\Downloads.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="FluentAvaloniaUI" Version="1.4.3" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="1.4.1" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="1.4.1" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
+    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview3" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview3" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
-    <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
-    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.69">
+    <PackageReference Include="ReactiveUI.Fody" Version="18.4.20" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

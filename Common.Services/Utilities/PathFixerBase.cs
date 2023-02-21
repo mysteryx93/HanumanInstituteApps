@@ -72,8 +72,8 @@ public abstract class PathFixerBase : IPathFixer
         var selectedPath = await _dialogService.ShowOpenFolderDialogAsync(owner).ConfigureAwait(true);
         if (selectedPath != null)
         {
-            selectedPath = _fileSystem.Path.TrimEndingDirectorySeparator(selectedPath);
-            var newPath = ProbeNewPath(selectedPath, folderName);
+            var newPath = _fileSystem.Path.TrimEndingDirectorySeparator(selectedPath.LocalPath);
+            newPath = ProbeNewPath(newPath, folderName);
             if (newPath != null)
             {
                 CalculateReplacement(invalidFolder, newPath);

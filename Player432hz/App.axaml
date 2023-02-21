@@ -9,13 +9,12 @@
     <Application.Styles>
         <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="#7c1fe6" />
         <StyleInclude Source="avares://Common.Avalonia.App/Styles/CommonStyles.axaml" />
-        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
-        <StyleInclude Source="avares://MediaPlayer.Avalonia/Styles/Colors/Gray.axaml" />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Common.Avalonia.App/Styles/CommonResources.axaml" />
+                <ResourceInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

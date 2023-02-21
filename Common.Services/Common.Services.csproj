@@ -13,19 +13,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="1.4.1" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.0.0-preview3" />
     <PackageReference Include="HanumanInstitute.Validators" Version="1.2.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
-    <PackageReference Include="MessagePack" Version="2.4.35" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-    <PackageReference Include="Splat" Version="14.4.1" />
-    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.69">
+    <PackageReference Include="MessagePack" Version="2.5.64-alpha" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+    <PackageReference Include="Splat" Version="14.6.8" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="6.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.1.18" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

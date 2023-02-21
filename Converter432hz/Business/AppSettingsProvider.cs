@@ -5,7 +5,7 @@ namespace HanumanInstitute.Converter432hz.Business;
 /// <summary>
 /// Contains custom application settings for 432hz Converter.
 /// </summary>
-public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
+public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
 {
     private readonly IAppPathService _appPath;
     private readonly IFileSystemService _fileSystem;
@@ -21,6 +21,9 @@ public sealed class AppSettingsProvider : SettingsProvider<AppSettingsData>
 
         Load();
     }
+    
+    /// <inheritdoc />
+    public override string FilePath => _appPath.ConfigFile;
 
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.

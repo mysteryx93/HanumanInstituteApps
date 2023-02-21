@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using HanumanInstitute.Common.Services.Properties;
 using HanumanInstitute.Common.Services.Validation;
+using HanumanInstitute.MvvmDialogs;
 
 // ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
@@ -10,12 +13,12 @@ namespace HanumanInstitute.Common.Services;
 /// Handles generic settings features such as loading, saving and validating data.
 /// </summary>
 /// <typeparam name="T">The type of data in which to store settings.</typeparam>
-public abstract class SettingsProvider<T> : ISettingsProvider<T>
+public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
     where T : class, new()
 {
     private readonly ISerializationService _serialization;
 
-    protected SettingsProvider(ISerializationService serializationService)
+    protected SettingsProviderBase(ISerializationService serializationService)
     {
         _serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
     }
@@ -33,6 +36,11 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
         }
     }
     private T _value = new T();
+    
+    /// <summary>
+    /// Gets the path where settings are stored.
+    /// </summary>
+    public abstract string FilePath { get; }
 
     /// <summary>
     /// Occurs when the Value property has changed.
@@ -55,16 +63,34 @@ public abstract class SettingsProvider<T> : ISettingsProvider<T>
     /// </summary>
     public T Load(string path)
     {
+        List<string> errors = new();
         T? result = null;
         try
         {
             result = _serialization.DeserializeFromFile<T>(path);
         }
-        catch (InvalidOperationException) { }
+        catch (InvalidOperationException e)
+        {
+            errors.Add(e.Message);
+        }
         catch (DirectoryNotFoundException) { }
         catch (FileNotFoundException) { }
 
-        Value = (result != null && result.Validate() == null) ? result : GetDefault();
+        var valErrors = result?.Validate();
+        if (valErrors != null)
+        {
+            foreach (var item in valErrors)
+            {
+                errors.Add(item.ErrorMessage ?? string.Empty);
+            }
+        }
+        if (errors.Any())
+        {
+            var msg = "Failed to load configuration file " + FilePath + Environment.NewLine + string.Join(Environment.NewLine, errors);
+            throw new InvalidOperationException(msg);
+        }
+        
+        Value = result ?? GetDefault();
         Changed?.Invoke(this, EventArgs.Empty);
         return Value;
     }

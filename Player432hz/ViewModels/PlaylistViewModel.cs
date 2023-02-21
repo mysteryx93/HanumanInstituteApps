@@ -58,9 +58,9 @@ public class PlaylistViewModel : ReactiveObject, IPlaylistViewModel
     {
         var folderSettings = new OpenFolderDialogSettings();
         var result = await _dialogService.ShowOpenFolderDialogAsync(_owner!, folderSettings).ConfigureAwait(true);
-        if (!string.IsNullOrEmpty(result) && !Folders.Source.Contains(result))
+        if (result != null && !Folders.Source.Contains(result.LocalPath))
         {
-            Folders.Source.Add(result);
+            Folders.Source.Add(result.LocalPath);
             Folders.MoveCurrentToLast();
             _fileListViewModel.SetPaths(Folders.Source);
         }

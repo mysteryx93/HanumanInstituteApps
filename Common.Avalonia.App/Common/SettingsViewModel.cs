@@ -59,8 +59,7 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
     public ListItemCollectionView<AppTheme> ThemeList { get; } = new()
     {
         { AppTheme.Light, "Light" },
-        { AppTheme.Dark, "Dark" },
-        { AppTheme.HighContrast, "HighContrast" }
+        { AppTheme.Dark, "Dark" }
     };
 
     /// <summary>

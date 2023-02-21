@@ -58,7 +58,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         var result = await _dialogService.ShowOpenFolderDialogAsync(this, options).ConfigureAwait(false);
         if (result != null)
         {
-            Settings.DestinationFolder = result;
+            Settings.DestinationFolder = result.LocalPath;
             TestDestinationPathImpl();
         }
     }
@@ -78,7 +78,7 @@ public class SettingsViewModel : SettingsViewModel<AppSettingsData>
         var result = await _dialogService.ShowOpenFileDialogAsync(this, options).ConfigureAwait(false);
         if (result != null)
         {
-            Settings.FFmpegPath = result;
+            Settings.FFmpegPath = result.LocalPath;
             TestFFmpegImpl();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 
 namespace HanumanInstitute.Common.Avalonia.App.Tests;
@@ -9,20 +10,22 @@ public class FakeDispatcher : IDispatcher
     
     public void VerifyAccess() {}
     
-    public void Post(Action action, DispatcherPriority priority = DispatcherPriority.Normal) => action();
+    public void Post(Action action, DispatcherPriority priority = default) => action();
 
-    public Task InvokeAsync(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    public void Post(SendOrPostCallback action, object? arg, DispatcherPriority priority = default) => action(arg);
+
+    public Task InvokeAsync(Action action, DispatcherPriority priority = default)
     {
         action();
         return Task.CompletedTask;
     }
     
-    public Task<TResult> InvokeAsync<TResult>(Func<TResult> function, DispatcherPriority priority = DispatcherPriority.Normal) =>
+    public Task<TResult> InvokeAsync<TResult>(Func<TResult> function, DispatcherPriority priority = default) =>
         new(function);
 
-    public Task InvokeAsync(Func<Task> function, DispatcherPriority priority = DispatcherPriority.Normal) =>
+    public Task InvokeAsync(Func<Task> function, DispatcherPriority priority = default) =>
         function();
 
-    public Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> function, DispatcherPriority priority = DispatcherPriority.Normal) =>
+    public Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> function, DispatcherPriority priority = default) =>
         function();
 }

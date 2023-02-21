@@ -60,11 +60,11 @@ public abstract class CommonApplication<TMain> : Application
 
             var vm = InitViewModel();
             dialogService.Show(null, vm);
-            desktop.MainWindow = desktop.Windows[0];
+            // desktop.MainWindow = desktop.Windows[0];
         }
 
         GlobalErrorHandler.EndInit(dialogService,
-            desktop?.MainWindow.DataContext as INotifyPropertyChanged);
+            desktop?.MainWindow?.DataContext as INotifyPropertyChanged);
 
         await tBackground.ConfigureAwait(true);
         base.OnFrameworkInitializationCompleted();
