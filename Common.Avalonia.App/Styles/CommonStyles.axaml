@@ -16,7 +16,7 @@
     
     <Style Selector="Button.round">
         <Setter Property="Height" Value="26" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="CornerRadius" Value="14" />
     </Style>

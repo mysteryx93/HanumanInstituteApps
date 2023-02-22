@@ -6,7 +6,6 @@ using System.Linq;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using LazyCache;
 using ManagedBass;
-using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using Xunit.Abstractions;
 // ReSharper disable MemberCanBePrivate.Global
@@ -58,7 +57,7 @@ public class AudioEncoderTests : TestsBase
     {
         BassDevice.Instance.Init(0);
         var chan = Bass.CreateStream(file, Flags: BassFlags.Decode).Valid();
-        var chanInfo = Bass.ChannelGetInfo(chan);
+        // var chanInfo = Bass.ChannelGetInfo(chan);
         var tags = new TagsReader(chan);
         var result = property(tags);
         Bass.StreamFree(chan);
@@ -146,7 +145,7 @@ public class AudioEncoderTests : TestsBase
         await Model.StartAsync(file, Settings);
 
         Assert.True(FileSystem.File.Exists(file.Destination));
-        Assert.True(FileSystem.FileInfo.FromFileName(file.Destination).Length > 0);
+        Assert.True(FileSystem.FileInfo.New(file.Destination).Length > 0);
     }
 
     [Theory]
@@ -168,7 +167,7 @@ public class AudioEncoderTests : TestsBase
         await Model.StartAsync(file, Settings);
 
         Assert.True(FileSystem.File.Exists(file.Destination));
-        Assert.True(FileSystem.FileInfo.FromFileName(file.Destination).Length > 0);
+        Assert.True(FileSystem.FileInfo.New(file.Destination).Length > 0);
         Assert.Equal(1.0, file.ProgressPercent);
     }
 
@@ -195,7 +194,7 @@ public class AudioEncoderTests : TestsBase
         await Model.StartAsync(file, Settings);
 
         Assert.True(FileSystem.File.Exists(file.Destination));
-        var fileLength = FileSystem.FileInfo.FromFileName(file.Destination).Length;
+        var fileLength = FileSystem.FileInfo.New(file.Destination).Length;
         Output.WriteLine(fileLength.ToString());
     }
 
@@ -379,7 +378,7 @@ public class AudioEncoderTests : TestsBase
         await Model.StartAsync(file, Settings);
 
         Assert.True(FileSystem.File.Exists(file.Destination));
-        var fileSize = FileSystem.FileInfo.FromFileName(file.Destination).Length;
+        var fileSize = FileSystem.FileInfo.New(file.Destination).Length;
         Output.WriteLine(fileSize.ToString());
         // Look at test run times
     }
