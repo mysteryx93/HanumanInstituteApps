@@ -20,8 +20,8 @@
       <PackageReference Include="ManagedBass.Fx" Version="3.1.1" />
       <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
       <PackageReference Include="ManagedBass.Tags" Version="3.1.1" />
-      <PackageReference Include="ReactiveUI" Version="18.4.20" />
-      <PackageReference Include="ReactiveUI.Fody" Version="18.4.20" />
+      <PackageReference Include="ReactiveUI" Version="18.4.22" />
+      <PackageReference Include="ReactiveUI.Fody" Version="18.4.22" />
       <PackageReference Include="Splat" Version="14.6.8" />
       <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
         <PrivateAssets>all</PrivateAssets>

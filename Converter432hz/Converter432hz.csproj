@@ -43,7 +43,7 @@
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
     <PackageReference Include="ManagedBass.Tags" Version="3.1.1" />
-    <PackageReference Include="ReactiveUI.Fody" Version="18.4.20" />
+    <PackageReference Include="ReactiveUI.Fody" Version="18.4.22" />
     <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>

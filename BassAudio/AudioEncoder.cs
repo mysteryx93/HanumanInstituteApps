@@ -54,6 +54,7 @@ public class AudioEncoder : IAudioEncoder
         Bass.Configure(Configuration.SRCQuality, 4);
         Bass.Configure(Configuration.FloatDSP, true);
         var chan = Bass.CreateStream(file.Path, Flags: BassFlags.Float | BassFlags.Decode).Valid();
+        int chanOut = 0;
         file.Status = EncodeStatus.Processing;
         try
         {
@@ -71,7 +72,7 @@ public class AudioEncoder : IAudioEncoder
             BassMix.MixerAddChannel(chanMix, chan, BassFlags.MixerChanNoRampin | BassFlags.AutoFree);
 
             // Add tempo effects.
-            var chanOut = BassFx.TempoCreate(chanMix, BassFlags.Decode).Valid();
+            chanOut = BassFx.TempoCreate(chanMix, BassFlags.Decode).Valid();
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoUseAAFilter, settings.AntiAlias ? 1 : 0);
             Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoAAFilterLength, settings.AntiAliasLength);
 
@@ -155,6 +156,10 @@ public class AudioEncoder : IAudioEncoder
         finally
         {
             Bass.StreamFree(chan);
+            if (chanOut != 0)
+            {
+                Bass.StreamFree(chanOut);
+            }
         }
     }
 

@@ -494,4 +494,17 @@ public class AudioEncoderTests : TestsBase
         Output.WriteLine(length2.ToStringInvariant());
         Assert.NotEqual(length1, length2);
     }
+    
+    [Fact]
+    public async Task Start_ShortFile_OutputFileNotLocked()
+    {
+        var file = CreateSourceShort();
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Format = EncodeFormat.Mp3;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        FileSystem.File.Delete(file.Destination);
+    }
 }
