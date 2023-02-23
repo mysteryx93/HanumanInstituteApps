@@ -14,9 +14,11 @@
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview5" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview5" />
     <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview5" />
+    <PackageReference Include="FluentAvalonia.UI.Windowing" Version="2.0.0-preview5" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview3" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview4" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.22" />
     <PackageReference Include="Splat" Version="14.6.8" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">

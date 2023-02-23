@@ -50,7 +50,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding Encoder.Destination}" />
+                    <TextBox Grid.Column="0" Text="{Binding Settings.Destination}" />
                     <Button Classes="round" Grid.Column="1" Command="{Binding BrowseDestination}" Width="35">
                         <ui:SymbolIcon Symbol="OpenFolder" FontSize="20" />
                     </Button>

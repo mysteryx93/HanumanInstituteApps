@@ -9,6 +9,7 @@
     <Application.Styles>
         <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="Coral" />
         <StyleInclude Source="avares://Common.Avalonia.App/Styles/CommonStyles.axaml" />
+        <StyleInclude Source="avares://FluentAvalonia.UI.Windowing/Styles/FAWindowingStyles.axaml" />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>

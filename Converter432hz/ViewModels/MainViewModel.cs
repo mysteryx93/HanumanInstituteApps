@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices.JavaScript;
 using DynamicData;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
@@ -36,18 +39,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         _environment = environment;
         _pitchDetector = pitchDetector;
 
-        FormatsList.SelectedValue = EncodeFormat.Mp3;
-        BitrateList.SelectedValue = 0;
-        BitsPerSampleList.SelectedValue = 16;
-        SampleRateList.SelectedValue = 48000;
-        FileExistsActionList.SelectedValue = FileExistsAction.Ask;
-        SourcesSelectedIndex = -1;
-
-        this.WhenAnyValue(x => x.Encoder.FileExistsAction)
-            .BindTo(this, x => x.FileExistsActionList.SelectedValue);
-        this.WhenAnyValue(x => x.FileExistsActionList.SelectedValue)
-            .BindTo(this, x => x.Encoder.FileExistsAction);
-
+        Bind(x => x.Settings.Encode.Format, x => x.FormatsList.SelectedValue);
+        Bind(x => x.Settings.Encode.Bitrate, x => x.BitrateList.SelectedValue);
+        Bind(x => x.Settings.Encode.BitsPerSample, x => x.BitsPerSampleList.SelectedValue);
+        Bind(x => x.Settings.Encode.SampleRate, x => x.SampleRateList.SelectedValue);
+        Bind(x => x.Settings.FileExistsAction, x => x.FileExistsActionList.SelectedValue);
+        
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
@@ -67,6 +64,14 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         //     CalcFilesLeft();
         //     CalcCompleted();
         // };
+    }
+
+    private void Bind<T1, T2>(Expression<Func<MainViewModel, T1?>> expr1, Expression<Func<MainViewModel, T2?>> expr2)
+    {
+        this.WhenAnyValue(expr1)
+            .BindTo(this, expr2);
+        this.WhenAnyValue(expr2)
+            .BindTo(this, expr1);
     }
 
     // /// <summary>
@@ -117,7 +122,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     public IEncoderService Encoder { get; }
 
     [Reactive]
-    public int SourcesSelectedIndex { get; set; }
+    public int SourcesSelectedIndex { get; set; } = -1;
 
     public RxCommandUnit AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
     private RxCommandUnit? _addFiles;
@@ -194,7 +199,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
         if (folder != null)
         {
-            Encoder.Destination = folder.LocalPath;
+            Settings.Destination = folder.LocalPath;
         }
     }
 
@@ -271,11 +276,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     {
         Encoder.ProcessingFiles.Clear();
 
-        Settings.Encode.Format = FormatsList.SelectedValue;
-        Settings.Encode.Bitrate = BitrateList.SelectedValue;
-        Settings.Encode.BitsPerSample = BitsPerSampleList.SelectedValue;
-        Settings.Encode.SampleRate = SampleRateList.SelectedValue;
+        // Settings.Encode.Format = FormatsList.SelectedValue;
+        // Settings.Encode.Bitrate = BitrateList.SelectedValue;
+        // Settings.Encode.BitsPerSample = BitsPerSampleList.SelectedValue;
+        // Settings.Encode.SampleRate = SampleRateList.SelectedValue;
         Encoder.FileExistsAction = FileExistsActionList.SelectedValue;
+        Encoder.Destination = Settings.Destination;
 
         return Encoder.RunAsync();
     }

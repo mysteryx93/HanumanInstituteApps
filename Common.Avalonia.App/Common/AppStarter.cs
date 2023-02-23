@@ -2,6 +2,7 @@
 using System.Threading;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using FluentAvalonia.UI.Windowing;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
@@ -60,5 +61,6 @@ public static class AppStarter
         => AppBuilder.Configure<TApp>()
             .UsePlatformDetect()
             .LogToTrace()
-            .UseReactiveUI();
+            .UseReactiveUI()
+            .UseFAWindowing();
 }
