@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <AssemblyVersion>2.2.1</AssemblyVersion>
     <RootNamespace>HanumanInstitute.Converter432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -15,7 +14,8 @@
     <Company>Hanuman Institute</Company>
     <Product>432hz Converter</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <TrimMode>copyused</TrimMode> <!-- Disable trimming for this assembly only -->
+    <TrimMode>copyused</TrimMode>
+    <IsPackable>false</IsPackable> <!-- Disable trimming for this assembly only -->
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

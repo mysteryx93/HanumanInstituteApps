@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <AssemblyVersion>2.2.1</AssemblyVersion>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU;x86;x64</Platforms>
