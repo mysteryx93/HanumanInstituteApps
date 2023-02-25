@@ -49,8 +49,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             .ToProperty(this, x => x.IsBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitsPerSampleVisible);
-        _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
-            .ToProperty(this, x => x.IsSampleRateVisible);
+        // _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
+        //     .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
         this.WhenAnyValue(x => x.Settings.Encode.Format).Subscribe(FillSampleRateList);
@@ -229,13 +229,14 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private void FillSampleRateList(EncodeFormat format)
     {
         var selection = SampleRateList.SelectedValue;
-        SampleRateList.Source.Clear();
-        SampleRateList.Add(0, "Source");
+        List<ListItem<int>> list = new() { { 0, "Source" } };
         foreach (var sampleRate in Encoder.GetSupportedSampleRates(format))
         {
-            SampleRateList.Add(sampleRate, string.Format(_environment.CurrentCulture, "{0} Hz", sampleRate));
+            list.Add(sampleRate, string.Format(_environment.CurrentCulture, "{0} Hz", sampleRate));
         }
         
+        SampleRateList.Source.Clear();
+        SampleRateList.AddRange(list);
         SampleRateList.SelectedValue = SampleRateList.Source.Any(x => x.Value == selection) ? selection : 48000;
     }
 

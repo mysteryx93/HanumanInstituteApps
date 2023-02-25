@@ -34,9 +34,13 @@ public class CollectionView<T> : ICollectionView<T>
 
     /// <inheritdoc />
     public ObservableCollectionWithRange<T> Source { get; } = new();
+
+    private bool _suspendCollectionChanged;
     
     private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (_suspendCollectionChanged) { return;}
+        
         CollectionChanged?.Invoke(this, e);
         // Must clear selection first otherwise removing last item doesn't select the new selection.
         var pos = CurrentPosition;
@@ -112,7 +116,13 @@ public class CollectionView<T> : ICollectionView<T>
         {
             return -1;
         }
-    } 
+    }
+
+    /// <summary>
+    /// Adds a range of items while raising CollectionChanged only once.
+    /// </summary>
+    /// <param name="items">The list of items to add.</param>
+    public void AddRange(IEnumerable<T> items) => Source.AddRange(items);
     
     /// <inheritdoc cref="IList"/>
     public void Clear() => Source.Clear();

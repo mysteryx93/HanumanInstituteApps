@@ -21,7 +21,7 @@
         <Grid Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="230" />
+                <ColumnDefinition Width="245" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="220" />
@@ -93,26 +93,26 @@
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Output Format" />
-                        <ComboBox HorizontalAlignment="Right" Width="100"
+                        <ComboBox HorizontalAlignment="Right" Width="120"
                                   Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitrateVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bitrate" />
-                        <ComboBox HorizontalAlignment="Right" Width="100"
+                        <ComboBox HorizontalAlignment="Right" Width="120"
                                   Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitsPerSampleVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
-                        <ComboBox HorizontalAlignment="Right" Width="100"
+                        <ComboBox HorizontalAlignment="Right" Width="120"
                                   Items="{Binding BitsPerSampleList}"
                                   SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                         </ComboBox>
                     </Grid>
-                    <Grid Margin="0,2,0,2" IsVisible="{Binding IsSampleRateVisible}">
+                    <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                        <ComboBox HorizontalAlignment="Right" Width="115"
+                        <ComboBox HorizontalAlignment="Right" Width="120"
                                   Items="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>
@@ -127,7 +127,7 @@
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Text="Quality" />
                         </Grid>
                     </Grid>
-                    <Button Classes="round" Width="100" HorizontalAlignment="Center" Margin="0,5"
+                    <Button Classes="round" Width="110" HorizontalAlignment="Center" Margin="0,5"
                             Command="{Binding ShowSettings}">
                         Advanced
                     </Button>
