@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Common.Services.Validation;
+﻿using System.Diagnostics;
+using HanumanInstitute.Common.Services.Validation;
 using ManagedBass;
 using ManagedBass.Enc;
 using ManagedBass.Fx;
@@ -211,7 +212,18 @@ public class AudioEncoder : IAudioEncoder
             _ when bitrate <= 128 => 128,
             _ when bitrate <= 192 => 192,
             _ when bitrate <= 256 => 256,
-            _ when bitrate <= 320 => 320,
-            _ => bitrate
+            _ => 320
         };
+
+    /// <inheritdoc />
+    public int[] GetSupportedSampleRates(EncodeFormat format) => format switch
+    {
+        EncodeFormat.Wav => new[] { 8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000 },
+        EncodeFormat.Flac => new[] { 8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000 },
+        EncodeFormat.Mp3 => new[] { 8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000 },
+        EncodeFormat.Aac => new[] { 32000, 44100, 48000, 88200, 96000 },
+        EncodeFormat.Ogg => new[] { 32000, 44100, 48000 },
+        EncodeFormat.Opus => new[] { 48000 },
+        _ => Array.Empty<int>()
+    };
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace HanumanInstitute.Common.Avalonia;
@@ -7,7 +9,7 @@ namespace HanumanInstitute.Common.Avalonia;
 /// Enables current record management on a collection.
 /// </summary>
 /// <typeparam name="T">The type of the list.</typeparam>
-public interface ICollectionView<T>  : IEnumerable<T>, INotifyPropertyChanged
+public interface ICollectionView<T>  : INotifyPropertyChanged, INotifyCollectionChanged, IList<T>, IList
 {
     /// <summary>
     /// Gets the data source as an ObservableCollection. It uses a derived collection that supports range modifications.
@@ -30,5 +32,4 @@ public interface ICollectionView<T>  : IEnumerable<T>, INotifyPropertyChanged
     /// Moves selection to the last item in the list.
     /// </summary>
     void MoveCurrentToLast();
-
 }

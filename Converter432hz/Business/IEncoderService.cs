@@ -49,4 +49,10 @@ public interface IEncoderService : IReactiveObject, IValidatableViewModel
     /// Cancels the encoding batch job.
     /// </summary>
     void Cancel();
+    /// <summary>
+    /// Returns the list of sample rates supported for specified audio format.
+    /// </summary>
+    /// <param name="format">The audio format to get supported sample rates for.</param>
+    /// <returns>A list of supported sample rates.</returns>
+    public int[] GetSupportedSampleRates(EncodeFormat format);
 }

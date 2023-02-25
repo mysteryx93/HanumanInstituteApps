@@ -8,6 +8,7 @@ using LazyCache;
 using ManagedBass;
 using ReactiveUI;
 using Xunit.Abstractions;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.BassAudio.Tests.Integration;
@@ -34,21 +35,27 @@ public class AudioEncoderTests : TestsBase
     public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
     private IFileSystemService _fileSystem;
 
-    public ProcessingItem CreateSourceShort(EncodeFormat format = EncodeFormat.Mp3) => CreateSource("SourceShort", format);
-    public ProcessingItem CreateSourceLong(EncodeFormat format = EncodeFormat.Mp3) => CreateSource("SourceLong", format);
-    public ProcessingItem CreateSource(string source, EncodeFormat format = EncodeFormat.Mp3)
+    public ProcessingItem CreateSourceShort(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3) =>
+        CreateSource("SourceShort", dstFormat, srcFormat);
+    public ProcessingItem CreateSourceLong(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3) =>
+        CreateSource("SourceLong", dstFormat, srcFormat);
+    public ProcessingItem CreateSource(string source, EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3)
     {
-        var ext = format switch
-        {
-            EncodeFormat.Mp3 => "mp3",
-            EncodeFormat.Flac => "flac",
-            EncodeFormat.Ogg => "ogg",
-            EncodeFormat.Opus => "opus",
-            EncodeFormat.Wav => "wav",
-            _ => ""
-        };
-        return new ProcessingItem($"{source}.mp3", $"{source}.mp3") { Destination = $"{source}_out.{ext}" };
+        var srcExt = GetFormatExtension(srcFormat);
+        var dstExt = GetFormatExtension(dstFormat);
+        return new ProcessingItem($"{source}.{srcExt}", $"{source}.{srcExt}") { Destination = $"{source}_out.{dstExt}" };
     }
+
+    private static string GetFormatExtension(EncodeFormat format) => format switch
+    {
+        EncodeFormat.Mp3 => "mp3",
+        EncodeFormat.Aac => "m4a",
+        EncodeFormat.Flac => "flac",
+        EncodeFormat.Ogg => "ogg",
+        EncodeFormat.Opus => "opus",
+        EncodeFormat.Wav => "wav",
+        _ => ""
+    };
 
     public string GetTag(string propertyName, string file = "SourceShort.mp3") =>
         GetTag(x => typeof(TagsReader).GetProperty(propertyName)!.GetValue(x) as string);
@@ -62,6 +69,20 @@ public class AudioEncoderTests : TestsBase
         var result = property(tags);
         Bass.StreamFree(chan);
         return result;
+    }
+
+    public static IEnumerable<object[]> GetAllSampleRates()
+    {
+        foreach (var format in Enum.GetValues<EncodeFormat>())
+        {
+            foreach (var sampleRate in new[]
+                     {
+                         0, 8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000
+                     })
+            {
+                yield return new object[] { format, sampleRate };
+            }
+        }
     }
 
     [Fact]
@@ -108,7 +129,7 @@ public class AudioEncoderTests : TestsBase
     public async Task Start_SourceFileNotAudio_ThrowsBassException()
     {
         var file = new ProcessingItem("BassAudio.dll", "BassAudio.dll") { Destination = "_out" };
-        
+
         var t1 = Model.StartAsync(file, Settings);
 
         await Assert.ThrowsAsync<BassException>(() => t1);
@@ -199,15 +220,7 @@ public class AudioEncoderTests : TestsBase
     }
 
     [Theory]
-    [InlineData(EncodeFormat.Mp3, 0)]
-    [InlineData(EncodeFormat.Mp3, 44100)]
-    [InlineData(EncodeFormat.Mp3, 48000)]
-    [InlineData(EncodeFormat.Ogg, 0)]
-    [InlineData(EncodeFormat.Ogg, 44100)]
-    [InlineData(EncodeFormat.Ogg, 48000)]
-    [InlineData(EncodeFormat.Opus, 0)]
-    // [InlineData(EncodeFormat.Opus, 44100)] // Opus does not support 44100
-    [InlineData(EncodeFormat.Opus, 48000)]
+    [MemberData(nameof(GetAllSampleRates))]
     public async Task Start_SampleRate_CreateFileWithSampleRate(EncodeFormat format, int sampleRate)
     {
         var sourceSampleRate = 48000;
@@ -217,16 +230,47 @@ public class AudioEncoderTests : TestsBase
         Settings.Bitrate = 128;
         Settings.SampleRate = sampleRate;
         Settings.PitchTo = 432;
+        var shouldSucceed = sampleRate == 0 || Model.GetSupportedSampleRates(format).Contains(sampleRate);
+        var threwError = false;
 
-        await Model.StartAsync(file, Settings);
+        try
+        {
+            await Model.StartAsync(file, Settings);
+        }
+        catch
+        {
+            threwError = true;
+        }
 
-        Assert.True(FileSystem.File.Exists(file.Destination));
-        var chan = Bass.CreateStream(file.Destination);
-        var chanInfo = Bass.ChannelGetInfo(chan);
-        Bass.StreamFree(chan);
-        Assert.Equal(sampleRate > 0 ? sampleRate : sourceSampleRate, chanInfo.Frequency);
+        if (shouldSucceed)
+        {
+            Output.WriteLine("Expecting success");
+            Assert.True(FileSystem.File.Exists(file.Destination));
+            var chan = Bass.CreateStream(file.Destination);
+            var chanInfo = Bass.ChannelGetInfo(chan);
+            Bass.StreamFree(chan);
+            Output.WriteLine(chanInfo.Frequency.ToString());
+            Assert.False(threwError);
+            Assert.Equal(sampleRate > 0 ? sampleRate : sourceSampleRate, chanInfo.Frequency);
+        }
+        else
+        {
+            Output.WriteLine("Unsupported sample rate, expecting failure");
+            if (FileSystem.File.Exists(file.Destination))
+            {
+                var chan = Bass.CreateStream(file.Destination);
+                var chanInfo = Bass.ChannelGetInfo(chan);
+                Bass.StreamFree(chan);
+                Output.WriteLine(chanInfo.Frequency.ToString());
+                Assert.NotEqual(sampleRate > 0 ? sampleRate : sourceSampleRate, chanInfo.Frequency);
+            }
+            else
+            {
+                Output.WriteLine("Threw exception");
+            }
+        }
     }
-    
+
     [Theory]
     [InlineData(EncodeFormat.Wav, 0)]
     [InlineData(EncodeFormat.Wav, 8)]
@@ -384,6 +428,13 @@ public class AudioEncoderTests : TestsBase
     }
 
     [Theory]
+    [InlineData(EncodeFormat.Aac, "Title")]
+    [InlineData(EncodeFormat.Aac, "Artist")]
+    [InlineData(EncodeFormat.Aac, "Album")]
+    [InlineData(EncodeFormat.Aac, "Year")]
+    [InlineData(EncodeFormat.Aac, "Comment")]
+    [InlineData(EncodeFormat.Aac, "Track")]
+    [InlineData(EncodeFormat.Aac, "Genre")]
     [InlineData(EncodeFormat.Wav, "Title")]
     [InlineData(EncodeFormat.Wav, "Artist")]
     [InlineData(EncodeFormat.Wav, "Album")]
@@ -434,27 +485,27 @@ public class AudioEncoderTests : TestsBase
         Output.WriteLine($"Output = {dstTag}");
         Assert.Equal(srcTag, dstTag);
     }
-    
+
     [Fact]
     [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
     public async Task Start_RoundPitch_CreateDifferentOutput()
     {
         var file1 = CreateSourceShort(EncodeFormat.Wav);
         var file2 = CreateSourceShort(EncodeFormat.Wav);
-        file1.Destination = file1.Destination.Replace("out", "out1"); 
-        file2.Destination = file1.Destination.Replace("out", "out2"); 
+        file1.Destination = file1.Destination.Replace("out", "out1");
+        file2.Destination = file1.Destination.Replace("out", "out2");
         FileSystem.DeleteFileSilent(file1.Destination);
         FileSystem.DeleteFileSilent(file2.Destination);
         Settings.Format = EncodeFormat.Wav;
         Settings.RoundPitch = false;
-        
+
         await Model.StartAsync(file1, Settings);
         Settings.RoundPitch = true;
         await Model.StartAsync(file2, Settings);
 
         Assert.False(File.ReadAllBytes(file1.Destination).SequenceEqual(File.ReadAllBytes(file2.Destination)));
     }
-    
+
     [Theory]
     [InlineData(0)] // Pitch
     [InlineData(1)] // Speed
@@ -464,8 +515,8 @@ public class AudioEncoderTests : TestsBase
     {
         var file1 = CreateSourceShort(EncodeFormat.Wav);
         var file2 = CreateSourceShort(EncodeFormat.Wav);
-        file1.Destination = file1.Destination.Replace("out", "out1"); 
-        file2.Destination = file1.Destination.Replace("out", "out2"); 
+        file1.Destination = file1.Destination.Replace("out", "out1");
+        file2.Destination = file1.Destination.Replace("out", "out2");
         FileSystem.DeleteFileSilent(file1.Destination);
         FileSystem.DeleteFileSilent(file2.Destination);
         Settings.Format = EncodeFormat.Wav;
@@ -479,7 +530,7 @@ public class AudioEncoderTests : TestsBase
             Settings.Speed = 1.1;
         }
         Settings.SkipTempo = false;
-        
+
         await Model.StartAsync(file1, Settings);
         Settings.SkipTempo = true;
         await Model.StartAsync(file2, Settings);
@@ -494,7 +545,7 @@ public class AudioEncoderTests : TestsBase
         Output.WriteLine(length2.ToStringInvariant());
         Assert.NotEqual(length1, length2);
     }
-    
+
     [Fact]
     public async Task Start_ShortFile_OutputFileNotLocked()
     {
@@ -506,5 +557,19 @@ public class AudioEncoderTests : TestsBase
 
         Assert.True(FileSystem.File.Exists(file.Destination));
         FileSystem.File.Delete(file.Destination);
+    }
+
+    [Fact]
+    public async Task Start_SourceWavBitrateSource_OutputBitrate320()
+    {
+        var file = CreateSourceShort(EncodeFormat.Mp3, EncodeFormat.Wav);
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Bitrate = 0;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        var fileLength = FileSystem.FileInfo.New(file.Destination).Length;
+        Output.WriteLine(fileLength.ToString());
     }
 }

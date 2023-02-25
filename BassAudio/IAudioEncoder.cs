@@ -25,4 +25,10 @@ public interface IAudioEncoder
     /// <exception cref="ManagedBass.BassException">File is invalid or there was an error while processing the file.</exception>
     void Start(ProcessingItem file, EncodeSettings settings, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns the list of sample rates supported for specified audio format.
+    /// </summary>
+    /// <param name="format">The audio format to get supported sample rates for.</param>
+    /// <returns>A list of supported sample rates.</returns>
+    public int[] GetSupportedSampleRates(EncodeFormat format);
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 
@@ -38,4 +39,6 @@ public class EnvironmentService : IEnvironmentService
     public bool IsWindows => OperatingSystem.IsWindows();
     /// <inheritdoc />
     public bool IsMacOS => OperatingSystem.IsMacOS();
+    /// <inheritdoc />
+    public IFormatProvider CurrentCulture => CultureInfo.CurrentCulture;
 }

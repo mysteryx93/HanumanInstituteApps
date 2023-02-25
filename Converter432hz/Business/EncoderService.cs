@@ -348,4 +348,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             item.Destination = destPathRename;
         }
     }
+
+    /// <inheritdoc />
+    public int[] GetSupportedSampleRates(EncodeFormat format) => _audioEncoder.GetSupportedSampleRates(format);
 }

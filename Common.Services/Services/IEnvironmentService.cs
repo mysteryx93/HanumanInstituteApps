@@ -62,4 +62,8 @@ public interface IEnvironmentService
     /// <summary>Indicates whether the current application is running on MacOS.</summary>
     // ReSharper disable once InconsistentNaming
     bool IsMacOS { get; }
+    /// <summary>
+    /// Gets or sets the <see cref="T:System.Globalization.CultureInfo" /> object that represents the culture used by the current thread and task-based asynchronous operations.
+    /// </summary>
+    public IFormatProvider CurrentCulture { get; }
 }

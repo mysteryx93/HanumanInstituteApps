@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using HanumanInstitute.Common.Services;
 
 namespace HanumanInstitute.Common.Avalonia.App.Tests;
@@ -34,4 +35,6 @@ public class FakeEnvironmentService : IEnvironmentService
     public bool IsWindows => false;
 
     public bool IsMacOS => false;
+    
+    public IFormatProvider CurrentCulture => CultureInfo.CurrentCulture;
 }

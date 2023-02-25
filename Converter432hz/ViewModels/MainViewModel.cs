@@ -53,6 +53,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
+        this.WhenAnyValue(x => x.Settings.Encode.Format).Subscribe(FillSampleRateList);
 
         // _completedString = this.WhenAnyValue(x => x.FilesLeft, x => x.CompletedCount,
         //     (left, completed) => left > 0 || completed > 0 ?
@@ -216,29 +217,30 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
-        { EncodeFormat.Aac, "AAC" }, //AAC file encoder creates no valid containers and no tags
+        { EncodeFormat.Aac, "M4A/AAC" }, //AAC file encoder creates no valid containers and no tags
         { EncodeFormat.Wav, "WAV" },
         { EncodeFormat.Flac, "FLAC" },
-        { EncodeFormat.Ogg, "OGG" },
+        { EncodeFormat.Ogg, "OGG/Vorbis" },
         { EncodeFormat.Opus, "OPUS" }
     };
 
-    public ListItemCollectionView<int> SampleRateList { get; } = new()
+    public ListItemCollectionView<int> SampleRateList { get; } = new();
+
+    private void FillSampleRateList(EncodeFormat format)
     {
-        { 0, "Source" },
-        { 8000, "8000 Hz" },
-        { 11025, "11,025 Hz" },
-        { 16000, "16,000 Hz" },
-        { 22050, "22,050 Hz" },
-        { 44100, "44,100 Hz" },
-        { 48000, "48,000 Hz" },
-        { 88200, "88,200 Hz" },
-        { 96000, "96,000 Hz" },
-        { 176400, "176,400 Hz" },
-        { 192000, "192,000 Hz" },
-        { 352800, "352,800 Hz" },
-        { 384000, "384,000 Hz" }
-    };
+        var selection = SampleRateList.SelectedValue;
+        SampleRateList.Source.Clear();
+        SampleRateList.Add(0, "Source");
+        foreach (var sampleRate in Encoder.GetSupportedSampleRates(format))
+        {
+            SampleRateList.Add(sampleRate, string.Format(_environment.CurrentCulture, "{0} Hz", sampleRate));
+        }
+        
+        SampleRateList.SelectedValue = SampleRateList.Source.Any(x => x.Value == selection) ? selection : 48000;
+    }
+
+    // Write sample rate with local culture formatting. We cannot specify _environment.CurrentCulture because it needs to be static to be used in the declaration.
+    private static string GetSrText(int sampleRate) => $"{sampleRate} Hz"; 
 
     public ListItemCollectionView<int> BitrateList { get; } = new()
     {
