@@ -3,6 +3,7 @@ using System.Threading;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using FluentAvalonia.UI.Windowing;
+using ReactiveUI;
 
 namespace HanumanInstitute.Common.Avalonia.App;
 
@@ -22,6 +23,7 @@ public static class AppStarter
     public static void Start<TApp>(string[] args, Func<AppTheme> getTheme, Func<string?>? logPath)
         where TApp : Application, new()
     {
+        PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
         try
         {
             // Initialize ViewModelLocator and load settings in parallel.
