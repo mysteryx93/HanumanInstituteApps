@@ -67,8 +67,10 @@ public class AudioEncoder : IAudioEncoder
             var length = Bass.ChannelGetLength(chan);
                         
             // Add mix effect.
-            var sampleRate = settings.Format == EncodeFormat.Opus ? 48000 :
-                settings.SampleRate > 0 ? settings.SampleRate : chanInfo.Frequency;
+            var sampleRate = settings.SampleRate > 0 ? settings.SampleRate : chanInfo.Frequency;
+            sampleRate = EnsureSampleRateValid(settings.Format, sampleRate);
+            // var sampleRate = settings.Format == EncodeFormat.Opus ? 48000 :
+            //     settings.SampleRate > 0 ? settings.SampleRate : chanInfo.Frequency;
             var chanMix = BassMix.CreateMixerStream(sampleRate, chanInfo.Channels, BassFlags.MixerEnd | BassFlags.Decode).Valid();
             BassMix.MixerAddChannel(chanMix, chan, BassFlags.MixerChanNoRampin | BassFlags.AutoFree);
 
@@ -214,6 +216,24 @@ public class AudioEncoder : IAudioEncoder
             _ when bitrate <= 256 => 256,
             _ => 320
         };
+
+    /// <summary>
+    /// Ensures that the sample rate is valid. If not, returns the closest valid sample rate. 
+    /// </summary>
+    private int EnsureSampleRateValid(EncodeFormat format, int sampleRate)
+    {
+        var valid = GetSupportedSampleRates(format);
+        if (valid.Contains(sampleRate))
+        {
+            return sampleRate;
+        }
+        else
+        {
+            // Returns closest valid sample rate.
+            var closest = valid.Select(x => (x, Math.Abs(sampleRate - x))).OrderBy(x => x.Item2).FirstOrDefault();
+            return closest.x;
+        }
+    }
 
     /// <inheritdoc />
     public int[] GetSupportedSampleRates(EncodeFormat format) => format switch

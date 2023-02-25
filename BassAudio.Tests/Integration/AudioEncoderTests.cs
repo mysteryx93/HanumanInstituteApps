@@ -39,6 +39,10 @@ public class AudioEncoderTests : TestsBase
         CreateSource("SourceShort", dstFormat, srcFormat);
     public ProcessingItem CreateSourceLong(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3) =>
         CreateSource("SourceLong", dstFormat, srcFormat);
+    public ProcessingItem CreateSourceSampleRateHigh(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Flac) =>
+        CreateSource("SourceSampleRateHigh", dstFormat, srcFormat);
+    public ProcessingItem CreateSourceSampleRateLow(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Flac) =>
+        CreateSource("SourceSampleRateLow", dstFormat, srcFormat);
     public ProcessingItem CreateSource(string source, EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3)
     {
         var srcExt = GetFormatExtension(srcFormat);
@@ -571,5 +575,55 @@ public class AudioEncoderTests : TestsBase
         Assert.True(FileSystem.File.Exists(file.Destination));
         var fileLength = FileSystem.FileInfo.New(file.Destination).Length;
         Output.WriteLine(fileLength.ToString());
+    }
+
+    [Theory]
+    [InlineData(EncodeFormat.Mp3, 48000)]
+    [InlineData(EncodeFormat.Aac, 96000)]
+    [InlineData(EncodeFormat.Wav, 384000)]
+    [InlineData(EncodeFormat.Flac, 384000)]
+    [InlineData(EncodeFormat.Ogg, 48000)]
+    [InlineData(EncodeFormat.Opus, 48000)]
+    public async Task Start_SampleRateSourceTooHigh_CreateFileWithClosestSampleRate(EncodeFormat format,  int expectedSampleRate)
+    {
+        // SourceSampleRate = 384000
+        var file = CreateSourceSampleRateHigh(format);
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Format = format;
+        Settings.SampleRate = 0;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        var chan = Bass.CreateStream(file.Destination);
+        var chanInfo = Bass.ChannelGetInfo(chan);
+        Bass.StreamFree(chan);
+        Output.WriteLine(chanInfo.Frequency.ToString());
+        Assert.Equal(expectedSampleRate, chanInfo.Frequency);
+    }
+    
+    [Theory]
+    [InlineData(EncodeFormat.Mp3, 8000)]
+    [InlineData(EncodeFormat.Aac, 32000)]
+    [InlineData(EncodeFormat.Wav, 8000)]
+    [InlineData(EncodeFormat.Flac, 8000)]
+    [InlineData(EncodeFormat.Ogg, 32000)]
+    [InlineData(EncodeFormat.Opus, 48000)]
+    public async Task Start_SampleRateSourceTooLow_CreateFileWithClosestSampleRate(EncodeFormat format,  int expectedSampleRate)
+    {
+        // SourceSampleRate = 8000
+        var file = CreateSourceSampleRateLow(format);
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Format = format;
+        Settings.SampleRate = 0;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        var chan = Bass.CreateStream(file.Destination);
+        var chanInfo = Bass.ChannelGetInfo(chan);
+        Bass.StreamFree(chan);
+        Output.WriteLine(chanInfo.Frequency.ToString());
+        Assert.Equal(expectedSampleRate, chanInfo.Frequency);
     }
 }
