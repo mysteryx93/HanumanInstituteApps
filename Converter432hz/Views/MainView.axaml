@@ -5,7 +5,7 @@
         x:Class="HanumanInstitute.Converter432hz.Views.MainView"
         mc:Ignorable="d" Classes="gradient"
         Title="432hz Batch Converter" Icon="/Assets/App.ico"
-        MinHeight="350" MinWidth="570"
+        MinHeight="350" MinWidth="590"
         hic:SizeExtension.TrackSize="True"
         hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
@@ -13,7 +13,9 @@
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:bass="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        d:DataContext="{x:Static local:ViewModelLocator.Main}">
+        xmlns:vm="clr-namespace:HanumanInstitute.Converter432hz.ViewModels"
+        xmlns:views="clr-namespace:HanumanInstitute.Converter432hz.Views"
+        d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Window.Resources>
         <hic:PercentageConverter x:Key="PercentageConverter" />
     </Window.Resources>
@@ -89,30 +91,30 @@
                         <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold" Text="Settings" />
                         <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Content="I"
-                                Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                Command="{Binding $parent[views:MainView].ViewModel.ShowAbout}" />
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Output Format" />
-                        <ComboBox HorizontalAlignment="Right" Width="120"
+                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
                                   Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitrateVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bitrate" />
-                        <ComboBox HorizontalAlignment="Right" Width="120"
+                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
                                   Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitsPerSampleVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
-                        <ComboBox HorizontalAlignment="Right" Width="120"
+                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
                                   Items="{Binding BitsPerSampleList}"
                                   SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                        <ComboBox HorizontalAlignment="Right" Width="120"
+                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
                                   Items="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>
@@ -137,7 +139,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center"
                                Text="When destination file exists" />
-                    <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center"
+                    <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center" x:CompileBindings="False"
                               Items="{Binding FileExistsActionList}"
                               SelectedItem="{Binding FileExistsActionList.CurrentItem, Mode=TwoWay}">
                     </ComboBox>

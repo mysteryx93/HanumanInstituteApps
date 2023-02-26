@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
+    <AssemblyVersion>2.3</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <Configurations>Release;Debug</Configurations>
@@ -14,7 +15,8 @@
     <Company>Hanuman Institute</Company>
     <Product>Powerliminals Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <TrimMode>copyused</TrimMode> <!-- Disable trimming for this assembly only -->
+<!--    <TrimMode>copyused</TrimMode>-->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

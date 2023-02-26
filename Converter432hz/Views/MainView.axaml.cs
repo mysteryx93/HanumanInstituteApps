@@ -6,20 +6,7 @@ namespace HanumanInstitute.Converter432hz.Views;
 /// <summary>
 /// Interaction logic for MainView.xaml
 /// </summary>
-public partial class MainView : Window
+public partial class MainView : CommonWindow<MainViewModel>
 {
-    public MainView()
-    {
-        InitializeComponent();
-#if DEBUG
-        this.AttachDevTools();
-#endif
-    }
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
-    
-    public MainViewModel ViewModel => (MainViewModel)DataContext!;
+    protected override void Initialize() => AvaloniaXamlLoader.Load(this);
 }

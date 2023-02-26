@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
+    <AssemblyVersion>2.3</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.Player432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
@@ -14,7 +15,9 @@
     <Company>Hanuman Institute</Company>
     <Product>432hz Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <TrimMode>copyused</TrimMode> <!-- Disable trimming for this assembly only -->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -45,4 +48,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  </Project>
+</Project>

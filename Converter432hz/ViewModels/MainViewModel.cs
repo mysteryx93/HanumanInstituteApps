@@ -217,7 +217,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     public ListItemCollectionView<EncodeFormat> FormatsList { get; } = new()
     {
         { EncodeFormat.Mp3, "MP3" },
-        { EncodeFormat.Aac, "M4A/AAC" }, //AAC file encoder creates no valid containers and no tags
+        { EncodeFormat.Aac, "M4A/AAC" },
         { EncodeFormat.Wav, "WAV" },
         { EncodeFormat.Flac, "FLAC" },
         { EncodeFormat.Ogg, "OGG/Vorbis" },

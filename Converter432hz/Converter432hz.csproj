@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
+    <AssemblyVersion>2.3</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.Converter432hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
@@ -14,8 +15,17 @@
     <Company>Hanuman Institute</Company>
     <Product>432hz Converter</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <TrimMode>copyused</TrimMode>
-    <IsPackable>false</IsPackable> <!-- Disable trimming for this assembly only -->
+<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
+<!--    <PublishTrimmed>false</PublishTrimmed>-->
+    <IsPackable>false</IsPackable>
+    
+<!--    <DebuggerSupport>false</DebuggerSupport>-->
+<!--    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>-->
+<!--    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>-->
+<!--    <EventSourceSupport>false</EventSourceSupport>-->
+<!--    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>-->
+<!--    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>-->
+<!--    <UseNativeHttpHandler>true</UseNativeHttpHandler>    -->
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -50,4 +60,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  </Project>
+</Project>

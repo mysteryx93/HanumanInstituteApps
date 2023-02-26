@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 
@@ -9,6 +10,7 @@ public abstract class CommonWindow<T> : CommonWindow
     public T ViewModel => (T)DataContext!;
 }
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
 public abstract class CommonWindow : Window
 {
     protected CommonWindow()
