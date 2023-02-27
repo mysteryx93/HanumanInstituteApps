@@ -15,8 +15,8 @@
     <Company>Hanuman Institute</Company>
     <Product>432hz Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <PublishTrimmed>true</PublishTrimmed>
+<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
+<!--    <PublishTrimmed>true</PublishTrimmed>-->
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
@@ -27,7 +27,6 @@
     <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LazyCache.Splat\LazyCache.Splat.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
@@ -38,8 +37,7 @@
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
-    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
+    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5.1" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview4" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview4" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.22" />

@@ -126,7 +126,7 @@
             <ItemsControl Items="{Binding Playlist.Files}" Margin="0,0,10,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <media:MediaPlayer IsLoopVisible="False">
+                        <media:MediaPlayer IsLoopVisible="False" Opacity=".85">
                             <!-- StopCommandExecuted="{s:MethodBinding {Binding $parent[views:MainView].ViewModel}, OnRemoveMedia, {Binding}}"> -->
                             <mediab:BassPlayerHost Source="{Binding FullPath, Mode=TwoWay}"
                                                    Volume="{Binding Volume, Mode=TwoWay}"

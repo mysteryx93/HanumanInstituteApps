@@ -35,7 +35,6 @@
     <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LazyCache.Splat\LazyCache.Splat.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
@@ -45,9 +44,8 @@
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview5" />
-    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.999-build20230226-01" />
+    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5.1" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview4" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview4" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
