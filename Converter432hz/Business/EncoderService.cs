@@ -217,6 +217,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
             }
             file.Status = EncodeStatus.Processing;
             file.IsFileCreated = true;
+            file.Pitch = null;
 
             await _audioEncoder.StartAsync(file, Settings.Encode, cancellationToken);
             file.ProgressPercent = 0;
