@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 ./publish-linux Player432hz linux-x64
 ./publish-linux Player432hz linux-arm64
 
