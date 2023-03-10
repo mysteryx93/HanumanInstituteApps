@@ -33,6 +33,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             .Subscribe((_) => ReloadFiles());
     }
 
+    public override async void OnLoaded()
+    {
+        base.OnLoaded();
+        await PromptFixPathsAsync().ConfigureAwait(false);
+    }
+
     /// <inheritdoc />
     protected override void ApplySettings()
     {

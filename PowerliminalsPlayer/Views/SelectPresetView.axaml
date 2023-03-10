@@ -10,7 +10,9 @@
         ShowInTaskbar="False" Icon="/Assets/App.ico" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
-        d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}">
+        xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
+        xmlns:views="clr-namespace:HanumanInstitute.PowerliminalsPlayer.Views"
+        d:DataContext="{x:Static local:ViewModelLocator.SelectPreset}" x:DataType="vm:SelectPresetViewModel">
     <Window.Resources>
         <hic:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Save Preset As..."
                                       FalseValue="Load Preset..." />
@@ -35,7 +37,7 @@
                             <i:Interaction.Behaviors>
                                 <ia:EventTriggerBehavior EventName="DoubleTapped">
                                     <ia:InvokeCommandAction
-                                        Command="{Binding ViewModel.ConfirmCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                        Command="{Binding ViewModel.ConfirmCommand, RelativeSource={RelativeSource AncestorType=views:SelectPresetView}}"
                                         CommandParameter="{x:Null}" />
                                 </ia:EventTriggerBehavior>
                             </i:Interaction.Behaviors>

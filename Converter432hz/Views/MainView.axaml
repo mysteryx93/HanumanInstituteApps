@@ -91,7 +91,8 @@
                         <TextBlock FontSize="16" Margin="0,0,0,10" FontWeight="DemiBold" Text="Settings" />
                         <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Content="I"
-                                Command="{Binding $parent[views:MainView].ViewModel.ShowAbout}" />
+                                Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
+                        <!-- Command="{Binding $parent[views:MainView].ViewModel.ShowAbout}" x:CompileBindings="False"  -->
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Output Format" />

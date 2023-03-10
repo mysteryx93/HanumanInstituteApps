@@ -113,19 +113,6 @@ public class MainViewModelTests : TestsBase
     [Theory]
     [InlineData(EncodeFormat.Flac, true)]
     [InlineData(EncodeFormat.Mp3, true)]
-    [InlineData(EncodeFormat.Ogg, true)]
-    [InlineData(EncodeFormat.Opus, false)]
-    [InlineData(EncodeFormat.Wav, true)]
-    public void IsSampleRateVisible_SetFormat_IsExpectedValue(EncodeFormat format, bool value)
-    {
-        Model.FormatsList.SelectedValue = format;
-
-        Assert.Equal(Model.IsSampleRateVisible, value);
-    }
-
-    [Theory]
-    [InlineData(EncodeFormat.Flac, true)]
-    [InlineData(EncodeFormat.Mp3, true)]
     [InlineData(EncodeFormat.Ogg, false)]
     [InlineData(EncodeFormat.Opus, false)]
     [InlineData(EncodeFormat.Wav, false)]

@@ -5,15 +5,17 @@
         xmlns:ui="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
         x:Class="HanumanInstitute.Player432hz.Views.MainView"
         mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="350"
-        Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560"
+        Title="432hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.Player432hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:flu="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.Player432hz.ViewModels"
+        xmlns:views="clr-namespace:HanumanInstitute.Player432hz.Views"
         hic:SizeExtension.TrackSize="True"
         hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
         hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
-        d:DataContext="{x:Static local:ViewModelLocator.Main}" Classes="gradient">
+        d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Grid>
         <Grid Margin="10,6,10,10" ColumnDefinitions="150,*" RowDefinitions="*,40">
             <Grid Column="0">
@@ -28,7 +30,7 @@
                         <flu:SymbolIcon Symbol="Remove" FontSize="20" />
                     </Button>
                 </Grid>
-                <ListBox TabIndex="1" Background="{x:Null}" Margin="0,28,0,0"
+                <ListBox TabIndex="1" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
                          Items="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
                     <ListBox.Styles>
                         <Style Selector="ListBoxItem">
@@ -42,7 +44,7 @@
                                 <Interaction.Behaviors>
                                     <EventTriggerBehavior EventName="DoubleTapped">
                                         <InvokeCommandAction
-                                            Command="{Binding ViewModel.StartPlayList, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                            Command="{Binding ViewModel.StartPlayList, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
                                     </EventTriggerBehavior>
                                 </Interaction.Behaviors>
                             </TextBlock>
@@ -69,23 +71,23 @@
                         </StackPanel>
                         <Button Classes="round icon" Width="35" HorizontalAlignment="Right" Content="I"
                                 Margin="0,0,38,0"
-                                Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
                         <Button Classes="round" Width="35" HorizontalAlignment="Right"
-                                Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                                Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType=views:MainView}}">
                             <flu:SymbolIcon Symbol="Settings" FontSize="20" />
                         </Button>
                     </Grid>
-                    <ListBox TabIndex="5" Background="{x:Null}" Margin="0,28,0,0"
+                    <ListBox TabIndex="5" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
                              Items="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
                     </ListBox>
                 </Grid>
-                <Grid Row="1" DataContext="{x:Static local:ViewModelLocator.FilesList}" Margin="0,6,0,0">
+                <Grid Row="1" DataContext="{x:Static local:ViewModelLocator.FilesList}" Margin="0,6,0,0" x:DataType="vm:IFilesListViewModel">
                     <Grid VerticalAlignment="Top">
                         <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
                         <Button Classes="round" Content="Play" HorizontalAlignment="Right"
                                 Width="75" TabIndex="9" Command="{Binding PlayCommand}" />
                     </Grid>
-                    <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0"
+                    <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
                              Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -93,7 +95,7 @@
                                     <Interaction.Behaviors>
                                         <EventTriggerBehavior EventName="DoubleTapped">
                                             <InvokeCommandAction
-                                                Command="{Binding ViewModel.StartPlayFile, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                Command="{Binding ViewModel.StartPlayFile, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
                                         </EventTriggerBehavior>
                                     </Interaction.Behaviors>
                                 </TextBlock>
@@ -104,7 +106,7 @@
             </Grid>
         </Grid>
         <Grid Height="43" VerticalAlignment="Bottom"
-              DataContext="{x:Static local:ViewModelLocator.Player}">
+              DataContext="{x:Static local:ViewModelLocator.Player}" x:DataType="vm:PlayerViewModel">
             <ui:MediaPlayer
                 IsLoopVisible="False" IsSpeedVisible="False">
                 <bass:BassPlayerHost Source="{Binding Player.NowPlaying, Mode=OneWay}"
@@ -118,7 +120,7 @@
                                      EffectsSkipTempo="{Binding Player.Settings.SkipTempo}"
                                      PitchError="{Binding Player.PitchError, Mode=OneWayToSource}"
                                      OutputSampleRate="{Binding Player.Settings.OutputSampleRate}"
-                                     Volume="{Binding ViewModel.Settings.Volume, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay}">
+                                     Volume="{Binding ViewModel.Settings.Volume, RelativeSource={RelativeSource AncestorType=views:MainView}, Mode=TwoWay}">
                     <Interaction.Behaviors>
                         <EventTriggerBehavior EventName="MediaFinished">
                             <InvokeCommandAction Command="{Binding PlayNextCommand}" />

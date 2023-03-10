@@ -10,7 +10,7 @@ public abstract class CommonWindow<T> : CommonWindow
     public T ViewModel => (T)DataContext!;
 }
 
-[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public abstract class CommonWindow : Window
 {
     protected CommonWindow()

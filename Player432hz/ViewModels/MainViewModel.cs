@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO.Abstractions;
+using System.Linq;
 using System.Reactive.Linq;
 using Avalonia.Input;
 using HanumanInstitute.Common.Avalonia.App;
@@ -15,18 +16,39 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private readonly IPlaylistViewModelFactory _playlistFactory;
     private readonly IFilesListViewModel _filesListViewModel;
     private readonly IDialogService _dialogService;
+    private readonly IPathFixer _pathFixer;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService,
-        IPlaylistViewModelFactory playlistFactory, IFilesListViewModel filesListViewModel, IDialogService dialogService) : 
+        IPlaylistViewModelFactory playlistFactory, IFilesListViewModel filesListViewModel, IDialogService dialogService, IPathFixer pathFixer) : 
         base(settings, appUpdateService)
     {
         _playlistFactory = playlistFactory;
         _playlistFactory.OwnerViewModel = this;
         _filesListViewModel = filesListViewModel;
         _dialogService = dialogService;
+        _pathFixer = pathFixer;
 
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe(_ => Playlists_CurrentChanged());
         // ConvertFromSettings();
+    }
+
+    public override void OnLoaded()
+    {
+        base.OnLoaded();
+        
+    }
+    
+    /// <summary>
+    /// Prompts to fix invalid paths, if any.
+    /// </summary>
+    public async Task PromptFixPathsAsync()
+    {
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Playlists.Folders).ConfigureAwait(false);
+        if (changed)
+        {
+            ReloadFiles();
+            _settings.Save();
+        }
     }
 
     /// <summary>

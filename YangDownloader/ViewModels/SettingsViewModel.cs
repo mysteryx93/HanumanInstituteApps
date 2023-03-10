@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class SettingsViewModel : SettingsViewModel<AppSettingsData>
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
     private readonly IDialogService _dialogService;
     private readonly IEncoderService _ffmpeg;

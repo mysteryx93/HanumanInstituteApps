@@ -3,36 +3,37 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
+        xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
         mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="420" Height="420" MaxHeight="420"
         x:Class="HanumanInstitute.YangDownloader.Views.EncodeSettingsView"
         Title="Advanced Settings" Classes="gradient"
         CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-        d:DataContext="{x:Static local:ViewModelLocator.EncodeSettings}">
+        d:DataContext="{x:Static local:ViewModelLocator.EncodeSettings}" x:DataType="vm:EncodeSettingsViewModel">
     <Grid>
         <Grid Margin="10">
             <StackPanel>
                 <Grid Margin="0,2,0,2">
                     <TextBlock VerticalAlignment="Center" Text="Output Format" />
-                    <ComboBox HorizontalAlignment="Right" Width="110" 
+                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False" 
                               Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24" IsVisible="{Binding IsBitrateVisible}">
                     <TextBlock VerticalAlignment="Center" Text="Bitrate" />
-                    <ComboBox HorizontalAlignment="Right" Width="110" 
+                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
                               Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24" IsVisible="{Binding IsBitsPerSampleVisible}">
                     <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
-                    <ComboBox HorizontalAlignment="Right" Width="110" 
+                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
                               Items="{Binding BitsPerSampleList}" SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid IsVisible="{Binding IsSampleRateVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                        <ComboBox HorizontalAlignment="Right" Width="110" 
+                        <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
                                   Items="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>

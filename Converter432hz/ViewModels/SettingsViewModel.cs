@@ -4,7 +4,7 @@ using HanumanInstitute.Common.Services.Validation;
 namespace HanumanInstitute.Converter432hz.ViewModels;
 
 /// <inheritdoc />
-public class SettingsViewModel : SettingsViewModel<AppSettingsData>
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
     private readonly IEnvironmentService _environment;
     

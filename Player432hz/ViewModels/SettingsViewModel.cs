@@ -4,7 +4,7 @@ using HanumanInstitute.Common.Services.Validation;
 namespace HanumanInstitute.Player432hz.ViewModels;
 
 /// <inheritdoc />
-public class SettingsViewModel : SettingsViewModel<AppSettingsData>
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
     public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player, IEnvironmentService environment) :
         base(settingsProvider, fluentTheme)

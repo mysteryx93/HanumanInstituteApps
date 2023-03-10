@@ -6,6 +6,8 @@
     xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
     xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
+    xmlns:views="clr-namespace:HanumanInstitute.YangDownloader.Views"
     x:Class="HanumanInstitute.YangDownloader.Views.MainView"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     MinHeight="260" MinWidth="590" d:DesignWidth="590" d:DesignHeight="260"
@@ -13,21 +15,21 @@
     hic:SizeExtension.TrackSize="True" Classes="gradient"
     hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
     hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
-    d:DataContext="{x:Static local:ViewModelLocator.Main}">
+    d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Grid>
         <Grid Margin="10" RowDefinitions="Auto,*">
             <Button Grid.Row="0" Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
                     Content="I" Margin="0,0,38,0"
-                    Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                    Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
             <Button Grid.Row="0" Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                    Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType=views:MainView}}">
                 <ui:SymbolIcon Symbol="Settings" FontSize="20" />
             </Button>
             
             <StackPanel Grid.Row="0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Preferred Video:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding PreferredVideo}" Margin="5,0,10,0"
+                    <ComboBox Width="85" Items="{Binding PreferredVideo}" Margin="5,0,10,0" x:CompileBindings="False"
                               SelectedItem="{Binding PreferredVideo.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -36,7 +38,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <TextBlock Text="Audio:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding PreferredAudio}" Margin="5,0,10,0"
+                    <ComboBox Width="85" Items="{Binding PreferredAudio}" Margin="5,0,10,0" x:CompileBindings="False"
                               SelectedItem="{Binding PreferredAudio.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -45,7 +47,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <TextBlock Text="Quality:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding MaxQuality}" Margin="5,0,0,0"
+                    <ComboBox Width="85" Items="{Binding MaxQuality}" Margin="5,0,0,0" x:CompileBindings="False"
                               SelectedItem="{Binding MaxQuality.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>

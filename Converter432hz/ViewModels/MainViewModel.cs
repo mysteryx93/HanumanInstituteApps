@@ -1,7 +1,5 @@
-﻿using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices.JavaScript;
 using DynamicData;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
@@ -106,12 +104,6 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private readonly ObservableAsPropertyHelper<bool> _isBitsPerSampleVisible;
 
     /// <summary>
-    /// Gets whether SampleRate control should be visible.
-    /// </summary>
-    public bool IsSampleRateVisible => _isSampleRateVisible.Value;
-    private readonly ObservableAsPropertyHelper<bool> _isSampleRateVisible;
-
-    /// <summary>
     /// Gets whether QualitySpeed slider should be visible.
     /// </summary>
     public bool IsQualitySpeedVisible => _isQualitySpeedVisible.Value;
@@ -125,9 +117,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     [Reactive]
     public int SourcesSelectedIndex { get; set; } = -1;
 
-    public RxCommandUnit AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImpl);
+    public RxCommandUnit AddFiles => _addFiles ??= ReactiveCommand.CreateFromTask(AddFilesImplAsync);
     private RxCommandUnit? _addFiles;
-    private async Task AddFilesImpl()
+    private async Task AddFilesImplAsync()
     {
         // throw new NotSupportedException();
         var settings = new OpenFileDialogSettings()
@@ -160,9 +152,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         }).ConfigureAwait(false);
     }
 
-    public RxCommandUnit AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImpl);
+    public RxCommandUnit AddFolder => _addFolder ??= ReactiveCommand.CreateFromTask(AddFolderImplAsync);
     private RxCommandUnit? _addFolder;
-    private async Task AddFolderImpl()
+    private async Task AddFolderImplAsync()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
@@ -192,9 +184,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         }
     }
 
-    public RxCommandUnit BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImpl);
+    public RxCommandUnit BrowseDestination => _browseDestination ??= ReactiveCommand.CreateFromTask(BrowseDestinationImplAsync);
     private RxCommandUnit? _browseDestination;
-    private async Task BrowseDestinationImpl()
+    private async Task BrowseDestinationImplAsync()
     {
         var settings = new OpenFolderDialogSettings() { Title = "Destination" };
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
@@ -240,9 +232,6 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         SampleRateList.SelectedValue = SampleRateList.Source.Any(x => x.Value == selection) ? selection : 48000;
     }
 
-    // Write sample rate with local culture formatting. We cannot specify _environment.CurrentCulture because it needs to be static to be used in the declaration.
-    private static string GetSrText(int sampleRate) => $"{sampleRate} Hz"; 
-
     public ListItemCollectionView<int> BitrateList { get; } = new()
     {
         { 0, "Source" },
@@ -273,9 +262,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// <summary>
     /// Starts the batch encoding job.
     /// </summary>
-    public RxCommandUnit StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImpl);
+    public RxCommandUnit StartEncoding => _startEncoding ??= ReactiveCommand.CreateFromTask(StartEncodingImplAsync);
     private RxCommandUnit? _startEncoding;
-    private Task StartEncodingImpl()
+    private Task StartEncodingImplAsync()
     {
         Encoder.ProcessingFiles.Clear();
 

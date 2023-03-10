@@ -7,7 +7,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// Shared ViewModel for the settings page.
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
-public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
+public abstract class SettingsViewModelBase<TSettings> : OkCancelViewModel
     where TSettings : SettingsDataBase, new()
 {
     private readonly IFluentAvaloniaTheme _fluentTheme;
@@ -16,7 +16,7 @@ public abstract class SettingsViewModel<TSettings> : OkCancelViewModel
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    protected SettingsViewModel(ISettingsProvider<TSettings> settingsProvider, IFluentAvaloniaTheme fluentTheme)
+    protected SettingsViewModelBase(ISettingsProvider<TSettings> settingsProvider, IFluentAvaloniaTheme fluentTheme)
     {
         _settingsProvider = settingsProvider;
         _fluentTheme = fluentTheme;

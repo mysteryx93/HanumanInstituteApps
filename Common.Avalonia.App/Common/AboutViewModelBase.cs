@@ -9,7 +9,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// Shared ViewModel for the information page.
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
-public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
+public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
     where TSettings : SettingsDataBase, new()
 {
     private readonly IAppInfo _appInfo;
@@ -25,7 +25,7 @@ public abstract class AboutViewModel<TSettings> : ReactiveObject, IModalDialogVi
     /// <summary>
     /// Initializes a new instance of the AboutViewModel class.
     /// </summary>
-    protected AboutViewModel(IAppInfo appInfo, IEnvironmentService environment, ISettingsProvider<TSettings> settings,
+    protected AboutViewModelBase(IAppInfo appInfo, IEnvironmentService environment, ISettingsProvider<TSettings> settings,
         IUpdateService updateService)
     {
         _appInfo = appInfo;

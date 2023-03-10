@@ -2,21 +2,35 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <AssemblyVersion>2.3</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <Configurations>Release;Debug</Configurations>
-    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <NeutralLanguage>en-US</NeutralLanguage>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <Company>Hanuman Institute</Company>
     <Product>Powerliminals Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-<!--    <TrimMode>copyused</TrimMode>-->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!--    <PublishTrimmed>true</PublishTrimmed>-->
+
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+    <EventSourceSupport>false</EventSourceSupport>
+    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <UseNativeHttpHandler>true</UseNativeHttpHandler>
     <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebuggerSupport>false</DebuggerSupport>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -26,9 +40,8 @@
     <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5.1" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview4" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview4" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview5" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview5" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.22" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">

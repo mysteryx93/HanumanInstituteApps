@@ -4,7 +4,7 @@ using HanumanInstitute.Common.Avalonia.App;
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
 /// <inheritdoc />
-public class SettingsViewModel : SettingsViewModel<AppSettingsData>
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.

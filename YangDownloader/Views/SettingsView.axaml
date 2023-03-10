@@ -5,11 +5,12 @@
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
         mc:Ignorable="d" MinWidth="350" Width="350" MinHeight="250" Height="250"
         x:Class="HanumanInstitute.YangDownloader.Views.SettingsView"
         Title="Settings" Classes="gradient"
         ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
-        d:DataContext="{x:Static local:ViewModelLocator.Settings}">
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
     <Window.Resources>
         <hic:BooleanToBrushConverter x:Key="BooleanToBrushConverter">
             <hic:BooleanToBrushConverter.TrueValue>
@@ -36,13 +37,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Theme" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="20,0,0,0">
-                        <ComboBox Width="130" Items="{Binding ThemeList}"
+                        <ComboBox Width="130" Items="{Binding ThemeList}" x:CompileBindings="False"
                                   SelectedItem="{Binding ThemeList.CurrentItem}" />
                     </Grid>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
                     <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
-                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}"
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
                 <TextBlock Grid.Column="0" Text="Save to Folder" HorizontalAlignment="Left"/>

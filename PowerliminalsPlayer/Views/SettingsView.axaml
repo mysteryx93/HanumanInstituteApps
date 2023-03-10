@@ -4,11 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
         mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="260" Height="260" MaxHeight="260"
         x:Class="HanumanInstitute.PowerliminalsPlayer.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
-        d:DataContext="{x:Static local:ViewModelLocator.Settings}">
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
     <Grid>
         <Grid Margin="10">
             <StackPanel>
@@ -20,13 +21,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Theme" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="20,0,0,0">
-                        <ComboBox Width="130" Items="{Binding ThemeList}"
+                        <ComboBox Width="130" Items="{Binding ThemeList}" x:CompileBindings="False"
                                   SelectedItem="{Binding ThemeList.CurrentItem}" />
                     </Grid>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
-                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}"
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
@@ -45,7 +46,7 @@
                 <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
                     <TextBlock Text="Output sample rate" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="10,0,0,0">
-                        <ComboBox Width="115" Items="{Binding OutputSampleRateList}"
+                        <ComboBox Width="115" Items="{Binding OutputSampleRateList}" x:CompileBindings="False"
                                   SelectedItem="{Binding OutputSampleRateList.CurrentItem}" />
                     </Grid>
                 </StackPanel>

@@ -12,7 +12,6 @@ public class App : CommonApplication<MainView>
 {
     public App()
     {
-        var _ = new Window[] { new AboutView(), new AskFileActionView(), new MainView(), new SettingsView() };
     }
     
     public override void Initialize() => AvaloniaXamlLoader.Load(this);

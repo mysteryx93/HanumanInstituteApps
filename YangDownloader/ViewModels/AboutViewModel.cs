@@ -2,7 +2,7 @@
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public sealed class AboutViewModel : AboutViewModel<AppSettingsData>
+public sealed class AboutViewModel : AboutViewModelBase<AppSettingsData>
 {
     public AboutViewModel(IAppInfo appInfo, IEnvironmentService environment,
         ISettingsProvider<AppSettingsData> settings, IUpdateService updateService) :
