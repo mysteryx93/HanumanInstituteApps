@@ -12,7 +12,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
 
-    public PlaylistPlayer(IPitchDetector pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings) :
+    public PlaylistPlayer(IPitchDetectorWithCache pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings) :
         base(settings)
     {
         _pitchDetector = pitchDetector;
@@ -56,7 +56,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     private readonly Random _random = new Random();
 
     /// <inheritdoc />
-    public void Play(IEnumerable<string>? list, string? current)
+    public async Task PlayAsync(IEnumerable<string>? list, string? current)
     {
         Files.Clear();
         if (list != null)
@@ -66,18 +66,18 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
         NowPlaying = string.Empty;
         if (current.HasValue())
         {
-            CalcPitch(current);
+            await CalcPitchAsync(current).ConfigureAwait(false);
             NowPlaying = current;
         }
         SetTitle();
         if (string.IsNullOrEmpty(current))
         {
-            PlayNext();
+            await PlayNextAsync().ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc />
-    public void PlayNext()
+    public async Task PlayNextAsync()
     {
         if (Files.Any())
         {
@@ -87,7 +87,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
                 pos = _random.Next(Files.Count);
             }
 
-            CalcPitch(Files[pos]);
+            await CalcPitchAsync(Files[pos]).ConfigureAwait(false);
 
             NowPlaying = string.Empty;
             NowPlaying = Files[pos];
@@ -95,9 +95,9 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
         }
     }
 
-    private void CalcPitch(string filePath)
+    private async Task CalcPitchAsync(string filePath)
     {
-        PitchFrom = _settings.Value.AutoDetectPitch ? _pitchDetector.GetPitch(filePath) : _settings.Value.PitchFrom;
+        PitchFrom = _settings.Value.AutoDetectPitch ? await _pitchDetector.GetPitchAsync(filePath).ConfigureAwait(false) : _settings.Value.PitchFrom;
         SetTitle();
         Pitch = _settings.Value.PitchTo / PitchFrom;
     }
@@ -110,11 +110,11 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
             _fileSystem.Path.GetFileName(NowPlaying);
     }
 
-    protected override void ApplySettings()
+    protected override async void ApplySettings()
     {
         if (NowPlaying.HasValue())
         {
-            CalcPitch(NowPlaying);
+            await CalcPitchAsync(NowPlaying);
         }
     }
     

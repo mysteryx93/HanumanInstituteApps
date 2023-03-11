@@ -5,7 +5,7 @@ namespace HanumanInstitute.BassAudio.Tests.Integration;
 
 public class PitchDetectorWithDebug : PitchDetector
 {
-    public PitchDetectorWithDebug(IFileSystemService fileSystem, IAppCache cache) : base(fileSystem, cache)
+    public PitchDetectorWithDebug(IFileSystemService fileSystem) : base(fileSystem)
     {
     }
     

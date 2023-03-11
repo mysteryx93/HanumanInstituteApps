@@ -20,7 +20,7 @@ public class PitchDetectorTests : TestsBase
     private PitchDetectorWithDebug _model;
     private PitchDetectorWithDebug SetupModel()
     {
-        return new PitchDetectorWithDebug(FileSystem, AppCache);
+        return new PitchDetectorWithDebug(FileSystem);
     }
 
     public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
@@ -67,7 +67,7 @@ public class PitchDetectorTests : TestsBase
         foreach (var file in Directory.GetFiles(dir, "*.mp3"))
         {
             // var file = "SourceLong.mp3";
-            var pitch = await Model.GetPitchAsync(file, false);
+            var pitch = await Model.GetPitchAsync(file);
 
             var bestItem = iter < bestFreq.Length ? (float?)bestFreq[iter] : null;
             var diffWithBest = bestItem.HasValue ? Math.Abs(pitch - bestItem.Value) : 0;

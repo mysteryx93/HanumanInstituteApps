@@ -16,5 +16,5 @@ public interface IPlayerViewModel
     /// <summary>
     /// Plays the next file when playback ends.
     /// </summary>
-    RxCommandUnit PlayNextCommand { get; }
+    RxCommandUnit PlayNext { get; }
 }

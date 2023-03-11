@@ -30,7 +30,7 @@ public class EncoderServiceTests : TestsBase
     public IAudioEncoder BassEncoder => _bassEncoder ??= new AudioEncoder(PitchDetector, FileSystem);
     private IAudioEncoder _bassEncoder;
 
-    public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem, AppCache);
+    public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem);
     private IPitchDetector _pitchDetector;
 
     public FileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
@@ -43,9 +43,6 @@ public class EncoderServiceTests : TestsBase
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();
     private Mock<IDialogManager> _mockDialogManager;
     
-    public IAppCache AppCache => _appCache ??= new CachingService();
-    private IAppCache _appCache;
-
     private object ViewModelFactory(Type type) => (type) switch
     {
         _ when type == typeof(AskFileActionViewModel) => new AskFileActionViewModel(),

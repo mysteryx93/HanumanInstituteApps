@@ -14,13 +14,13 @@ public class PlayerViewModelTests
     public ISettingsProvider<AppSettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<AppSettingsData>();
     private ISettingsProvider<AppSettingsData> _mockSettings;
 
-    public Mock<IPitchDetector> MockPitchDetector => _mockPitchDetector ??= CreatePitchDetector();
-    private Mock<IPitchDetector> _mockPitchDetector;
-    private Mock<IPitchDetector> CreatePitchDetector()
+    public Mock<IPitchDetectorWithCache> MockPitchDetector => _mockPitchDetector ??= CreatePitchDetector();
+    private Mock<IPitchDetectorWithCache> _mockPitchDetector;
+    private Mock<IPitchDetectorWithCache> CreatePitchDetector()
     {
-        var mock = new Mock<IPitchDetector>();
-        mock.Setup(x => x.GetPitch(It.IsAny<string>(), It.IsAny<bool>())).Returns(440f);
-        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>(), It.IsAny<bool>())).Returns(Task.FromResult(440f));
+        var mock = new Mock<IPitchDetectorWithCache>();
+        mock.Setup(x => x.GetPitch(It.IsAny<string>())).Returns(440f);
+        mock.Setup(x => x.GetPitchAsync(It.IsAny<string>())).Returns(Task.FromResult(440f));
         return mock;
     }
 
@@ -54,9 +54,9 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void Play_ListNoCurrent_StartPlayback()
+    public async Task PlayAsync_ListNoCurrent_StartPlayback()
     {
-        Model.Player.Play(new[] { FileName1 }, null);
+        await Model.Player.PlayAsync(new[] { FileName1 }, null);
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -65,9 +65,9 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void Play_ListSetCurrent_StartPlayback()
+    public async Task Play_ListSetCurrent_StartPlayback()
     {
-        Model.Player.Play(new[] { FileName1 }, FileName2);
+        await Model.Player.PlayAsync(new[] { FileName1 }, FileName2);
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -76,9 +76,9 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void Play_NoListSetCurrent_StartPlayback()
+    public async Task Play_NoListSetCurrent_StartPlayback()
     {
-        Model.Player.Play(null, FileName2);
+        await Model.Player.PlayAsync(null, FileName2);
 
         Assert.Empty(Model.Player.Files);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -87,9 +87,9 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void Play_NoListNoCurrent_NowPlayingEmpty()
+    public async Task Play_NoListNoCurrent_NowPlayingEmpty()
     {
-        Model.Player.Play(null, null);
+        await Model.Player.PlayAsync(null, null);
 
         Assert.Empty(Model.Player.Files);
         Assert.Empty(Model.Player.NowPlaying);
@@ -98,10 +98,10 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void PlayNext_ListNoCurrent_StartPlayback()
+    public async Task PlayNext_ListNoCurrent_StartPlayback()
     {
-        Model.Player.Play(new[] { FileName1 }, null);
-        Model.Player.PlayNext();
+        await Model.Player.PlayAsync(new[] { FileName1 }, null);
+        await Model.Player.PlayNextAsync();
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -112,8 +112,8 @@ public class PlayerViewModelTests
     [Fact]
     public async Task PlayNext_ListSetCurrent_StartPlayback()
     {
-        Model.Player.Play(new[] { FileName1, FileName2, FileName3 }, FileName1);
-        Model.Player.PlayNext();
+        await Model.Player.PlayAsync(new[] { FileName1, FileName2, FileName3 }, FileName1);
+        await Model.Player.PlayNextAsync();
 
         Assert.Equal(3, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -123,10 +123,10 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void PlayNext_NoListSetCurrent_StartPlayback()
+    public async Task PlayNext_NoListSetCurrent_StartPlayback()
     {
-        Model.Player.Play(null, FileName2);
-        Model.Player.PlayNext();
+        await Model.Player.PlayAsync(null, FileName2);
+        await Model.Player.PlayNextAsync();
 
         Assert.Empty(Model.Player.Files);
         Assert.NotEmpty(Model.Player.NowPlaying);
@@ -135,10 +135,10 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void PlayNext_NoListNoCurrent_NowPlayingEmpty()
+    public async Task PlayNext_NoListNoCurrent_NowPlayingEmpty()
     {
-        Model.Player.Play(null, null);
-        Model.Player.PlayNext();
+        await Model.Player.PlayAsync(null, null);
+        await Model.Player.PlayNextAsync();
 
         Assert.Empty(Model.Player.Files);
         Assert.Empty(Model.Player.NowPlaying);
@@ -147,10 +147,10 @@ public class PlayerViewModelTests
     }
 
     [Fact]
-    public void PlayTwice_List_RestartsPlayback()
+    public async Task PlayTwice_List_RestartsPlayback()
     {
-        Model.Player.Play(new[] { FileName1 }, null);
-        Model.Player.Play(new[] { FileName2 }, null);
+        await Model.Player.PlayAsync(new[] { FileName1 }, null);
+        await Model.Player.PlayAsync(new[] { FileName2 }, null);
 
         Assert.Equal(1, Model.Player.Files.Count);
         Assert.NotEmpty(Model.Player.NowPlaying);

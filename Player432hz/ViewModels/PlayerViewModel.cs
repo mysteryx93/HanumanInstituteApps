@@ -14,7 +14,7 @@ public class PlayerViewModel : ReactiveObject, IPlayerViewModel
     }
 
     /// <inheritdoc />
-    public RxCommandUnit PlayNextCommand => _playNextCommand ??= ReactiveCommand.Create(PlayNextImpl);
-    private RxCommandUnit? _playNextCommand; 
-    private void PlayNextImpl() => Player.PlayNext();
+    public RxCommandUnit PlayNext => _playNext ??= ReactiveCommand.CreateFromTask(PlayNextImplAsync);
+    private RxCommandUnit? _playNext; 
+    private Task PlayNextImplAsync() => Player.PlayNextAsync();
 }

@@ -40,11 +40,11 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// </summary>
     /// <param name="list">The list of file paths to play.</param>
     /// <param name="current">If specified, playback will start with specified file.</param>
-    void Play(IEnumerable<string>? list, string? current);
+    Task PlayAsync(IEnumerable<string>? list, string? current);
     /// <summary>
     /// Starts playing the next media file from the list.
     /// </summary>
-    void PlayNext();
+    Task PlayNextAsync();
     // /// <summary>
     // /// Applies settings to the active player.
     // /// </summary>

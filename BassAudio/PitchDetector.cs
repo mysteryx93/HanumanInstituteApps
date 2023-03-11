@@ -10,17 +10,13 @@ namespace HanumanInstitute.BassAudio;
 public class PitchDetector : IPitchDetector
 {
     private readonly IFileSystemService _fileSystem;
-    private readonly IAppCache _cache;
-    private readonly TimeSpan _cacheExpiration = TimeSpan.FromDays(1);
-    private const string CachePrefix = "BassAudio.PitchDetector: ";
 
     /// <summary>
     /// Initializes a new instance of the PitchDetector class.
     /// </summary>
-    public PitchDetector(IFileSystemService fileSystem, IAppCache cache)
+    public PitchDetector(IFileSystemService fileSystem)
     {
         _fileSystem = fileSystem;
-        _cache = cache;
         // ReSharper disable once VirtualMemberCallInConstructor
         PassesChanged();
     }
@@ -57,26 +53,14 @@ public class PitchDetector : IPitchDetector
     { }
 
     /// <inheritdoc />
-    public Task<float> GetPitchAsync(string filePath, bool useCache = true) => useCache ?
-        _cache.GetOrAddAsync(CachePrefix + filePath,
-            () => GetPitchInternalAsync(filePath),
-            _cacheExpiration) :
-        Task.Run(() => GetPitchInternalAsync(filePath));
-
-    /// <inheritdoc />
-    public float GetPitch(string filePath, bool useCache = true) => useCache ?
-        _cache.GetOrAdd(CachePrefix + filePath,
-            () => GetPitchInternal(filePath),
-            _cacheExpiration) :
-        GetPitchInternal(filePath);
-
-    private async Task<float> GetPitchInternalAsync(string filePath)
+    public virtual async Task<float> GetPitchAsync(string filePath)
     {
         var results = await GetAnalyzeSampleRates().ForEachOrderedAsync(x => Task.Run(() => GetPitchInternal(filePath, x)));
         return SelectBest(results);
     }
 
-    private float GetPitchInternal(string filePath)
+    /// <inheritdoc />
+    public virtual float GetPitch(string filePath)
     {
         var results = GetAnalyzeSampleRates().Select(x => GetPitchInternal(filePath, x)).ToList();
         return SelectBest(results);
@@ -106,6 +90,9 @@ public class PitchDetector : IPitchDetector
 
         var toneFreq = ToneFreq;
         BassDevice.Instance.Init();
+        // Changing these configurations does not improve results. 
+        // Bass.Configure(Configuration.SRCQuality, 4);
+        // Bass.Configure(Configuration.FloatDSP, true);
 
         // Get file stream.
         var chan = 0;

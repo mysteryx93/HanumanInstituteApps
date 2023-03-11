@@ -16,6 +16,7 @@ public static class SplatContainerExtensions
         services.CheckNotNull(nameof(services));
 
         SplatRegistrations.Register<IPitchDetector, PitchDetector>();
+        SplatRegistrations.Register<IPitchDetectorWithCache, PitchDetectorWithCache>();
         SplatRegistrations.Register<IAudioEncoder, AudioEncoder>();
         // SplatRegistrations.Register<IBassDevice, BassDevice>();
         SplatRegistrations.SetupIOC();

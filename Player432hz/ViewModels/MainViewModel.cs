@@ -43,10 +43,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Playlists.Folders).ConfigureAwait(false);
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Playlists.Select(x => x.Folders).ToList()).ConfigureAwait(false);
         if (changed)
         {
-            ReloadFiles();
             _settings.Save();
         }
     }
@@ -62,12 +61,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private void StartPlayListImpl(TappedEventArgs e)
     {
         _filesListViewModel.Files.CurrentPosition = -1;
-        _filesListViewModel.PlayCommand.Execute().Subscribe();
+        _filesListViewModel.Play.Execute().Subscribe();
     }
 
     public ReactiveCommand<TappedEventArgs, Unit> StartPlayFile => _startPlayFile ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayFileImpl);
     private ReactiveCommand<TappedEventArgs, Unit>? _startPlayFile;
-    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.PlayCommand.Execute().Subscribe();
+    private void StartPlayFileImpl(TappedEventArgs e) => _filesListViewModel.Play.Execute().Subscribe();
 
     /// <summary>
     /// Adds a new playlist to the list.

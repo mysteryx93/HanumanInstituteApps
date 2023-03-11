@@ -24,13 +24,10 @@ public class AudioEncoderTests : TestsBase
     private IAudioEncoder SetupModel()
     {
         BassDevice.Instance.Init(0);
-        return new AudioEncoder(new PitchDetector(FileSystem, AppCache), FileSystem);
+        return new AudioEncoder(new PitchDetector(FileSystem), FileSystem);
     }
 
     public EncodeSettings Settings { get; set; } = new EncodeSettings() { QualityOrSpeed = 2 };
-
-    public IAppCache AppCache => _appCache ??= new CachingService();
-    private IAppCache _appCache;
 
     public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
     private IFileSystemService _fileSystem;

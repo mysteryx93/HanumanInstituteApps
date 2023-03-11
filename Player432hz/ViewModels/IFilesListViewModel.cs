@@ -21,5 +21,5 @@ public interface IFilesListViewModel
     /// <summary>
     /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
     /// </summary>
-    RxCommandUnit PlayCommand { get; }
+    RxCommandUnit Play { get; }
 }
