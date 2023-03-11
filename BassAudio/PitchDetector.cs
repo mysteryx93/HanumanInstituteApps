@@ -1,5 +1,6 @@
 ﻿using LazyCache;
 using ManagedBass;
+using ManagedBass.Mix;
 
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -13,6 +14,9 @@ public class PitchDetector : IPitchDetector
     private readonly TimeSpan _cacheExpiration = TimeSpan.FromDays(1);
     private const string CachePrefix = "BassAudio.PitchDetector: ";
 
+    /// <inheritdoc />
+    public ICollection<int> AnalyzeSampleRates { get; set; } = new List<int> { 44100, 32000, 24000 };
+
     /// <summary>
     /// Initializes a new instance of the PitchDetector class.
     /// </summary>
@@ -25,9 +29,9 @@ public class PitchDetector : IPitchDetector
     /// <inheritdoc />
     public Task<float> GetPitchAsync(string filePath, bool useCache = true) => useCache ?
         _cache.GetOrAddAsync(CachePrefix + filePath,
-            () => Task.FromResult(GetPitchInternal(filePath)),
+            () => GetPitchInternalAsync(filePath),
             _cacheExpiration) :
-        Task.Run(() => GetPitchInternal(filePath));
+        Task.Run(() => GetPitchInternalAsync(filePath));
 
     /// <inheritdoc />
     public float GetPitch(string filePath, bool useCache = true) => useCache ? 
@@ -35,8 +39,20 @@ public class PitchDetector : IPitchDetector
             () => GetPitchInternal(filePath),
             _cacheExpiration) :
             GetPitchInternal(filePath);
-    
+
+    private async Task<float> GetPitchInternalAsync(string filePath)
+    {
+        var results = await AnalyzeSampleRates.ForEachOrderedAsync(x => Task.Run(() => GetPitchInternal(filePath, x)));
+        return results.MinBy(x => x.Sum).Frequency;
+    }
+
     private float GetPitchInternal(string filePath)
+    {
+        var results = AnalyzeSampleRates.Select(x => GetPitchInternal(filePath, x));
+        return results.MinBy(x => x.Sum).Frequency;
+    }
+    
+    private FreqPeak GetPitchInternal(string filePath, int sampleRate)
     {
         if (!_fileSystem.File.Exists(filePath))
         {
@@ -47,21 +63,28 @@ public class PitchDetector : IPitchDetector
         BassDevice.Instance.Init();
 
         // Get file stream.
-        var chan = Bass.CreateStream(filePath, Flags: BassFlags.Float | BassFlags.Decode).Valid();
+        var chan = 0;
+        var chanMix = 0;
         try
         {
+            chan = Bass.CreateStream(filePath, Flags: BassFlags.Float | BassFlags.Decode).Valid();
             var chanInfo = Bass.ChannelGetInfo(chan);
+            
+            // Add mixer to change frequency.
+            chanMix = BassMix.CreateMixerStream(sampleRate, chanInfo.Channels, BassFlags.MixerEnd | BassFlags.Decode).Valid();
+            BassMix.MixerAddChannel(chanMix, chan, BassFlags.MixerChanNoRampin | BassFlags.AutoFree);
+
             var fft = new float[32768 / 2];
             var fftBuffer = new float[fft.Length];
-            var freqStep = (float)chanInfo.Frequency / fft.Length;
+            var freqStep = (float)sampleRate / fft.Length;
 
             // Read file and sum FFT values for up to 100 seconds.
             int read;
             var readTotal = 0;
-            var maxRead = (int)Bass.ChannelSeconds2Bytes(chan, 100);
+            var maxRead = (int)Bass.ChannelSeconds2Bytes(chanMix, 100);
             do
             {
-                read = Bass.ChannelGetData(chan, fftBuffer, (int)DataFlags.FFT32768);
+                read = Bass.ChannelGetData(chanMix, fftBuffer, (int)DataFlags.FFT32768);
                 if (read > 0)
                 {
                     readTotal += read;
@@ -74,7 +97,7 @@ public class PitchDetector : IPitchDetector
 
             // Find the tuning frequency
             var maxSum = 0.0f;
-            var maxFreq = 440.0f;
+            FreqPeak peak = new(0, 440);
             for (var i = 424f; i <= 448f; i += 0.1f)
             {
                 var tones = Array.ConvertAll(toneFreq, x => x * i / 440f);
@@ -97,14 +120,18 @@ public class PitchDetector : IPitchDetector
                     if (sum > maxSum)
                     {
                         maxSum = sum;
-                        maxFreq = i;
+                        peak = new FreqPeak(sum, i);
                     }
                 }
             }
-            return maxFreq;
+            // Analysis at smaller sampling rates gives smaller sums. I do not understand why, nor how to compensate for that.
+            // This equation compensates for that difference and the .2577 constant came by trial and error tests.
+            var adjust = (44100f / sampleRate - 1) *.2577f + 1;   
+            return new FreqPeak(peak.Sum * adjust, peak.Frequency);
         }
         finally
         {
+            Bass.StreamFree(chanMix);
             Bass.StreamFree(chan);
         }
     }
@@ -128,5 +155,19 @@ public class PitchDetector : IPitchDetector
             }
             return _toneFreq;
         }
+    }
+    
+    private struct FreqPeak
+    {
+        public FreqPeak(float sum, float frequency)
+        {
+            Sum = sum;
+            Frequency = frequency;
+        }
+        
+        public float Sum { get; }
+        public float Frequency { get; }
+
+        public override string ToString() => $"Frequency: {Frequency}, Sum: {Sum}";
     }
 }

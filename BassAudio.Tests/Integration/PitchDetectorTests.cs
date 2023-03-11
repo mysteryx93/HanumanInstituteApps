@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using LazyCache;
 using ManagedBass;
 using Xunit.Abstractions;
@@ -31,12 +32,12 @@ public class PitchDetectorTests : TestsBase
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/Symphony X - V The New Mythology Suite/")]
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/DJ Project/DJ Project - Experience/")]
     [InlineData("/run/media/hanuman/Storage-ntfs/Music/Enigma/Enigma - Best of Enigma CD1/")]
-    public void DetectPitch(string dir)
+    public async Task DetectPitchAsync(string dir)
     {
         foreach (var file in Directory.GetFiles(dir, "*.mp3"))
         {
             // var file = "SourceLong.mp3";
-            var pitch = Model.GetPitch(file);
+            var pitch = await Model.GetPitchAsync(file);
 
             Output.WriteLine($"{Path.GetFileName(file)}: {pitch.ToStringInvariant()}");
             Assert.True(pitch is > 400 and < 450);

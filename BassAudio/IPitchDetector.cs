@@ -19,4 +19,10 @@ public interface IPitchDetector
     /// <param name="useCache">True to cache the data, false to calculate without cache.</param>
     /// <returns>The audio pitch between 424 and 448.</returns>
     float GetPitch(string filePath, bool useCache = true);
+    /// <summary>
+    /// Gets or sets the list of sample rates at which analysis will be done. The full operation will be repeated for each frequency.
+    /// This can make a significant performance difference with GetPitch().
+    /// With GetPitchAsync, the multiple operations can be done in separate tasks.
+    /// </summary>
+    ICollection<int> AnalyzeSampleRates { get; set; }
 }

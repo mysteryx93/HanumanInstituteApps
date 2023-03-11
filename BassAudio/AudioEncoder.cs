@@ -45,7 +45,7 @@ public class AudioEncoder : IAudioEncoder
         // Calculate pitch.
         if (settings.AutoDetectPitch)
         {
-            file.Pitch ??= _pitchDetector.GetPitch(file.Path);
+            file.Pitch ??= _pitchDetector.GetPitch(file.Path, false);
         }
         var pitch = settings.AutoDetectPitch ? 
             settings.PitchTo / file.Pitch!.Value : 
