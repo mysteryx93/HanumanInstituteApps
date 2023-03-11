@@ -171,6 +171,7 @@ public class MainViewModelTests
     [Fact]
     public void Settings_LoadedWithFolders_FillPlaylistFolders()
     {
+        var _ = Model; // must initialize model first. 
         var folders = new List<string>() { "a", "b", "c" };
         MockSettings.Value.Playlists.Add(new SettingsPlaylistItem("P1", folders));
 

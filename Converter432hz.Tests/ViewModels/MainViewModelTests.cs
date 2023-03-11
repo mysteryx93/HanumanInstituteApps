@@ -3,7 +3,10 @@ using System.Linq;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
+using JetBrains.Annotations;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Converter432hz.Tests.ViewModels;
@@ -66,25 +69,31 @@ public class MainViewModelTests : TestsBase
     protected void SetOpenFilesResult(string[] values) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFileDialogSettings>(),
                 It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
-            .Returns(() => Task.FromResult<object>(values));
+            .Returns(() => Task.FromResult<object>(values.Select(GetFileMock).ToList()));
     
     protected void SetOpenFolderResult(string value) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
                 It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
-            .Returns(() => Task.FromResult<object>(value));
+            .Returns(() => Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(value) }));
+
+    private IDialogStorageFile GetFileMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFile>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
+
+    private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFolder>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
 
     [Fact]
     public void FileExistsAction_SetOnVM_SetOnEncoder()
     {
         Model.FileExistsActionList.SelectedValue = FileExistsAction.Rename;
 
-        Assert.Equal(FileExistsAction.Rename, Model.Encoder.FileExistsAction);
+        Assert.Equal(FileExistsAction.Rename, Model.Settings.FileExistsAction);
     }
 
     [Fact]
-    public void FileExistsAction_SetOnEncoder_SetOnVM()
+    public void FileExistsAction_SetInSettings_SetOnVM()
     {
-        Model.Encoder.FileExistsAction = FileExistsAction.Rename;
+        Model.Settings.FileExistsAction = FileExistsAction.Rename;
 
         Assert.Equal(FileExistsAction.Rename, Model.FileExistsActionList.SelectedValue);
     }
@@ -94,7 +103,7 @@ public class MainViewModelTests : TestsBase
     {
         Model.FileExistsActionList.CurrentPosition = 1;
 
-        Assert.Equal(Model.FileExistsActionList.Source[1].Value, Model.Encoder.FileExistsAction);
+        Assert.Equal(Model.FileExistsActionList.Source[1].Value, Model.Settings.FileExistsAction);
     }
 
     [Theory]
@@ -314,7 +323,7 @@ public class MainViewModelTests : TestsBase
 
         Model.BrowseDestination.Execute().Subscribe();
 
-        Assert.Equal(folder, Model.Encoder.Destination);
+        Assert.Equal(folder, Model.Settings.Destination);
     }
 
     // [Fact]

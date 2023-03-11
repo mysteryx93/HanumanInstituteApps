@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -38,8 +39,11 @@ public class PlaylistViewModelTests : TestsBase
     {
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
                 It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
-            .Returns(Task.FromResult<object>(DialogFolderPath));
+            .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(DialogFolderPath) }));
     }
+    
+    private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFolder>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
 
     private void AddFolders(int count)
     {

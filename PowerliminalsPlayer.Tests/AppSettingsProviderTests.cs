@@ -149,7 +149,7 @@ public class AppSettingsProviderTests
         MockFileSystem.EnsureDirectoryExists(path);
         using (var file = MockFileSystem.File.CreateText(path))
         {
-            file.Write(InvalidXml);
+            file.Write(ValidXml);
         }
         
         Model.Save();

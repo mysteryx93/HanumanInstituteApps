@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.FFmpeg;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Models;
 
@@ -32,7 +34,10 @@ public class SettingsViewModelTests: TestsBase
     protected void SetBrowseDestination(string value) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
                 It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
-            .Returns(Task.FromResult((object)value));
+            .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(value) }));
+
+    private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFolder>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
 
     [Fact]
     public void BrowseDestination_Cancel_DisplayOpenFolder()

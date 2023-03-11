@@ -2,6 +2,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -55,9 +56,12 @@ public class AppPathFixerTests
         MockDialogManager.Setup(x =>
                 x.ShowFrameworkDialogAsync(Owner, It.IsAny<OpenFolderDialogSettings>(),
                     It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
-            .ReturnsAsync(result)
+            .ReturnsAsync(new List<IDialogStorageFolder> { GetFolderMock(result) })
             .Callback(() => SetMessageBoxResult(nextPromptResult));
     }
+    
+    private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFolder>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
 
     protected void VerifyMessageBox(Times times)
     {

@@ -6,6 +6,7 @@ using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -84,7 +85,10 @@ public class MainViewModelTests
     protected void SetDialogManagerOpenFolder(string result) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(
                 It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
-            .Returns(Task.FromResult<object>(result?.ReplaceDirectorySeparator()));
+            .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(result?.ReplaceDirectorySeparator()) }));
+
+    private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
+        Mock.Of<IDialogStorageFolder>(x => x.Name == path && x.Path == new Uri(path) && x.LocalPath == path);
 
     protected void SetDialogManagerLoadPreset(PresetItem result) =>
         MockDialogManager.Setup(x => x.ShowDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<IModalDialogViewModel>()))
@@ -242,12 +246,10 @@ public class MainViewModelTests
         Assert.Empty(Model.Playlist.Files);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public void AddFolderCommand_NullOrEmpty_DoNotAddFolder(string folder)
+    [Fact]
+    public void AddFolderCommand_Null_DoNotAddFolder()
     {
-        SetDialogManagerOpenFolder(folder);
+        SetDialogManagerOpenFolder(null);
 
         Model.AddFolder.Execute().Subscribe();
 
