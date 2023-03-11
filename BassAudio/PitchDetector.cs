@@ -14,9 +14,6 @@ public class PitchDetector : IPitchDetector
     private readonly TimeSpan _cacheExpiration = TimeSpan.FromDays(1);
     private const string CachePrefix = "BassAudio.PitchDetector: ";
 
-    /// <inheritdoc />
-    public ICollection<int> AnalyzeSampleRates { get; set; } = new List<int> { 44100, 32000, 24000 };
-
     /// <summary>
     /// Initializes a new instance of the PitchDetector class.
     /// </summary>
@@ -24,7 +21,40 @@ public class PitchDetector : IPitchDetector
     {
         _fileSystem = fileSystem;
         _cache = cache;
+        // ReSharper disable once VirtualMemberCallInConstructor
+        PassesChanged();
     }
+
+    /// <inheritdoc />
+    public IEnumerable<int>? AnalyzeSampleRates
+    {
+        get => _analyzeSampleRates;
+        set
+        {
+            _analyzeSampleRates = value;
+            PassesChanged();
+        }
+    }
+    private IEnumerable<int>? _analyzeSampleRates;
+
+    /// <inheritdoc />
+    public int AnalyzePasses
+    {
+        get => _analyzePasses;
+        set
+        {
+            value.CheckRange(nameof(AnalyzePasses), min: 1, max: 3);
+            _analyzePasses = value;
+            PassesChanged();
+        }
+    }
+    private int _analyzePasses = 3;
+
+    /// <summary>
+    /// Occurs after setting AnalyzeSampleRates or AnalyzePasses.
+    /// </summary>
+    protected virtual void PassesChanged()
+    { }
 
     /// <inheritdoc />
     public Task<float> GetPitchAsync(string filePath, bool useCache = true) => useCache ?
@@ -34,24 +64,39 @@ public class PitchDetector : IPitchDetector
         Task.Run(() => GetPitchInternalAsync(filePath));
 
     /// <inheritdoc />
-    public float GetPitch(string filePath, bool useCache = true) => useCache ? 
-            _cache.GetOrAdd(CachePrefix + filePath, 
+    public float GetPitch(string filePath, bool useCache = true) => useCache ?
+        _cache.GetOrAdd(CachePrefix + filePath,
             () => GetPitchInternal(filePath),
             _cacheExpiration) :
-            GetPitchInternal(filePath);
+        GetPitchInternal(filePath);
 
     private async Task<float> GetPitchInternalAsync(string filePath)
     {
-        var results = await AnalyzeSampleRates.ForEachOrderedAsync(x => Task.Run(() => GetPitchInternal(filePath, x)));
-        return results.MinBy(x => x.Sum).Frequency;
+        var results = await GetAnalyzeSampleRates().ForEachOrderedAsync(x => Task.Run(() => GetPitchInternal(filePath, x)));
+        return SelectBest(results);
     }
 
     private float GetPitchInternal(string filePath)
     {
-        var results = AnalyzeSampleRates.Select(x => GetPitchInternal(filePath, x));
-        return results.MinBy(x => x.Sum).Frequency;
+        var results = GetAnalyzeSampleRates().Select(x => GetPitchInternal(filePath, x)).ToList();
+        return SelectBest(results);
     }
-    
+
+    /// <summary>
+    /// Returns the list of sample rates at which to run analysis. 
+    /// </summary>
+    private IEnumerable<int> GetAnalyzeSampleRates() => AnalyzeSampleRates ?? new[] { 42000, 34000, 27000 }.Take(AnalyzePasses);
+
+    /// <summary>
+    /// Returns average of all frequencies within 3% of max sum.
+    /// </summary>
+    protected virtual float SelectBest(IList<FreqPeak> values)
+    {
+        // 
+        var max = values.MaxBy(x => x.Sum).Sum;
+        return values.Where(x => x.Sum >= max * .97).Select(x => x.Frequency).Average();
+    }
+
     private FreqPeak GetPitchInternal(string filePath, int sampleRate)
     {
         if (!_fileSystem.File.Exists(filePath))
@@ -69,7 +114,7 @@ public class PitchDetector : IPitchDetector
         {
             chan = Bass.CreateStream(filePath, Flags: BassFlags.Float | BassFlags.Decode).Valid();
             var chanInfo = Bass.ChannelGetInfo(chan);
-            
+
             // Add mixer to change frequency.
             chanMix = BassMix.CreateMixerStream(sampleRate, chanInfo.Channels, BassFlags.MixerEnd | BassFlags.Decode).Valid();
             BassMix.MixerAddChannel(chanMix, chan, BassFlags.MixerChanNoRampin | BassFlags.AutoFree);
@@ -126,7 +171,7 @@ public class PitchDetector : IPitchDetector
             }
             // Analysis at smaller sampling rates gives smaller sums. I do not understand why, nor how to compensate for that.
             // This equation compensates for that difference and the .2577 constant came by trial and error tests.
-            var adjust = (44100f / sampleRate - 1) *.2577f + 1;   
+            var adjust = (44100f / sampleRate - 1) * .2577f + 1;
             return new FreqPeak(peak.Sum * adjust, peak.Frequency);
         }
         finally
@@ -156,18 +201,35 @@ public class PitchDetector : IPitchDetector
             return _toneFreq;
         }
     }
-    
-    private struct FreqPeak
+
+    /// <summary>
+    /// Holds information about detected frequencies.
+    /// </summary>
+    protected readonly struct FreqPeak
     {
+        /// <summary>
+        /// Initializes a new instance of the FreqPeak class.
+        /// </summary>
+        /// <param name="sum">The sum or 'confidence' of the detected frequency.</param>
+        /// <param name="frequency">The detected frequency.</param>
         public FreqPeak(float sum, float frequency)
         {
             Sum = sum;
             Frequency = frequency;
         }
-        
+
+        /// <summary>
+        /// The sum or 'confidence' of the detected frequency.
+        /// </summary>
         public float Sum { get; }
+        /// <summary>
+        /// The detected frequency.
+        /// </summary>
         public float Frequency { get; }
 
+        /// <summary>
+        /// Returns the values as a string representation. 
+        /// </summary>
         public override string ToString() => $"Frequency: {Frequency}, Sum: {Sum}";
     }
 }

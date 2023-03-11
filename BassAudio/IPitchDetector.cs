@@ -20,9 +20,15 @@ public interface IPitchDetector
     /// <returns>The audio pitch between 424 and 448.</returns>
     float GetPitch(string filePath, bool useCache = true);
     /// <summary>
-    /// Gets or sets the list of sample rates at which analysis will be done. The full operation will be repeated for each frequency.
-    /// This can make a significant performance difference with GetPitch().
-    /// With GetPitchAsync, the multiple operations can be done in separate tasks.
+    /// Gets or sets the list of sample rates at which analysis will be done. This overrides <see cref="AnalyzePasses"/>. 
     /// </summary>
-    ICollection<int> AnalyzeSampleRates { get; set; }
+    IEnumerable<int>? AnalyzeSampleRates { get; set; }
+    /// <summary>
+    /// Gets or sets how many times the operation will be performed at various sample rates. A higher value will
+    /// give better results but multiply the calculation time.
+    /// This can make a significant performance difference with GetPitch().
+    /// With GetPitchAsync, the passes are done in separate tasks in parallel.
+    /// </summary>
+    /// <returns></returns>
+    public int AnalyzePasses { get; set; }
 }
