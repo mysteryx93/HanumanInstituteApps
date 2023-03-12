@@ -6,8 +6,8 @@ namespace HanumanInstitute.Player432hz.ViewModels;
 /// <inheritdoc />
 public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player, IEnvironmentService environment) :
-        base(settingsProvider, fluentTheme)
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IPlaylistPlayer player, IEnvironmentService environment) :
+        base(settingsProvider)
     {
         Player = player;
         OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;

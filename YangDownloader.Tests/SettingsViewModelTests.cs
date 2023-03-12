@@ -13,7 +13,7 @@ public class SettingsViewModelTests: TestsBase
     public SettingsViewModelTests(ITestOutputHelper output) : base(output) { }
 
     public SettingsViewModel Model => _model ??= 
-        new SettingsViewModel(FakeSettings, Mock.Of<IFluentAvaloniaTheme>(), DialogService, MockEncoderService.Object, FakeFileSystem);
+        new SettingsViewModel(FakeSettings, DialogService, MockEncoderService.Object, FakeFileSystem);
     private SettingsViewModel _model;
     
     public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);

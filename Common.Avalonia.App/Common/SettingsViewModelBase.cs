@@ -1,3 +1,6 @@
+using System.Net.Mime;
+using Avalonia;
+using Avalonia.Styling;
 using HanumanInstitute.Common.Services;
 using ReactiveUI;
 
@@ -10,16 +13,14 @@ namespace HanumanInstitute.Common.Avalonia.App;
 public abstract class SettingsViewModelBase<TSettings> : OkCancelViewModel
     where TSettings : SettingsDataBase, new()
 {
-    private readonly IFluentAvaloniaTheme _fluentTheme;
     protected readonly ISettingsProvider<TSettings> _settingsProvider;
 
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    protected SettingsViewModelBase(ISettingsProvider<TSettings> settingsProvider, IFluentAvaloniaTheme fluentTheme)
+    protected SettingsViewModelBase(ISettingsProvider<TSettings> settingsProvider)
     {
         _settingsProvider = settingsProvider;
-        _fluentTheme = fluentTheme;
 
         // ReSharper disable once VirtualMemberCallInConstructor
         Settings = CloneSettings(_settingsProvider.Value);
@@ -40,7 +41,10 @@ public abstract class SettingsViewModelBase<TSettings> : OkCancelViewModel
         Settings.Theme = ThemeList.SelectedValue;
         Settings.CheckForUpdates = CheckForUpdateList.SelectedValue;
         Cloning.CopyAllFields(Settings, _settingsProvider.Value);
-        _fluentTheme.RequestedTheme = Settings.Theme.ToString();
+        if (Application.Current != null)
+        {
+            Application.Current.RequestedThemeVariant = new ThemeVariant(Settings.Theme.ToString(), null);
+        }
 
         _settingsProvider.Save();
         return true;

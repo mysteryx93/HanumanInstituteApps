@@ -41,8 +41,6 @@ public static class ViewModelLocator
         SplatRegistrations.Register<IMediaEncoder, MediaEncoder>();
         SplatRegistrations.Register<IMediaInfoReader, MediaInfoReader>();
         SplatRegistrations.Register<IMediaScript, MediaScript>();
-        container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
-            new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
 
         // ViewModels
         SplatRegistrations.Register<MainViewModel>("Init");
