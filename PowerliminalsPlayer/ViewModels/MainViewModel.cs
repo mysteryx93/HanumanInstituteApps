@@ -92,7 +92,10 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Folders).ConfigureAwait(false);
+        var folders = new List<FixFolderItem> { new FixFolder<string>(Settings.Folders) };
+        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.FullPath, (f, v) => f.FullPath = v!)));
+        
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, folders).ConfigureAwait(false);
         if (changed)
         {
             ReloadFiles();

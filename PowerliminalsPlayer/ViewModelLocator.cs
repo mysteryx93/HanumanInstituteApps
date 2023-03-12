@@ -46,7 +46,6 @@ public static class ViewModelLocator
         container.Register(() => 
             Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
-        SplatRegistrations.RegisterLazySingleton<IPathFixer, AppPathFixer>();
             
         SplatRegistrations.SetupIOC();
     }

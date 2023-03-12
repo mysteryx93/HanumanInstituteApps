@@ -32,10 +32,10 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         // ConvertFromSettings();
     }
 
-    public override void OnLoaded()
+    public override async void OnLoaded()
     {
         base.OnLoaded();
-        
+        await PromptFixPathsAsync().ConfigureAwait(false);
     }
     
     /// <summary>
@@ -43,9 +43,11 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// </summary>
     public async Task PromptFixPathsAsync()
     {
-        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, Settings.Playlists.Select(x => x.Folders).ToList()).ConfigureAwait(false);
+        var changed = await _pathFixer.ScanAndFixFoldersAsync(this, 
+            Settings.Playlists.Select(x => (FixFolderItem)new FixFolder<string>(x.Folders)).ToList()).ConfigureAwait(false);
         if (changed)
         {
+            ConvertFromSettings();
             _settings.Save();
         }
     }
@@ -53,8 +55,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// <summary>
     /// Returns the list of playlists with selection properties that can be bound to the UI.
     /// </summary>
-    public ICollectionView<IPlaylistViewModel> Playlists { get; private set; } =
-        new CollectionView<IPlaylistViewModel>();
+    public ICollectionView<IPlaylistViewModel> Playlists { get; } = new CollectionView<IPlaylistViewModel>();
 
     public ReactiveCommand<TappedEventArgs, Unit> StartPlayList => _startPlayList ??= ReactiveCommand.Create<TappedEventArgs>(StartPlayListImpl);
     private ReactiveCommand<TappedEventArgs, Unit>? _startPlayList;

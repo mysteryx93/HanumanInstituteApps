@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FileSystem;
@@ -29,7 +30,7 @@ public class AppPathFixerTests
 
     protected INotifyPropertyChanged Owner { get; set; } = Mock.Of<INotifyPropertyChanged>();
 
-    protected IPathFixer Model => _model ??= new AppPathFixer(MockFileSystem, DialogService, MockSettingsProvider);
+    protected IPathFixer Model => _model ??= new PathFixer(MockFileSystem, DialogService);
     private IPathFixer _model;
 
     protected void AddFile(string filePath) => Files.Add(
@@ -75,10 +76,17 @@ public class AppPathFixerTests
             Owner, It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()), times);
     }
 
+    protected List<FixFolderItem> GetAllFolders()
+    {
+        var folders = new List<FixFolderItem> { new FixFolder<string>(Settings.Folders) };
+        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.FullPath, (f, v) => f.FullPath = v!)));
+        return folders;
+    }
+
     [Fact]
     public async Task ScanAndFixFoldersAsync_NoFolder_DoNotPrompt()
     {
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyMessageBox(Times.Never());
         MockDialogManager.VerifyNoOtherCalls();
@@ -87,7 +95,7 @@ public class AppPathFixerTests
     [Fact]
     public async Task ScanAndFixFoldersAsync_NoFolder_ReturnFalse()
     {
-        var result = await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.False(result);
     }
@@ -102,7 +110,7 @@ public class AppPathFixerTests
         AddFile("/Dir/Sub/file.mp3");
         AddFolder(folder);
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyMessageBox(Times.Never());
         MockDialogManager.VerifyNoOtherCalls();
@@ -114,7 +122,7 @@ public class AppPathFixerTests
         AddFile("/Dir/Sub/file.mp3");
         AddFolder("/Dir");
 
-        var result = await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.False(result);
     }
@@ -124,7 +132,7 @@ public class AppPathFixerTests
     {
         AddFolder("/Invalid");
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyMessageBox(Times.Once());
         MockDialogManager.VerifyNoOtherCalls();
@@ -136,7 +144,7 @@ public class AppPathFixerTests
         AddFolder("/Invalid");
         SetMessageBoxResult(true);
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyOpenFolder(Times.Once());
     }
@@ -148,7 +156,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/Nope".ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyOpenFolder(Times.Once());
         VerifyMessageBox(Times.Exactly(2));
@@ -162,7 +170,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/Nope".ReplaceDirectorySeparator());
 
-        var result = await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.False(result);
     }
@@ -179,7 +187,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(selectPath.ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.Equal("/New/Sub".ReplaceDirectorySeparator(), Settings.Folders[0]);
         VerifyMessageBox(Times.Once());
@@ -193,7 +201,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New".ReplaceDirectorySeparator());
 
-        var result = await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.True(result);
     }
@@ -212,7 +220,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(selectPath.ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.Equal("/New/Sub".ReplaceDirectorySeparator(), Settings.Folders[0]);
         Assert.Equal("/New/Music".ReplaceDirectorySeparator(), Settings.Folders[1]);
@@ -228,7 +236,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New".ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         VerifyOpenFolder(Times.Once());
         VerifyMessageBox(Times.Exactly(2));
@@ -244,7 +252,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New".ReplaceDirectorySeparator());
 
-        var result = await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.True(result);
     }
@@ -262,7 +270,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult("/New/Sub".ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.Equal(expected.ReplaceDirectorySeparator(), Settings.Presets[0].Files[0].FullPath);
     }
@@ -283,7 +291,7 @@ public class AppPathFixerTests
         SetMessageBoxResult(true);
         SetOpenFolderResult(newFolder.ReplaceDirectorySeparator());
 
-        await Model.ScanAndFixFoldersAsync(Owner, Settings.Folders);
+        await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
         Assert.Equal(newFile, Settings.Presets[0].Files[0].FullPath);
     }

@@ -55,7 +55,7 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.RegisterLazySingleton<IPlaylistPlayer, PlaylistPlayer>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
-            
+
         SplatRegistrations.SetupIOC();
     }
 

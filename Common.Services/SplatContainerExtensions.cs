@@ -23,6 +23,8 @@ public static class SplatContainerExtensions
         SplatRegistrations.RegisterLazySingleton<IWindowsApiService, WindowsApiService>();
         SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
         SplatRegistrations.RegisterLazySingleton<ISyndicationFeedService, SyndicationFeedService>();
+        SplatRegistrations.RegisterLazySingleton<IPathFixer, PathFixer>();
+
         SplatRegistrations.SetupIOC();
 
         return services;

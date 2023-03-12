@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 
@@ -9,7 +8,7 @@ namespace HanumanInstitute.Common.Services;
 /// <summary>
 /// Scans paths to detect broken paths, in which case it will prompt the user to locate the folders, and auto-fix the paths. 
 /// </summary>
-public abstract class PathFixerBase : IPathFixer
+public class PathFixer : IPathFixer
 {
     private readonly IFileSystemService _fileSystem;
     private readonly IDialogService _dialogService;
@@ -19,49 +18,52 @@ public abstract class PathFixerBase : IPathFixer
     /// </summary>
     /// <param name="fileSystem">The service providing access to the file system.</param>
     /// <param name="dialogService">The service providing window and dialog interactions.</param>
-    protected PathFixerBase(IFileSystemService fileSystem, IDialogService dialogService)
+    public PathFixer(IFileSystemService fileSystem, IDialogService dialogService)
     {
         _fileSystem = fileSystem;
         _dialogService = dialogService;
     }
 
     /// <inheritdoc />
-    public Task<bool> ScanAndFixFoldersAsync<T>(INotifyPropertyChanged owner, IList<T> folders)
-        where T : class =>
-        ScanAndFixFoldersMultipleAsync(owner, new List<IList<T>> { folders }, null);
+    public Task<bool> ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<string> folders) =>
+        ScanAndFixFoldersAsync(owner, new List<FixFolderItem> { new FixFolder<string>(folders) });
 
     /// <inheritdoc />
-    public Task<bool> ScanAndFixFoldersAsync<T>(INotifyPropertyChanged owner, IList<T> folders, Func<T, string?>? selector)
-        where T : class =>
-        ScanAndFixFoldersMultipleAsync(owner, new List<IList<T>> { folders }, selector);
+    public Task<bool> ScanAndFixFoldersAsync(INotifyPropertyChanged owner, FixFolderItem folders) =>
+        ScanAndFixFoldersAsync(owner, new List<FixFolderItem> { folders });
 
     /// <inheritdoc />
-    public Task<bool> ScanAndFixFoldersMultipleAsync<T>(INotifyPropertyChanged owner, IList<IList<T>> folders)
-        where T : class =>
-        ScanAndFixFoldersMultipleAsync(owner, folders, null);
-
-    /// <inheritdoc />
-    public async Task<bool> ScanAndFixFoldersMultipleAsync<T>(INotifyPropertyChanged owner, IList<IList<T>> folders, Func<T, string?>? selector)
-        where T : class
+    public async Task<bool> ScanAndFixFoldersAsync(INotifyPropertyChanged owner, IList<FixFolderItem> folders)
     {
-        selector ??= t => t?.ToString(); 
-        T? invalidFolderItem = null;
+        string? invalidFolder = null;
+        FixFolderItem fixFolder = new FixFolder<object>();
         foreach (var item in folders)
         {
-            invalidFolderItem = item.FirstOrDefault(x => !_fileSystem.Directory.Exists(selector(x)));
-            if (invalidFolderItem != null)
+            for (var i = 0; i < item.Count; i++)
+            {
+                if (!_fileSystem.Directory.Exists(item.GetElementAt(i)))
+                {
+                    invalidFolder = item.GetElementAt(i);
+                    fixFolder = item;
+                    break;
+                }
+            }
+            if (invalidFolder != null)
             {
                 break;
             }
         }
-        if (invalidFolderItem != null)
+        if (invalidFolder != null)
         {
-            var invalidFolder = selector(invalidFolderItem)!;
+            if (fixFolder.IsFilePath)
+            {
+                invalidFolder = _fileSystem.Path.GetDirectoryName(invalidFolder)!;
+            }
             invalidFolder = _fileSystem.Path.TrimEndingDirectorySeparator(invalidFolder);
             var folderName = _fileSystem.Path.GetFileName(invalidFolder);
 
             // Prompt whether to fix.
-            var message = $"Cannot find folder \"{invalidFolder}\". It may have been moved or deleted.\n" +
+            var message = $"Cannot find folder \"{invalidFolder}\".\nIt may have been moved or deleted.\n" +
                           "Do you want to fix the paths?\n\n" +
                           $"Click Yes to browse for folder \"{folderName}\".";
 
@@ -73,7 +75,7 @@ public abstract class PathFixerBase : IPathFixer
 
             if (result == true)
             {
-                return await BrowseNewPathAsync(owner, folders, selector, invalidFolder, folderName).ConfigureAwait(true);
+                return await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
             }
         }
         return false;
@@ -84,11 +86,9 @@ public abstract class PathFixerBase : IPathFixer
     /// </summary>
     /// <param name="owner">The ViewModel that will own dialog interactions. It will be passed to<see cref="IDialogService"/>.</param>
     /// <param name="folders">A list of lists of folders to examine. Do not include file names.</param>
-    /// <param name="selector">If the list of folders are not string, converts a folder item into its path string.</param>
     /// <param name="invalidFolder">The invalid folder path to prompt for.</param>
     /// <param name="folderName">The name of the invalid folder, without its parent path.</param>
-    private async Task<bool> BrowseNewPathAsync<T>(INotifyPropertyChanged owner, IList<IList<T>> folders, Func<T, string?> selector, string invalidFolder, string folderName)
-        where T : class
+    private async Task<bool> BrowseNewPathAsync(INotifyPropertyChanged owner, IList<FixFolderItem> folders, string invalidFolder, string folderName)
     {
         // Browse for new path.
         var selectedPath = await _dialogService.ShowOpenFolderDialogAsync(owner).ConfigureAwait(true);
@@ -98,8 +98,8 @@ public abstract class PathFixerBase : IPathFixer
             newPath = ProbeNewPath(newPath, folderName);
             if (newPath != null)
             {
-                CalculateReplacement(invalidFolder, newPath);
-                await ScanAndFixFoldersMultipleAsync(owner, folders, selector).ConfigureAwait(true);
+                CalculateReplacement(folders, invalidFolder, newPath);
+                await ScanAndFixFoldersAsync(owner, folders).ConfigureAwait(true);
                 return true;
             }
             else
@@ -114,7 +114,7 @@ public abstract class PathFixerBase : IPathFixer
 
                 if (result == true)
                 {
-                    return await BrowseNewPathAsync(owner, folders, selector, invalidFolder, folderName).ConfigureAwait(true);
+                    return await BrowseNewPathAsync(owner, folders, invalidFolder, folderName).ConfigureAwait(true);
                 }
             }
         }
@@ -143,9 +143,10 @@ public abstract class PathFixerBase : IPathFixer
     /// <summary>
     /// Calculates the replaceOld and replaceNew values for specified oldFolder and newFolder values.
     /// </summary>
+    /// <param name="folders">A list of lists of folders to examine. Do not include file names.</param>
     /// <param name="oldFolder">The old folder path.</param>
     /// <param name="newFolder">The new folder path.</param>
-    private void CalculateReplacement(string oldFolder, string newFolder)
+    private void CalculateReplacement(IList<FixFolderItem> folders, string oldFolder, string newFolder)
     {
         // Old folder: /Backup/Home/Music/INNA/Party
         // New folder: /Sync/Music/INNA/Party
@@ -177,15 +178,25 @@ public abstract class PathFixerBase : IPathFixer
         var replaceNew = string.Join(separator, newFolderParts[..replaceNewCount]) + separator;
 
         // Apply replace to all paths.
-        Apply(replaceOld, replaceNew);
+        Apply(folders, replaceOld, replaceNew);
     }
-    
+
     /// <summary>
     /// Apply replace to all paths in the application.
     /// </summary>
+    /// <param name="folders">A list of lists of folders to examine. Do not include file names.</param>
     /// <param name="replaceOld">The old path to replace.</param>
     /// <param name="replaceNew">The new path to replace it with.</param>
-    protected abstract void Apply(string replaceOld, string replaceNew);
+    private void Apply(IList<FixFolderItem> folders, string replaceOld, string replaceNew)
+    {
+        foreach (var x in folders)
+        {
+            for (var i = 0; i < x.Count; i++)
+            {
+                x.SetElementAt(i, Replace(x.GetElementAt(i), replaceOld, replaceNew));
+            }
+        }
+    }
     
     /// <summary>
     /// Call from within <see cref="Apply"/> to apply a replace to a specific path.
@@ -194,6 +205,6 @@ public abstract class PathFixerBase : IPathFixer
     /// <param name="replaceOld">The old path to replace.</param>
     /// <param name="replaceNew">The new path to replace it with.</param>
     /// <returns>The new path after doing the replace.</returns>
-    protected string Replace(string filePath, string replaceOld, string replaceNew) =>
-        filePath.StartsWith(replaceOld) ? replaceNew + filePath[replaceOld.Length..] : filePath;
+    protected string? Replace(string? filePath, string replaceOld, string replaceNew) =>
+        filePath?.StartsWith(replaceOld) == true ? replaceNew + filePath[replaceOld.Length..] : filePath;
 }
