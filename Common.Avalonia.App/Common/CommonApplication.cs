@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Styling;
 using Avalonia.Xaml.Interactions.Core;
 using FluentAvalonia.Styling;
 using HanumanInstitute.MvvmDialogs;
@@ -51,12 +52,10 @@ public abstract class CommonApplication<TMain> : Application
         var desktop = DesktopLifetime;
         if (desktop != null)
         {
-            var style = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>();
-            if (style != null)
-            {
-                style.RequestedTheme = await AppStarter.AppThemeLoader!.ConfigureAwait(true);
-                AppStarter.AppThemeLoader = null;
-            }
+            var theme = await AppStarter.AppThemeLoader!.ConfigureAwait(true);
+            theme = new[] { "Light", "Dark" }.Contains(theme) ? theme : "Light";
+            Current!.RequestedThemeVariant = new ThemeVariant(theme, null);
+            AppStarter.AppThemeLoader = null;
 
             var vm = InitViewModel();
             dialogService.Show(null, vm);
