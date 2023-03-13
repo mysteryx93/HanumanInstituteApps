@@ -9,8 +9,8 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IEnvironmentService environment) :
-        base(settingsProvider)
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IEnvironmentService environment) :
+        base(settingsProvider, fluentTheme)
     {
         OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;
         IsDeviceSampleRateVisible = environment.IsLinux;

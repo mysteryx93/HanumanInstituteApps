@@ -42,6 +42,8 @@ public static class ViewModelLocator
                 dialogFactory: new DialogFactory().AddFluent())));
         container.Register<IBassDevice>(() => BassDevice.Instance);
         container.Register<IDispatcher>(() => Dispatcher.UIThread);
+        container.RegisterLazySingleton<IFluentAvaloniaTheme>(() => 
+            new FluentAvaloniaThemeWrapper(AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>()!));
 
         // ViewModels
         SplatRegistrations.Register<MainViewModel>("Init");

@@ -14,9 +14,9 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     private readonly IEncoderService _ffmpeg;
     private readonly IFileSystemService _fileSystem;
 
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider,
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme,
         IDialogService dialogService, IEncoderService ffmpeg, IFileSystemService fileSystem) :
-        base(settingsProvider)
+        base(settingsProvider, fluentTheme)
     {
         _dialogService = dialogService;
         _ffmpeg = ffmpeg;
