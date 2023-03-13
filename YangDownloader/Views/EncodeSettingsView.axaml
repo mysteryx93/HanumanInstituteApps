@@ -31,7 +31,7 @@
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
-                    <Grid IsVisible="{Binding IsSampleRateVisible}">
+                    <Grid>
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
                         <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
                                   Items="{Binding SampleRateList}"

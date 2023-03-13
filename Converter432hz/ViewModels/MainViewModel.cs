@@ -47,8 +47,6 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             .ToProperty(this, x => x.IsBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitsPerSampleVisible);
-        // _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
-        //     .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
         this.WhenAnyValue(x => x.Settings.Encode.Format).Subscribe(FillSampleRateList);

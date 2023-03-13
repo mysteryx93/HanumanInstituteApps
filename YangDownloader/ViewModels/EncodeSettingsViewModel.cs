@@ -1,42 +1,40 @@
-﻿using HanumanInstitute.BassAudio;
+﻿using System.Linq.Expressions;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
-using HanumanInstitute.Common.Services.Validation;
 using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
 public class EncodeSettingsViewModel : OkCancelViewModel
 {
-    public EncodeSettingsViewModel()
+    private readonly IAudioEncoder _encoder;
+    private readonly IEnvironmentService _environment;
+    
+    public EncodeSettingsViewModel(IAudioEncoder encoder, IEnvironmentService environment)
     {
-        this.WhenAnyValue(x => x.Settings.Format)
-            .BindTo(this, x => x.FormatsList.SelectedValue);
-        this.WhenAnyValue(x => x.FormatsList.SelectedValue)
-            .BindTo(this, x => x.Settings.Format);
-
-        this.WhenAnyValue(x => x.Settings.Bitrate)
-            .BindTo(this, x => x.BitrateList.SelectedValue);
-        this.WhenAnyValue(x => x.BitrateList.SelectedValue)
-            .BindTo(this, x => x.Settings.Bitrate);
-
-        this.WhenAnyValue(x => x.Settings.BitsPerSample)
-            .BindTo(this, x => x.BitsPerSampleList.SelectedValue);
-        this.WhenAnyValue(x => x.BitsPerSampleList.SelectedValue)
-            .BindTo(this, x => x.Settings.BitsPerSample);
-
-        this.WhenAnyValue(x => x.Settings.SampleRate)
-            .BindTo(this, x => x.SampleRateList.SelectedValue);
-        this.WhenAnyValue(x => x.SampleRateList.SelectedValue)
-            .BindTo(this, x => x.Settings.SampleRate);
+        _encoder = encoder;
+        _environment = environment;
+        
+        Bind(x => x.Settings.Format, x => x.FormatsList.SelectedValue);
+        Bind(x => x.Settings.Bitrate, x => x.BitrateList.SelectedValue);
+        Bind(x => x.Settings.BitsPerSample, x => x.BitsPerSampleList.SelectedValue);
+        Bind(x => x.Settings.SampleRate, x => x.SampleRateList.SelectedValue);
 
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitsPerSampleVisible);
-        _isSampleRateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Opus)
-            .ToProperty(this, x => x.IsSampleRateVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
             .ToProperty(this, x => x.IsQualitySpeedVisible);
+        this.WhenAnyValue(x => x.Settings.Format).Subscribe(FillSampleRateList);
+    }
+    
+    private void Bind<T1, T2>(Expression<Func<EncodeSettingsViewModel, T1?>> expr1, Expression<Func<EncodeSettingsViewModel, T2?>> expr2)
+    {
+        this.WhenAnyValue(expr1)
+            .BindTo(this, expr2);
+        this.WhenAnyValue(expr2)
+            .BindTo(this, expr1);
     }
 
     [Reactive]
@@ -87,12 +85,6 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     private readonly ObservableAsPropertyHelper<bool> _isBitsPerSampleVisible;
 
     /// <summary>
-    /// Gets whether SampleRate control should be visible.
-    /// </summary>
-    public bool IsSampleRateVisible => _isSampleRateVisible.Value;
-    private readonly ObservableAsPropertyHelper<bool> _isSampleRateVisible;
-
-    /// <summary>
     /// Gets whether QualitySpeed slider should be visible.
     /// </summary>
     public bool IsQualitySpeedVisible => _isQualitySpeedVisible.Value;
@@ -108,22 +100,21 @@ public class EncodeSettingsViewModel : OkCancelViewModel
         { EncodeFormat.Opus, "OPUS" }
     };
 
-    public ListItemCollectionView<int> SampleRateList { get; } = new()
+    public ListItemCollectionView<int> SampleRateList { get; } = new();
+
+    private void FillSampleRateList(EncodeFormat format)
     {
-        { 0, "Source" },
-        { 8000, "8000 Hz" },
-        { 11025, "11,025 Hz" },
-        { 16000, "16,000 Hz" },
-        { 22050, "22,050 Hz" },
-        { 44100, "44,100 Hz" },
-        { 48000, "48,000 Hz" },
-        { 88200, "88,200 Hz" },
-        { 96000, "96,000 Hz" },
-        { 176400, "176,400 Hz" },
-        { 192000, "192,000 Hz" },
-        { 352800, "352,800 Hz" },
-        { 384000, "384,000 Hz" }
-    };
+        var selection = SampleRateList.SelectedValue;
+        List<ListItem<int>> list = new() { { 0, "Source" } };
+        foreach (var sampleRate in _encoder.GetSupportedSampleRates(format))
+        {
+            list.Add(sampleRate, string.Format(_environment.CurrentCulture, "{0} Hz", sampleRate));
+        }
+        
+        SampleRateList.Source.Clear();
+        SampleRateList.AddRange(list);
+        SampleRateList.SelectedValue = SampleRateList.Source.Any(x => x.Value == selection) ? selection : 48000;
+    }
 
     public ListItemCollectionView<int> BitrateList { get; } = new()
     {
