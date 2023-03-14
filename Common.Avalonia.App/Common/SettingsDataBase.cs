@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Xml.Serialization;
+using Avalonia;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -47,4 +48,22 @@ public class SettingsDataBase : ReactiveObject
     /// </summary>
     [Reactive]
     public DateTime? LastCheckForUpdate { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the license key.
+    /// </summary>
+    [Reactive]
+    public string? LicenseKey { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the license key is valid.
+    /// </summary>
+    [Reactive]
+    [XmlIgnore]
+    public bool IsLicenseValid { get; set; }
+
+    /// <summary>
+    /// Resets settings that are disabled with free license.
+    /// </summary>
+    public virtual void SetFreeLicenseDefaults() { }
 }

@@ -97,7 +97,7 @@ public class EncodeSettings : ReactiveObject
             this.RaisePropertyChanged(nameof(Pitch));
         }
     }
-    private double _pitchTo = 440;
+    private double _pitchTo = 432;
 
     /// <summary>
     /// Gets or sets whether to focus on quality or speed. 0 = fastest, 4 = best quality, 2 = default.

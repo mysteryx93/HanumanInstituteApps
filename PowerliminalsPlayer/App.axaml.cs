@@ -12,5 +12,10 @@ public class App : CommonApplication<MainView>
 
     protected override INotifyPropertyChanged InitViewModel() => ViewModelLocator.Main;
 
+    protected override void InitLicense(SettingsDataBase settings)
+    {
+        settings.IsLicenseValid = true;
+    }
+
     protected override void BackgroundInit() => BassDevice.Instance.Init();
 }

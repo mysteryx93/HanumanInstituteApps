@@ -18,57 +18,26 @@
         <Grid Margin="10,8,10,4">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding AppName}" Margin="0,0,8,0" />
+                    <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding AppInfo.AppName}" Margin="0,0,8,0" />
                     <TextBlock FontSize="24" Text="{Binding AppVersion, Converter={StaticResource VersionConverter}}" />
                 </StackPanel>
-                <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppDescription}" HorizontalAlignment="Center" />
+                <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppInfo.AppDescription}" HorizontalAlignment="Center" />
                 <ui:HyperlinkButton Margin="0,5,0,0" HorizontalAlignment="Center" 
                     NavigateUri="https://github.com/mysteryx93/NaturalGroundingPlayer/releases" Content="{Binding CheckForUpdateText}" />
-                <TextBlock Margin="0,15,0,0" Text="License: MIT (Free &amp; Open Source)"
-                           HorizontalAlignment="Center" />
-                <TextBlock Margin="0,5,0,0" Text="Author: Etienne Charland" HorizontalAlignment="Center" />
+                <TextBlock Margin="0,15,0,0" Text="Author: Etienne Charland" HorizontalAlignment="Center" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,2,0,0">
                     <TextBlock Text="Website: " HorizontalAlignment="Center" />
                     <ui:HyperlinkButton NavigateUri="http://www.spiritualselftransformation.com" Content="http://www.spiritualselftransformation.com" Padding="0" />
                 </StackPanel>
 
-                <TextBlock FontSize="18" Margin="0,30,0,0" Text="Like this app? There are 3 ways to donate."
-                           HorizontalAlignment="Center" />
-                <TabControl>
-                    <TabControl.Styles>
-                        <Style Selector="TabItem">
-                            <Setter Property="FontSize" Value="17" />
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="Margin" Value="0,0,0,6" />
-                            <Setter Property="Padding" Value="8,5,8,5" />
-                        </Style>
-                    </TabControl.Styles>
-                    <TabItem Header="Hanuman Institute">
-                        <StackPanel>
-                            <TextBlock Text="Donate to Etienne Charland to build the Hanuman Institute as an ascension hub, to provide the support that Lightworkers need." TextWrapping="Wrap" />
-                            <ui:HyperlinkButton Margin="0,10,0,0" Content=">> Donate here" 
-                                NavigateUri="https://store.spiritualselftransformation.com/donation" />
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem Header="Charland Academy">
-                        <StackPanel>
-                            <TextBlock Text="Donate to the Charland Academy in Pakistan to give a new life to children living in total poverty by providing education and spiritual teachings." TextWrapping="Wrap" />
-                            <ui:HyperlinkButton Margin="0,10,0,0" Content=">> Donate here" 
-                                                NavigateUri="https://opencollective.com/pakistan-academy" />
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem Header="Project Varanasi">
-                        <StackPanel>
-                            <TextBlock Text="Want energetic support? We have an army of 15 monks at the Lord Shiva Temple in Varanasi India meditating 5h per day for our group of donors!" TextWrapping="Wrap" />
-                            <ui:HyperlinkButton Margin="0,10,0,0" Content=">> Donate here" 
-                                                NavigateUri="https://www.spiritualselftransformation.com/blog/conscious-business/conscious-ressources/launching-project-varanasi/" />
-
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
+                <TextBlock FontSize="18" Margin="0,24,0,0" Text="This software is open source and contains no ads" HorizontalAlignment="Center" />
+                <TextBlock Margin="0,10,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding AppInfo.LicenseInfo}" />
+                <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" />
+                
             </StackPanel>
             <Grid VerticalAlignment="Bottom">
-                <CheckBox Content="Do not show on startup" IsChecked="{Binding !Settings.ShowInfoOnStartup}" />
+                <ui:HyperlinkButton Margin="0,0,0,50" Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" />
+                <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
                 <Button HorizontalAlignment="Right" Width="100" Classes="round" 
                         Command="{Binding Close}" IsDefault="True" IsCancel="true">Close</Button>
             </Grid>

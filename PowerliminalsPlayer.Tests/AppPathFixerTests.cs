@@ -295,4 +295,17 @@ public class AppPathFixerTests
 
         Assert.Equal(newFile, Settings.Presets[0].Files[0].FullPath);
     }
-}
+    
+    [Fact]
+    public async Task ScanAndFixFoldersAsync_ValidFile_ReturnFalse()
+    {
+        var fileName = "/Dir/Sub/file.mp3";
+        AddFile(fileName);
+        AddFolder("/Dir/Sub/");
+        AddPreset();
+        AddPresetFile(fileName);
+
+        var result = await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
+
+        Assert.False(result);
+    }}

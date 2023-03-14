@@ -8,7 +8,7 @@
         x:Class="HanumanInstitute.Converter432hz.Views.SettingsView"
         Title="Settings" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
-        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel" >
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
     <Grid>
         <Grid Margin="10">
             <StackPanel>
@@ -26,33 +26,40 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
-                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}"
+                              x:CompileBindings="False"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
-                <CheckBox IsChecked="{Binding Settings.Encode.AntiAlias}">Apply anti-alias filter</CheckBox>
-                <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.Encode.AntiAlias}">
-                    <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
-                    <NumericUpDown Value="{Binding Settings.Encode.AntiAliasLength}" Width="80" Minimum="8" Maximum="128" />
+                <StackPanel Margin="0" IsEnabled="{Binding Settings.IsLicenseValid}">
+                    <CheckBox IsChecked="{Binding Settings.Encode.AntiAlias}">Apply anti-alias filter</CheckBox>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.Encode.AntiAlias}">
+                        <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding Settings.Encode.AntiAliasLength}" Width="80" Minimum="8"
+                                       Maximum="128" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding Settings.Encode.Speed}" Width="80" Minimum="0.01" Maximum="100" />
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding Settings.Encode.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
+                    <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                        <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Settings.Encode.PitchFrom}"
+                                       IsEnabled="{Binding !Settings.Encode.AutoDetectPitch}" Minimum="1"
+                                       Maximum="10000" />
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                        <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.Encode.PitchTo}"
+                                       Minimum="1" Maximum="10000" />
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                    </Grid>
+                    <CheckBox IsChecked="{Binding Settings.Encode.RoundPitch}" Content="Round pitch for quality" />
+                    <CheckBox IsChecked="{Binding Settings.Encode.SkipTempo}" Margin="0,-4,0,0"
+                              Content="Skip tempo adjustment for quality" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Speed multiplier  " VerticalAlignment="Center" />
-                    <NumericUpDown Value="{Binding Settings.Encode.Speed}" Width="80" Minimum="0.01" Maximum="100" />
-                </StackPanel>
-                <CheckBox IsChecked="{Binding Settings.Encode.AutoDetectPitch}">Auto-detect source pitch</CheckBox>
-                <Grid RowDefinitions="26,26" ColumnDefinitions="Auto,40,Auto,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Shift pitch" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="from" VerticalAlignment="Center"
-                               HorizontalAlignment="Center" />
-                    <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Settings.Encode.PitchFrom}"
-                             IsEnabled="{Binding !Settings.Encode.AutoDetectPitch}" Minimum="1" Maximum="10000" />
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
-                               HorizontalAlignment="Center" />
-                    <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.Encode.PitchTo}" Minimum="1" Maximum="10000" />
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
-                </Grid>
-                <CheckBox IsChecked="{Binding Settings.Encode.RoundPitch}" Content="Round pitch for quality" />
-                <CheckBox IsChecked="{Binding Settings.Encode.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Max threads  " VerticalAlignment="Center" />
                     <NumericUpDown Value="{Binding Settings.MaxThreads}" Width="80" Minimum="1" Maximum="64" />

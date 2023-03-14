@@ -41,7 +41,9 @@ public class PathFixer : IPathFixer
         {
             for (var i = 0; i < item.Count; i++)
             {
-                if (!_fileSystem.Directory.Exists(item.GetElementAt(i)))
+                var itemPath = item.GetElementAt(i);
+                itemPath = item.IsFilePath ? _fileSystem.Path.GetDirectoryName(itemPath) : itemPath;
+                if (!_fileSystem.Directory.Exists(itemPath))
                 {
                     invalidFolder = item.GetElementAt(i);
                     fixFolder = item;

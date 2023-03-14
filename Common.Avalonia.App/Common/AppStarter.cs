@@ -15,19 +15,19 @@ public static class AppStarter
     /// <summary>
     /// Gets or sets the task to initialize ViewModelLocator, settings, and return the configured theme.
     /// </summary>
-    public static Task<string>? AppThemeLoader { get; set; }
+    public static Task<SettingsDataBase>? AppSettingsLoader { get; set; }
     
     /// <summary>
     /// Call this from Program.Main.
     /// </summary>
-    public static void Start<TApp>(string[] args, Func<AppTheme> getTheme, Func<string?>? logPath)
+    public static void Start<TApp>(string[] args, Func<SettingsDataBase> getSettings, Func<string?>? logPath)
         where TApp : Application, new()
     {
         PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
         try
         {
             // Initialize ViewModelLocator and load settings in parallel.
-            AppThemeLoader = Task.Run(() => getTheme().ToString());
+            AppSettingsLoader = Task.Run(getSettings);
             
             BuildAvaloniaApp<TApp>()
                 .StartWithClassicDesktopLifetime(args);

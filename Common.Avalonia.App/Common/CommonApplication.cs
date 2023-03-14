@@ -1,12 +1,8 @@
 ﻿using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Styling;
 using Avalonia.Xaml.Interactions.Core;
-using FluentAvalonia.Styling;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -48,14 +44,15 @@ public abstract class CommonApplication<TMain> : Application
 
         var tBackground = Task.Run(BackgroundInit);
         var dialogService = Locator.Current.GetService<IDialogService>()!;
+        var themeManager = Locator.Current.GetService<IFluentAvaloniaTheme>()!;
 
         var desktop = DesktopLifetime;
         if (desktop != null)
         {
-            var theme = await AppStarter.AppThemeLoader!.ConfigureAwait(true);
-            theme = new[] { "Light", "Dark" }.Contains(theme) ? theme : "Light";
-            Current!.RequestedThemeVariant = new ThemeVariant(theme, null);
-            AppStarter.AppThemeLoader = null;
+            var settings = await AppStarter.AppSettingsLoader!.ConfigureAwait(true);
+            InitSettings(settings);
+            themeManager.RequestedTheme = settings.Theme.ToString();
+            AppStarter.AppSettingsLoader = null;
 
             var vm = InitViewModel();
             dialogService.Show(null, vm);
@@ -69,17 +66,34 @@ public abstract class CommonApplication<TMain> : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    private void InitSettings(SettingsDataBase settings)
+    {
+        if (settings.Theme == AppTheme.HighContrast)
+        {
+            settings.Theme = AppTheme.Dark;
+        }
+        if (settings.LicenseKey.HasValue())
+        {
+            var validator = Locator.Current.GetService<ILicenseValidator>()!;
+            settings.IsLicenseValid = validator.Validate(settings.LicenseKey);
+        }
+        InitLicense(settings);
+    }
+
+    protected virtual void InitLicense(SettingsDataBase settings)
+    {
+        if (!settings.IsLicenseValid)
+        {
+            settings.ShowInfoOnStartup = true;
+            settings.SetFreeLicenseDefaults();
+        }
+    }
+
     /// <summary>
     /// Initializes the ViewModel.
     /// </summary>
     /// <returns>The new ViewModel.</returns>
     protected abstract INotifyPropertyChanged InitViewModel();
-
-    // /// <summary>
-    // /// Returns the application theme from the configuration file.
-    // /// </summary>
-    // /// <returns>The application theme to initialize.</returns>
-    // protected abstract AppTheme GetTheme();
 
     /// <summary>
     /// Initializes additional tasks in a background thread while the application loads, if not in design-mode. 

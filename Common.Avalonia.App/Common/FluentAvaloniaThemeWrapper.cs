@@ -5,7 +5,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// <inheritdoc />
 public class FluentAvaloniaThemeWrapper : IFluentAvaloniaTheme
 {
-    private FluentAvaloniaTheme _theme;
+    private readonly FluentAvaloniaTheme _theme;
     
     public FluentAvaloniaThemeWrapper(FluentAvaloniaTheme theme)
     {

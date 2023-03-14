@@ -50,7 +50,7 @@
                     </Grid>
                 </Grid>
                 <CheckBox IsChecked="{Binding ShiftPitch}">Shift audio pitch</CheckBox>
-                <StackPanel IsVisible="{Binding ShiftPitch}">
+                <StackPanel IsVisible="{Binding ShiftPitch}" IsEnabled="{Binding AppSettings.IsLicenseValid}">
                     <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
                         <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />

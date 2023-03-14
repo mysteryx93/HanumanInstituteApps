@@ -25,6 +25,7 @@ public static class SplatContainerExtensions
             GetService<IAppInfo>()));
         
         // SplatRegistrations.Register<IAppUpdateService, AppUpdateService<TSettings>>();
+        SplatRegistrations.RegisterLazySingleton<ILicenseValidator, LicenseValidator>();
         SplatRegistrations.SetupIOC();
 
         return services;

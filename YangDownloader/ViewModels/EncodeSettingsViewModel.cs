@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
@@ -9,11 +10,13 @@ public class EncodeSettingsViewModel : OkCancelViewModel
 {
     private readonly IAudioEncoder _encoder;
     private readonly IEnvironmentService _environment;
+    private readonly ISettingsProvider<AppSettingsData> _appSettings;
     
-    public EncodeSettingsViewModel(IAudioEncoder encoder, IEnvironmentService environment)
+    public EncodeSettingsViewModel(IAudioEncoder encoder, IEnvironmentService environment, ISettingsProvider<AppSettingsData> appSettings)
     {
         _encoder = encoder;
         _environment = environment;
+        _appSettings = appSettings;
         
         Bind(x => x.Settings.Format, x => x.FormatsList.SelectedValue);
         Bind(x => x.Settings.Bitrate, x => x.BitrateList.SelectedValue);
@@ -40,6 +43,8 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     [Reactive]
     public EncodeSettings Settings { get; private set; } = default!;
 
+    public AppSettingsData AppSettings => _appSettings.Value;
+
     private EncodeSettings _source = default!;
 
     public void SetSettings(EncodeSettings settings)
@@ -61,13 +66,13 @@ public class EncodeSettingsViewModel : OkCancelViewModel
         get => _shiftPitch;
         set
         {
-            this.RaiseAndSetIfChanged(ref _shiftPitch, value);
-            if (value == false)
+            if (value != _shiftPitch)
             {
-                Settings.AutoDetectPitch = false;
+                Settings.AutoDetectPitch = value;
                 Settings.PitchFrom = 440;
-                Settings.PitchTo = 440;
+                Settings.PitchTo = value ? 432 : 440;
             }
+            this.RaiseAndSetIfChanged(ref _shiftPitch, value);
         }
     }
     private bool _shiftPitch;

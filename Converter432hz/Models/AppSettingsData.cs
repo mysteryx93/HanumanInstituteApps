@@ -35,4 +35,17 @@ public class AppSettingsData : SettingsDataBase
     [Reactive]
     [Range(1, 64)]
     public int MaxThreads { get; set; } = 1;
+    
+    /// <inheritdoc />
+    public override void SetFreeLicenseDefaults()
+    {
+        Encode.AntiAlias = false;
+        Encode.AntiAliasLength = 32;
+        Encode.Speed = 1;
+        Encode.AutoDetectPitch = true;
+        Encode.PitchFrom = 440;
+        Encode.PitchTo = 432;
+        Encode.RoundPitch = true;
+        Encode.SkipTempo = false;
+    }
 }
