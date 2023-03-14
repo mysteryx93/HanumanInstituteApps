@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using MessagePack;
 
 // ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
@@ -13,7 +12,7 @@ public class SerializationService : ISerializationService
     
     public SerializationService(IFileSystemService fileSystemService)
     {
-        _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
+        _fileSystem = fileSystemService;
     }
 
     /// <inheritdoc />
@@ -51,7 +50,7 @@ public class SerializationService : ISerializationService
     public void SerializeToFile<T>(T dataToSerialize, string path)
     {
         _fileSystem.EnsureDirectoryExists(path);
-        using var writer = _fileSystem.FileStream.Create(path, FileMode.Create);
+        using var writer = _fileSystem.FileStream.New(path, FileMode.Create);
         var serializer = new XmlSerializer(typeof(T));
         var ns = new XmlSerializerNamespaces();
         ns.Add(string.Empty, string.Empty);
