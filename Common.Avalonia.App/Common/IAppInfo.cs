@@ -38,5 +38,5 @@ public interface IAppInfo
     /// <summary>
     /// The amount of byte sets defined during generation.
     /// </summary>
-    public int TotalKeyByteSets => 8;
+    public int TotalKeyByteSets => 7;
 }

@@ -2,7 +2,6 @@
 using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 // Trimming fails if MainViewModelBase is in a separate assembly.
 // Copied here as a work-around.
@@ -46,6 +45,7 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
         _dialogService = dialogService;
         // ReSharper disable once VirtualMemberCallInConstructor
         _updateService.FileFormat = AppInfo.GitHubFileFormat;
+        _license = _settings.Value.LicenseKey;
 
         // Start in constructor to save time.
         if (!Design.IsDesignMode)
@@ -86,13 +86,12 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
     /// <summary>
     /// Gets or sets the license key. 
     /// </summary>
-    [Reactive]
     public string? License
     {
         get => _license;
         set
         {
-            _license = value?.Trim();
+            this.RaiseAndSetIfChanged(ref _license, value?.Trim());
             Settings.IsLicenseValid = _license.HasValue() && _licenseValidator.Validate(_license);
             if (Settings.IsLicenseValid)
             {

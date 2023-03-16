@@ -16,7 +16,7 @@
     <Company>Hanuman Institute</Company>
     <Product>432Hz Batch Converter</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
 
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
