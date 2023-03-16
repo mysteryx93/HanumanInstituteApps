@@ -25,8 +25,11 @@ public class AppInfo : IAppInfo
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader";
 
     /// <inheritdoc />
-    public KeyByteSet[] KeyByteSets => new KeyByteSet[]
+    public KeyByteSet[] KeyByteSets => new[]
     {
-        
+        new KeyByteSet(1, 146, 133, 42),
+        new KeyByteSet(3, 160, 44, 218),
+        new KeyByteSet(5, 211, 50, 179),
+        new KeyByteSet(7, 230, 202, 203)
     };
 }

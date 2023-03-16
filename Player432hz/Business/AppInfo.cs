@@ -25,8 +25,11 @@ public class AppInfo : IAppInfo
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-player432hz";
 
     /// <inheritdoc />
-    public KeyByteSet[] KeyByteSets => new KeyByteSet[]
+    public KeyByteSet[] KeyByteSets => new[]
     {
-        
+        new KeyByteSet(1, 166, 56, 5),
+        new KeyByteSet(3, 1, 94, 94),
+        new KeyByteSet(5, 224, 9, 54),
+        new KeyByteSet(7, 1, 228, 95)
     };
 }

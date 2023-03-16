@@ -10,7 +10,7 @@ public class AppInfo : IAppInfo
     public string GitHubFileFormat => "Converter432hz-{0}_Win_x64.zip";
 
     /// <inheritdoc />
-    public string AppName => "432hz Batch Converter";
+    public string AppName => "432Hz Batch Converter";
 
     /// <inheritdoc />
     public string AppDescription => "Converts and re-encodes music to 432hz";
@@ -25,5 +25,11 @@ public class AppInfo : IAppInfo
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader";
     
     /// <inheritdoc />
-    public KeyByteSet[] KeyByteSets => new KeyByteSet[] { };
+    public KeyByteSet[] KeyByteSets => new[]
+    {
+        new KeyByteSet(1, 232, 93, 227),
+        new KeyByteSet(3, 115, 100, 30),
+        new KeyByteSet(5, 240, 64, 6),
+        new KeyByteSet(7, 230, 121, 231)
+    };
 }

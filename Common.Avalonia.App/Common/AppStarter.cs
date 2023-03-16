@@ -63,7 +63,6 @@ public static class AppStarter
         => AppBuilder.Configure<TApp>()
             .UsePlatformDetect()
             .LogToTrace()
-            .UseReactiveUI()
-            .UseFAWindowing();
+            .UseReactiveUI();
 
 }
