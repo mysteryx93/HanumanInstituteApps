@@ -65,7 +65,7 @@ public class UpdateService : IUpdateService
                     var version = item.Id[(pos + 2)..];
 
                     // Produce download string like this.
-                    // https://github.com/mysteryx93/NaturalGroundingPlayer/releases/download/v2.0.1/Converter432hz-2.0.1_Win_x64.zip
+                    // https://github.com/mysteryx93/NaturalGroundingPlayer/releases/download/v2.0.1/Converter432Hz-2.0.1_Win_x64.zip
                     var downloadLink = GitRepo + string.Format("/releases/download/v{0}/" + FileFormat, version);
 
                     // Check if link exists.

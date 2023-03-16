@@ -53,7 +53,7 @@ public class PitchDetectorTests : TestsBase
         Output.WriteLine("");
         foreach (var item in results.OrderBy(x => x.Item2))
         {
-            Output.WriteLine($"Diff {item.Item1}hz: {item.Item2}");
+            Output.WriteLine($"Diff {item.Item1}Hz: {item.Item2}");
         }
     }
 
@@ -72,7 +72,7 @@ public class PitchDetectorTests : TestsBase
             var bestItem = iter < bestFreq.Length ? (float?)bestFreq[iter] : null;
             var diffWithBest = bestItem.HasValue ? Math.Abs(pitch - bestItem.Value) : 0;
             Output.WriteLine(
-                $"{Path.GetFileName(file)} @ {Model.LastWinningSampleRate}hz: {pitch.ToStringInvariant()}  {(diffWithBest > 1f ? $"*({bestItem})*" : "")}");
+                $"{Path.GetFileName(file)} @ {Model.LastWinningSampleRate}Hz: {pitch.ToStringInvariant()}  {(diffWithBest > 1f ? $"*({bestItem})*" : "")}");
             diffBest.Add(diffWithBest);
             Assert.True(pitch is > 400 and < 450);
             strAll.Append((strAll.Length > 0 ? ", " : "") + pitch + "f");

@@ -18,9 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Avalonia.App.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HanumanInstitute.Validators", "..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj", "{68CE5BEA-A972-428B-A71E-659DAF39DA35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter432hz", "..\Converter432hz\Converter432hz.csproj", "{C793BA5B-B1EA-40AE-978C-B003C2D02365}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter432Hz", "..\Converter432Hz\Converter432Hz.csproj", "{C793BA5B-B1EA-40AE-978C-B003C2D02365}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter432hz.Tests", "..\Converter432hz.Tests\Converter432hz.Tests.csproj", "{92E95121-7757-4622-B8BD-4FF856F5A40F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter432Hz.Tests", "..\Converter432Hz.Tests\Converter432Hz.Tests.csproj", "{92E95121-7757-4622-B8BD-4FF856F5A40F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BassDlls", "..\DLL\Bass\BassDlls.csproj", "{68CCCE77-EB94-4CE1-AC6B-7D7295065481}"
 EndProject
@@ -34,9 +34,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaPlayer.Avalonia", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaPlayer.Avalonia.Bass", "..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj", "{1697E531-1E21-4076-844E-6B12D572D6FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432hz", "..\Player432hz\Player432hz.csproj", "{DEF1D8A1-BE91-4D09-9595-F5DC8B3B5809}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432Hz", "..\Player432Hz\Player432Hz.csproj", "{DEF1D8A1-BE91-4D09-9595-F5DC8B3B5809}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432hz.Tests", "..\Player432hz.Tests\Player432hz.Tests.csproj", "{8652B70C-58DD-42AA-A569-596B723EED65}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player432Hz.Tests", "..\Player432Hz.Tests\Player432Hz.Tests.csproj", "{8652B70C-58DD-42AA-A569-596B723EED65}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YangDownloader", "..\YangDownloader\YangDownloader.csproj", "{2FEC9EAB-20A2-4647-B75A-EBFB8A6131AB}"
 EndProject

@@ -65,11 +65,11 @@
                                    HorizontalAlignment="Center" />
                         <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.PitchFrom}" 
                                  IsEnabled="{Binding !Settings.AutoDetectPitch}" />
-                        <TextBlock Grid.Row="0" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text=" Hz" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
                                    HorizontalAlignment="Center" />
                         <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.PitchTo}"  />
-                        <TextBlock Grid.Row="1" Grid.Column="3" Text=" hz" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text=" Hz" VerticalAlignment="Center" />
                     </Grid>
                     <CheckBox IsChecked="{Binding Settings.RoundPitch}" Content="Round pitch for quality" />
                     <CheckBox IsChecked="{Binding Settings.SkipTempo}" Margin="0,-4,0,0" Content="Skip tempo adjustment for quality" />

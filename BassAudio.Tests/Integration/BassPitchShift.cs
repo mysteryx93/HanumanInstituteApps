@@ -48,7 +48,7 @@ public class BassPitchShift : TestsBase
 
         // Optimized pitch shifting for increased quality
         // 1. Rate shift to Output * Pitch (rounded)
-        // 2. Resample to Output (48000hz)
+        // 2. Resample to Output (48000Hz)
         // 3. Tempo adjustment: -Pitch
         var r = pitch;
         if (roundPitch)

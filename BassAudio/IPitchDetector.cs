@@ -6,13 +6,13 @@
 public interface IPitchDetector
 {
     /// <summary>
-    /// Measures the pitch of an audio file, between 424hz and 448hz. Most music is between 440-442hz.
+    /// Measures the pitch of an audio file, between 424Hz and 448Hz. Most music is between 440-442Hz.
     /// </summary>
     /// <param name="filePath">The path of the file to measure.</param>
     /// <returns>The audio pitch between 424 and 448.</returns>
     Task<float> GetPitchAsync(string filePath);
     /// <summary>
-    /// Measures the pitch of an audio file, between 424hz and 448hz. Most music is between 440-442hz.
+    /// Measures the pitch of an audio file, between 424Hz and 448Hz. Most music is between 440-442Hz.
     /// It is recommended to use the Async method when using multiple passes.
     /// </summary>
     /// <param name="filePath">The path of the file to measure.</param>

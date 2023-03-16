@@ -7,7 +7,7 @@
     <LangVersion>default</LangVersion>
     <AssemblyVersion>2.3</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
-    <RootNamespace>HanumanInstitute.YangDownloader</RootNamespace>
+    <RootNamespace>HanumanInstitute.Player432Hz</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>AnyCPU</Platforms>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -16,10 +16,8 @@
     <Company>Hanuman Institute</Company>
     <Product>432Hz Player</Product>
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
-    <TrimMode>copyused</TrimMode>
-    <AssemblyName>YangDownloader</AssemblyName>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <!--    <PublishTrimmed>true</PublishTrimmed>-->
+<!--    <PublishTrimmed>true</PublishTrimmed>-->
 
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
@@ -42,48 +40,22 @@
     <AvaloniaResource Remove="Assets\App.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
-    <ProjectReference Include="..\DLL\BassEnc\BassEncDlls.csproj" />
+    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Downloads\Downloads.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview6" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview6" />
-    <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.26" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Res.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SettingsView.axaml.cs">
-      <DependentUpon>SettingsView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>YangDownloader.Tests</_Parameter1>
-    </AssemblyAttribute>
   </ItemGroup>
 </Project>
