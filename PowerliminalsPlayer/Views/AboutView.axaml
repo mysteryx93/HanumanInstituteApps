@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
-        mc:Ignorable="d" MinWidth="550" Width="550" MaxWidth="550" MinHeight="410" Height="410" MaxHeight="410" 
+        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="380" Height="380" MaxHeight="380" 
         x:Class="HanumanInstitute.PowerliminalsPlayer.Views.AboutView"
         Title="Information" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -30,9 +30,8 @@
                     <ui:HyperlinkButton NavigateUri="http://www.spiritualselftransformation.com" Content="http://www.spiritualselftransformation.com" Padding="0" />
                 </StackPanel>
 
-                <TextBlock FontSize="18" Margin="0,24,0,0" Text="This software is open source and contains no ads" HorizontalAlignment="Center" />
                 <TextBlock Margin="0,10,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding AppInfo.LicenseInfo}" />
-                <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" />
+                <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" Margin="0,10,0,0" />
                 
             </StackPanel>
             <Grid VerticalAlignment="Bottom">
