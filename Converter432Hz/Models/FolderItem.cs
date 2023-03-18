@@ -17,7 +17,7 @@ public class FolderItem : FileItem
     /// <summary>
     /// Gets or sets the list of files contained in the folder.
     /// </summary>
-    public ObservableCollection<FileItem> Files { get; } = new ObservableCollection<FileItem>();
+    public ObservableCollection<FileItem> Files { get; } = new();
 
     /// <inheritdoc />
     public override string ToolTip =>

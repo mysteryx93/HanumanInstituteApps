@@ -52,7 +52,7 @@ public class AppSettingsData : SettingsDataBase
     /// Gets or sets encoding settings.
     /// </summary>
     [Reactive]
-    public EncodeSettings EncodeSettings { get; set; } = new EncodeSettings();
+    public EncodeSettings EncodeSettings { get; set; } = new();
     
     /// <inheritdoc />
     public override void SetFreeLicenseDefaults()

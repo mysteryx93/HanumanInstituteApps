@@ -125,8 +125,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             Title = "Select files to convert",
             Filters = new List<FileFilter>()
             {
-                new FileFilter("Audio files", _appPath.AudioExtensions),
-                new FileFilter("All files", "*")
+                new("Audio files", _appPath.AudioExtensions),
+                new("All files", "*")
             }
         };
         var files = await _dialogService.ShowOpenFilesDialogAsync(this, settings).ConfigureAwait(true);

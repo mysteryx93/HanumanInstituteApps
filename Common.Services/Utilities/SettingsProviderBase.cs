@@ -35,7 +35,7 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
             Changed?.Invoke(this, EventArgs.Empty);
         }
     }
-    private T _value = new T();
+    private T _value = new();
     
     /// <summary>
     /// Gets the path where settings are stored.
@@ -120,5 +120,5 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
     /// <summary>
     /// When overriden in a derived class, returns the default settings values.
     /// </summary>
-    protected virtual T GetDefault() => new T();
+    protected virtual T GetDefault() => new();
 }

@@ -85,7 +85,7 @@ public class PositionExtension : AvaloniaObject
         public int X { get; set; }
         public int Y { get; set; }
 
-        public PixelPoint ToPixelPoint() => new PixelPoint(X, Y);
+        public PixelPoint ToPixelPoint() => new(X, Y);
     }
     
     // Note: Window.Position doesn't support binding by default 

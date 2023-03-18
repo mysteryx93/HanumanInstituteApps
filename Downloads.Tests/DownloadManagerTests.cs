@@ -18,7 +18,7 @@ public class DownloadManagerTests : TestsBase
     private const string VideoUrl = "https://www.youtube.com/watch?v=HV9PCGoGbSA";
     private const string DestFile = "DownloadTestFile.mp4";
     const string VideoTitle = "Title";
-    protected DownloadOptions Settings { get; set; } = new DownloadOptions();
+    protected DownloadOptions Settings { get; set; } = new();
 
     public FakeFileSystemService FileSystem => _fileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService? _fileSystem;

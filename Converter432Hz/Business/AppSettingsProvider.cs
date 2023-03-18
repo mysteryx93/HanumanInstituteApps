@@ -47,7 +47,7 @@ public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
     public override void Save() => Save(_appPath.ConfigFile);
 
     protected override AppSettingsData GetDefault() =>
-        new AppSettingsData
+        new()
         {
             Width = 600,
             Height = 400,

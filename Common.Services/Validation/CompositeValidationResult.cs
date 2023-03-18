@@ -9,7 +9,7 @@ namespace HanumanInstitute.Common.Services;
 /// </summary>
 public class CompositeValidationResult : ValidationResult
 {
-    private readonly List<ValidationResult> _results = new List<ValidationResult>();
+    private readonly List<ValidationResult> _results = new();
 
     /// <summary>
     /// Returns the combined validation results.

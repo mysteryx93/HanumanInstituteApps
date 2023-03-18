@@ -52,7 +52,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     /// <inheritdoc />
     public double? PitchErrorHz => PitchError * PitchFrom;
 
-    private readonly Random _random = new Random();
+    private readonly Random _random = new();
 
     /// <inheritdoc />
     public async Task PlayAsync(IEnumerable<string>? list, string? current)

@@ -8,7 +8,7 @@ public class FakeEnvironmentService : IEnvironmentService
 {
     public IEnumerable<string> CommandLineArguments { get; set; } = Array.Empty<string>();
 
-    public Version AppVersion { get; set; } = new Version(1, 0);
+    public Version AppVersion { get; set; } = new(1, 0);
 
     public string AppFriendlyName { get; set; } = "TestApp";
 
@@ -24,9 +24,9 @@ public class FakeEnvironmentService : IEnvironmentService
 
     public char AltDirectorySeparatorChar { get; set; } = '/';
 
-    public DateTime Now { get; set; } = new DateTime(2019, 01, 01);
+    public DateTime Now { get; set; } = new(2019, 01, 01);
 
-    public DateTime UtcNow { get; set; } = new DateTime(2019, 01, 01);
+    public DateTime UtcNow { get; set; } = new(2019, 01, 01);
 
     public int ProcessorCount { get; set; } = 2;
     

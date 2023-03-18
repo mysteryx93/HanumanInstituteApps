@@ -4,7 +4,7 @@ namespace HanumanInstitute.Downloads.Tests;
 
 public class FakeDownloadTaskFactory : IDownloadTaskFactory
 {
-    public ConcurrentBag<FakeDownloadTask> Instances { get; private set; } = new ConcurrentBag<FakeDownloadTask>();
+    public ConcurrentBag<FakeDownloadTask> Instances { get; private set; } = new();
 
     public IDownloadTask Create(StreamQueryInfo streamQuery, string destination)
     {
@@ -23,7 +23,7 @@ public class FakeDownloadTaskFactory : IDownloadTaskFactory
 
     public int Total(FakeDownloadTask.FakeStatus status) => Instances.Where(x => x.Status == status).Count();
 
-    private readonly object _lock = new object();
+    private readonly object _lock = new();
 
     // Completes n amount of tasks.
     public void Complete(int n)

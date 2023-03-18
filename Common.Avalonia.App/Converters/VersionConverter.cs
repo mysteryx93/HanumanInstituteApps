@@ -8,7 +8,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// </summary>
 public class VersionConverter : IValueConverter
 {
-    public static VersionConverter Instance => new VersionConverter();
+    public static VersionConverter Instance => new();
     
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

@@ -6,7 +6,7 @@ namespace HanumanInstitute.Common.Avalonia.App.Tests;
 public class FakeSettingsProvider<T> : ISettingsProvider<T>
     where T : class, new()
 {
-    public virtual T Value { get; set; } = new T();
+    public virtual T Value { get; set; } = new();
 
     public event EventHandler? Changed;
     public event EventHandler? Saving;

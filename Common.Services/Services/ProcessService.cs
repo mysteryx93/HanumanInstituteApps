@@ -9,10 +9,10 @@ namespace HanumanInstitute.Common.Services;
 public class ProcessService : IProcessService
 {
     /// <inheritdoc />
-    public ProcessWrapper Start(string fileName, string arguments) => new ProcessWrapper(Process.Start(fileName, arguments));
+    public ProcessWrapper Start(string fileName, string arguments) => new(Process.Start(fileName, arguments));
 
     /// <inheritdoc />
-    public ProcessWrapper Start(string fileName) => new ProcessWrapper(Process.Start(fileName));
+    public ProcessWrapper Start(string fileName) => new(Process.Start(fileName));
 
     /// <inheritdoc />
     public ProcessWrapper StartNotePad(string arguments) => Start("notepad.exe", arguments);

@@ -2,7 +2,7 @@
 
 public class FakeDownloadTask : IDownloadTask
 {
-    public StreamQueryInfo Query => new StreamQueryInfo();
+    public StreamQueryInfo Query => new();
 
     public string Destination { get; set; } = string.Empty;
 

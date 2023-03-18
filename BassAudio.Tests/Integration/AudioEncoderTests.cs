@@ -27,7 +27,7 @@ public class AudioEncoderTests : TestsBase
         return new AudioEncoder(new PitchDetector(FileSystem), FileSystem);
     }
 
-    public EncodeSettings Settings { get; set; } = new EncodeSettings() { QualityOrSpeed = 2 };
+    public EncodeSettings Settings { get; set; } = new() { QualityOrSpeed = 2 };
 
     public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
     private IFileSystemService _fileSystem;

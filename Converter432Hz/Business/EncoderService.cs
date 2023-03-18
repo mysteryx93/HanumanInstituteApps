@@ -261,7 +261,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
         }
     }
 
-    private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _semaphore = new(1, 1);
 
     /// <summary>
     /// Shows the AskFileAction dialog only once even if there are multiple threads.

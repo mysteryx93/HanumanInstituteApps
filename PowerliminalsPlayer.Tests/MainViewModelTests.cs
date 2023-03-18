@@ -67,7 +67,7 @@ public class MainViewModelTests
 
     // ReSharper disable once PossibleUnintendedReferenceComparison
     protected IBassDevice MockBassDevice => _mockBassDevice ??= Mock.Of<IBassDevice>(x =>
-        x.SupportedExtensions == new List<FileExtension>() { new FileExtension("Default", new[] { ".mp3", ".mp4" }) });
+        x.SupportedExtensions == new List<FileExtension>() { new("Default", new[] { ".mp3", ".mp4" }) });
     private IBassDevice _mockBassDevice;
 
     protected IAppPathService AppPath => _appPath ??= new AppPathService(new FakeEnvironmentService(), MockFileSystem, MockBassDevice);
