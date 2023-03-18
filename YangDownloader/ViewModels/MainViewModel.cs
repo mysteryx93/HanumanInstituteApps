@@ -1,11 +1,13 @@
 ﻿using System.Net.Http;
 using System.Reactive.Linq;
+using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
+using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
@@ -147,7 +149,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// <summary>
     /// Gets the list of downloads.
     /// </summary>
-    public ObservableCollection<DownloadItem> Downloads { get; } = new ObservableCollection<DownloadItem>();
+    public ObservableCollection<DownloadItem> Downloads { get; } = new();
 
     /// <summary>
     /// Gets or sets whether the selection is valid to start downloading. 
@@ -213,6 +215,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         }).ConfigureAwait(true);
         if (!success)
         {
+            VideoTitle = string.Empty;
             return;
         }
 
@@ -364,8 +367,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         EncodeAudio = Settings.EncodeAudio ? Settings.EncodeSettings : null
     };
 
-    private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) =>
-        Downloads.Add(new DownloadItem(e.Download, VideoTitle));
+    private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) => Dispatcher.UIThread.Post(() => 
+        Downloads.Add(new DownloadItem(e.Download, VideoTitle))
+    );
 
     /// <inheritdoc />
     protected override Task ShowAboutImplAsync() => _dialogService.ShowAboutAsync(this);

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Xaml.Interactions.Core;
 using HanumanInstitute.MvvmDialogs;
+using ReactiveUI;
 using Splat;
 
 namespace HanumanInstitute.Common.Avalonia.App;
@@ -61,6 +62,7 @@ public abstract class CommonApplication<TMain> : Application
 
         GlobalErrorHandler.EndInit(dialogService,
             desktop?.MainWindow?.DataContext as INotifyPropertyChanged);
+        RxApp.DefaultExceptionHandler = GlobalErrorHandler.Instance;
 
         await tBackground.ConfigureAwait(true);
         base.OnFrameworkInitializationCompleted();

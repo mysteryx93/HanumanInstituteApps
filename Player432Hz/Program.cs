@@ -11,7 +11,6 @@ public class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SettingsPlaylistItem))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(FileItem))]
     [STAThread]
     public static void Main(string[] args) => AppStarter.Start<App>(args,
         () => ViewModelLocator.SettingsProvider.Value,

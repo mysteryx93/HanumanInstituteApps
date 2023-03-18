@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using Avalonia;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;

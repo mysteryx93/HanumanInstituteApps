@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using HanumanInstitute.Common.Services.Properties;
 using HanumanInstitute.Common.Services.Validation;
-using HanumanInstitute.MvvmDialogs;
 
 // ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;

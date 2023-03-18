@@ -55,8 +55,6 @@
     <ProjectReference Include="..\Downloads\Downloads.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview6" />
-    <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview6" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.26" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
@@ -86,5 +84,8 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>YangDownloader.Tests</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="YoutubeExplode" />
   </ItemGroup>
 </Project>
