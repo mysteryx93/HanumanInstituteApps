@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.Player432Hz"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432Hz.ViewModels"
-        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="380" Height="380" MaxHeight="380" 
+        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="355" Height="355" MaxHeight="355" 
         x:Class="HanumanInstitute.Player432Hz.Views.AboutView"
         Title="Information" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -30,7 +30,7 @@
                     <ui:HyperlinkButton NavigateUri="http://www.spiritualselftransformation.com" Content="http://www.spiritualselftransformation.com" Padding="0" />
                 </StackPanel>
 
-                <TextBlock Margin="0,10,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding !Settings.IsLicenseValid}" 
+                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding !Settings.IsLicenseValid}" 
                            Text="{Binding AppInfo.LicenseInfo}" />
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,10" HorizontalAlignment="Center">
                     <TextBlock Text="License" VerticalAlignment="Center" />
@@ -38,14 +38,15 @@
                     <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" IsVisible="{Binding !Settings.IsLicenseValid}" />
                     <ui:SymbolIcon Symbol="CheckmarkFilled" FontSize="20" Foreground="Green" IsVisible="{Binding Settings.IsLicenseValid}" />
                 </StackPanel>
-                
             </StackPanel>
-            <Grid VerticalAlignment="Bottom">
-                <ui:HyperlinkButton Margin="0,0,0,50" Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" />
-                <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
-                <Button HorizontalAlignment="Right" Width="100" Classes="round" 
-                        Command="{Binding Close}" IsDefault="True" IsCancel="true">Close</Button>
-            </Grid>
+            <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                <ui:HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" />
+                <Grid>
+                    <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
+                    <Button HorizontalAlignment="Right" Width="100" Classes="round"
+                            Command="{Binding Close}" IsDefault="True" IsCancel="true" Content="Close" />
+                </Grid>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

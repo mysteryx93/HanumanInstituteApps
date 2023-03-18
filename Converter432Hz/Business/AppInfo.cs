@@ -22,7 +22,7 @@ public class AppInfo : IAppInfo
     public string BuyLicenseText => "Get license for $5"; 
 
     /// <inheritdoc />
-    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-converter432hz";
+    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=0";
     
     /// <inheritdoc />
     public KeyByteSet[] KeyByteSets => new[]

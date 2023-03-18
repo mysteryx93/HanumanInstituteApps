@@ -19,10 +19,10 @@ public class AppInfo : IAppInfo
     public string LicenseInfo => "The free version is fully functional. To unlock advanced settings, purchase a license for just $5 per computer to support the application development. This is a lifetime license for this app and all future updates.";
 
     /// <inheritdoc />
-    public string BuyLicenseText => "Get license for $5"; 
+    public string BuyLicenseText => "Get license for $3"; 
 
     /// <inheritdoc />
-    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader";
+    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader?id=2";
 
     /// <inheritdoc />
     public KeyByteSet[] KeyByteSets => new[]
