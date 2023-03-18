@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using DynamicData.Binding;
 using ReactiveUI;
 

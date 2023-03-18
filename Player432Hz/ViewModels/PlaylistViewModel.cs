@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;

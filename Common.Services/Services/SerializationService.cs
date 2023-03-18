@@ -39,11 +39,18 @@ public class SerializationService : ISerializationService
     /// <inheritdoc />
     public T DeserializeFromFile<T>(string path)
     {
-        var stream = _fileSystem.File.OpenRead(path);
-        using var reader = XmlReader.Create(stream,
-            new XmlReaderSettings() { XmlResolver = null });
-        var serializer = new XmlSerializer(typeof(T));
-        return (T)serializer.Deserialize(reader)!;
+        try
+        {
+            var stream = _fileSystem.File.OpenRead(path);
+            using var reader = XmlReader.Create(stream,
+                new XmlReaderSettings() { XmlResolver = null });
+            var serializer = new XmlSerializer(typeof(T));
+            return (T)serializer.Deserialize(reader)!;
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw ex.InnerException?.InnerException ?? ex.InnerException ?? ex;
+        }
     }
 
     /// <inheritdoc />

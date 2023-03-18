@@ -1,7 +1,4 @@
-﻿using System.Windows.Input;
-using ReactiveUI;
-
-namespace HanumanInstitute.Player432Hz.ViewModels;
+﻿namespace HanumanInstitute.Player432Hz.ViewModels;
 
 /// <summary>
 /// Represents the media player.

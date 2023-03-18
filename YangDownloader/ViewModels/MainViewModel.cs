@@ -342,6 +342,10 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         {
             SetError(Resources.InvalidUrl);
         }
+        catch (Exception e)
+        {
+            SetError(e.Message);
+        }
         return false;
     }
 

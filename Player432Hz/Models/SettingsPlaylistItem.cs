@@ -16,13 +16,13 @@ public class SettingsPlaylistItem
     /// Gets or sets the list of folders included in the playlist.
     /// </summary>
     [XmlElement("Folder")]
-    public List<string> Folders { get; } = new List<string>();
+    public List<string> Folders { get; } = new();
 
     public SettingsPlaylistItem() { }
 
     public SettingsPlaylistItem(string name, IList<string>? folders = null)
     {
-        this.Name = name;
+        Name = name;
         if (folders != null)
         {
             Folders.AddRange(folders);

@@ -81,11 +81,11 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding Display}">
                                 <Interaction.Behaviors>
-                                    <EventTriggerBehavior EventName="DoubleTapped">
+                                    <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.DoubleTappedEvent}">
                                         <InvokeCommandAction
                                             Command="{Binding ViewModel.Play, RelativeSource={RelativeSource AncestorType=views:MainView}}"
                                             CommandParameter="{x:Null}" />
-                                    </EventTriggerBehavior>
+                                    </RoutedEventTriggerBehavior>
                                 </Interaction.Behaviors>
                             </TextBlock>
                         </DataTemplate>
@@ -134,11 +134,11 @@
                                                    OutputSampleRate="{Binding ViewModel.Settings.OutputSampleRate, RelativeSource={RelativeSource AncestorType=views:MainView}}">
                             </mediab:BassPlayerHost>
                             <Interaction.Behaviors>
-                                <EventTriggerBehavior EventName="StopCommandExecuted">
+                                <RoutedEventTriggerBehavior RoutedEvent="{x:Static media:MediaPlayerBase.StopCommandExecutedEvent}">
                                     <InvokeCommandAction
                                         Command="{Binding ViewModel.RemoveMedia, RelativeSource={RelativeSource AncestorType=views:MainView}}"
                                         CommandParameter="{Binding}" />
-                                </EventTriggerBehavior>
+                                </RoutedEventTriggerBehavior>
                             </Interaction.Behaviors>
                         </media:MediaPlayer>
                     </DataTemplate>

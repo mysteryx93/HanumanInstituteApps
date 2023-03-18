@@ -21,11 +21,6 @@
             </hic:BooleanToBrushConverter.FalseValue>
         </hic:BooleanToBrushConverter>
     </Window.Resources>
-    <Interaction.Behaviors>
-        <EventTriggerBehavior EventName="Closing">
-            <InvokeCommandAction Command="{Binding Closed}" />
-        </EventTriggerBehavior>
-    </Interaction.Behaviors>
     <Grid>
         <Grid Margin="10">
             <StackPanel>
@@ -51,9 +46,9 @@
                     <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True"
                              Text="{Binding Settings.DestinationFolder}">
                         <Interaction.Behaviors>
-                            <EventTriggerBehavior EventName="LostFocus">
+                            <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.LostFocusEvent}">
                                 <InvokeCommandAction Command="{Binding TestDestinationPath}" />
-                            </EventTriggerBehavior>
+                            </RoutedEventTriggerBehavior>
                         </Interaction.Behaviors>
                     </TextBox>
                     <Button Classes="round" Grid.Column="2" Width="35"
@@ -68,9 +63,9 @@
                     <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True" 
                              Text="{Binding Settings.FFmpegPath}">
                         <Interaction.Behaviors>
-                            <EventTriggerBehavior EventName="LostFocus">
+                            <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.LostFocusEvent}">
                                 <InvokeCommandAction Command="{Binding TestFFmpeg}" />
-                            </EventTriggerBehavior>
+                            </RoutedEventTriggerBehavior>
                         </Interaction.Behaviors>
                     </TextBox>
                     <Button Classes="round" Grid.Column="2" Width="35"

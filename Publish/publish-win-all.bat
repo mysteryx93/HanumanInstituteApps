@@ -1,12 +1,12 @@
 
-call publish-win Player432hz win-x64
+call publish-win Player432Hz win-x64
 if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
-call publish-win Player432hz win-x86
+call publish-win Player432Hz win-x86
 if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
 
-call publish-win Converter432hz win-x64
+call publish-win Converter432Hz win-x64
 if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
-call publish-win Converter432hz win-x86
+call publish-win Converter432Hz win-x86
 if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
 
 call publish-win PowerliminalsPlayer win-x64

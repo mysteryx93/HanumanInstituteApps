@@ -5,7 +5,7 @@
     <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
-    <AssemblyVersion>2.3</AssemblyVersion>
+    <AssemblyVersion>3.0</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.YangDownloader</RootNamespace>
     <Configurations>Release;Debug</Configurations>
@@ -19,7 +19,8 @@
     <TrimMode>copyused</TrimMode>
     <AssemblyName>YangDownloader</AssemblyName>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <!--    <PublishTrimmed>true</PublishTrimmed>-->
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
 
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>

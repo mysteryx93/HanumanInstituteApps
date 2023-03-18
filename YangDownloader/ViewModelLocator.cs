@@ -7,6 +7,7 @@ using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.YangDownloader.Business;
+using HanumanInstitute.YangDownloader.Views;
 using LazyCache.Splat;
 using Splat;
 
@@ -31,6 +32,13 @@ public static class ViewModelLocator
         container.AddBassAudio();
         container.AddDownloads();
         container.AddLazyCache();
+        
+        var viewLocator = new StrongViewLocator()
+            .Register<AboutViewModel, AboutView>()
+            .Register<EncodeSettingsViewModel, EncodeSettingsView>()
+            .Register<MainViewModel, MainView>()
+            .Register<SettingsViewModel, SettingsView>();
+        
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
             viewLocator: new ViewLocator(),
             dialogFactory: new DialogFactory().AddFluent()),

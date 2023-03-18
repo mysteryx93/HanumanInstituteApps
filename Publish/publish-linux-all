@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-./publish-linux Player432hz linux-x64
-./publish-linux Player432hz linux-arm64
+./publish-linux Player432Hz linux-x64
+./publish-linux Player432Hz linux-arm64
 
-./publish-linux Converter432hz linux-x64
-./publish-linux Converter432hz linux-arm64
+./publish-linux Converter432Hz linux-x64
+./publish-linux Converter432Hz linux-arm64
 
 ./publish-linux PowerliminalsPlayer linux-x64
 ./publish-linux PowerliminalsPlayer linux-arm64

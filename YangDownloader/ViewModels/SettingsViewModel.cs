@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewClosed
 {
     private readonly IDialogService _dialogService;
     private readonly IEncoderService _ffmpeg;
@@ -38,10 +38,10 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     /// <summary>
     /// When the window is closed, sets FFmpeg path in IEncoderService whether settings are saved or not.
     /// </summary>
-    public ReactiveCommand<CancelEventArgs, Unit> Closed => _closed ??= ReactiveCommand.Create<CancelEventArgs>(ClosedImpl);
-    private ReactiveCommand<CancelEventArgs, Unit>? _closed;
-    private void ClosedImpl(CancelEventArgs e) => 
+    public void OnClosed()
+    {
         _ffmpeg.Processes.Paths.FFmpeg = _settingsProvider.Value.FFmpegPath;
+    }
 
     /// <summary>
     /// Shows the open folder dialog to select destination. 
