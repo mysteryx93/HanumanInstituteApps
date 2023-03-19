@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
-using LazyCache;
 using ManagedBass;
 using ReactiveUI;
 using Xunit.Abstractions;

@@ -7,7 +7,6 @@ using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
-using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;

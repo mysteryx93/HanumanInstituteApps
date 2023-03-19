@@ -2,7 +2,6 @@
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using ReactiveUI;
 
 // ReSharper disable MemberCanBePrivate.Global
 

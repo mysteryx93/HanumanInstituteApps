@@ -13,8 +13,8 @@ public class Program
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SettingsPlaylistItem))]
     [STAThread]
     public static void Main(string[] args) => AppStarter.Start<App>(args,
-        () => ViewModelLocator.SettingsProvider.Value,
-        () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);
+            () => ViewModelLocator.SettingsProvider.Value,
+            () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);
 
     // Avalonia configuration, don't remove; also used by visual designer.
     // ReSharper disable once MemberCanBePrivate.Global

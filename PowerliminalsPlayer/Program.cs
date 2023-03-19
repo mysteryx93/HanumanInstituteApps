@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Common.Avalonia.App;
 using Splat;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -12,7 +11,6 @@ public class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(PlayingItem))]
     public static void Main(string[] args) => AppStarter.Start<App>(args,
         () => ViewModelLocator.SettingsProvider.Value,
         () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);

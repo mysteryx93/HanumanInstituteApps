@@ -1,6 +1,4 @@
-﻿
-
-// ReSharper disable CheckNamespace
+﻿// ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
 
 /// <summary>
@@ -33,6 +31,7 @@ public interface ISettingsProvider<T>
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.
     /// </summary>
+    /// <param name="path">The file path to load the serialized settings object from.</param>
     T Load(string path);
 
     /// <summary>

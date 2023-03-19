@@ -1,6 +1,4 @@
-using System.ComponentModel;
-using AngleSharp.Media;
-using FluentAvalonia.Styling;
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -15,8 +13,8 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewCl
     private readonly IFileSystemService _fileSystem;
 
     public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme,
-        IDialogService dialogService, IEncoderService ffmpeg, IFileSystemService fileSystem) :
-        base(settingsProvider, fluentTheme)
+        IDialogService dialogService, IEncoderService ffmpeg, IFileSystemService fileSystem, IJsonTypeInfoResolver? serializerContext) :
+        base(settingsProvider, fluentTheme, serializerContext)
     {
         _dialogService = dialogService;
         _ffmpeg = ffmpeg;

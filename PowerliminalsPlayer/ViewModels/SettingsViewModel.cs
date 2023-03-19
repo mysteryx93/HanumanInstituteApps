@@ -1,4 +1,4 @@
-using FluentAvalonia.Styling;
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Avalonia.App;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
@@ -9,8 +9,8 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IEnvironmentService environment) :
-        base(settingsProvider, fluentTheme)
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IEnvironmentService environment, IJsonTypeInfoResolver? serializerContext) :
+        base(settingsProvider, fluentTheme, serializerContext)
     {
         OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;
         IsDeviceSampleRateVisible = environment.IsLinux;

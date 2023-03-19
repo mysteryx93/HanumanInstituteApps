@@ -29,7 +29,7 @@ public class AppPathService : IAppPathService
 
     /// <inheritdoc />
     public string ConfigFile => _configFile ??= 
-        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\432hzConfig.xml");
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\432HzPlayerConfig.json");
     private string? _configFile;
     
     /// <inheritdoc />

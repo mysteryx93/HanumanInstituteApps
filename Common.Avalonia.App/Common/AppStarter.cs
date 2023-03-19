@@ -2,7 +2,6 @@
 using System.Threading;
 using Avalonia;
 using Avalonia.ReactiveUI;
-using FluentAvalonia.UI.Windowing;
 using ReactiveUI;
 
 namespace HanumanInstitute.Common.Avalonia.App;

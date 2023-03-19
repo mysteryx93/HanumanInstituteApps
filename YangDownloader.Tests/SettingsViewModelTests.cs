@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.FileSystem;
@@ -13,7 +12,7 @@ public class SettingsViewModelTests: TestsBase
     public SettingsViewModelTests(ITestOutputHelper output) : base(output) { }
 
     public SettingsViewModel Model => _model ??= 
-        new SettingsViewModel(FakeSettings, Mock.Of<IFluentAvaloniaTheme>(), DialogService, MockEncoderService.Object, FakeFileSystem);
+        new SettingsViewModel(FakeSettings, Mock.Of<IFluentAvaloniaTheme>(), DialogService, MockEncoderService.Object, FakeFileSystem, null);
     private SettingsViewModel _model;
     
     public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);

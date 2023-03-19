@@ -28,7 +28,7 @@ public class AppPathService : IAppPathService
 
     /// <inheritdoc />
     public string ConfigFile => _configFile ??= 
-        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\YangDownloaderConfig.xml");
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\YangDownloaderConfig.json");
     private string? _configFile;
     
     /// <summary>

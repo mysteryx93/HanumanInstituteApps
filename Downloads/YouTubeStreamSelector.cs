@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.BassAudio;
+﻿using System.Text.Json.Serialization.Metadata;
+using HanumanInstitute.BassAudio;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.Downloads;
@@ -6,6 +7,13 @@ namespace HanumanInstitute.Downloads;
 /// <inheritdoc />
 public sealed class YouTubeStreamSelector : IYouTubeStreamSelector
 {
+    private readonly IJsonTypeInfoResolver? _serializerContext;
+    
+    public YouTubeStreamSelector(IJsonTypeInfoResolver? serializerContext)
+    {
+        _serializerContext = serializerContext;
+    }
+    
     /// <inheritdoc />
     public StreamQueryInfo SelectStreams(StreamManifest streams, bool downloadVideo, bool downloadAudio, DownloadOptions? options)
     {
@@ -29,7 +37,7 @@ public sealed class YouTubeStreamSelector : IYouTubeStreamSelector
             result.Audio = SelectBestAudio(streams, options);
         }
 
-        result.EncodeAudio = Cloning.ShallowClone(options.EncodeAudio);
+        result.EncodeAudio = Cloning.DeepClone(options.EncodeAudio, _serializerContext);
         result.FileExtension = GetFinalExtension(result.OutputVideo, result.OutputAudio, result.EncodeAudio?.Format);
 
         return result;

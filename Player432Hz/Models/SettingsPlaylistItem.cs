@@ -1,11 +1,8 @@
-﻿using System.Xml.Serialization;
-
-namespace HanumanInstitute.Player432Hz.Models;
+﻿namespace HanumanInstitute.Player432Hz.Models;
 
 /// <summary>
 /// Contains information on a playlist.
 /// </summary>
-[Serializable]
 public class SettingsPlaylistItem
 {
     /// <summary>
@@ -15,8 +12,7 @@ public class SettingsPlaylistItem
     /// <summary>
     /// Gets or sets the list of folders included in the playlist.
     /// </summary>
-    [XmlElement("Folder")]
-    public List<string> Folders { get; } = new();
+    public List<string> Folders { get; set; } = new();
 
     public SettingsPlaylistItem() { }
 

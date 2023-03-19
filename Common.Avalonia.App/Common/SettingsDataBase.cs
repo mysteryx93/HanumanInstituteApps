@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text.Json.Serialization;
 using Avalonia;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -59,7 +59,7 @@ public class SettingsDataBase : ReactiveObject
     /// Gets or sets whether the license key is valid.
     /// </summary>
     [Reactive]
-    [XmlIgnore]
+    [JsonIgnore]
     public bool IsLicenseValid { get; set; }
 
     /// <summary>

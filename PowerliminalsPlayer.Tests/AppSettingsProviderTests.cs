@@ -21,7 +21,7 @@ public class AppSettingsProviderTests
     protected ISerializationService Serialization => _serialization ??= new SerializationService(MockFileSystem);
     private ISerializationService _serialization;
 
-    protected AppSettingsProvider Model => _model ??= new AppSettingsProvider(Serialization, AppPath, MockFileSystem);
+    protected AppSettingsProvider Model => _model ??= new AppSettingsProvider(Serialization, AppPath, MockFileSystem, null);
     private AppSettingsProvider _model;
 
     protected string SetPath() => System.IO.Path.DirectorySeparatorChar == '\\' ? SetWindowsPath() : SetLinuxPath();
@@ -70,7 +70,7 @@ public class AppSettingsProviderTests
         var _ = Model; // Init object, Load is called in constructor.
         // Model.Load();
 
-        mockSerialization.Verify(x => x.DeserializeFromFile<AppSettingsData>(path), Times.Once);
+        mockSerialization.Verify(x => x.DeserializeFromFile<AppSettingsData>(path, null), Times.Once);
     }
 
     [Fact]

@@ -1,9 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.YangDownloader.Business;
 using Splat;
-using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.YangDownloader;
 
@@ -14,9 +11,6 @@ public class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(EncodeSettings))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DownloadItem))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ObservableCollection<DownloadItem>))]
     public static void Main(string[] args) => AppStarter.Start<App>(args, 
         () => ViewModelLocator.SettingsProvider.Value,
         () => Locator.Current.GetService<IAppPathService>()?.UnhandledExceptionLogPath);

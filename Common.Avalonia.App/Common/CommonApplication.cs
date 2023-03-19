@@ -70,10 +70,6 @@ public abstract class CommonApplication<TMain> : Application
 
     private void InitSettings(SettingsDataBase settings)
     {
-        if (settings.Theme == AppTheme.HighContrast)
-        {
-            settings.Theme = AppTheme.Dark;
-        }
         if (settings.LicenseKey.HasValue())
         {
             var validator = Locator.Current.GetService<ILicenseValidator>()!;

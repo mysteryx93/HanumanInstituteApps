@@ -1,6 +1,5 @@
 ﻿namespace HanumanInstitute.Common.Services;
 
-
 /// <summary>
 /// Application settings for design view.
 /// </summary>

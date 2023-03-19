@@ -1,5 +1,4 @@
-﻿using System.Windows.Input;
-using HanumanInstitute.MvvmDialogs;
+﻿using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.Converter432Hz.ViewModels;

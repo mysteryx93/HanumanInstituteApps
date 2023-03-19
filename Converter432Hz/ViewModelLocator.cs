@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Text.Json.Serialization.Metadata;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Avalonia.App;
@@ -61,6 +62,7 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
         SplatRegistrations.Register<IEncoderService, EncoderService>();
+        container.RegisterLazySingleton<IJsonTypeInfoResolver>(() => SourceGenerationContext.Default);
             
         SplatRegistrations.SetupIOC();
     }

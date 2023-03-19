@@ -9,7 +9,7 @@ public class MainViewModelDesign : MainViewModel
 {
     public MainViewModelDesign() : base(Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!,
         Locator.Current.GetService<IAppUpdateService>()!,
-        Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(),
+        Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(null),
         new DialogService(), Locator.Current.GetService<IFileSystemService>()!)
     {
         DisplayDownloadInfo = true;

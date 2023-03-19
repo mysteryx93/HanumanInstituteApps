@@ -4,10 +4,6 @@ using System.Linq;
 using System.Reflection;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
-using LazyCache;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 
 // ReSharper disable MemberCanBePrivate.Global
 

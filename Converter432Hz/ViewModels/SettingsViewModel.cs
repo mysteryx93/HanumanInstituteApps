@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
 
@@ -11,13 +12,14 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     /// <summary>
     /// Initializes a new instance of the SettingsViewModel class.
     /// </summary>
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IEnvironmentService environment) :
-        base(settingsProvider, fluentTheme)
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IEnvironmentService environment, IJsonTypeInfoResolver? serializerContext) :
+        base(settingsProvider, fluentTheme, serializerContext)
     {
         _environment = environment;
     }
 
-    protected override AppSettingsData CloneSettings(AppSettingsData value) => Cloning.DeepClone(value);
+    /// <inheritdoc />
+    protected override AppSettingsData CloneSettings(AppSettingsData value, IJsonTypeInfoResolver? serializerContext) => Cloning.DeepClone(value, serializerContext);
 
     protected override bool Validate() => Settings.Validate() == null;
 

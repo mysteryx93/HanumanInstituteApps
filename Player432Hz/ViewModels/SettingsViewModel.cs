@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
 
@@ -6,8 +7,8 @@ namespace HanumanInstitute.Player432Hz.ViewModels;
 /// <inheritdoc />
 public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
-    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player, IEnvironmentService environment) :
-        base(settingsProvider, fluentTheme)
+    public SettingsViewModel(ISettingsProvider<AppSettingsData> settingsProvider, IFluentAvaloniaTheme fluentTheme, IPlaylistPlayer player, IEnvironmentService environment, IJsonTypeInfoResolver? serializerContext) :
+        base(settingsProvider, fluentTheme, serializerContext)
     {
         Player = player;
         OutputSampleRateList.SelectedValue = Settings.OutputSampleRate;

@@ -26,7 +26,7 @@ public class DownloadManagerTests : TestsBase
     public FakeYouTubeDownloader MockYouTube => _mockYouTube ??= new FakeYouTubeDownloader(FileSystem);
     private FakeYouTubeDownloader? _mockYouTube;
 
-    public IYouTubeStreamSelector StreamSelector => _streamSelector ??= new YouTubeStreamSelector();
+    public IYouTubeStreamSelector StreamSelector => _streamSelector ??= new YouTubeStreamSelector(null);
     private IYouTubeStreamSelector? _streamSelector;
 
     public FakeDownloadTaskFactory MockFactory => _mockFactory ??= new FakeDownloadTaskFactory();

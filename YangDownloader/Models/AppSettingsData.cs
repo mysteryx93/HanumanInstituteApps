@@ -1,5 +1,4 @@
-﻿using System.Xml.Serialization;
-using HanumanInstitute.BassAudio;
+﻿using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
 
@@ -8,8 +7,6 @@ namespace HanumanInstitute.YangDownloader.Models;
 /// <summary>
 /// Contains the application settings and configured playlists.
 /// </summary>
-[Serializable]
-[XmlRoot("YangDownloader")]
 public class AppSettingsData : SettingsDataBase
 {
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace HanumanInstitute.Player432Hz.Business;
+namespace HanumanInstitute.Player432Hz.Models;
 
 public class PlayingInfo : ReactiveObject
 {

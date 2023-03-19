@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 // ReSharper disable CheckNamespace
 namespace HanumanInstitute.Common.Services;
@@ -15,53 +15,35 @@ public class SerializationService : ISerializationService
         _fileSystem = fileSystemService;
     }
 
+    private JsonSerializerOptions GetOptions(IJsonTypeInfoResolver? serializerContext) =>
+        new() {
+            TypeInfoResolver = serializerContext,
+            IgnoreReadOnlyProperties = true,
+            WriteIndented = true
+        };
+
     /// <inheritdoc />
-    public string Serialize<T>(T dataToSerialize)
+    public string Serialize<T>(T dataToSerialize, IJsonTypeInfoResolver? serializerContext) =>
+        JsonSerializer.Serialize(dataToSerialize, typeof(T), GetOptions(serializerContext));
+
+    /// <inheritdoc />
+    public T Deserialize<T>(string data, IJsonTypeInfoResolver? serializerContext)
+        where T : class, new() =>
+        (T)JsonSerializer.Deserialize(data, typeof(T), GetOptions(serializerContext))!;
+
+    /// <inheritdoc />
+    public T DeserializeFromFile<T>(string path, IJsonTypeInfoResolver? serializerContext)
     {
-        using var stringWriter = new StringWriter();
-        var serializer = new XmlSerializer(typeof(T));
-        var ns = new XmlSerializerNamespaces();
-        ns.Add(string.Empty, string.Empty);
-        serializer.Serialize(stringWriter, dataToSerialize, ns);
-        return stringWriter.ToString();
+        var stream = _fileSystem.File.OpenRead(path);
+        return (T)JsonSerializer.Deserialize(stream, typeof(T), GetOptions(serializerContext))!;
     }
 
     /// <inheritdoc />
-    public T Deserialize<T>(string xmlText) where T : class, new()
-    {
-        using var stringReader = new StringReader(xmlText);
-        using var xmlReader = XmlReader.Create(stringReader,
-            new XmlReaderSettings() { XmlResolver = null });
-        var serializer = new XmlSerializer(typeof(T));
-        return (T)serializer.Deserialize(xmlReader)!;
-    }
-
-    /// <inheritdoc />
-    public T DeserializeFromFile<T>(string path)
-    {
-        try
-        {
-            var stream = _fileSystem.File.OpenRead(path);
-            using var reader = XmlReader.Create(stream,
-                new XmlReaderSettings() { XmlResolver = null });
-            var serializer = new XmlSerializer(typeof(T));
-            return (T)serializer.Deserialize(reader)!;
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw ex.InnerException?.InnerException ?? ex.InnerException ?? ex;
-        }
-    }
-
-    /// <inheritdoc />
-    public void SerializeToFile<T>(T dataToSerialize, string path)
+    public void SerializeToFile<T>(T dataToSerialize, string path, IJsonTypeInfoResolver? serializerContext)
     {
         _fileSystem.EnsureDirectoryExists(path);
         using var writer = _fileSystem.FileStream.New(path, FileMode.Create);
-        var serializer = new XmlSerializer(typeof(T));
-        var ns = new XmlSerializerNamespaces();
-        ns.Add(string.Empty, string.Empty);
-        serializer.Serialize(writer, dataToSerialize, ns);
+        JsonSerializer.Serialize(writer, dataToSerialize, typeof(T), GetOptions(serializerContext));
         writer.Flush();
     }
 }

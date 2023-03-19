@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Text.Json.Serialization.Metadata;
+using Avalonia.Controls;
 
 namespace HanumanInstitute.YangDownloader.Business;
 
@@ -9,8 +10,8 @@ public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
 {
     private readonly IAppPathService _appPath;
 
-    public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath) :
-        base(serializationService)
+    public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath, IJsonTypeInfoResolver? serializerContext) :
+        base(serializationService, serializerContext)
     {
         _appPath = appPath;
 

@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
-using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
@@ -11,12 +11,14 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     private readonly IAudioEncoder _encoder;
     private readonly IEnvironmentService _environment;
     private readonly ISettingsProvider<AppSettingsData> _appSettings;
+    private readonly IJsonTypeInfoResolver? _serializerContext;
     
-    public EncodeSettingsViewModel(IAudioEncoder encoder, IEnvironmentService environment, ISettingsProvider<AppSettingsData> appSettings)
+    public EncodeSettingsViewModel(IAudioEncoder encoder, IEnvironmentService environment, ISettingsProvider<AppSettingsData> appSettings, IJsonTypeInfoResolver serializerContext)
     {
         _encoder = encoder;
         _environment = environment;
         _appSettings = appSettings;
+        _serializerContext = serializerContext;
         
         Bind(x => x.Settings.Format, x => x.FormatsList.SelectedValue);
         Bind(x => x.Settings.Bitrate, x => x.BitrateList.SelectedValue);
@@ -50,7 +52,7 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     public void SetSettings(EncodeSettings settings)
     {
         _source = settings;
-        Settings = Cloning.ShallowClone(settings);
+        Settings = Cloning.DeepClone(settings, _serializerContext);
         ShiftPitch = Settings.AutoDetectPitch || Math.Abs(Settings.PitchFrom - Settings.PitchTo) > 0.001;
         this.RaisePropertyChanged(nameof(Settings));
     }

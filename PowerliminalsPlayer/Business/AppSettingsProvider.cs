@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text.Json.Serialization.Metadata;
+using System.Xml.Serialization;
 using Avalonia.Controls;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
@@ -12,7 +13,8 @@ public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
     private readonly IAppPathService _appPath;
     private readonly IFileSystemService _fileSystem;
 
-    public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath, IFileSystemService fileSystem) : base(serializationService)
+    public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath, IFileSystemService fileSystem, IJsonTypeInfoResolver? serializerContext) :
+        base(serializationService, serializerContext)
     {
         _appPath = appPath;
         _fileSystem = fileSystem;

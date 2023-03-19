@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Services.Properties;
 using HanumanInstitute.Common.Services.Validation;
 
@@ -16,10 +17,12 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
     where T : class, new()
 {
     private readonly ISerializationService _serialization;
+    private readonly IJsonTypeInfoResolver? _serializerContext;
 
-    protected SettingsProviderBase(ISerializationService serializationService)
+    protected SettingsProviderBase(ISerializationService serializationService, IJsonTypeInfoResolver? serializerContext)
     {
         _serialization = serializationService ?? throw new ArgumentNullException(nameof(serializationService));
+        _serializerContext = serializerContext;
     }
 
     /// <summary>
@@ -60,13 +63,14 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
     /// <summary>
     /// Loads settings file if present, or creates a new object with default values.
     /// </summary>
+    /// <param name="path">The file path to load the serialized settings object from.</param>
     public T Load(string path)
     {
         List<string> errors = new();
         T? result = null;
         try
         {
-            result = _serialization.DeserializeFromFile<T>(path);
+            result = _serialization.DeserializeFromFile<T>(path, _serializerContext);
         }
         catch (InvalidOperationException e)
         {
@@ -113,7 +117,7 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
         if (Value == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
         if (Value.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
-        _serialization.SerializeToFile(Value, path);
+        _serialization.SerializeToFile(Value, path, _serializerContext);
     }
 
     /// <summary>

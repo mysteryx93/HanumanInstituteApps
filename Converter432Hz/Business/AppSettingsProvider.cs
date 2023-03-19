@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Text.Json.Serialization.Metadata;
+using Avalonia.Controls;
 
 namespace HanumanInstitute.Converter432Hz.Business;
 
@@ -12,8 +13,8 @@ public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
     private readonly IEnvironmentService _environment;
 
     public AppSettingsProvider(ISerializationService serializationService, IAppPathService appPath, IFileSystemService fileSystem,
-        IEnvironmentService environment) :
-        base(serializationService)
+        IEnvironmentService environment, IJsonTypeInfoResolver? serializerContext) :
+        base(serializationService, serializerContext)
     {
         _appPath = appPath;
         _fileSystem = fileSystem;

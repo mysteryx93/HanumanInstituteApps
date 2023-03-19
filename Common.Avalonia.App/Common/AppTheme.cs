@@ -6,6 +6,5 @@ namespace HanumanInstitute.Common.Avalonia.App;
 public enum AppTheme
 {
     Light,
-    Dark,
-    HighContrast // for compatibility
+    Dark
 }

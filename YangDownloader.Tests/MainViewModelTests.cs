@@ -37,7 +37,7 @@ public class MainViewModelTests : TestsBase
     });
     private Mock<IDownloadManager> _downloadManager;
 
-    public IYouTubeStreamSelector StreamSelector => _streamSelector ??= new YouTubeStreamSelector();
+    public IYouTubeStreamSelector StreamSelector => _streamSelector ??= new YouTubeStreamSelector(null);
     private IYouTubeStreamSelector _streamSelector;
 
     public IDialogService DialogService => _dialogService ??= new DialogService(MockDialogManager.Object);

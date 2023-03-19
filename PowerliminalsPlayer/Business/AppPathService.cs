@@ -31,7 +31,7 @@ public class AppPathService : IAppPathService
 
     /// <inheritdoc />
     public string ConfigFile => _configFile ??= 
-        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\PowerliminalsConfig.xml");
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\PowerliminalsPlayerConfig.json");
     private string? _configFile;
     
     /// <inheritdoc />

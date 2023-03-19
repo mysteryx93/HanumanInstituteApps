@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Converter432Hz.Views;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
-using Splat;
 
 namespace HanumanInstitute.Converter432Hz;
 

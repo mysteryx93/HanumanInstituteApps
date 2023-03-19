@@ -1,5 +1,4 @@
-﻿using LazyCache;
-using ManagedBass;
+﻿using ManagedBass;
 using ManagedBass.Mix;
 
 // ReSharper disable MemberCanBePrivate.Global

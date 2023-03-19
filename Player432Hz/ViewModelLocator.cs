@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Text.Json.Serialization.Metadata;
+using Avalonia.Controls;
 using FluentAvalonia.Styling;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
@@ -60,6 +61,7 @@ public static class ViewModelLocator
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
         SplatRegistrations.RegisterLazySingleton<IPlaylistPlayer, PlaylistPlayer>();
         SplatRegistrations.Register<IFileLocator, FileLocator>();
+        container.RegisterLazySingleton<IJsonTypeInfoResolver>(() => SourceGenerationContext.Default);
 
         SplatRegistrations.SetupIOC();
     }
