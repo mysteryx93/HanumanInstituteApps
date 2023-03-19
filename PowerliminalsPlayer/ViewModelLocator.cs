@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Text.Json.Serialization.Metadata;
+using Avalonia.Controls;
 using FluentAvalonia.Styling;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
@@ -54,6 +55,7 @@ public static class ViewModelLocator
         container.Register(() => 
             Design.IsDesignMode ? new AppSettingsProviderDesign() : Locator.Current.GetService<ISettingsProvider<AppSettingsData>>("Init"));
         SplatRegistrations.RegisterLazySingleton<IAppPathService, AppPathService>();
+        container.RegisterLazySingleton<IJsonTypeInfoResolver>(() => SourceGenerationContext.Default);
             
         SplatRegistrations.SetupIOC();
     }

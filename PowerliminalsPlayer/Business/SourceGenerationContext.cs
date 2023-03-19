@@ -3,7 +3,7 @@
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
 [JsonSerializable(typeof(AppSettingsData))]
-[JsonSerializable(typeof(List<PlayingItem>))]
+[JsonSerializable(typeof(PlayingItem))]
 public partial class SourceGenerationContext : JsonSerializerContext
 {
 }

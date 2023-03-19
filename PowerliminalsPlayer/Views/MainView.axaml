@@ -120,7 +120,7 @@
                     <DataTemplate>
                         <media:MediaPlayer IsLoopVisible="False" Opacity=".85">
                             <!-- StopCommandExecuted="{s:MethodBinding {Binding $parent[views:MainView].ViewModel}, OnRemoveMedia, {Binding}}"> -->
-                            <mediab:BassPlayerHost Source="{Binding FullPath, Mode=TwoWay}"
+                            <mediab:BassPlayerHost Source="{Binding Path, Mode=TwoWay}"
                                                    Volume="{Binding Volume, Mode=TwoWay}"
                                                    SpeedInt="{Binding Speed, Mode=TwoWay}"
                                                    IsPlaying="{Binding IsPlaying, Mode=TwoWay}"

@@ -7,19 +7,16 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models;
 /// <summary>
 /// Contains the PowerliminalsPlayer application settings.
 /// </summary>
-[XmlRoot("PowerliminalsPlayer")]
 public class AppSettingsData : SettingsDataBase
 {
     /// <summary>
     /// Gets or sets the list of folders in which to look for audio files.
     /// </summary>
-    [XmlElement("Folder")]
     public ObservableCollection<string> Folders { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the list of saved presets.
     /// </summary>
-    //[XmlElement("Preset")]
     public ObservableCollection<PresetItem> Presets { get; set; } = new();
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
+using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia.App;
@@ -93,7 +94,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     public async Task PromptFixPathsAsync()
     {
         var folders = new List<FixFolderItem> { new FixFolder<string>(Settings.Folders) };
-        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.FullPath, (f, v) => f.FullPath = v!)));
+        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.Path, (f, v) => f.Path = v!)));
         
         var changed = await _pathFixer.ScanAndFixFoldersAsync(this, folders).ConfigureAwait(false);
         if (changed)
@@ -207,7 +208,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         if (Files.CurrentItem != null)
         {
             // First first unused speed.
-            var usedSpeeds = Playlist.Files.Where(x => x.FullPath == Files.CurrentItem.FullPath).Select(x => x.Speed).ToList();
+            var usedSpeeds = Playlist.Files.Where(x => x.Path == Files.CurrentItem.FullPath).Select(x => x.Speed).ToList();
             var speed = 0;
             var containCount = 1;
             while (usedSpeeds.Count(x => x == speed) >= containCount)
@@ -268,7 +269,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             if (preset == null)
             {
                 preset = new PresetItem();
-                Settings.Presets.Add(preset);
+                Dispatcher.UIThread.Post(() => Settings.Presets.Add(preset));
             }
 
             Playlist.SaveAs(preset);

@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+﻿using System.Text.Json.Serialization;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
@@ -6,21 +6,21 @@ namespace HanumanInstitute.PowerliminalsPlayer.Models;
 public class PlayingItem : ReactiveObject
 {
     [Reactive]
-    [XmlIgnore]
+    [JsonIgnore]
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public string FullPath
+    public string Path
     {
-        get => _fullPath;
-        set => this.RaiseAndSetIfChanged(ref _fullPath, value);
+        get => _path;
+        set => this.RaiseAndSetIfChanged(ref _path, value);
     }
-    private string _fullPath = string.Empty;
+    private string _path = string.Empty;
 
-    [XmlIgnore]
-    public string FileName => System.IO.Path.GetFileName(FullPath);
+    [JsonIgnore]
+    public string FileName => System.IO.Path.GetFileName(Path);
 
     [Reactive]
-    [XmlElement("Volume")]
+    [JsonPropertyName("Volume")]
     public double FullVolume { get; set; } = 100;
 
     private double MasterVolume { get; set; } = -1;
@@ -35,12 +35,12 @@ public class PlayingItem : ReactiveObject
 
     public PlayingItem(string path, double masterVolume = 1.0)
     {
-        _fullPath = path;
+        _path = path;
         // this.MasterVolume = masterVolume;
         AdjustVolume(masterVolume);
     }
 
-    [XmlIgnore]
+    [JsonIgnore]
     public double Volume
     {
         get => _volume;
@@ -79,7 +79,7 @@ public class PlayingItem : ReactiveObject
     private int _speed;
 
     [Reactive]
-    [XmlIgnore]
+    [JsonIgnore]
     public double Rate { get; private set; }
 
     public PlayingItem Clone(double newMasterVolume)
@@ -88,7 +88,7 @@ public class PlayingItem : ReactiveObject
         //return (PlayingItem)this.MemberwiseClone();
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        var result = new PlayingItem(FullPath, MasterVolume);
+        var result = new PlayingItem(Path, MasterVolume);
         result._adjustingVolume = true;
 
         result.FullVolume = FullVolume;

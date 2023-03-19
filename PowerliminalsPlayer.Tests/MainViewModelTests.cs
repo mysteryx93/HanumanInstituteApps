@@ -455,7 +455,7 @@ public class MainViewModelTests
         Model.Play.Execute().Subscribe();
         
         Assert.Single(Model.Playlist.Files);
-        Assert.Equal(Model.Files.Source[selectedIndex].FullPath, Model.Playlist.Files.First().FullPath);
+        Assert.Equal(Model.Files.Source[selectedIndex].FullPath, Model.Playlist.Files.First().Path);
     }
     
     [Theory]
@@ -724,7 +724,7 @@ public class MainViewModelTests
         Model.SavePreset.ExecuteIfCan();
 
         Assert.Single(Model.Settings.Presets);
-        Assert.Equal(newFile, Model.Settings.Presets.Single().Files.Single().FullPath);
+        Assert.Equal(newFile, Model.Settings.Presets.Single().Files.Single().Path);
     }
     
     [Fact]

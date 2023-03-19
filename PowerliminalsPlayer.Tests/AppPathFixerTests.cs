@@ -79,7 +79,7 @@ public class AppPathFixerTests
     protected List<FixFolderItem> GetAllFolders()
     {
         var folders = new List<FixFolderItem> { new FixFolder<string>(Settings.Folders) };
-        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.FullPath, (f, v) => f.FullPath = v!)));
+        folders.AddRange(Settings.Presets.Select(x => new FixFolder<PlayingItem>(x.Files, true, f => f.Path, (f, v) => f.Path = v!)));
         return folders;
     }
 
@@ -272,7 +272,7 @@ public class AppPathFixerTests
 
         await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
-        Assert.Equal(expected.ReplaceDirectorySeparator(), Settings.Presets[0].Files[0].FullPath);
+        Assert.Equal(expected.ReplaceDirectorySeparator(), Settings.Presets[0].Files[0].Path);
     }
     
     [Theory]
@@ -293,7 +293,7 @@ public class AppPathFixerTests
 
         await Model.ScanAndFixFoldersAsync(Owner, GetAllFolders());
 
-        Assert.Equal(newFile, Settings.Presets[0].Files[0].FullPath);
+        Assert.Equal(newFile, Settings.Presets[0].Files[0].Path);
     }
     
     [Fact]

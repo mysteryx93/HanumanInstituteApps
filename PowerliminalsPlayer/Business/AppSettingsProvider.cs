@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization.Metadata;
-using System.Xml.Serialization;
 using Avalonia.Controls;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
@@ -7,7 +6,6 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business;
 /// <summary>
 /// Manages the PowerliminalsPlayer application settings.
 /// </summary>
-[XmlRoot("PowerliminalsPlayer")]
 public sealed class AppSettingsProvider : SettingsProviderBase<AppSettingsData>
 {
     private readonly IAppPathService _appPath;
