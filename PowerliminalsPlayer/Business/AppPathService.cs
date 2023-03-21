@@ -34,11 +34,6 @@ public class AppPathService : IAppPathService
         Combine(_environment.ApplicationDataPath, @"Hanuman Institute\PowerliminalsPlayerConfig.json");
     private string? _configFile;
     
-    /// <inheritdoc />
-    public string OldConfigFile => _oldConfigFile ??= 
-        Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\PowerliminalsConfig.xml");
-    private string? _oldConfigFile;
-
     /// <summary>
     /// Combines two paths while replacing folder separator chars with platform-specific char.
     /// </summary>

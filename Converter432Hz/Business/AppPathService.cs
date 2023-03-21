@@ -32,11 +32,6 @@ public class AppPathService : IAppPathService
         Combine(_environment.ApplicationDataPath, @"Hanuman Institute\432HzConverterConfig.json");
     private string? _configFile;
     
-    /// <inheritdoc />
-    public string OldConfigFile => _oldConfigFile ??= 
-        _fileSystem.Path.Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\432hzConverterConfig.xml");
-    private string? _oldConfigFile; // Created file with '\' char instead of creating in folder for Linux.
-    
     /// <summary>
     /// Combines two paths while replacing folder separator chars with platform-specific char.
     /// </summary>
