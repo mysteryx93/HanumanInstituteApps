@@ -24,12 +24,12 @@ public class SettingsDataBase : ReactiveObject
     /// </summary>
     [Reactive]
     public PixelPoint Position { get; set; }
-    
+
     /// <summary>
     /// Gets or sets whether to display the About window on startup.
     /// </summary>
     [Reactive]
-    public bool ShowInfoOnStartup { get; set; }
+    public bool ShowInfoOnStartup { get; set; } = true;
     
     /// <summary>
     /// Gets or sets the visual theme: Light or Dark.

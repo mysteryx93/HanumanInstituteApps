@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
+using Avalonia.Threading;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 using ICloseable = HanumanInstitute.MvvmDialogs.ICloseable;

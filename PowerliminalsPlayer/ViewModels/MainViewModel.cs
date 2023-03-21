@@ -269,7 +269,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             if (preset == null)
             {
                 preset = new PresetItem();
-                Dispatcher.UIThread.Post(() => Settings.Presets.Add(preset));
+                Settings.Presets.Add(preset);
             }
 
             Playlist.SaveAs(preset);

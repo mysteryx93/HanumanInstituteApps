@@ -43,7 +43,7 @@ echo Output = Publish\%output%
 @echo on
 rd /s /q %publishPath%
 
-dotnet publish %folder% -r %runtime% -c Release --self-contained=true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true -p:PublishReadyToRun=true -o %publishPath%
+dotnet publish %folder% -r %runtime% -c Release --self-contained=true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true -o %publishPath%
 
 if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
 
