@@ -64,7 +64,14 @@ public abstract class CommonApplication<TMain> : Application
             desktop?.MainWindow?.DataContext as INotifyPropertyChanged);
         RxApp.DefaultExceptionHandler = GlobalErrorHandler.Instance;
 
-        await tBackground.ConfigureAwait(true);
+        try
+        {
+            await tBackground.ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            GlobalErrorHandler.ShowErrorLog(tBackground.Exception?.InnerException!);
+        }
         base.OnFrameworkInitializationCompleted();
     }
 

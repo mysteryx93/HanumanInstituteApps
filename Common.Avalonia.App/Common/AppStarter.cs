@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 
@@ -25,6 +23,7 @@ public static class AppStarter
         PlatformRegistrationManager.SetRegistrationNamespaces(RegistrationNamespace.Avalonia);
         try
         {
+            GlobalErrorHandler.LogPath = logPath?.Invoke();
             // Initialize ViewModelLocator and load settings in parallel.
             AppSettingsLoader = Task.Run(getSettings);
             
@@ -33,24 +32,7 @@ public static class AppStarter
         }
         catch (Exception ex)
         {
-            if (logPath != null)
-            {
-                // Dump error to log file and open default text editor.
-                var log = logPath();
-                if (log.HasValue())
-                {
-                    System.IO.File.WriteAllText(log, ex.ToString());
-                    new Process
-                    {
-                        StartInfo = new ProcessStartInfo(log)
-                        {
-                            UseShellExecute = true
-                        }
-                    }.Start();
-                    // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                }
-            }
+            GlobalErrorHandler.ShowErrorLog(ex);
         }
     }
 

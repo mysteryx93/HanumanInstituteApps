@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -53,6 +55,26 @@ public class GlobalErrorHandler : IObserver<Exception>
         {
             await _dialogService.ShowMessageBoxAsync(OwnerVm!, error.ToString(), "Application Error", MessageBoxButton.Ok,
                 MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// Sets the log path before using <see cref="ShowErrorLog"/>.
+    /// </summary>
+    public static string? LogPath { get; set; }
+
+    /// <summary>
+    /// Dump error to log file and open default text editor.
+    /// </summary>
+    /// <param name="ex">The exception to output in a log file.</param>
+    public static void ShowErrorLog(Exception ex)
+    {
+        if (LogPath.HasValue())
+        {
+            System.IO.File.WriteAllText(LogPath, ex.ToString());
+            new Process { StartInfo = new ProcessStartInfo(LogPath) { UseShellExecute = true } }.Start();
+            // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
+            Thread.Sleep(TimeSpan.FromSeconds(1));
         }
     }
 }
