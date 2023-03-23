@@ -5,27 +5,31 @@ using DynamicData;
 using DynamicData.Binding;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
+using HanumanInstitute.FFmpeg;
+using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 using YoutubeExplode.Videos.Streams;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class MainViewModel : MainViewModelBase<AppSettingsData>
+public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
 {
     private readonly IDownloadManager _downloadManager;
     private readonly IYouTubeStreamSelector _streamSelector;
     private readonly IDialogService _dialogService;
     private readonly IFileSystemService _fileSystem;
+    private readonly IMediaInfoReader? _ffmpegInfo;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
-        IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem) :
+        IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo) :
         base(settings, appUpdateService)
     {
         _downloadManager = downloadManager;
         _streamSelector = streamSelector;
         _dialogService = dialogService;
         _fileSystem = fileSystem;
+        _ffmpegInfo = ffmpegInfo;
 
         PreferredVideo = new ListItemCollectionView<StreamContainerOption>()
         {
@@ -59,6 +63,15 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
             .ToCollection()
             .Select(x => x.Any())
             .ToProperty(this, x => x.HasDownloads);
+    }
+    
+    /// <inheritdoc />
+    public event EventHandler? RequestClose;
+
+    public override async void OnLoaded()
+    {
+        base.OnLoaded();
+        await CheckFFmpegAsync().ConfigureAwait(false);
     }
 
     protected override void ConvertFromSettings()
@@ -375,4 +388,24 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
 
     /// <inheritdoc />
     protected override Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
+    
+    private async Task CheckFFmpegAsync()
+    {
+        if (_ffmpegInfo == null) { return; }
+        
+        var found = false;
+        try
+        {
+            var version = _ffmpegInfo.GetVersion();
+            found = version.HasValue();
+        }
+        catch { }
+        
+        if (!found)
+        {
+            var msg = "FFmpeg not found! Please install FFmpeg on your system.";
+            await _dialogService.ShowMessageBoxAsync(this, msg, "Error", MessageBoxButton.Ok).ConfigureAwait(true);
+            RequestClose?.Invoke(this, EventArgs.Empty);
+        }
+    }
 }

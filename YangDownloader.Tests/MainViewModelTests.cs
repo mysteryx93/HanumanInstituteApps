@@ -19,7 +19,7 @@ public class MainViewModelTests : TestsBase
     public MainViewModel Model => _model ??= Init(() =>
     {
         SetTitle();
-        return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem)
+        return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null)
         {
             DownloadUrl = "https://www.youtube.com/watch?v=4OqXWzekVw4"
         };
@@ -102,7 +102,7 @@ public class MainViewModelTests : TestsBase
     [Fact]
     public void Constructor_Valid_HasInitialState()
     {
-        _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem);
+        _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null);
 
         Assert.NotEmpty(Model.PreferredVideo);
         Assert.Equal(0, Model.PreferredVideo.CurrentPosition);

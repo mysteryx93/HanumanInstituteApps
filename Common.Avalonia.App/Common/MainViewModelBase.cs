@@ -8,7 +8,7 @@ namespace HanumanInstitute.Common.Avalonia.App;
 /// Base implementation of the main ViewModel with shared features.
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
-public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>, ICloseable, IViewLoaded, IViewClosed
+public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>, IViewLoaded, IViewClosed
     where TSettings : SettingsDataBase, new()
 {
     private IAppUpdateService _appUpdateService;
@@ -22,9 +22,6 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
         _appUpdateService = appUpdateService;
     }
     
-    /// <inheritdoc />
-    public event EventHandler? RequestClose;
-
     /// <summary>
     /// On startup, show About window and/or check for updates. 
     /// </summary>

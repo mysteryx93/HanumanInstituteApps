@@ -1,5 +1,6 @@
 ﻿using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Downloads;
+using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 
@@ -10,12 +11,16 @@ public class MainViewModelDesign : MainViewModel
     public MainViewModelDesign() : base(Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!,
         Locator.Current.GetService<IAppUpdateService>()!,
         Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(null),
-        new DialogService(), Locator.Current.GetService<IFileSystemService>()!)
+        new DialogService(), Locator.Current.GetService<IFileSystemService>()!, null)
     {
         DisplayDownloadInfo = true;
         VideoTitle = "This is a very long title! This is a very long title! This is a very long title! ";
         VideoStreamInfo = "vp9";
         AudioStreamInfo = "opus";
         ErrorMessage = "Error";
+    }
+
+    public override void OnLoaded()
+    {
     }
 }

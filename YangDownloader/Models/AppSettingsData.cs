@@ -16,12 +16,6 @@ public class AppSettingsData : SettingsDataBase
     public string DestinationFolder { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the path of FFmpeg.
-    /// </summary>
-    [Reactive]
-    public string FFmpegPath { get; set; } = "ffmpeg";
-    
-    /// <summary>
     /// Gets or sets the preferred video stream format.
     /// </summary>
     [Reactive]

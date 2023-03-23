@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
-public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewClosed
+public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
 {
     private readonly IDialogService _dialogService;
     private readonly IEncoderService _ffmpeg;
@@ -19,26 +19,14 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewCl
         _dialogService = dialogService;
         _ffmpeg = ffmpeg;
         _fileSystem = fileSystem;
-
-        TestFFmpegImpl();
     }
 
     protected override bool Validate() => 
-        TestDestinationPathImpl() & TestFFmpegImpl();
+        TestDestinationPathImpl();
 
     protected override void RestoreDefaultImpl()
     {
         CheckForUpdateList.SelectedValue = UpdateInterval.Biweekly;
-        Settings.FFmpegPath = "ffmpeg";
-        TestFFmpegImpl();
-    }
-
-    /// <summary>
-    /// When the window is closed, sets FFmpeg path in IEncoderService whether settings are saved or not.
-    /// </summary>
-    public void OnClosed()
-    {
-        _ffmpeg.Processes.Paths.FFmpeg = _settingsProvider.Value.FFmpegPath;
     }
 
     /// <summary>
@@ -60,32 +48,6 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewCl
             TestDestinationPathImpl();
         }
     }
-
-    /// <summary>
-    /// Shows the open file dialog to locate FFmpeg executable. 
-    /// </summary>
-    public RxCommandUnit BrowseFFmpeg => _browseFFmpeg ??= ReactiveCommand.CreateFromTask(BrowseFFmpegImpl);
-    private RxCommandUnit? _browseFFmpeg;
-    private async Task BrowseFFmpegImpl()
-    {
-        var options = new OpenFileDialogSettings()
-        {
-            Title = "Locate FFmpeg Executable",
-            InitialFile = Settings.FFmpegPath
-        };
-        var result = await _dialogService.ShowOpenFileDialogAsync(this, options).ConfigureAwait(false);
-        if (result != null)
-        {
-            Settings.FFmpegPath = result.LocalPath;
-            TestFFmpegImpl();
-        }
-    }
-
-    [Reactive]
-    public bool IsFFmpegPathValid { get; set; }
-    
-    [Reactive]
-    public string FFmpegVersion { get; set; } = string.Empty;
 
     [Reactive]
     public string DestinationPathError { get; set; } = string.Empty;
@@ -111,45 +73,5 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>, IViewCl
             DestinationPathError = string.Empty;
         }
         return string.IsNullOrEmpty(DestinationPathError);
-    }
-    
-    /// <summary>
-    /// Tries to get FFmpeg version. FFmpegVersion and IsFFmpegPathValid will be set accordingly.
-    /// </summary>
-    /// <returns>Whether FFmpegPath is valid.</returns>
-    public ReactiveCommand<Unit, bool> TestFFmpeg => _testFFmpeg ??= ReactiveCommand.Create(TestFFmpegImpl);
-    private ReactiveCommand<Unit, bool>? _testFFmpeg;
-    private bool TestFFmpegImpl()
-    {
-        var version = GetFFmpegVersion();
-        IsFFmpegPathValid = version.HasValue();
-        FFmpegVersion = version.HasValue() ?
-            "Found FFmpeg " + version :
-            "FFmpeg not found";
-        return IsFFmpegPathValid;
-    }
-    
-    private string GetFFmpegVersion()
-    {
-        try
-        {
-            _ffmpeg.Processes.Paths.FFmpeg = Settings.FFmpegPath;
-            var options = new ProcessOptionsEncoder(ProcessDisplayMode.None) { Timeout = TimeSpan.FromSeconds(1) };
-            var version = _ffmpeg.GetMediaInfoReader(this).GetVersion(options);
-            var prefix = "ffmpeg version ";
-            if (version.StartsWith(prefix))
-            {
-                var endPos = version.IndexOf(' ', prefix.Length + 1);
-                if (endPos > -1)
-                {
-                    return version.Substring(prefix.Length, endPos - prefix.Length);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // ignored
-        }
-        return string.Empty;
     }
 }
