@@ -32,11 +32,11 @@
     <DebuggerSupport>false</DebuggerSupport>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Remove="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\App.icns" />
-    <AvaloniaResource Remove="Assets\App.png" />
+    <AvaloniaResource Include="Assets\App.ico" />
+    <AvaloniaResource Include="Assets\App.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />

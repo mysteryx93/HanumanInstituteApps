@@ -34,11 +34,11 @@
     <DebugType>None</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Remove="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\App.icns" />
-    <AvaloniaResource Remove="Assets\App.png" />
+    <AvaloniaResource Include="Assets\App.ico" />
+    <AvaloniaResource Include="Assets\App.svg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LazyCache" Version="2.4.0" />

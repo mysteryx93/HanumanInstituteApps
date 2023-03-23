@@ -36,11 +36,11 @@
     <DebugType>None</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Remove="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\App.icns" />
-    <AvaloniaResource Remove="Assets\App.png" />
+    <AvaloniaResource Include="Assets\App.ico" />
+    <AvaloniaResource Include="Assets\App.svg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
@@ -52,6 +52,7 @@
     <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
     <ProjectReference Include="..\DLL\BassEnc\BassEncDlls.csproj" />
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\DLL\FFmpeg\FFmpegExe.csproj" />
     <ProjectReference Include="..\Downloads\Downloads.csproj" />
   </ItemGroup>
   <ItemGroup>
