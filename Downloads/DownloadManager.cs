@@ -93,11 +93,16 @@ public sealed class DownloadManager : IDownloadManager, IDisposable
         await _pool.WaitAsync().ConfigureAwait(false);
 
         // Download the file(s).
-        await task.DownloadAsync().ConfigureAwait(false);
-
-        // Release the pool and allow next download to start.
-        _pool.TryRelease();
-        _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
+        try
+        {
+            await task.DownloadAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            // Release the pool and allow next download to start.
+            _pool.TryRelease();
+            _pool.ChangeCapacity(_options.Value.ConcurrentDownloads);
+        }
 
         return task.Status;
     }

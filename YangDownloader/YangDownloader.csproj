@@ -20,7 +20,7 @@
     <AssemblyName>YangDownloader</AssemblyName>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>true</PublishReadyToRun>
+<!--    <PublishReadyToRun>true</PublishReadyToRun>-->
 
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
@@ -43,7 +43,6 @@
     <AvaloniaResource Include="Assets\App.svg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using ManagedBass;
 
 namespace HanumanInstitute.BassAudio;
@@ -14,7 +14,7 @@ internal static class BassExtensions
     /// <param name="handle">The BASS handle to validate.</param>
     /// <returns>The same value.</returns>
     /// <exception cref="InvalidOperationException">BASS handle is null</exception>
-    public static int Valid(this int handle)
+    internal static int Valid(this int handle)
     {
         if (handle == 0)
         {
@@ -29,7 +29,7 @@ internal static class BassExtensions
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <exception cref="InvalidOperationException">Value is false.</exception>
-    public static void Valid(this bool value)
+    internal static void Valid(this bool value)
     {
         if (!value)
         {
@@ -45,7 +45,7 @@ internal static class BassExtensions
     /// <param name="param">The parameter name.</param>
     /// <param name="value">The value to append if not empty.</param>
     /// <returns>The command with appended parameter value.</returns>
-    public static string AddTag(this string command, string param, string? value) =>
+    internal static string AddTag(this string command, string param, string? value) =>
          string.IsNullOrEmpty(value) ? command : 
             "{0} {1}{2}{3}".FormatInvariant(command, param, param.EndsWith('=') ? "" : " ", EncodeParameterArgument(value));
     

@@ -72,6 +72,7 @@ public static class ViewModelLocator
     public static AskFileActionViewModel AskFileAction => Locator.Current.GetService<AskFileActionViewModel>()!;
     public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
     public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
+    public static IAppPathService AppPathService => Locator.Current.GetService<IAppPathService>()!;
 
     public static void Cleanup()
     {

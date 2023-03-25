@@ -17,5 +17,9 @@ public class App : CommonApplication<MainView>
         settings.IsLicenseValid = true;
     }
 
-    protected override void BackgroundInit() => BassDevice.Instance.Init();
+    protected override void BackgroundInit()
+    {
+        BassDevice.Instance.Init();
+        BassDevice.Instance.VerifyPlugins();
+    }
 }

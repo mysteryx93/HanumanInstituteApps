@@ -12,5 +12,9 @@ public class App : CommonApplication<MainView>
 
     protected override INotifyPropertyChanged InitViewModel() => ViewModelLocator.Main;
 
-    protected override void BackgroundInit() => BassDevice.Instance.Init();
+    protected override void BackgroundInit()
+    {
+        BassDevice.Instance.Init();
+        BassDevice.Instance.VerifyPlugins();
+    }
 }

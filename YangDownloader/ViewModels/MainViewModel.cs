@@ -64,7 +64,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
             .Select(x => x.Any())
             .ToProperty(this, x => x.HasDownloads);
     }
-    
+
     /// <inheritdoc />
     public event EventHandler? RequestClose;
 
@@ -329,7 +329,13 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
             }
             destination += suffix;
 
-            var _ = _downloadManager.DownloadAsync(query, destination).ConfigureAwait(false);
+            var _ = _downloadManager.DownloadAsync(query, destination).ContinueWith(async x =>
+            {
+                if (x.Exception != null)
+                {
+                    await _dialogService.ShowMessageBoxAsync(this, x.Exception.InnerException!.ToString(), "Download error");
+                }
+            });
         }
     }
 
@@ -379,7 +385,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
         EncodeAudio = Settings.EncodeAudio ? Settings.EncodeSettings : null
     };
 
-    private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) => Dispatcher.UIThread.Post(() => 
+    private void DownloadManager_DownloadAdded(object sender, DownloadTaskEventArgs e) => Dispatcher.UIThread.Post(() =>
         Downloads.Add(new DownloadItem(e.Download, VideoTitle))
     );
 
@@ -388,11 +394,11 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
 
     /// <inheritdoc />
     protected override Task ShowSettingsImplAsync() => _dialogService.ShowSettingsAsync(this, _settings.Value);
-    
+
     private async Task CheckFFmpegAsync()
     {
         if (_ffmpegInfo == null) { return; }
-        
+
         var found = false;
         try
         {
@@ -400,7 +406,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
             found = version.HasValue();
         }
         catch { }
-        
+
         if (!found)
         {
             var msg = "FFmpeg not found! Please install FFmpeg on your system.";

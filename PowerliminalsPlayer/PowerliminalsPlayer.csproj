@@ -18,7 +18,7 @@
     <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>true</PublishReadyToRun>
+<!--    <PublishReadyToRun>true</PublishReadyToRun>-->
 
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
@@ -49,7 +49,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />

@@ -83,6 +83,7 @@ public static class ViewModelLocator
     public static AboutViewModel About => Locator.Current.GetService<AboutViewModel>()!;
     public static SettingsViewModel Settings => Locator.Current.GetService<SettingsViewModel>()!;
     public static ISettingsProvider<AppSettingsData> SettingsProvider => Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!;
+    public static IAppPathService AppPathService => Locator.Current.GetService<IAppPathService>()!;
 
     public static void Cleanup()
     {

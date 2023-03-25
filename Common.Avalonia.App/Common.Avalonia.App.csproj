@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
-    <ProjectReference Include="..\..\HanumanInstitute.Validators\Validators\HanumanInstitute.Validators.csproj" />
     <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview6" />
@@ -50,5 +49,12 @@
   <ItemGroup>
     <None Remove="Styles\HanumanInstituteAppIcons.otf" />
     <AvaloniaResource Include="Styles\HanumanInstituteAppIcons.otf" />
+    <AvaloniaXaml Remove="Common\AboutView.axaml" />
+    <None Include="Common\AboutView.axaml" />
+    <Compile Remove="Common\AboutView.axaml.cs" />
+    <None Include="Common\AboutView.axaml.cs">
+      <DependentUpon>AboutView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </None>
   </ItemGroup>
 </Project>
