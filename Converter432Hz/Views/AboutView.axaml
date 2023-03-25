@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HanumanInstitute.Converter432Hz"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.Converter432Hz.ViewModels"
-        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="370" Height="370" MaxHeight="370" 
+        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="360" Height="360" MaxHeight="360" 
         x:Class="HanumanInstitute.Converter432Hz.Views.AboutView"
         Title="Information" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
@@ -23,12 +23,12 @@
                     <TextBlock FontSize="24" Text="{Binding AppVersion, Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" />
                 </StackPanel>
                 <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppInfo.AppDescription}" HorizontalAlignment="Center" />
-                <ui:HyperlinkButton Margin="0,5,0,0" HorizontalAlignment="Center" 
-                    NavigateUri="https://github.com/mysteryx93/NaturalGroundingPlayer/releases" Content="{Binding CheckForUpdateText}" />
-                <TextBlock Margin="0,15,0,0" Text="Author: Etienne Charland" HorizontalAlignment="Center" />
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,2,0,20">
-                    <TextBlock Text="Website: " HorizontalAlignment="Center" />
-                    <ui:HyperlinkButton NavigateUri="http://www.spiritualselftransformation.com" Content="http://www.spiritualselftransformation.com" Padding="0" />
+                <ui:HyperlinkButton HorizontalAlignment="Center" Margin="0,5,0,0" 
+                                    NavigateUri="https://github.com/mysteryx93/NaturalGroundingPlayer/releases" Content="{Binding CheckForUpdateText}" />
+                <ui:HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" HorizontalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Margin="0,10,0,10" Text="Author: " HorizontalAlignment="Center" />
+                    <ui:HyperlinkButton Content="Etienne Charland" NavigateUri="https://www.spiritualselftransformation.com/" />
                 </StackPanel>
 
                 <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding !Settings.IsLicenseValid}" 
@@ -41,7 +41,9 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
-                <ui:HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" />
+                <Grid>
+                    <ui:HyperlinkButton Content="This project is sponsored by Isagenix" NavigateUri="https://www.spiritualselftransformation.com/isagenix" />
+                </Grid>
                 <Grid>
                     <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
                     <Button HorizontalAlignment="Right" Width="100" Classes="round"
