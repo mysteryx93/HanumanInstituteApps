@@ -45,7 +45,7 @@ rd /s /q %publishPath%
 
 dotnet publish %folder% -r %runtime% -c Release --self-contained=true -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=true -o %publishPath%
 
-if %ERRORLEVEL% > 0 exit /b %ERRORLEVEL%
+if ERRORLEVEL 1 exit /b !ERRORLEVEL!
 
 del /s %publishPath%\*.xml
 del /q %output%
