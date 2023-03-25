@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using ReactiveUI;
 
 namespace HanumanInstitute.BassAudio;
@@ -21,10 +21,16 @@ public class EncodeSettings : ReactiveObject
     public int Bitrate { get; set; }
     
     /// <summary>
+    /// Gets or sets whether to encode as fixed bitrate.
+    /// </summary>
+    [Reactive]
+    public bool FixedBitrate { get; set; }
+
+    /// <summary>
     /// Gets or sets the encoding bits per sample for WAV or FLAC formats. Valid values are 0 (auto), 8, 16, 24 or 32.
     /// </summary>
     [Reactive]
-    public int BitsPerSample { get; set; }
+    public int BitsPerSample { get; set; } = 16;
     
     /// <summary>
     /// Gets or sets the encoding sample rate.

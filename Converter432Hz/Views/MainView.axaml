@@ -18,6 +18,7 @@
         d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Window.Resources>
         <hic:PercentageConverter x:Key="PercentageConverter" />
+        <hic:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
     </Window.Resources>
     <Grid>
         <Grid Margin="10">
@@ -101,7 +102,12 @@
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitrateVisible}">
-                        <TextBlock VerticalAlignment="Center" Text="Bitrate" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="Bitrate" />
+                            <Button Classes="round" Width="40" Margin="10,0,0,0"
+                                    Content="{Binding Settings.Encode.FixedBitrate, Converter={StaticResource BitrateConverter}}"
+                                    Command="{Binding ToggleFixedBitrate}" IsVisible="{Binding IsToggleBitrateVisible}" />
+                        </StackPanel>
                         <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
                                   Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>

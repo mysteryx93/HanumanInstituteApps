@@ -218,6 +218,27 @@ public class AudioEncoderTests : TestsBase
         var fileLength = FileSystem.FileInfo.New(file.Destination).Length;
         Output.WriteLine(fileLength.ToString());
     }
+    
+    [Theory]
+    [InlineData(0)]
+    [InlineData(32)]
+    [InlineData(128)]
+    [InlineData(256)]
+    [InlineData(320)]
+    public async Task Start_FixedBitrate_CreateFileOfSize(int bitrate)
+    {
+        var file = CreateSourceShort(EncodeFormat.Mp3);
+        FileSystem.DeleteFileSilent(file.Destination);
+        Settings.Format = EncodeFormat.Mp3;
+        Settings.FixedBitrate = true;
+        Settings.Bitrate = bitrate;
+
+        await Model.StartAsync(file, Settings);
+
+        Assert.True(FileSystem.File.Exists(file.Destination));
+        var fileLength = FileSystem.FileInfo.New(file.Destination).Length;
+        Output.WriteLine(fileLength.ToString());
+    }
 
     [Theory]
     [MemberData(nameof(GetAllSampleRates))]

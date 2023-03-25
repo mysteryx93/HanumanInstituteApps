@@ -3,6 +3,7 @@ using ManagedBass;
 using ManagedBass.Enc;
 using ManagedBass.Fx;
 using ManagedBass.Mix;
+
 // ReSharper disable StringLiteralTypo
 
 namespace HanumanInstitute.BassAudio;
@@ -46,10 +47,10 @@ public class AudioEncoder : IAudioEncoder
         {
             file.Pitch ??= _pitchDetector.GetPitch(file.Path);
         }
-        var pitch = settings.AutoDetectPitch ? 
-            settings.PitchTo / file.Pitch!.Value : 
+        var pitch = settings.AutoDetectPitch ?
+            settings.PitchTo / file.Pitch!.Value :
             settings.Pitch;
-        
+
         // Create channel.
         Bass.Configure(Configuration.SRCQuality, 4);
         Bass.Configure(Configuration.FloatDSP, true);
@@ -59,12 +60,12 @@ public class AudioEncoder : IAudioEncoder
         try
         {
             var tags = new TagsReader(chan);
-            
+
             var chanInfo = Bass.ChannelGetInfo(chan);
             var bitrate = (int)Bass.ChannelGetAttribute(chan, ChannelAttribute.Bitrate);
             bitrate = BitrateRoundUp(bitrate);
             var length = Bass.ChannelGetLength(chan);
-                        
+
             // Add mix effect.
             var sampleRate = settings.SampleRate > 0 ? settings.SampleRate : chanInfo.Frequency;
             sampleRate = EnsureSampleRateValid(settings.Format, sampleRate);
@@ -83,7 +84,7 @@ public class AudioEncoder : IAudioEncoder
             // Bass.ChannelSetAttribute(chan, ChannelAttribute.Tempo, (1.0 / pitch * settings.Speed - 1.0) * 100.0);
             // Bass.ChannelSetAttribute(chan, ChannelAttribute.TempoFrequency,
             //     chanInfo.Frequency * pitch * settings.Rate);
-            
+
             // Optimized pitch shifting for increased quality
             // 1. Rate shift to Output * Pitch (rounded)
             // 2. Resample to Output (48000Hz)
@@ -183,11 +184,13 @@ public class AudioEncoder : IAudioEncoder
 
         return settings.Format switch
         {
-            EncodeFormat.Mp3 => $"--abr {bitrate} -q {settings.Mp3QualitySpeed} --add-id3v2"
-                .AddTag("--tt", tags.Title).AddTag("--ta", tags.Artist).AddTag("--tl", tags.Album).AddTag("--ty", tags.Year)
+            EncodeFormat.Mp3 => (settings.FixedBitrate ? "-b" : "--abr") + $" {bitrate} -q {settings.Mp3QualitySpeed} --add-id3v2"
+                .AddTag("--tt", tags.Title).AddTag("--ta", tags.Artist).AddTag("--tl", tags.Album)
+                .AddTag("--ty", tags.Year)
                 .AddTag("--tc", tags.Comment).AddTag("--tn", tags.Track).AddTag("--tg", tags.Genre),
             EncodeFormat.Flac => $"--compression-level-{settings.FlacCompression}"
-                .AddTag("-T title=", tags.Title).AddTag("-T artist=", tags.Artist).AddTag("-T album=", tags.Album).AddTag("--date", tags.Year)
+                .AddTag("-T title=", tags.Title).AddTag("-T artist=", tags.Artist).AddTag("-T album=", tags.Album)
+                .AddTag("--date", tags.Year)
                 .AddTag("-T comment=", tags.Comment).AddTag("-T tracknum=", tags.Track).AddTag("-T genre=", tags.Genre),
             EncodeFormat.Ogg => $"--bitrate {bitrate}"
                 .AddTag("--title", tags.Title).AddTag("--artist", tags.Artist).AddTag("--album", tags.Album).AddTag("--date", tags.Year)

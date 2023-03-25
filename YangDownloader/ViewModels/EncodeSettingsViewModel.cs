@@ -27,6 +27,8 @@ public class EncodeSettingsViewModel : OkCancelViewModel
 
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
+        _isToggleBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3)
+            .ToProperty(this, x => x.IsToggleBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitsPerSampleVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
@@ -86,6 +88,12 @@ public class EncodeSettingsViewModel : OkCancelViewModel
     private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
     
     /// <summary>
+    /// Gets or sets whether Toggle Bitrate button should be visible. 
+    /// </summary>
+    public bool IsToggleBitrateVisible => _isToggleBitrateVisible.Value;
+    private readonly ObservableAsPropertyHelper<bool> _isToggleBitrateVisible;
+
+    /// <summary>
     /// Gets whether Bits Per Sample control should be visible.
     /// </summary>
     public bool IsBitsPerSampleVisible => _isBitsPerSampleVisible.Value;
@@ -140,6 +148,16 @@ public class EncodeSettingsViewModel : OkCancelViewModel
         { 24, "24-bits" },
         { 32, "32-bits" }
     };
+    
+    /// <summary>
+    /// Enables or disables the Fixed Bitrate option.
+    /// </summary>
+    public RxCommandUnit ToggleFixedBitrate => _toggleFixedBitrate ??= ReactiveCommand.Create(ToggleFixedBitrateImpl);
+    private RxCommandUnit? _toggleFixedBitrate;
+    private void ToggleFixedBitrateImpl()
+    {
+        Settings.FixedBitrate = !Settings.FixedBitrate;
+    }
     
     /// <summary>
     /// Restores default settings.

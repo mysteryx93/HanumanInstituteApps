@@ -3,7 +3,7 @@
 namespace HanumanInstitute.Common.Avalonia;
 
 /// <summary>
-/// Converts boolean values to string while allowing to configure true and false values.
+/// Converts boolean values to brush while allowing to configure true and false values.
 /// </summary>
 public sealed class BooleanToBrushConverter : BooleanConverter<Brush>
 {

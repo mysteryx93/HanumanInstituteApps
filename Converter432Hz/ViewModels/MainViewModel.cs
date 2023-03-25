@@ -45,6 +45,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         
         _isBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x != EncodeFormat.Flac && x != EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitrateVisible);
+        _isToggleBitrateVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3)
+            .ToProperty(this, x => x.IsToggleBitrateVisible);
         _isBitsPerSampleVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Flac || x == EncodeFormat.Wav)
             .ToProperty(this, x => x.IsBitsPerSampleVisible);
         _isQualitySpeedVisible = this.WhenAnyValue(x => x.FormatsList.SelectedValue, x => x == EncodeFormat.Mp3 || x == EncodeFormat.Flac)
@@ -94,6 +96,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// </summary>
     public bool IsBitrateVisible => _isBitrateVisible.Value;
     private readonly ObservableAsPropertyHelper<bool> _isBitrateVisible;
+
+    /// <summary>
+    /// Gets or sets whether Toggle Bitrate button should be visible. 
+    /// </summary>
+    public bool IsToggleBitrateVisible => _isToggleBitrateVisible.Value;
+    private readonly ObservableAsPropertyHelper<bool> _isToggleBitrateVisible;
 
     /// <summary>
     /// Gets whether Bits Per Sample control should be visible.
@@ -256,6 +264,16 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         { FileExistsAction.Rename, "Rename" },
         { FileExistsAction.Cancel, "Cancel" }
     };
+    
+    /// <summary>
+    /// Enables or disables the Fixed Bitrate option.
+    /// </summary>
+    public RxCommandUnit ToggleFixedBitrate => _toggleFixedBitrate ??= ReactiveCommand.Create(ToggleFixedBitrateImpl);
+    private RxCommandUnit? _toggleFixedBitrate;
+    private void ToggleFixedBitrateImpl()
+    {
+        Settings.Encode.FixedBitrate = !Settings.Encode.FixedBitrate;
+    }
 
     /// <summary>
     /// Starts the batch encoding job.

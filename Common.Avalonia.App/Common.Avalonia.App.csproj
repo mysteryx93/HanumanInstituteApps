@@ -49,12 +49,5 @@
   <ItemGroup>
     <None Remove="Styles\HanumanInstituteAppIcons.otf" />
     <AvaloniaResource Include="Styles\HanumanInstituteAppIcons.otf" />
-    <AvaloniaXaml Remove="Common\AboutView.axaml" />
-    <None Include="Common\AboutView.axaml" />
-    <Compile Remove="Common\AboutView.axaml.cs" />
-    <None Include="Common\AboutView.axaml.cs">
-      <DependentUpon>AboutView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </None>
   </ItemGroup>
 </Project>
