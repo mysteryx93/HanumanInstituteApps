@@ -4,21 +4,21 @@ These apps were built for my personal needs, and made available for everyone.
 
 Supports Windows, Linux and MacOS.
 
-### 432hz Player: Plays music in 432hz
+### 432Hz Player: Plays music in 432Hz
 
-Most music is recorded in 440hz. Many people claim that 432hz resonates more with the heart whereas 440hz resonates more with the brain, and that 432hz music feels better. Try it yourself. Play a music in 440hz and in 432hz, and see which one you prefer. Most people choose the 432hz version, and it's hard to go back to 440hz.
+Most music is recorded in 440Hz. Many people claim that 432Hz resonates more with the heart whereas 440Hz resonates more with the brain, and that 432Hz music feels better. Try it yourself. Play a music in 440Hz and in 432Hz, and see which one you prefer. Most people choose the 432Hz version, and it's hard to go back to 440Hz.
 
 This application uses a very high-quality pitch-shifting algorithm with low CPU usage. It also auto-detects the music's exact pitch for precise tuning.
 
-[[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/432hz-Player) [[Download]](https://sourceforge.net/projects/player432hz/files/)
+[[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/432hz-Player) [[Download]](https://sourceforge.net/projects/player432Hz/files/)
 
-### 432hz Batch Converter: Converts and re-encodes music to 432hz
+### 432Hz Batch Converter: Converts and re-encodes music to 432Hz
 
-This application re-encodes your audio files while shifting the pitch to 432hz. It uses a very high-quality pitch-shifting algorithm.
+This application re-encodes your audio files while shifting the pitch to 432Hz. It uses a very high-quality pitch-shifting algorithm.
 
 It solves 2 problems with one stone:
 
-- 432hz Player allows playing music on the desktop, and this will allow playing them on other devices
+- 432Hz Player allows playing music on the desktop, and this will allow playing them on other devices
 - Certain devices like cars have limited support for file formats, and some music needs to be re-encoded into a standard format to work
 
 [[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/432hz-Batch-Converter) [[Download]](https://sourceforge.net/projects/converter432hz/files/)
@@ -37,7 +37,7 @@ Yet another YouTube downloader? Most downloaders do not give the best quality as
 
 This downloader allows you to get either the MP4 or VP9 videos, and the AAC or Opus audios, without re-encoding to preserve the best quality. While VP9 is 35% more efficient than MP4 for videos, some videos have 40-60% smaller file sizes in VP9 format! It will automatically select the best-quality video based on file sizes. It can even combine MP4 videos with Opus audios in a MKV file, although not all players will support it. I haven't seen any other downloader that can produce a MKV file with the best video and audio without re-encoding anything.
 
-Yang YouTube Downloader also allows to re-encode audios with all the same features as 432hz Batch Converter!
+Yang YouTube Downloader also allows to re-encode audios with all the same features as 432Hz Batch Converter!
 
 [[More Info]](https://github.com/mysteryx93/HanumanInstituteApps/wiki/Yang-YouTube-Downloader) [[Download]](https://sourceforge.net/projects/yangdownloader/files/)
 
