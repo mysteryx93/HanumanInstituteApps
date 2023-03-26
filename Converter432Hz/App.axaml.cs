@@ -19,7 +19,7 @@ public class App : CommonApplication<MainView>
 
     protected override void BackgroundInit()
     {
-        BassDevice.Instance.Init();
+        BassDevice.Instance.InitPlugins();
         BassDevice.Instance.VerifyPlugins();
     }
 }
