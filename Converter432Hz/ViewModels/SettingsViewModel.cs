@@ -18,9 +18,6 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
         _environment = environment;
     }
 
-    /// <inheritdoc />
-    protected override AppSettingsData CloneSettings(AppSettingsData value, IJsonTypeInfoResolver? serializerContext) => Cloning.DeepClone(value, serializerContext);
-
     protected override bool Validate() => Settings.Validate() == null;
 
     /// <inheritdoc />
