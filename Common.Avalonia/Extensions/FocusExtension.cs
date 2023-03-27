@@ -73,7 +73,8 @@ public class FocusExtensions : AvaloniaObject
     {
         if (e.Sender is InputElement element && e.NewValue.Value)
         {
-            element.AttachedToVisualTree += (_, _) => element.Focus();
+            // Crashes on MacOS with preview6 
+            // element.AttachedToVisualTree += (_, _) => element.Focus();
         }
     }
 
