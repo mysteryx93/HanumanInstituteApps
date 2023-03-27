@@ -35,7 +35,6 @@ public class AudioEncoder : IAudioEncoder
         settings.ValidateAndThrow();
 
         // Prepare.
-        BassDevice.Instance.Init();
         if (!_fileSystem.File.Exists(file.Path))
         {
             throw new FileNotFoundException("Source audio file was not found.", file.Path);

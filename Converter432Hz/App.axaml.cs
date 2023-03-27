@@ -14,7 +14,7 @@ public class App : CommonApplication<MainView>
 
     protected override void BackgroundInit()
     {
-        BassDevice.Instance.Init(0);
+        BassDevice.Instance.InitNoSound();
         BassDevice.Instance.VerifyPlugins();
     }
 }

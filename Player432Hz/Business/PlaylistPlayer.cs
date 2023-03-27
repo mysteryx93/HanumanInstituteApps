@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432Hz.Business;
@@ -96,6 +97,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
 
     private async Task CalcPitchAsync(string filePath)
     {
+        BassDevice.Instance.Init(-1, _settings.Value.OutputSampleRate);
         PitchFrom = _settings.Value.AutoDetectPitch ? await _pitchDetector.GetPitchAsync(filePath).ConfigureAwait(false) : _settings.Value.PitchFrom;
         SetTitle();
         Pitch = _settings.Value.PitchTo / PitchFrom;

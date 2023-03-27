@@ -88,7 +88,6 @@ public class PitchDetector : IPitchDetector
         }
 
         var toneFreq = ToneFreq;
-        BassDevice.Instance.Init();
         // Changing these configurations does not improve results. 
         // Bass.Configure(Configuration.SRCQuality, 4);
         // Bass.Configure(Configuration.FloatDSP, true);

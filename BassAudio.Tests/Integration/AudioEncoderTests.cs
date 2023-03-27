@@ -22,7 +22,7 @@ public class AudioEncoderTests : TestsBase
     private IAudioEncoder _model;
     private IAudioEncoder SetupModel()
     {
-        BassDevice.Instance.Init(0);
+        BassDevice.Instance.InitNoSound();
         return new AudioEncoder(new PitchDetector(FileSystem), FileSystem);
     }
 
@@ -62,7 +62,7 @@ public class AudioEncoderTests : TestsBase
 
     public string GetTag(Func<TagsReader, string> property, string file = "SourceShort.mp3")
     {
-        BassDevice.Instance.Init(0);
+        BassDevice.Instance.InitNoSound();
         var chan = Bass.CreateStream(file, Flags: BassFlags.Decode).Valid();
         // var chanInfo = Bass.ChannelGetInfo(chan);
         var tags = new TagsReader(chan);
