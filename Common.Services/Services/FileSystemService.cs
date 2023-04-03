@@ -59,7 +59,7 @@ public class FileSystemService : IFileSystemService
 
         try
         {
-            return Directory.EnumerateFiles(path, "*", searchOption).Where(f => extensions.Any(s => f.EndsWith(s, StringComparison.InvariantCulture)));
+            return Directory.EnumerateFiles(path, "*", searchOption).Where(f => extensions.Any(s => f.EndsWith(s, StringComparison.InvariantCultureIgnoreCase)));
         }
         catch (DirectoryNotFoundException) { }
         catch (UnauthorizedAccessException) { }
