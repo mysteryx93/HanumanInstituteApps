@@ -1,5 +1,7 @@
 ﻿using System.Net.Http;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
+using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
@@ -10,6 +12,7 @@ using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 using YoutubeExplode.Videos.Streams;
+using SplatContainerExtensions = HanumanInstitute.Downloads.SplatContainerExtensions;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
@@ -20,9 +23,11 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
     private readonly IDialogService _dialogService;
     private readonly IFileSystemService _fileSystem;
     private readonly IMediaInfoReader? _ffmpegInfo;
+    private readonly IClipboard _clipboard;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
-        IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo) :
+        IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo,
+        IClipboard clipboard) :
         base(settings, appUpdateService)
     {
         _downloadManager = downloadManager;
@@ -30,6 +35,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
         _dialogService = dialogService;
         _fileSystem = fileSystem;
         _ffmpegInfo = ffmpegInfo;
+        _clipboard = clipboard;
 
         PreferredVideo = new ListItemCollectionView<StreamContainerOption>()
         {
@@ -177,6 +183,31 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
     private async Task ShowEncodeSettingsImpl()
     {
         await _dialogService.ShowEncodeSettingsAsync(this, Settings.EncodeSettings);
+    }
+
+    /// <summary>
+    /// When activating the window, auto-paste URL and query.
+    /// </summary>
+    public RxCommandUnit ViewActivated => _viewActivated ??= ReactiveCommand.CreateFromTask(ViewActivatedImplAsync);
+    private RxCommandUnit? _viewActivated;
+    private async Task ViewActivatedImplAsync()
+    {
+        if (string.IsNullOrWhiteSpace(DownloadUrl) || !DisplayDownloadInfo)
+        {
+            var text = await _clipboard.GetTextAsync().ConfigureAwait(true);
+            if (text?.Length < 128 && IsValidUrl(text))
+            {
+                DownloadUrl = text;
+                Query.Execute().Subscribe();
+            }
+        }
+    }
+    
+    private bool IsValidUrl(string url)
+    {
+        const string Pattern = @"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$";
+        var rgx = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        return rgx.IsMatch(url);
     }
 
     /// <summary>

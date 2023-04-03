@@ -16,6 +16,11 @@
     hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
     hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Activated">
+            <InvokeCommandAction Command="{Binding ViewActivated}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
     <Grid>
         <Grid Margin="10" RowDefinitions="Auto,*">
             <Button Grid.Row="0" Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"

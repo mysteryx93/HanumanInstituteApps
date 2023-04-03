@@ -1,4 +1,6 @@
-﻿using HanumanInstitute.Common.Services;
+﻿using Avalonia;
+using Avalonia.Input.Platform;
+using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -23,6 +25,8 @@ public static class SplatContainerExtensions
             GetService<IUpdateService>(),
             GetService<IProcessService>(),
             GetService<IAppInfo>()));
+        
+        services.Register<IClipboard>(() => Application.Current!.Clipboard);
         
         // SplatRegistrations.Register<IAppUpdateService, AppUpdateService<TSettings>>();
         SplatRegistrations.RegisterLazySingleton<ILicenseValidator, LicenseValidator>();
