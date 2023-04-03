@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.Common.Services.Validation;
+using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
 namespace HanumanInstitute.Player432Hz.ViewModels;
 
@@ -21,6 +22,7 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
     protected override bool SaveSettings()
     {
         Settings.OutputSampleRate = OutputSampleRateList.SelectedValue;
+        BassDevice.Instance.Init(-1, Settings.OutputSampleRate);
         return base.SaveSettings();
     }
 
