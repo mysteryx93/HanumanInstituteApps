@@ -87,11 +87,6 @@ public abstract class CommonApplication<TMain> : Application
 
     protected virtual void InitLicense(SettingsDataBase settings)
     {
-        if (!settings.IsLicenseValid)
-        {
-            settings.ShowInfoOnStartup = true;
-            settings.SetFreeLicenseDefaults();
-        }
     }
 
     /// <summary>

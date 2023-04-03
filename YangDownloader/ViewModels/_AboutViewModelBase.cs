@@ -63,24 +63,14 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
     /// </summary>
     public Version AppVersion => _environment.AppVersion;
 
+    /// <summary>
+    /// Gets or sets whether to display the about screen on startup.
+    /// </summary>
     public bool ShowInfoOnStartup
     {
         get => Settings.ShowInfoOnStartup;
-        set
-        {
-            if (!Settings.IsLicenseValid && !value)
-            {
-                ShowLicenseInfo();
-            }
-            else
-            {
-                Settings.ShowInfoOnStartup = value;
-            }
-        }
+        set => Settings.ShowInfoOnStartup = value;
     }
-
-    private async void ShowLicenseInfo() =>
-        await _dialogService.ShowMessageBoxAsync(this, "You need a license to disable the startup screen.");
 
     /// <summary>
     /// Gets or sets the license key. 

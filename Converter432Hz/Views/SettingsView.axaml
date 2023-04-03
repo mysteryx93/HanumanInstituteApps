@@ -30,7 +30,7 @@
                               x:CompileBindings="False"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
-                <StackPanel Margin="0" IsEnabled="{Binding Settings.IsLicenseValid}">
+                <StackPanel Margin="0">
                     <CheckBox IsChecked="{Binding Settings.Encode.AntiAlias}">Apply anti-alias filter</CheckBox>
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.Encode.AntiAlias}">
                         <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />

@@ -2,42 +2,40 @@
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
-// Trimming fails if MainViewModelBase is in a separate assembly.
-// Copied here as a work-around.
-// https://github.com/AvaloniaUI/Avalonia/issues/10494
-
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;
 
 /// <summary>
 /// Base implementation of the main ViewModel with shared features.
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
-public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>, ICloseable, IViewLoaded, IViewClosed
+public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>, IViewLoaded, IViewClosed
     where TSettings : SettingsDataBase, new()
 {
     private IAppUpdateService _appUpdateService;
+    private IEnvironmentService _environment;
 
     /// <summary>
     /// Initializes a new instance of the MainViewModelBase class.
     /// </summary>
-    protected MainViewModelBase(ISettingsProvider<TSettings> settings, IAppUpdateService appUpdateService) :
+    protected MainViewModelBase(ISettingsProvider<TSettings> settings, IAppUpdateService appUpdateService, IEnvironmentService environment) :
         base(settings)
     {
         _appUpdateService = appUpdateService;
+        _environment = environment;
     }
     
-    /// <inheritdoc />
-    public event EventHandler? RequestClose;
-
     /// <summary>
     /// On startup, show About window and/or check for updates. 
     /// </summary>
     public virtual async void OnLoaded()
     {
-        if (_settings.Value.ShowInfoOnStartup)
+        // Without license, show info on startup once per 3 days.
+        if (_settings.Value.ShowInfoOnStartup ||
+            (!_settings.Value.IsLicenseValid && _environment.Now - _settings.Value.LastShowInfo > TimeSpan.FromDays(3)))
         {
             await Task.Delay(400).ConfigureAwait(true);
             ShowAbout.Execute().Subscribe();
+            _settings.Value.LastShowInfo = _environment.Now;
             _settings.Save();
         }
         else

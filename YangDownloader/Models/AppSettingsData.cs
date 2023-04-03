@@ -44,17 +44,4 @@ public class AppSettingsData : SettingsDataBase
     /// </summary>
     [Reactive]
     public EncodeSettings EncodeSettings { get; set; } = new();
-    
-    /// <inheritdoc />
-    public override void SetFreeLicenseDefaults()
-    {
-        EncodeSettings.AntiAlias = false;
-        EncodeSettings.AntiAliasLength = 32;
-        EncodeSettings.Speed = 1;
-        EncodeSettings.AutoDetectPitch = true;
-        EncodeSettings.PitchFrom = 440;
-        EncodeSettings.PitchTo = 432;
-        EncodeSettings.RoundPitch = true;
-        EncodeSettings.SkipTempo = false;
-    }
 }

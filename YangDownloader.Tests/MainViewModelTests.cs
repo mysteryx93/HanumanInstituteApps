@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using Avalonia.Input.Platform;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.YangDownloader.Models;
 using YoutubeExplode.Channels;
@@ -19,7 +20,7 @@ public class MainViewModelTests : TestsBase
     public MainViewModel Model => _model ??= Init(() =>
     {
         SetTitle();
-        return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null)
+        return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null, Mock.Of<IClipboard>(), new FakeEnvironmentService())
         {
             DownloadUrl = "https://www.youtube.com/watch?v=4OqXWzekVw4"
         };
@@ -102,7 +103,7 @@ public class MainViewModelTests : TestsBase
     [Fact]
     public void Constructor_Valid_HasInitialState()
     {
-        _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null);
+        _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null, Mock.Of<IClipboard>(), new FakeEnvironmentService());
 
         Assert.NotEmpty(Model.PreferredVideo);
         Assert.Equal(0, Model.PreferredVideo.CurrentPosition);

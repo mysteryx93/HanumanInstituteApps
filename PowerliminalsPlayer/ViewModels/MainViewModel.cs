@@ -20,8 +20,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IAppPathService appPath, 
-        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer) :
-        base(settings, appUpdateService)
+        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment) :
+        base(settings, appUpdateService, environment)
     {
         _appPath = appPath;
         _fileSystem = fileSystem;

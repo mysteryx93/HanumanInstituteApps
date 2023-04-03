@@ -1,10 +1,6 @@
 ﻿using HanumanInstitute.Common.Avalonia.App;
 using ReactiveUI;
 
-// Trimming fails if MainViewModelBase is in a separate assembly.
-// Copied here as a work-around.
-// https://github.com/AvaloniaUI/Avalonia/issues/10494
-
 namespace HanumanInstitute.YangDownloader.ViewModels;
 
 /// <summary>
@@ -15,14 +11,16 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
     where TSettings : SettingsDataBase, new()
 {
     private IAppUpdateService _appUpdateService;
+    private IEnvironmentService _environment;
 
     /// <summary>
     /// Initializes a new instance of the MainViewModelBase class.
     /// </summary>
-    protected MainViewModelBase(ISettingsProvider<TSettings> settings, IAppUpdateService appUpdateService) :
+    protected MainViewModelBase(ISettingsProvider<TSettings> settings, IAppUpdateService appUpdateService, IEnvironmentService environment) :
         base(settings)
     {
         _appUpdateService = appUpdateService;
+        _environment = environment;
     }
     
     /// <summary>
@@ -30,10 +28,13 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
     /// </summary>
     public virtual async void OnLoaded()
     {
-        if (_settings.Value.ShowInfoOnStartup)
+        // Without license, show info on startup once per 3 days.
+        if (_settings.Value.ShowInfoOnStartup ||
+            (!_settings.Value.IsLicenseValid && _environment.Now - _settings.Value.LastShowInfo > TimeSpan.FromDays(3)))
         {
             await Task.Delay(400).ConfigureAwait(true);
             ShowAbout.Execute().Subscribe();
+            _settings.Value.LastShowInfo = _environment.Now;
             _settings.Save();
         }
         else

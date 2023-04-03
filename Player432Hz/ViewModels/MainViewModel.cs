@@ -17,9 +17,9 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private readonly IDialogService _dialogService;
     private readonly IPathFixer _pathFixer;
 
-    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService,
-        IPlaylistViewModelFactory playlistFactory, IFilesListViewModel filesListViewModel, IDialogService dialogService, IPathFixer pathFixer) : 
-        base(settings, appUpdateService)
+    public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IPlaylistViewModelFactory playlistFactory,
+        IFilesListViewModel filesListViewModel, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment) : 
+        base(settings, appUpdateService, environment)
     {
         _playlistFactory = playlistFactory;
         _playlistFactory.OwnerViewModel = this;

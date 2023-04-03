@@ -27,8 +27,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
         IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo,
-        IClipboard clipboard) :
-        base(settings, appUpdateService)
+        IClipboard clipboard, IEnvironmentService environment) :
+        base(settings, appUpdateService, environment)
     {
         _downloadManager = downloadManager;
         _streamSelector = streamSelector;

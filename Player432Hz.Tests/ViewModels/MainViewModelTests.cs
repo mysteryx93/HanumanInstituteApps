@@ -18,7 +18,7 @@ public class MainViewModelTests
     public PlaylistViewModelFactory Factory => _factory ??= new PlaylistViewModelFactory(Mock.Of<IDialogService>(), Mock.Of<IFilesListViewModel>());
     private PlaylistViewModelFactory _factory;
 
-    public MainViewModel Model => _model ??= new MainViewModel(MockSettings, MockAppUpdate.Object, Factory, MockFileList.Object, DialogService, null!);
+    public MainViewModel Model => _model ??= new MainViewModel(MockSettings, MockAppUpdate.Object, Factory, MockFileList.Object, DialogService, null!, new FakeEnvironmentService());
     private MainViewModel _model;
     
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= new Mock<IDialogManager>();

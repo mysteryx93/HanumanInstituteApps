@@ -79,17 +79,4 @@ public class AppSettingsData : SettingsDataBase
     /// </summary>
     [Reactive]
     public int? OutputSampleRate { get; set; }
-
-    /// <inheritdoc />
-    public override void SetFreeLicenseDefaults()
-    {
-        AntiAlias = false;
-        AntiAliasLength = 32;
-        Speed = 1;
-        AutoDetectPitch = true;
-        PitchFrom = 440;
-        PitchTo = 432;
-        RoundPitch = true;
-        SkipTempo = false;
-    }
 }

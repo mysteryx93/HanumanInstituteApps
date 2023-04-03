@@ -50,6 +50,12 @@ public class SettingsDataBase : ReactiveObject
     public DateTime? LastCheckForUpdate { get; set; }
     
     /// <summary>
+    /// Gets or sets the date of the last startup popup when using no license.
+    /// </summary>
+    [Reactive]
+    public DateTime? LastShowInfo { get; set; }
+    
+    /// <summary>
     /// Gets or sets the license key.
     /// </summary>
     [Reactive]
@@ -61,9 +67,4 @@ public class SettingsDataBase : ReactiveObject
     [Reactive]
     [JsonIgnore]
     public bool IsLicenseValid { get; set; }
-
-    /// <summary>
-    /// Resets settings that are disabled with free license.
-    /// </summary>
-    public virtual void SetFreeLicenseDefaults() { }
 }

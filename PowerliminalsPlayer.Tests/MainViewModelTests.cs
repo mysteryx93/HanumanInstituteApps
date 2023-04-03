@@ -76,7 +76,7 @@ public class MainViewModelTests
     protected IPathFixer PathFixer => _pathFixer ??= new PathFixer(MockFileSystem, DialogService); 
     private IPathFixer _pathFixer;
 
-    protected MainViewModel Model => _model ??= new MainViewModel(MockAppSettings.Object, MockAppUpdate.Object, AppPath, MockFileSystem, DialogService, PathFixer);
+    protected MainViewModel Model => _model ??= new MainViewModel(MockAppSettings.Object, MockAppUpdate.Object, AppPath, MockFileSystem, DialogService, PathFixer, new FakeEnvironmentService());
     private MainViewModel _model;
     
     public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();
