@@ -117,7 +117,14 @@ public abstract class SettingsProviderBase<T> : ISettingsProvider<T>
         if (Value == null) { throw new NullReferenceException(Resources.GenericSettingsProviderCurrentNull); }
         if (Value.Validate() != null) { throw new ValidationException(Resources.GenericSettingsProviderValidationErrors); }
 
-        _serialization.SerializeToFile(Value, path, _serializerContext);
+        try
+        {
+            _serialization.SerializeToFile(Value, path, _serializerContext);
+        }
+        catch
+        {
+            // Don't crash on failure to save.
+        }
     }
 
     /// <summary>
