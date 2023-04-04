@@ -16,14 +16,13 @@ public class AppInfo : IAppInfo
     public string AppDescription => "Plays multiple audios simultaneously at varying speeds";
 
     /// <inheritdoc />
-    public string LicenseInfo =>
-        "Play many audios at low volume with high energetic frequencies side-by-side 24/7 to stabilize the energy of your environment. The same audio can be played 5 times at different speeds. To make full use of this software, we recommend our Powerliminals Pack for a series of silent audios with very high frequencies.";
+    public string LicenseInfo => "This is an open source software. The free version has no restriction. You can get a license to support the development of these apps. This is a lifetime license for this app and all future updates.";
+    
+    /// <inheritdoc />
+    public string BuyLicenseText => "Get license for $6.95";
 
     /// <inheritdoc />
-    public string BuyLicenseText => "Get the Powerliminals Pack"; 
-
-    /// <inheritdoc />
-    public string BuyLicenseUrl => "https://www.spiritualselftransformation.com/powerliminals-nonrivalry";
+    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=3";
 
     /// <inheritdoc />
     public KeyByteSet[] KeyByteSets => new KeyByteSet[]

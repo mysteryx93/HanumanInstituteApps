@@ -16,10 +16,10 @@ public class AppInfo : IAppInfo
     public string AppDescription => "Converts and re-encodes music to 432Hz";
 
     /// <inheritdoc />
-    public string LicenseInfo => "The free version is fully functional. To unlock advanced settings, purchase a license for just $5 per computer to support the application development. This is a lifetime license for this app and all future updates.";
+    public string LicenseInfo => "This is an open source software. The free version only has a single restriction: encoding entire folder hierarchies. This is a lifetime license for this app and all future updates.";
 
     /// <inheritdoc />
-    public string BuyLicenseText => "Get license for $5"; 
+    public string BuyLicenseText => "Get license for $16.95"; 
 
     /// <inheritdoc />
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=0";

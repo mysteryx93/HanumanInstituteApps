@@ -16,10 +16,10 @@ public class AppInfo : IAppInfo
     public string AppDescription => "Plays music in 432Hz";
 
     /// <inheritdoc />
-    public string LicenseInfo => "The free version is fully functional. To unlock advanced settings, purchase a license for just $5 per computer to support the application development. This is a lifetime license for this app and all future updates.";
+    public string LicenseInfo => "This is an open source software. The free version has no restriction. You can get a license to support the development of these apps. This is a lifetime license for this app and all future updates.";
 
     /// <inheritdoc />
-    public string BuyLicenseText => "Get license for $5"; 
+    public string BuyLicenseText => "Get license for $6.95"; 
 
     /// <inheritdoc />
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=1";
