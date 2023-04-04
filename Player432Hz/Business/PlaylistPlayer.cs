@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DynamicData;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
@@ -12,7 +13,8 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
 
-    public PlaylistPlayer(IPitchDetectorWithCache pitchDetector, IFileSystemService fileSystem, ISettingsProvider<AppSettingsData> settings) :
+    public PlaylistPlayer(IPitchDetectorWithCache pitchDetector, IFileSystemService fileSystem,
+        ISettingsProvider<AppSettingsData> settings) :
         base(settings)
     {
         _pitchDetector = pitchDetector;
@@ -25,6 +27,10 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     /// <inheritdoc />
     [Reactive]
     public string NowPlaying { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    [Reactive]
+    public int NowPlayingPos { get; set; } = -1;
 
     /// <inheritdoc />
     [Reactive]
@@ -61,13 +67,15 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
         Files.Clear();
         if (list != null)
         {
-            Files.AddRange(list);
+            ListExtensions.AddRange(Files, list);
         }
         NowPlaying = string.Empty;
+        NowPlayingPos = -1;
         if (current.HasValue())
         {
             await CalcPitchAsync(current).ConfigureAwait(false);
             NowPlaying = current;
+            NowPlayingPos = Files.IndexOf(NowPlaying);
         }
         SetTitle();
         if (string.IsNullOrEmpty(current))
@@ -81,16 +89,25 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     {
         if (Files.Any())
         {
-            var pos = _random.Next(Files.Count);
-            if (Files[pos] == NowPlaying)
+            var pos = -1;
+            if (_settings.Value.Shuffle)
             {
                 pos = _random.Next(Files.Count);
+                if (Files[pos] == NowPlaying)
+                {
+                    pos = _random.Next(Files.Count);
+                }
             }
-
+            else
+            {
+                pos = (NowPlayingPos + 1) % Files.Count;
+            }
+            
             await CalcPitchAsync(Files[pos]).ConfigureAwait(false);
 
             NowPlaying = string.Empty;
             NowPlaying = Files[pos];
+            NowPlayingPos = pos;
             SetTitle();
         }
     }
@@ -98,7 +115,9 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     private async Task CalcPitchAsync(string filePath)
     {
         BassDevice.Instance.Init(-1, _settings.Value.OutputSampleRate);
-        PitchFrom = _settings.Value.AutoDetectPitch ? await _pitchDetector.GetPitchAsync(filePath).ConfigureAwait(false) : _settings.Value.PitchFrom;
+        PitchFrom = _settings.Value.AutoDetectPitch ?
+            await _pitchDetector.GetPitchAsync(filePath).ConfigureAwait(false) :
+            _settings.Value.PitchFrom;
         SetTitle();
         Pitch = _settings.Value.PitchTo / PitchFrom;
     }
@@ -118,7 +137,7 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
             await CalcPitchAsync(NowPlaying);
         }
     }
-    
+
 
     // /// <inheritdoc />
     // public void ApplySettings()

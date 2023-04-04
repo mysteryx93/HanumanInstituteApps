@@ -22,7 +22,7 @@ public class AppInfo : IAppInfo
     public string BuyLicenseText => "Get license for $2.95"; 
 
     /// <inheritdoc />
-    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader?id=2";
+    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/app-yangdownloader?id=3";
 
     /// <inheritdoc />
     public KeyByteSet[] KeyByteSets => new[]

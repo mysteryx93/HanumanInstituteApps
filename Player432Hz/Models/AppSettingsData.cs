@@ -16,6 +16,12 @@ public class AppSettingsData : SettingsDataBase
     public List<SettingsPlaylistItem> Playlists { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets whether to play files in random order.
+    /// </summary>
+    [Reactive]
+    public bool Shuffle { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the playback volume.
     /// </summary>
     [Range(0, 100)]

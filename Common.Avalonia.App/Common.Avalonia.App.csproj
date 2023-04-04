@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>HanumanInstitute.Common.Avalonia.App</RootNamespace>
@@ -33,12 +32,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Utilities\AboutView.axaml.cs">
-      <DependentUpon>AboutView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -47,7 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Styles\HanumanInstituteAppIcons.otf" />
+    <AvaloniaResource Remove="Styles\Icons\**" />
+  </ItemGroup>
+  <ItemGroup>
     <AvaloniaResource Include="Styles\HanumanInstituteAppIcons.otf" />
   </ItemGroup>
 </Project>

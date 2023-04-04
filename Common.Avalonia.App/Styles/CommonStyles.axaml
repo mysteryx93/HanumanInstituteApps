@@ -22,7 +22,7 @@
     <Style Selector="Button.round:disabled">
         <Setter Property="Opacity" Value="0.5" />
     </Style>
-    
+
     <Style Selector="ListBox">
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
@@ -69,7 +69,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     
-    <Style Selector="Button.icon">
+    <Style Selector="Button.icon, ToggleButton.icon">
         <Setter Property="FontFamily" Value="avares://Common.Avalonia.App/Styles/HanumanInstituteAppIcons.otf#" />
         <Setter Property="FontSize" Value="17" />
     </Style>
@@ -94,5 +94,68 @@
     
     <Style Selector="ui|HyperlinkButton">
         <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="ToolTip">
+        <Setter Property="FontFamily" Value="default" />
+    </Style>
+    
+    <Style Selector="Button.toolbar, ToggleButton.toolbar">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      RecognizesAccessKey="True"
+                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
+        </Style>
+        <Style Selector="^:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarCheckedHoverBrush}" />
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarPressedBrush}" />
+        </Style>
+        <Style Selector="^:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Opacity" Value="{DynamicResource MediaPlayerDisabledOpacity}" />
+        </Style>
+
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="FontFamily" Value="{TemplateBinding FontFamily}" />
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="FontSize" Value="{TemplateBinding FontSize}" />
+        </Style>
     </Style>
 </Styles>

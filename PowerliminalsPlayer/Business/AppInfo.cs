@@ -22,11 +22,14 @@ public class AppInfo : IAppInfo
     public string BuyLicenseText => "Get license for $6.95";
 
     /// <inheritdoc />
-    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=3";
+    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=2";
 
     /// <inheritdoc />
-    public KeyByteSet[] KeyByteSets => new KeyByteSet[]
+    public KeyByteSet[] KeyByteSets => new[]
     {
-        
+        new KeyByteSet(1, 25, 37, 164),
+        new KeyByteSet(3, 50, 226, 55),
+        new KeyByteSet(5, 126, 127, 246),
+        new KeyByteSet(7, 126, 113, 86)
     };
 }

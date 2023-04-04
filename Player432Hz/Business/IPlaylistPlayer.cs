@@ -16,6 +16,10 @@ public interface IPlaylistPlayer : INotifyPropertyChanged
     /// </summary>
     string NowPlaying { get; set; }
     /// <summary>
+    /// Gets the index of the file currently playing.
+    /// </summary>
+    int NowPlayingPos { get; set; }
+    /// <summary>
     /// Gets the display title of the file currently playing.
     /// </summary>
     string NowPlayingTitle { get; set; }

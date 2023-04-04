@@ -85,8 +85,11 @@
                 <Grid Row="1" DataContext="{x:Static local:ViewModelLocator.FilesList}" Margin="0,6,0,0" x:DataType="vm:IFilesListViewModel">
                     <Grid VerticalAlignment="Top">
                         <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
-                        <Button Classes="round" Content="Play" HorizontalAlignment="Right"
-                                Width="75" TabIndex="9" Command="{Binding Play}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <ToggleButton Classes="toolbar icon" Content="U" Width="35" ToolTip.Tip="Shuffle"
+                                          IsChecked="{Binding ViewModel.Settings.Shuffle, RelativeSource={RelativeSource AncestorType=views:MainView}, Mode=TwoWay}" />
+                            <Button Classes="round" Content="Play" Width="75" TabIndex="9" Command="{Binding Play}" />
+                        </StackPanel>
                     </Grid>
                     <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
                              Items="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">

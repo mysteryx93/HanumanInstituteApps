@@ -5,9 +5,7 @@ using ReactiveUI;
 
 namespace HanumanInstitute.Player432Hz.ViewModels;
 
-/// <summary>
-/// Represents a list of files to view the content of specified folders.
-/// </summary>
+/// <inheritdoc cref="IFilesListViewModel" />
 public class FilesListViewModel : ReactiveObject, IFilesListViewModel
 {
     private readonly IFileLocator _fileLocator;
@@ -18,10 +16,8 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
         _fileLocator = fileLocator;
         _playlistPlayer = playlistPlayer;
     }
-
-    /// <summary>
-    /// Gets the list of files and selection properties.
-    /// </summary>
+    
+    /// <inheritdoc />
     public ICollectionView<FileItem> Files
     {
         get
@@ -36,10 +32,7 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     }
     private readonly ICollectionView<FileItem> _files = new CollectionView<FileItem>();
 
-    /// <summary>
-    /// Sets the folder paths from which to load files.
-    /// </summary>
-    /// <param name="paths">The list of folder paths to load.</param>
+    /// <inheritdoc />
     public void SetPaths(IEnumerable<string>? paths)
     {
         _paths = paths?.ToList();
@@ -61,10 +54,8 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
             _files.Source.AddRange(_fileLocator.GetAudioFiles(_paths));
         }
     }
-
-    /// <summary>
-    /// Starts playing the selected playlist. If string parameter is specified, the specified file path will be played first.
-    /// </summary>
+    
+    /// <inheritdoc />
     public RxCommandUnit Play => _play ??= ReactiveCommand.CreateFromTask(PlayImplAsync,
         this.Files.Source.ToObservableChangeSet().Select(x => x.Any()));
     private RxCommandUnit? _play;
