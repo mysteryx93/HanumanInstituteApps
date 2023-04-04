@@ -31,7 +31,7 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
     {
         // Without license, show info on startup once per 3 days.
         if (_settings.Value.ShowInfoOnStartup ||
-            (!_settings.Value.IsLicenseValid && _environment.Now - _settings.Value.LastShowInfo > TimeSpan.FromDays(3)))
+            (!_settings.Value.IsLicenseValid && (_settings.Value.LastShowInfo == null || _environment.Now - _settings.Value.LastShowInfo > TimeSpan.FromDays(3))))
         {
             await Task.Delay(400).ConfigureAwait(true);
             ShowAbout.Execute().Subscribe();
