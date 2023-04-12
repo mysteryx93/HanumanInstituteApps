@@ -1,8 +1,10 @@
 # Hanuman Institute Apps
 
-These apps were built for my personal needs, and made available for everyone.
+This is a suite of audio/video tools built for my personal needs, and made available for everyone.
 
-Supports Windows, Linux and MacOS.
+They were developed using cutting-edge programming practices, and I wrote a tutorial on [How to Build Modern Cross-Platform Apps with .NET](https://github.com/mysteryx93/Modern.Net-Tutorial). I also had to develop several core components, including [HanumanInstitute.MvvmDialogs](https://github.com/mysteryx93/HanumanInstitute.MvvmDialogs/) and [MediaPlayerUI.NET](https://github.com/mysteryx93/MediaPlayerUI.NET).
+
+Supports Windows, Linux and MacOS. Possibly Android and iOS in the future.
 
 ### 432Hz Player: Plays music in 432Hz
 
