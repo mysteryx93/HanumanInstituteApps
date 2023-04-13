@@ -165,15 +165,6 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private RxCommandUnit? _addFolder;
     private async Task AddFolderImplAsync()
     {
-        if (!Settings.IsLicenseValid)
-        {
-            var msg = "Encoding entire folders is the only feature that requires a license." + Environment.NewLine + Environment.NewLine +
-                      "This feature allows encoding entire folder structures, and your destination will preserve the same sub-folder structure." + Environment.NewLine + Environment.NewLine +
-                      "You can still encode all the files you want using 'Add Files', or support us with the app development.";
-            await _dialogService.ShowMessageBoxAsync(this, msg, "Encode Folders").ConfigureAwait(true);
-            return;
-        }
-        
         var settings = new OpenFolderDialogSettings() { Title = "Convert all audio files in folder" };
         var folder = await _dialogService.ShowOpenFolderDialogAsync(this, settings).ConfigureAwait(true);
         if (folder != null)
