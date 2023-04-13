@@ -8,14 +8,14 @@
         Title="432Hz Player" Icon="/Assets/App.ico" MinHeight="240" MinWidth="560" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.Player432Hz"
         xmlns:bass="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia.Bass;assembly=MediaPlayer.Avalonia.Bass"
-        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:flu="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.Player432Hz.ViewModels"
         xmlns:views="clr-namespace:HanumanInstitute.Player432Hz.Views"
         xmlns:models="clr-namespace:HanumanInstitute.Player432Hz.Models"
-        hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
+        xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
+        av:SizeExtension.TrackSize="True"
+        av:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
+        av:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
         d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Grid>
         <Grid Margin="10,6,10,10" ColumnDefinitions="150,*" RowDefinitions="*,40">

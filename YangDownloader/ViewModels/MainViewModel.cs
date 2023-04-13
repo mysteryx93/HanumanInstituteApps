@@ -5,14 +5,14 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using HanumanInstitute.YangDownloader.Business;
 using ReactiveUI;
 using YoutubeExplode.Videos.Streams;
-using SplatContainerExtensions = HanumanInstitute.Downloads.SplatContainerExtensions;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 

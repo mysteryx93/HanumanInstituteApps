@@ -2,11 +2,12 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using FluentAvalonia.Styling;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.Converter432Hz.Views;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.Services;
 using LazyCache.Splat;
 using Splat;
 

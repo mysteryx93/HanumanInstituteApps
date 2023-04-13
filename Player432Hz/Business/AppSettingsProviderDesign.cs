@@ -1,4 +1,6 @@
-﻿namespace HanumanInstitute.Player432Hz.Business;
+﻿using HanumanInstitute.Services;
+
+namespace HanumanInstitute.Player432Hz.Business;
 
 /// <summary>
 /// Application settings for design view.

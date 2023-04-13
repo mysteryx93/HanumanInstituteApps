@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Apps;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -15,7 +16,8 @@ public class MainViewModelDesign : MainViewModel
             Locator.Current.GetService<IFileLocator>()!, 
             Locator.Current.GetService<IAppPathService>()!, 
             Locator.Current.GetService<IEnvironmentService>()!,
-            Locator.Current.GetService<IPitchDetector>()!)
+            Locator.Current.GetService<IPitchDetector>()!,
+            Locator.Current.GetService<AdRotatorViewModel>()!)
     {
         Encoder.ProcessingFiles.Add(new ProcessingItem("", "Short Item"));
         Encoder.ProcessingFiles.Add(new ProcessingItem("", "Long Long Long Long Long Long Long Long Long Long Long Long "));

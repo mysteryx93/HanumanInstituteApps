@@ -4,14 +4,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
         xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
-        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
+        xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
         mc:Ignorable="d" MinWidth="280" Width="280" MaxWidth="280" MinHeight="420" Height="420" MaxHeight="420"
         x:Class="HanumanInstitute.YangDownloader.Views.EncodeSettingsView"
         Title="Advanced Settings" Classes="gradient"
         CanResize="False" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         d:DataContext="{x:Static local:ViewModelLocator.EncodeSettings}" x:DataType="vm:EncodeSettingsViewModel">
     <Window.Resources>
-        <hic:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
+        <av:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
     </Window.Resources>
     <Grid>
         <Grid Margin="10">

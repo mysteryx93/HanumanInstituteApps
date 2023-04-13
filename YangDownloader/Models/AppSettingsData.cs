@@ -1,5 +1,5 @@
-﻿using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Apps;
+using HanumanInstitute.BassAudio;
 using HanumanInstitute.Downloads;
 
 namespace HanumanInstitute.YangDownloader.Models;
@@ -7,7 +7,7 @@ namespace HanumanInstitute.YangDownloader.Models;
 /// <summary>
 /// Contains the application settings and configured playlists.
 /// </summary>
-public class AppSettingsData : SettingsDataBase
+public class AppSettingsData : SettingsBase
 {
     /// <summary>
     /// Gets or sets the destination folder where to save downloaded files.

@@ -1,4 +1,6 @@
-﻿namespace HanumanInstitute.Player432Hz.ViewModels;
+﻿using HanumanInstitute.Avalonia;
+
+namespace HanumanInstitute.Player432Hz.ViewModels;
 
 /// <summary>
 /// Represents a playlist for viewing and editing.

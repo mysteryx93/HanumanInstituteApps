@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common.Avalonia.App.Tests\Common.Avalonia.App.Tests.csproj" />
+      <ProjectReference Include="..\Apps.Tests\Apps.Tests.csproj" />
       <ProjectReference Include="..\YangDownloader\YangDownloader.csproj" />
     </ItemGroup>
 

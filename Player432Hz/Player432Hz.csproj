@@ -44,9 +44,9 @@
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
     <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
-    <ProjectReference Include="..\Common.Avalonia.App\Common.Avalonia.App.csproj" />
-    <ProjectReference Include="..\Common.Avalonia\Common.Avalonia.csproj" />
-    <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+    <ProjectReference Include="..\Apps\Apps.csproj" />
+    <ProjectReference Include="..\Avalonia\Avalonia.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup>

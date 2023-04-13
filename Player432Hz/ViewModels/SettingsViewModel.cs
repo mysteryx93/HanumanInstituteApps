@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.Common.Services.Validation;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 

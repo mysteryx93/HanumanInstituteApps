@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Linq;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FileSystem;
@@ -18,7 +19,7 @@ public class MainViewModelTests : TestsBase
 
     public MainViewModel Model => _model ??=
         new MainViewModel(MockSettingsProvider, MockAppUpdate.Object, Encoder, DialogService, FileSystem,
-            FileLocator, MockAppPath.Object, new FakeEnvironmentService(), MockPitchDetector.Object);
+            FileLocator, MockAppPath.Object, new FakeEnvironmentService(), MockPitchDetector.Object, new AdRotatorViewModelDesign());
     private MainViewModel _model;
 
     public IEncoderService Encoder =>

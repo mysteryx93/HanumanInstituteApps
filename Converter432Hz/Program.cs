@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
-using Splat;
+﻿using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.Converter432Hz;
 

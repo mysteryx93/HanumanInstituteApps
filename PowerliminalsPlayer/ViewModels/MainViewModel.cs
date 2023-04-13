@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
-using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.Services;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;

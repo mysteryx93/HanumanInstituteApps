@@ -5,7 +5,6 @@ global using System.Collections.Generic;
 global using System.Threading.Tasks;
 global using Avalonia;
 global using HanumanInstitute.Common;
-global using HanumanInstitute.Common.Avalonia;
 global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.BassAudio;
 global using HanumanInstitute.Converter432Hz.Business;

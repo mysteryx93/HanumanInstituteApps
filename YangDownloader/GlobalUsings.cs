@@ -6,7 +6,6 @@ global using System.Linq;
 global using System.Threading.Tasks;
 global using Avalonia;
 global using HanumanInstitute.Common;
-global using HanumanInstitute.Common.Avalonia;
 global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.Validators;
 global using HanumanInstitute.MvvmDialogs;

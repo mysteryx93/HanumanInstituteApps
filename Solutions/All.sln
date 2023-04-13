@@ -8,13 +8,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.editorconfig = ..\.editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Services", "..\Common.Services\Common.Services.csproj", "{38E97D79-1BCC-48C3-BEE0-995F928F7AFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "..\Services\Services.csproj", "{38E97D79-1BCC-48C3-BEE0-995F928F7AFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Avalonia", "..\Common.Avalonia\Common.Avalonia.csproj", "{E71151BE-68FD-44D1-96E4-DFA941AFBC42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalonia", "..\Avalonia\Avalonia.csproj", "{E71151BE-68FD-44D1-96E4-DFA941AFBC42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Avalonia.App", "..\Common.Avalonia.App\Common.Avalonia.App.csproj", "{B9D35B98-BC89-45D1-AD30-B96C9A06E987}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apps", "..\Apps\Apps.csproj", "{B9D35B98-BC89-45D1-AD30-B96C9A06E987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Avalonia.App.Tests", "..\Common.Avalonia.App.Tests\Common.Avalonia.App.Tests.csproj", "{88101DFA-9801-4022-B642-CBEF7A36AECA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apps.Tests", "..\Apps.Tests\Apps.Tests.csproj", "{88101DFA-9801-4022-B642-CBEF7A36AECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter432Hz", "..\Converter432Hz\Converter432Hz.csproj", "{C793BA5B-B1EA-40AE-978C-B003C2D02365}"
 EndProject

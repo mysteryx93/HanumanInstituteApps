@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using HanumanInstitute.Common.Avalonia.App;
-using Splat;
+using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.Player432Hz;
 

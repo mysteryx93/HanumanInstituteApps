@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.Common.Services.Validation;
 
 namespace HanumanInstitute.Converter432Hz.ViewModels;

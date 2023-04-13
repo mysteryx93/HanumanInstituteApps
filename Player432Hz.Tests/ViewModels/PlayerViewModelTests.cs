@@ -1,4 +1,6 @@
 ﻿using HanumanInstitute.BassAudio;
+using HanumanInstitute.Services;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace HanumanInstitute.Player432Hz.Tests.ViewModels;
@@ -8,7 +10,7 @@ public class PlayerViewModelTests
     public FakeFileSystemService MockFileSystem => _mockFileSystem ??= new FakeFileSystemService();
     private FakeFileSystemService _mockFileSystem;
 
-    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem, MockSettings);
+    public IPlaylistPlayer PlaylistPlayer => _playlistPlayer ??= new PlaylistPlayer(MockPitchDetector.Object, MockFileSystem, MockSettings, new RandomGenerator());
     private IPlaylistPlayer _playlistPlayer;
 
     public ISettingsProvider<AppSettingsData> MockSettings => _mockSettings ??= new FakeSettingsProvider<AppSettingsData>();

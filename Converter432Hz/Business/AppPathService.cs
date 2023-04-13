@@ -1,16 +1,18 @@
 ﻿using System.Linq;
+using HanumanInstitute.Apps;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 
 namespace HanumanInstitute.Converter432Hz.Business;
 
-/// <inheritdoc />
-public class AppPathService : IAppPathService
+/// <inheritdoc cref="AppPathServiceBase" />
+public class AppPathService : AppPathServiceBase, IAppPathService
 {
     private readonly IEnvironmentService _environment;
     private readonly IFileSystemService _fileSystem;
     private readonly IBassDevice _bassDevice;
 
-    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService, IBassDevice bassDevice)
+    public AppPathService(IEnvironmentService environmentService, IFileSystemService fileSystemService, IBassDevice bassDevice) :
+        base(environmentService, fileSystemService)
     {
         _environment = environmentService;
         _fileSystem = fileSystemService;
@@ -23,22 +25,6 @@ public class AppPathService : IAppPathService
     private IReadOnlyList<string>? _audioExtensions;
 
     /// <inheritdoc />
-    public string UnhandledExceptionLogPath => _unhandledExceptionLogPath ??=
-        Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\Log.txt");
-    private string? _unhandledExceptionLogPath;
-    
-    /// <inheritdoc />
-    public string ConfigFile => _configFile ??= 
-        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\432HzConverterConfig.json");
+    public string ConfigFile => _configFile ??= GetStoragePath("432HzConverterConfig.json");
     private string? _configFile;
-    
-    /// <summary>
-    /// Combines two paths while replacing folder separator chars with platform-specific char.
-    /// </summary>
-    private string Combine(string part1, string part2)
-    {
-        part1 = part1.Replace('\\', _fileSystem.Path.DirectorySeparatorChar);
-        part2 = part2.Replace('\\', _fileSystem.Path.DirectorySeparatorChar);
-        return _fileSystem.Path.Combine(part1, part2);
-    }
 }

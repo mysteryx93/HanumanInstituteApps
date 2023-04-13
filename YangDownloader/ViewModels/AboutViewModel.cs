@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Apps;
+using HanumanInstitute.Services;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 

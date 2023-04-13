@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using Avalonia.Input.Platform;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.YangDownloader.Models;
 using YoutubeExplode.Channels;
 using YoutubeExplode.Common;

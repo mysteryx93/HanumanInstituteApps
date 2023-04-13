@@ -1,0 +1,161 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20" Width="600" Height="450">
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Window">
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+    <Style Selector="Window.gradient > Grid">
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
+    </Style>
+    
+    <Style Selector="Button.round">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="14" />
+    </Style>
+    <Style Selector="Button.round:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <Style Selector="ListBox">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="ListBox ListBoxItem > TextBlock">
+        <Setter Property="Padding" Value="8,4,4,4" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    
+    <Style Selector="TextBox">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="NumericUpDown">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="4,2,4,2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="ShowButtonSpinner" Value="False" />
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="8,1,0,1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style Selector="ComboBox ComboBoxItem">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="8,1,4,1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style Selector="Button.icon, ToggleButton.icon">
+        <Setter Property="FontFamily" Value="avares://HanumanInstitute.Apps/Styles/HanumanInstituteAppIcons.otf#" />
+        <Setter Property="FontSize" Value="17" />
+    </Style>
+
+    <!--Use Classes="RadioButtonListBox" in any ListBox to represent its items as RadioButtons-->
+    <Style Selector="ListBox.RadioButtonListBox">
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="ListBox.RadioButtonListBox ListBoxItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border Background="Transparent">
+                        <RadioButton Content="{TemplateBinding ContentPresenter.Content}"  
+                                     VerticalAlignment="Center"
+                                     IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="ui|HyperlinkButton">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="ToolTip">
+        <Setter Property="FontFamily" Value="default" />
+    </Style>
+    
+    <Style Selector="Button.toolbar, ToggleButton.toolbar">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      RecognizesAccessKey="True"
+                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
+        </Style>
+        <Style Selector="^:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarCheckedHoverBrush}" />
+        </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarPressedBrush}" />
+        </Style>
+        <Style Selector="^:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Opacity" Value="{DynamicResource MediaPlayerDisabledOpacity}" />
+        </Style>
+
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="FontFamily" Value="{TemplateBinding FontFamily}" />
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter">
+            <Setter Property="FontSize" Value="{TemplateBinding FontSize}" />
+        </Style>
+    </Style>
+</Styles>

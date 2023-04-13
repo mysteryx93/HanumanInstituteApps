@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Avalonia;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432Hz.ViewModels;
@@ -9,7 +10,7 @@ namespace HanumanInstitute.Player432Hz.ViewModels;
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
 public abstract class SettingsViewModelBase<TSettings> : OkCancelViewModel
-    where TSettings : SettingsDataBase, new()
+    where TSettings : SettingsBase, new()
 {
     private readonly IFluentAvaloniaTheme _fluentTheme;
     protected readonly ISettingsProvider<TSettings> _settingsProvider;

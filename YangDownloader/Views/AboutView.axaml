@@ -2,17 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:app="clr-namespace:HanumanInstitute.Common.Avalonia.App;assembly=Common.Avalonia.App"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
+        xmlns:apps="clr-namespace:HanumanInstitute.Apps;assembly=HanumanInstitute.Apps"
         mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="360" Height="360" MaxHeight="360" 
         x:Class="HanumanInstitute.YangDownloader.Views.AboutView"
         Title="Information" Classes="gradient"
         CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static local:ViewModelLocator.About}" x:DataType="vm:AboutViewModel">
     <Window.Resources>
-        <app:VersionConverter x:Key="VersionConverter" />
+        <apps:VersionConverter x:Key="VersionConverter" />
     </Window.Resources>
     <Grid>
         <Grid Margin="10,8,10,4">

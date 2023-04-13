@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using Avalonia.Markup.Xaml;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.Converter432Hz.Views;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 

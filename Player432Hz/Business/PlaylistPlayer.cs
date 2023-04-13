@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using DynamicData;
+using HanumanInstitute.Apps;
 using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.Services;
 using ReactiveUI;
 
 namespace HanumanInstitute.Player432Hz.Business;
@@ -12,13 +12,15 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
 {
     private readonly IPitchDetector _pitchDetector;
     private readonly IFileSystemService _fileSystem;
+    private readonly IRandomGenerator _randomGenerator;
 
     public PlaylistPlayer(IPitchDetectorWithCache pitchDetector, IFileSystemService fileSystem,
-        ISettingsProvider<AppSettingsData> settings) :
+        ISettingsProvider<AppSettingsData> settings, IRandomGenerator randomGenerator) :
         base(settings)
     {
         _pitchDetector = pitchDetector;
         _fileSystem = fileSystem;
+        _randomGenerator = randomGenerator;
     }
 
     /// <inheritdoc />
@@ -59,8 +61,6 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
     /// <inheritdoc />
     public double? PitchErrorHz => PitchError * PitchFrom;
 
-    private readonly Random _random = new();
-
     /// <inheritdoc />
     public async Task PlayAsync(IEnumerable<string>? list, string? current)
     {
@@ -92,10 +92,10 @@ public class PlaylistPlayer : BaseWithSettings<AppSettingsData>, IPlaylistPlayer
             var pos = -1;
             if (_settings.Value.Shuffle)
             {
-                pos = _random.Next(Files.Count);
+                pos = _randomGenerator.GetInt(Files.Count);
                 if (Files[pos] == NowPlaying)
                 {
-                    pos = _random.Next(Files.Count);
+                    pos = _randomGenerator.GetInt(Files.Count);
                 }
             }
             else

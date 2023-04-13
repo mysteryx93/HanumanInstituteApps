@@ -6,19 +6,20 @@
         mc:Ignorable="d" Classes="gradient"
         Title="432Hz Batch Converter" Icon="/Assets/App.ico"
         MinHeight="350" MinWidth="590"
-        hic:SizeExtension.TrackSize="True"
-        hic:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
-        hic:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
+        av:SizeExtension.TrackSize="True"
+        av:SizeExtension.Width="{Binding AppSettings.Width, Mode=TwoWay}"
+        av:SizeExtension.Height="{Binding AppSettings.Height, Mode=TwoWay}"
         xmlns:local="clr-namespace:HanumanInstitute.Converter432Hz"
-        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:bass="clr-namespace:HanumanInstitute.BassAudio;assembly=BassAudio"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.Converter432Hz.ViewModels"
         xmlns:views="clr-namespace:HanumanInstitute.Converter432Hz.Views"
+        xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
+        xmlns:ad="clr-namespace:HanumanInstitute.Apps.AdRotator;assembly=HanumanInstitute.Apps"
         d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Window.Resources>
-        <hic:PercentageConverter x:Key="PercentageConverter" />
-        <hic:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
+        <av:PercentageConverter x:Key="PercentageConverter" />
+        <av:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
     </Window.Resources>
     <Grid>
         <Grid Margin="10">
@@ -27,10 +28,11 @@
                 <ColumnDefinition Width="245" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="220" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Column="0" Grid.Row="0">
+                <ad:AdRotator DataContext="{Binding AdRotator}" />
                 <Grid>
                     <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="DemiBold" Text="Sources " />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,2">
@@ -59,7 +61,7 @@
                     </Button>
                 </Grid>
             </StackPanel>
-            <Grid Grid.Column="0" Grid.Row="1">
+            <Grid Grid.Column="0" Grid.Row="1" Margin="0,8,0,0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
                 </StackPanel>

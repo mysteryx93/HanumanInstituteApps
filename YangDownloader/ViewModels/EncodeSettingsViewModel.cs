@@ -1,7 +1,8 @@
 ﻿using System.Linq.Expressions;
 using System.Text.Json.Serialization.Metadata;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.BassAudio;
-using HanumanInstitute.Common.Avalonia.App;
 using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;

@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.Player432Hz.Models;
 
 /// <summary>
 /// Contains the application settings and configured playlists.
 /// </summary>
-public class AppSettingsData : SettingsDataBase
+public class AppSettingsData : SettingsBase
 {
     /// <summary>
     /// Gets or sets the list of configured playlists.

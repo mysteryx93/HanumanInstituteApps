@@ -4,22 +4,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
         xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
         xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
+        xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
         mc:Ignorable="d" MinWidth="350" Width="350" MinHeight="200" Height="200"
         x:Class="HanumanInstitute.YangDownloader.Views.SettingsView"
         Title="Settings" Classes="gradient"
         ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
     <Window.Resources>
-        <hic:BooleanToBrushConverter x:Key="BooleanToBrushConverter">
-            <hic:BooleanToBrushConverter.TrueValue>
+        <av:BooleanToBrushConverter x:Key="BooleanToBrushConverter">
+            <av:BooleanToBrushConverter.TrueValue>
                 <SolidColorBrush Color="Green" /> 
-            </hic:BooleanToBrushConverter.TrueValue>
-            <hic:BooleanToBrushConverter.FalseValue>
+            </av:BooleanToBrushConverter.TrueValue>
+            <av:BooleanToBrushConverter.FalseValue>
                 <SolidColorBrush Color="Red" /> 
-            </hic:BooleanToBrushConverter.FalseValue>
-        </hic:BooleanToBrushConverter>
+            </av:BooleanToBrushConverter.FalseValue>
+        </av:BooleanToBrushConverter>
     </Window.Resources>
     <Grid>
         <Grid Margin="10">
@@ -43,7 +43,7 @@
                 </StackPanel>
                 <TextBlock Grid.Column="0" Text="Save to Folder" HorizontalAlignment="Left"/>
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True"
+                    <TextBox Grid.Column="1" av:FocusExtensions.FocusOnLoaded="True"
                              Text="{Binding Settings.DestinationFolder}">
                         <Interaction.Behaviors>
                             <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.LostFocusEvent}">

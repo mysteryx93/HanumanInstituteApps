@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Avalonia.App.Tests\Common.Avalonia.App.Tests.csproj" />
-    <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+    <ProjectReference Include="..\Apps.Tests\Apps.Tests.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
     <ProjectReference Include="..\Downloads\Downloads.csproj" />
   </ItemGroup>
 </Project>

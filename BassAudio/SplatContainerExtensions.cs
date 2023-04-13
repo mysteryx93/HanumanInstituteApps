@@ -8,7 +8,7 @@ namespace HanumanInstitute.BassAudio;
 public static class SplatContainerExtensions
 {
     /// <summary>
-    /// Registers Common.Services classes into the IoC container.
+    /// Registers Services classes into the IoC container.
     /// </summary>
     /// <param name="services">The IoC services container.</param>
     public static IMutableDependencyResolver AddBassAudio(this IMutableDependencyResolver services)

@@ -2,12 +2,13 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
+using HanumanInstitute.Services;
 
 // ReSharper disable MemberCanBePrivate.Global
 

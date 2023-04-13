@@ -1,4 +1,4 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Apps;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
@@ -9,7 +9,7 @@ namespace HanumanInstitute.Player432Hz.ViewModels;
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
 public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>, IViewLoaded, IViewClosed
-    where TSettings : SettingsDataBase, new()
+    where TSettings : SettingsBase, new()
 {
     private IAppUpdateService _appUpdateService;
     private IEnvironmentService _environment;

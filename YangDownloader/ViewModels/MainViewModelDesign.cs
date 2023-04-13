@@ -1,6 +1,5 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
+﻿using HanumanInstitute.Apps;
 using HanumanInstitute.Downloads;
-using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 

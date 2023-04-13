@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Common.Avalonia.App;
-using HanumanInstitute.YangDownloader.Business;
-using Splat;
+﻿using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.YangDownloader;
 

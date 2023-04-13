@@ -1,4 +1,6 @@
-﻿namespace HanumanInstitute.PowerliminalsPlayer.Business;
+﻿using HanumanInstitute.Services;
+
+namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
 /// <summary>
 /// Application settings for design view.

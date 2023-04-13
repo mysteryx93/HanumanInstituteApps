@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using DynamicData;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
+using HanumanInstitute.Apps.AdRotator;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
@@ -19,12 +21,12 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private readonly IAppPathService _appPath;
     private readonly IEnvironmentService _environment;
     private readonly IPitchDetector _pitchDetector;
-
+    
     public AppSettingsData AppSettings => _settings.Value;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IEncoderService encoder,
         IDialogService dialogService, IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, 
-        IEnvironmentService environment, IPitchDetector pitchDetector) :
+        IEnvironmentService environment, IPitchDetector pitchDetector, AdRotatorViewModel adRotator) :
         base(settings, appUpdateService, environment)
     {
         Encoder = encoder;
@@ -35,6 +37,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         _appPath = appPath;
         _environment = environment;
         _pitchDetector = pitchDetector;
+        AdRotator = adRotator;
 
         Bind(x => x.Settings.Encode.Format, x => x.FormatsList.SelectedValue);
         Bind(x => x.Settings.Encode.Bitrate, x => x.BitrateList.SelectedValue);
@@ -63,6 +66,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         //     CalcCompleted();
         // };
     }
+
+    public AdRotatorViewModel AdRotator { get; }
 
     private void Bind<T1, T2>(Expression<Func<MainViewModel, T1?>> expr1, Expression<Func<MainViewModel, T2?>> expr2)
     {

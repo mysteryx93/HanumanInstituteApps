@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Avalonia.App.Tests\Common.Avalonia.App.Tests.csproj" />
+    <ProjectReference Include="..\Apps.Tests\Apps.Tests.csproj" />
     <ProjectReference Include="..\Player432Hz\Player432Hz.csproj" />
   </ItemGroup>
 

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common.Avalonia.App.Tests\Common.Avalonia.App.Tests.csproj" />
+    <ProjectReference Include="..\Apps.Tests\Apps.Tests.csproj" />
     <ProjectReference Include="..\Converter432Hz\Converter432Hz.csproj" />
     <ProjectReference Include="..\DLL\BassEnc\BassEncDlls.csproj" />
     <ProjectReference Include="..\DLL\Bass\BassDlls.csproj" />

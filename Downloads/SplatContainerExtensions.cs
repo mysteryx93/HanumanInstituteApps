@@ -6,7 +6,7 @@ namespace HanumanInstitute.Downloads;
 public static class SplatContainerExtensions
 {
     /// <summary>
-    /// Registers Common.Services classes into the IoC container.
+    /// Registers Services classes into the IoC container.
     /// </summary>
     /// <param name="services">The IoC services container.</param>
     /// <param name="options">Download manager configuration.</param>

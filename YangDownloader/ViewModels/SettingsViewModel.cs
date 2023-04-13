@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.FFmpeg;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;

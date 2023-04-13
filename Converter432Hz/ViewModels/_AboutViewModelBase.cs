@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.Services;
 using ReactiveUI;
 
 // Trimming fails if MainViewModelBase is in a separate assembly.
@@ -14,7 +15,7 @@ namespace HanumanInstitute.Converter432Hz.ViewModels;
 /// </summary>
 /// <typeparam name="TSettings">The data type of application settings.</typeparam>
 public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDialogViewModel, ICloseable
-    where TSettings : SettingsDataBase, new()
+    where TSettings : SettingsBase, new()
 {
     private readonly IEnvironmentService _environment;
     private readonly ISettingsProvider<TSettings> _settings;
@@ -57,7 +58,7 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
     /// <summary>
     /// Returns application settings.
     /// </summary>
-    public SettingsDataBase Settings => _settings.Value;
+    public SettingsBase Settings => _settings.Value;
 
     /// <summary>
     /// Returns the version of the application.

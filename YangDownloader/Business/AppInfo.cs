@@ -1,5 +1,5 @@
 ﻿using AppSoftware.LicenceEngine.Common;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.YangDownloader.Business;
 

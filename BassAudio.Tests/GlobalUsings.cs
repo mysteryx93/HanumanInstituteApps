@@ -5,6 +5,6 @@ global using System.Threading.Tasks;
 global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.BassAudio;
 global using HanumanInstitute.Validators;
-global using HanumanInstitute.Common.Avalonia.App.Tests;
+global using HanumanInstitute.Apps.Tests;
 global using Moq;
 global using Xunit;

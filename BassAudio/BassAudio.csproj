@@ -31,7 +31,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
-      <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
+      <ProjectReference Include="..\Services\Services.csproj" />
     </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">

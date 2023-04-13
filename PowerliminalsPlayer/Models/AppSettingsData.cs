@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Serialization;
-using HanumanInstitute.Common.Avalonia.App;
+using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Models;
 
 /// <summary>
 /// Contains the PowerliminalsPlayer application settings.
 /// </summary>
-public class AppSettingsData : SettingsDataBase
+public class AppSettingsData : SettingsBase
 {
     /// <summary>
     /// Gets or sets the list of folders in which to look for audio files.

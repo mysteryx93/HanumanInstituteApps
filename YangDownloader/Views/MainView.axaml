@@ -3,18 +3,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:hic="clr-namespace:HanumanInstitute.Common.Avalonia;assembly=Common.Avalonia"
     xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
     xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
     xmlns:views="clr-namespace:HanumanInstitute.YangDownloader.Views"
+    xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
     x:Class="HanumanInstitute.YangDownloader.Views.MainView"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     MinHeight="260" MinWidth="590" d:DesignWidth="590" d:DesignHeight="260"
     Title="Yang YouTube Downloader" Icon="/Assets/App.ico"
-    hic:SizeExtension.TrackSize="True" Classes="gradient"
-    hic:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
-    hic:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
+    av:SizeExtension.TrackSize="True" Classes="gradient"
+    av:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
+    av:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
     d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Activated">
@@ -63,7 +63,7 @@
                 </StackPanel>
                 <Grid Margin="0,10,0,4" ColumnDefinitions="Auto,*">
                     <TextBlock Grid.Column="0" Text="Download URL:" VerticalAlignment="Center" Width="110" />
-                    <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True"
+                    <TextBox Grid.Column="1" av:FocusExtensions.FocusOnLoaded="True"
                              Text="{Binding DownloadUrl}" />
                 </Grid>
                 <Grid Margin="0,5,0,5">
