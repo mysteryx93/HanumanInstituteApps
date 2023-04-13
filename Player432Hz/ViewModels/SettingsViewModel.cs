@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Apps;
 using HanumanInstitute.Avalonia;
-using HanumanInstitute.Common.Services.Validation;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
+using HanumanInstitute.Services.Validation;
 
 namespace HanumanInstitute.Player432Hz.ViewModels;
 

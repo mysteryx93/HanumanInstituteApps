@@ -2,8 +2,7 @@
 using System.IO;
 using System.IO.Abstractions;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Extends IFileSystem with a few extra IO functions. IFileSystem provides wrappers around all IO methods.

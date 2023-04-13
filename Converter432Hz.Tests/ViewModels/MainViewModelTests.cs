@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Linq;
-using HanumanInstitute.Apps;
 using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;

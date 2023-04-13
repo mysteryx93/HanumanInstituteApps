@@ -4,8 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using HanumanInstitute.Services.Properties;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class WindowsApiService : IWindowsApiService
@@ -13,10 +12,10 @@ public class WindowsApiService : IWindowsApiService
     private const int ResultOk = 0;
 
     /// <inheritdoc />
-    public IntPtr GetForegroundWindow() => NativeMethods.GetForegroundWindow();
+    public nint GetForegroundWindow() => NativeMethods.GetForegroundWindow();
 
     /// <inheritdoc />
-    public bool SetForegroundWindow(IntPtr hWnd) => NativeMethods.SetForegroundWindow(hWnd);
+    public bool SetForegroundWindow(nint hWnd) => NativeMethods.SetForegroundWindow(hWnd);
 
     /// <inheritdoc />
     public string GetShortPathName(string path)
@@ -55,11 +54,11 @@ public class WindowsApiService : IWindowsApiService
     private static class NativeMethods
     {
         [DllImport("user32.dll")]
-        internal static extern IntPtr GetForegroundWindow();
+        internal static extern nint GetForegroundWindow();
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool SetForegroundWindow(IntPtr hWnd);
+        internal static extern bool SetForegroundWindow(nint hWnd);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         internal static extern int GetShortPathName([MarshalAs(UnmanagedType.LPWStr)] string path, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder shortPath, int shortPathLength);
@@ -76,7 +75,7 @@ public class WindowsApiService : IWindowsApiService
         [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")]
         internal struct ShFileOpStruct
         {
-            public IntPtr Hwnd;
+            public nint Hwnd;
             [MarshalAs(UnmanagedType.U4)]
             public ApiFileOperationType Func;
             public string From;
@@ -84,7 +83,7 @@ public class WindowsApiService : IWindowsApiService
             public ApiFileOperationFlags Flags;
             [MarshalAs(UnmanagedType.Bool)]
             public bool AnyOperationsAborted;
-            public IntPtr NameMappings;
+            public nint NameMappings;
             public string ProgressTitle;
         }
     }

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services.Validation;
+namespace HanumanInstitute.Services.Validation;
 
 /// <summary>
 /// Provides methods to validate objects based on DataAnnotations.

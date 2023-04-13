@@ -1,14 +1,19 @@
 ﻿using AppSoftware.LicenceEngine.Common;
-using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.YangDownloader.Business;
 
 /// <inheritdoc />
 public class AppInfo : IAppInfo
 {
-    /// <inheritdoc />
-    public string GitHubFileFormat => "YangDownloader-{0}_Win_x64.zip";
+    // /// <inheritdoc />
+    // public string GitHubFileFormat => "YangDownloader-{0}_Win_x64.zip";
 
+    /// <inheritdoc />
+    public string DownloadInfoUrl => "https://github.com/mysteryx93/NaturalGroundingPlayer/releases";
+
+    /// <inheritdoc />
+    public AppIdentifier Id => AppIdentifier.YangDownloader;
+    
     /// <inheritdoc />
     public string AppName => "Yang YouTube Downloader";
 

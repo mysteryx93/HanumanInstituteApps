@@ -1,8 +1,8 @@
 ﻿using System.Threading;
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable CheckNamespace
 
-namespace HanumanInstitute.Common.Services;
+// ReSharper disable MemberCanBePrivate.Global
+
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// An extension of SemaphoreSlim that allows changing the capacity dynamically.

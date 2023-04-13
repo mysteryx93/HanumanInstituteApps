@@ -3,7 +3,6 @@ global using System.Linq;
 global using System.Collections.Generic;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.Apps.Tests;
 global using HanumanInstitute.Validators;
 global using Xunit;

@@ -1,14 +1,19 @@
 ﻿using AppSoftware.LicenceEngine.Common;
-using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.Player432Hz.Business;
 
 /// <inheritdoc />
 public class AppInfo : IAppInfo
 {
-    /// <inheritdoc />
-    public string GitHubFileFormat => "Player432Hz-{0}_Win_x64.zip";
+    // /// <inheritdoc />
+    // public string GitHubFileFormat => "Player432Hz-{0}_Win_x64.zip";
 
+    /// <inheritdoc />
+    public string DownloadInfoUrl => "https://github.com/mysteryx93/NaturalGroundingPlayer/releases";
+
+    /// <inheritdoc />
+    public AppIdentifier Id => AppIdentifier.Player432Hz;
+    
     /// <inheritdoc />
     public string AppName => "432Hz Player";
 

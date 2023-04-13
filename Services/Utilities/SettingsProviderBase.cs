@@ -3,11 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization.Metadata;
-using HanumanInstitute.Common.Services.Validation;
 using HanumanInstitute.Services.Properties;
+using HanumanInstitute.Services.Validation;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Handles generic settings features such as loading, saving and validating data.

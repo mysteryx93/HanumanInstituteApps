@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Apps;
-using HanumanInstitute.BassAudio;
+﻿using HanumanInstitute.BassAudio;
 using HanumanInstitute.Downloads;
 
 namespace HanumanInstitute.YangDownloader.Models;

@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Common.Services;
-
-namespace HanumanInstitute.Services;
+﻿namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Application settings for design view.

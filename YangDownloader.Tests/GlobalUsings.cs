@@ -3,7 +3,6 @@ global using System.ComponentModel;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using HanumanInstitute.Apps.Tests;
-global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.Downloads;
 global using HanumanInstitute.MvvmDialogs;
 global using HanumanInstitute.MvvmDialogs.Avalonia;

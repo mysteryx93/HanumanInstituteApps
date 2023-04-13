@@ -1,14 +1,13 @@
-﻿using HanumanInstitute.Apps;
+﻿using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.Services;
 
 namespace HanumanInstitute.Player432Hz.ViewModels;
 
 public sealed class AboutViewModel : AboutViewModelBase<AppSettingsData>
 {
     public AboutViewModel(IAppInfo appInfo, IEnvironmentService environment, ISettingsProvider<AppSettingsData> settings, 
-        IUpdateService updateService, ILicenseValidator licenseValidator, IDialogService dialogService) :
-        base(appInfo, environment, settings, updateService, licenseValidator, dialogService)
+        IHanumanInstituteHttpClient httpClient, ILicenseValidator licenseValidator, IDialogService dialogService, IAdRotatorViewModel adRotator) :
+        base(appInfo, environment, settings, httpClient, licenseValidator, dialogService, adRotator)
     {
     }
 }

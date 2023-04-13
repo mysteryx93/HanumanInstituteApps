@@ -5,8 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using HanumanInstitute.Services.Properties;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class FileSystemService : IFileSystemService

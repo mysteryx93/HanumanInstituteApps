@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Apps;
-using HanumanInstitute.Apps.AdRotator;
+﻿using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Provides information about the application, environment and operating system.
@@ -65,5 +64,10 @@ public interface IEnvironmentService
     /// <summary>
     /// Gets or sets the <see cref="T:System.Globalization.CultureInfo" /> object that represents the culture used by the current thread and task-based asynchronous operations.
     /// </summary>
-    public IFormatProvider CurrentCulture { get; }
+    IFormatProvider CurrentCulture { get; }
+    /// <summary>
+    /// Returns the operating system and CPU architecture in the same format as RuntimeIdentifier set while building. ex: win-x64, linux-arm64. 
+    /// </summary>
+    /// <returns>The operating system and architecture as a string.</returns>
+    string GetRuntimeIdentifier();
 }

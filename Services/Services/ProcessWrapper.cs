@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
-// ReSharper disable CheckNamespace
 
-namespace HanumanInstitute.Common.Services;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
+
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class ProcessWrapper : IProcess
@@ -121,7 +121,7 @@ public class ProcessWrapper : IProcess
     public bool Responding => _process.Responding;
 
     /// <inheritdoc />
-    public IntPtr ProcessorAffinity
+    public nint ProcessorAffinity
     {
         get => _process.ProcessorAffinity;
         set => _process.ProcessorAffinity = value;
@@ -146,7 +146,7 @@ public class ProcessWrapper : IProcess
     public SafeProcessHandle SafeHandle => _process.SafeHandle;
 
     /// <inheritdoc />
-    public IntPtr Handle => _process.Handle;
+    public nint Handle => _process.Handle;
 
     /// <inheritdoc />
     public DateTime ExitTime => _process.ExitTime;
@@ -161,7 +161,7 @@ public class ProcessWrapper : IProcess
     public int BasePriority => _process.BasePriority;
 
     /// <inheritdoc />
-    public IntPtr MainWindowHandle => _process.MainWindowHandle;
+    public nint MainWindowHandle => _process.MainWindowHandle;
 
     /// <inheritdoc />
     public event DataReceivedEventHandler ErrorDataReceived

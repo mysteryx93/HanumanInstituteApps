@@ -1,5 +1,5 @@
-﻿using HanumanInstitute.Common.Services;
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
+﻿// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
+using HanumanInstitute.Services;
 
 namespace HanumanInstitute.Apps.Tests;
 

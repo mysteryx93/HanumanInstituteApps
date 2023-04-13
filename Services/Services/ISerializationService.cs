@@ -1,9 +1,7 @@
-﻿// ReSharper disable CheckNamespace
-
-using System.IO;
+﻿using System.IO;
 using System.Text.Json.Serialization.Metadata;
 
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Manages the serialization of objects.

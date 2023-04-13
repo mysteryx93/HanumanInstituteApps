@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls;
-using HanumanInstitute.Apps;
-using HanumanInstitute.Services;
+using HanumanInstitute.Apps.AdRotator;
 using ReactiveUI;
 
 // Trimming fails if MainViewModelBase is in a separate assembly.
@@ -18,9 +17,10 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
 {
     private readonly IEnvironmentService _environment;
     private readonly ISettingsProvider<TSettings> _settings;
-    private readonly IUpdateService _updateService;
+    private readonly IHanumanInstituteHttpClient _httpClient;
     private readonly ILicenseValidator _licenseValidator;
     private readonly IDialogService _dialogService;
+    private readonly IAdRotatorViewModel _adRotator;
 
     /// <inheritdoc />
     public event EventHandler? RequestClose;
@@ -35,16 +35,16 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
     /// Initializes a new instance of the AboutViewModel class.
     /// </summary>
     protected AboutViewModelBase(IAppInfo appInfo, IEnvironmentService environment, ISettingsProvider<TSettings> settings,
-        IUpdateService updateService, ILicenseValidator licenseValidator, IDialogService dialogService)
+        IHanumanInstituteHttpClient httpClient, ILicenseValidator licenseValidator, IDialogService dialogService, IAdRotatorViewModel adRotator)
     {
         AppInfo = appInfo;
         _environment = environment;
         _settings = settings;
-        _updateService = updateService;
+        _httpClient = httpClient;
         _licenseValidator = licenseValidator;
         _dialogService = dialogService;
+        _adRotator = adRotator;
         // ReSharper disable once VirtualMemberCallInConstructor
-        _updateService.FileFormat = AppInfo.GitHubFileFormat;
         _license = _settings.Value.LicenseKey;
 
         // Start in constructor to save time.
@@ -87,6 +87,7 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
             {
                 Settings.LicenseKey = _license;
             }
+            _adRotator.Enabled = !Settings.IsLicenseValid;
         }
     }
     private string? _license;
@@ -109,10 +110,17 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
     private async Task CheckForUpdatesImpl()
     {
         CheckForUpdateText = "Checking for updates...";
-        var version = await _updateService.GetLatestVersionAsync();
-        CheckForUpdateText = version > _environment.AppVersion ?
-            $"v{version} is available!" :
-            "You have the latest version";
+        var version = await _httpClient.QueryVersionAsync();
+        if (version != null)
+        {
+            CheckForUpdateText = version.LatestVersion > _environment.AppVersion ?
+                $"v{version} is available!" :
+                "You have the latest version";
+            if (version.AdsLastUpdated > _adRotator.AdInfo.LastUpdated)
+            {
+                await _adRotator.LoadFromServerAsync();
+            }
+        }
     }
 
     /// <summary>

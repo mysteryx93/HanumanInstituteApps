@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
-using HanumanInstitute.Common.Services;
+using HanumanInstitute.Services;
 using Moq;
 
 namespace HanumanInstitute.Apps.Tests;

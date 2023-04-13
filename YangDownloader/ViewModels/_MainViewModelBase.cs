@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Apps;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace HanumanInstitute.YangDownloader.ViewModels;
 

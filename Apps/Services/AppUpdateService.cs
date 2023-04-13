@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-using HanumanInstitute.Common.Services;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using HanumanInstitute.Services;
 
 namespace HanumanInstitute.Apps;
 
@@ -13,20 +12,23 @@ public class AppUpdateService<TSettings> : IAppUpdateService
     private readonly IDialogService _dialogService;
     private readonly ISettingsProvider<TSettings> _settings;
     private readonly IEnvironmentService _environment;
-    private readonly IUpdateService _updateService;
+    private readonly IHanumanInstituteHttpClient _httpClient;
     private readonly IProcessService _processService;
     private readonly IAppInfo _appInfo;
+    private readonly IAdRotatorViewModel _adRotator;
 
     public AppUpdateService(ISettingsProvider<TSettings> settings, IDialogService dialogService, IEnvironmentService environment,
-        IUpdateService updateService, IProcessService processService, IAppInfo appInfo)
+        IHanumanInstituteHttpClient httpClient, IProcessService processService, IAppInfo appInfo, IAdRotatorViewModel adRotator)
     {
         _settings = settings;
         _dialogService = dialogService;
         _environment = environment;
-        _updateService = updateService;
+        _httpClient = httpClient;
         _processService = processService;
         _appInfo = appInfo;
+        _adRotator = adRotator;
     }
+    
 
     /// <inheritdoc />
     public async Task CheckForUpdatesAsync(INotifyPropertyChanged owner)
@@ -41,22 +43,28 @@ public class AppUpdateService<TSettings> : IAppUpdateService
              (interval == UpdateInterval.Bimonthly && lastCheck > TimeSpan.FromDays(15)) ||
              (interval == UpdateInterval.Monthly && lastCheck > TimeSpan.FromDays(30))))
         {
-            _updateService.FileFormat = _appInfo.GitHubFileFormat;
-            var version = await _updateService.GetLatestVersionAsync().ConfigureAwait(true);
+            // _updateService.FileFormat = _appInfo.GitHubFileFormat;
+            // var version = await _updateService.GetLatestVersionAsync().ConfigureAwait(true);
+            var version = await _httpClient.QueryVersionAsync();
             if (version != null)
             {
                 _settings.Value.LastCheckForUpdate = _environment.Now;
                 _settings.Save();
-            }
-            if (version > _environment.AppVersion)
-            {
-                await Task.Delay(1).ConfigureAwait(true);
-                var result = await _dialogService.ShowMessageBoxAsync(owner,
-                    $"Version {version} is available!\n\nWould you like to download it now?".ReplaceLineEndings(),
-                    "Update Available!", MessageBoxButton.YesNo, MessageBoxImage.Information).ConfigureAwait(false);
-                if (result == true)
+                
+                if (version.LatestVersion > _environment.AppVersion)
                 {
-                    _processService.OpenBrowserUrl(_updateService.GetDownloadInfoLink());
+                    await Task.Delay(1).ConfigureAwait(true);
+                    var result = await _dialogService.ShowMessageBoxAsync(owner,
+                        $"Version {version} is available!\n\nWould you like to download it now?".ReplaceLineEndings(),
+                        "Update Available!", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                    if (result == true)
+                    {
+                        _processService.OpenBrowserUrl(_appInfo.DownloadInfoUrl);
+                    }
+                }
+                if (version.AdsLastUpdated > _adRotator.AdInfo.LastUpdated)
+                {
+                    await _adRotator.LoadFromServerAsync();
                 }
             }
         }

@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class EnvironmentService : IEnvironmentService
@@ -41,4 +41,22 @@ public class EnvironmentService : IEnvironmentService
     public bool IsMacOS => OperatingSystem.IsMacOS();
     /// <inheritdoc />
     public IFormatProvider CurrentCulture => CultureInfo.CurrentCulture;
+    
+    /// <inheritdoc />
+    public string GetRuntimeIdentifier()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return RuntimeInformation.ProcessArchitecture == Architecture.X86 ? "win-x86" : "win-x64";
+        }
+        if (OperatingSystem.IsLinux())
+        {
+            return RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "linux-arm64" : "linux-x64";
+        }
+        if (OperatingSystem.IsMacOS())
+        {
+            return RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "osx-arm64" : "osx-x64";
+        }
+        return string.Empty;
+    }
 }

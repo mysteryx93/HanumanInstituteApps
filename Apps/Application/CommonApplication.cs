@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Xaml.Interactions.Core;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 using Splat;
@@ -81,6 +82,11 @@ public abstract class CommonApplication<TMain> : Application
         {
             var validator = Locator.Current.GetService<ILicenseValidator>()!;
             settings.IsLicenseValid = validator.Validate(settings.LicenseKey);
+            if (settings.IsLicenseValid)
+            {
+                var adRotator = Locator.Current.GetService<IAdRotatorViewModel>()!;
+                adRotator.Enabled = false;
+            }
         }
         InitLicense(settings);
     }

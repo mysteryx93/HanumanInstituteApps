@@ -1,9 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input.Platform;
 using HanumanInstitute.Apps.AdRotator;
-using HanumanInstitute.Common.Services;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.Services;
 using Splat;
 
 namespace HanumanInstitute.Apps;
@@ -24,16 +22,18 @@ public static class SplatContainerExtensions
             GetService<ISettingsProvider<TSettings>>(), 
             GetService<IDialogService>(),
             GetService<IEnvironmentService>(),
-            GetService<IUpdateService>(),
+            GetService<IHanumanInstituteHttpClient>(),
             GetService<IProcessService>(),
-            GetService<IAppInfo>()));
+            GetService<IAppInfo>(),
+            GetService<IAdRotatorViewModel>()));
         
         services.Register<IClipboard>(() => Application.Current!.Clipboard);
 
         // SplatRegistrations.Register<IAppUpdateService, AppUpdateService<TSettings>>();
         SplatRegistrations.RegisterLazySingleton<ILicenseValidator, LicenseValidator>();
         SplatRegistrations.RegisterLazySingleton<IAppPathServiceBase, AppPathServiceBase>();
-        SplatRegistrations.RegisterLazySingleton<AdRotatorViewModel>();
+        SplatRegistrations.RegisterLazySingleton<IAdRotatorViewModel, AdRotatorViewModel>();
+        SplatRegistrations.RegisterLazySingleton<IHanumanInstituteHttpClient, HanumanInstituteHttpClient>();
         SplatRegistrations.SetupIOC();
 
         return services;

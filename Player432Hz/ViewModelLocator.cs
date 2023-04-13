@@ -1,13 +1,11 @@
 ﻿using System.Text.Json.Serialization.Metadata;
 using Avalonia.Controls;
 using FluentAvalonia.Styling;
-using HanumanInstitute.Apps;
 using HanumanInstitute.BassAudio;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.Player432Hz.Views;
-using HanumanInstitute.Services;
 using LazyCache.Splat;
 using Splat;
 

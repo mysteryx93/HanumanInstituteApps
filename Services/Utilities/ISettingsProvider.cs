@@ -1,5 +1,4 @@
-﻿// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+﻿namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Handles generic settings features such as loading, saving and validating data.

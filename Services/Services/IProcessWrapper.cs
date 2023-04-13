@@ -3,8 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Abstraction wrapper around the System.Diagnostics.Process class that can be used for unit testing.
@@ -119,7 +118,7 @@ public interface IProcess : IDisposable
     /// <summary>
     /// Gets or sets the processors on which the threads in this process can be scheduled to run.
     /// </summary>
-    IntPtr ProcessorAffinity { get; set; }
+    nint ProcessorAffinity { get; set; }
     /// <summary>
     /// Gets the main module for the associated process.
     /// </summary>
@@ -147,7 +146,7 @@ public interface IProcess : IDisposable
     /// <summary>
     /// Gets the native handle of the associated process.
     /// </summary>
-    IntPtr Handle { get; }
+    nint Handle { get; }
     /// <summary>
     /// Gets the time that the associated process exited.
     /// </summary>
@@ -167,7 +166,7 @@ public interface IProcess : IDisposable
     /// <summary>
     /// Gets the window handle of the main window of the associated process.
     /// </summary>
-    IntPtr MainWindowHandle { get; }
+    nint MainWindowHandle { get; }
     /// <summary>
     /// Occurs when an application writes to its redirected System.Diagnostics.Process.StandardError stream.
     /// </summary>

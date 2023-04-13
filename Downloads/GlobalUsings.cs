@@ -6,5 +6,4 @@ global using System.Globalization;
 global using System.Linq;
 global using Microsoft.Extensions.Options;
 global using HanumanInstitute.Validators;
-global using HanumanInstitute.Common.Services;
 global using HanumanInstitute.Downloads.Properties;

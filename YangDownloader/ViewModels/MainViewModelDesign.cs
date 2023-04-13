@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Apps;
-using HanumanInstitute.Downloads;
+﻿using HanumanInstitute.Downloads;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 

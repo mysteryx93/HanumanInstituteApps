@@ -4,7 +4,7 @@ using System.Globalization;
 using HanumanInstitute.Services.Properties;
 
 // ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Although Razor Pages validate properties marked with BindAttribute, manual validation doesn't. 

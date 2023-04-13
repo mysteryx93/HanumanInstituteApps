@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mk="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+             xmlns:app="clr-namespace:HanumanInstitute.Apps"
+             xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+             xmlns:adRotator="clr-namespace:HanumanInstitute.Apps.AdRotator"
+             mc:Ignorable="d" d:DesignWidth="400" Height="75"
+             x:Class="HanumanInstitute.Apps.AdRotator.AdRotator" BorderThickness="2" BorderBrush="{DynamicResource ComboBoxBorderBrush}"
+             d:DataContext="{x:Static adRotator:AdRotatorViewModelDesign.Instance}" x:DataType="adRotator:AdRotatorViewModel">
+    <Grid>
+        <Interaction.Behaviors>
+            <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.PointerPressedEvent}">
+                <InvokeCommandAction Command="{Binding OpenLink}" />
+            </RoutedEventTriggerBehavior>
+        </Interaction.Behaviors>
+        <Viewbox Margin="4">
+            <mk:MarkdownScrollViewer Markdown="{Binding Current.Markdown}">
+                <mk:MarkdownScrollViewer.Styles>
+                    <Style Selector="ctxt|CTextBlock">
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="IsHitTestVisible" Value="False"/>
+                    </Style>
+                    <Style Selector="Grid.List">
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                    <Style Selector=".List ctxt|CTextBlock.ListMarker">
+                        <Setter Property="Margin" Value="2,0,4,0"/>
+                    </Style>
+                </mk:MarkdownScrollViewer.Styles>
+            </mk:MarkdownScrollViewer>
+        </Viewbox>
+        <TextBlock Text="Ads" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="10" />
+    </Grid>
+</UserControl>

@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class ProcessService : IProcessService

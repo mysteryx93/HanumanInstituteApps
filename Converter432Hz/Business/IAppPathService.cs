@@ -1,7 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using HanumanInstitute.Apps;
-
 namespace HanumanInstitute.Converter432Hz.Business;
 
 /// <summary>

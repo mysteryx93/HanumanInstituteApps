@@ -5,7 +5,6 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.Apps;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;

@@ -2,10 +2,8 @@
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
-using HanumanInstitute.Apps;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.Services;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;

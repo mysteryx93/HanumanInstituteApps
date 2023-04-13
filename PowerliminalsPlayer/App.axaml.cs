@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Avalonia.Markup.Xaml;
-using HanumanInstitute.Apps;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.PowerliminalsPlayer.Views;
 

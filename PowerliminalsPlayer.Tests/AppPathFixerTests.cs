@@ -5,7 +5,6 @@ using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
-using HanumanInstitute.Services;
 
 // ReSharper disable MemberCanBePrivate.Global
 

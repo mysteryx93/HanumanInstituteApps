@@ -1,13 +1,17 @@
 ﻿using AppSoftware.LicenceEngine.Common;
-using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.Converter432Hz.Business;
 
 /// <inheritdoc />
 public class AppInfo : IAppInfo
 {
+    //public string GitHubFileFormat => "Converter432Hz-{0}_Win_x64.zip";
+
     /// <inheritdoc />
-    public string GitHubFileFormat => "Converter432Hz-{0}_Win_x64.zip";
+    public string DownloadInfoUrl => "https://github.com/mysteryx93/NaturalGroundingPlayer/releases";
+
+    /// <inheritdoc />
+    public AppIdentifier Id => AppIdentifier.Converter432Hz;
 
     /// <inheritdoc />
     public string AppName => "432Hz Batch Converter";

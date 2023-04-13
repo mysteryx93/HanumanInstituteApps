@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Apps;
-
-namespace HanumanInstitute.YangDownloader;
+﻿namespace HanumanInstitute.YangDownloader;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Program

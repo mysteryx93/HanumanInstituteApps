@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Services;
-
-namespace HanumanInstitute.Converter432Hz.Business;
+﻿namespace HanumanInstitute.Converter432Hz.Business;
 
 /// <summary>
 /// Application settings for design view.

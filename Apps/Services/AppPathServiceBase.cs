@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Common.Services;
-
-namespace HanumanInstitute.Apps;
+﻿namespace HanumanInstitute.Apps;
 
 /// <inheritdoc />
 public class AppPathServiceBase : IAppPathServiceBase

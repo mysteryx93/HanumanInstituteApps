@@ -1,7 +1,4 @@
-﻿
-
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+﻿namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Exposes the Windows API.
@@ -11,12 +8,12 @@ public interface IWindowsApiService
     /// <summary>
     /// Returns the hWnd of the window that is in the foreground.
     /// </summary>
-    IntPtr GetForegroundWindow();
+    nint GetForegroundWindow();
     /// <summary>
     /// Moves specified window into the foreground.
     /// </summary>
     /// <param name="hWnd">The hWnd of the window to show.</param>
-    bool SetForegroundWindow(IntPtr hWnd);
+    bool SetForegroundWindow(nint hWnd);
     /// <summary>
     /// Returns the DOS-format short path name for specified path.
     /// </summary>

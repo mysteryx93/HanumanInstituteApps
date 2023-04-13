@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Apps;
-
-namespace HanumanInstitute.Converter432Hz;
+﻿namespace HanumanInstitute.Converter432Hz;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Program

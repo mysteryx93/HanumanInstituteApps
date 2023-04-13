@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using DynamicData;
-using HanumanInstitute.Apps;
 using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
@@ -26,7 +25,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IEncoderService encoder,
         IDialogService dialogService, IFileSystemService fileSystem, IFileLocator fileLocator, IAppPathService appPath, 
-        IEnvironmentService environment, IPitchDetector pitchDetector, AdRotatorViewModel adRotator) :
+        IEnvironmentService environment, IPitchDetector pitchDetector, IAdRotatorViewModel adRotator) :
         base(settings, appUpdateService, environment)
     {
         Encoder = encoder;
@@ -67,7 +66,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         // };
     }
 
-    public AdRotatorViewModel AdRotator { get; }
+    public IAdRotatorViewModel AdRotator { get; }
 
     private void Bind<T1, T2>(Expression<Func<MainViewModel, T1?>> expr1, Expression<Func<MainViewModel, T2?>> expr2)
     {

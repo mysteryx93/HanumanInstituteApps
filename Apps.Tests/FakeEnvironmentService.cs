@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using HanumanInstitute.Common.Services;
+using HanumanInstitute.Services;
 
 namespace HanumanInstitute.Apps.Tests;
 
@@ -37,4 +37,6 @@ public class FakeEnvironmentService : IEnvironmentService
     public bool IsMacOS => false;
     
     public IFormatProvider CurrentCulture => CultureInfo.CurrentCulture;
+
+    public string GetRuntimeIdentifier() => "win-x64";
 }

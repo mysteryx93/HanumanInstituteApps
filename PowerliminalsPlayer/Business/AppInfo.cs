@@ -1,14 +1,19 @@
 ﻿using AppSoftware.LicenceEngine.Common;
-using HanumanInstitute.Apps;
 
 namespace HanumanInstitute.PowerliminalsPlayer.Business;
 
 /// <inheritdoc />
 public class AppInfo : IAppInfo
 {
-    /// <inheritdoc />
-    public string GitHubFileFormat => "PowerliminalsPlayer-{0}_Win_x64.zip";
+    // /// <inheritdoc />
+    // public string GitHubFileFormat => "PowerliminalsPlayer-{0}_Win_x64.zip";
 
+    /// <inheritdoc />
+    public string DownloadInfoUrl => "https://github.com/mysteryx93/NaturalGroundingPlayer/releases";
+
+    /// <inheritdoc />
+    public AppIdentifier Id => AppIdentifier.PowerliminalsPlayer;
+    
     /// <inheritdoc />
     public string AppName => "Powerliminals Player";
 

@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using System.Net.Http;
-using HanumanInstitute.Common.Services;
 using Splat;
 
 namespace HanumanInstitute.Services;

@@ -1,6 +1,4 @@
-﻿using HanumanInstitute.Services;
-
-namespace HanumanInstitute.YangDownloader.Business;
+﻿namespace HanumanInstitute.YangDownloader.Business;
 
 /// <summary>
 /// Application settings for design view.

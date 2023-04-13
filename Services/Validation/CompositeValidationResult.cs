@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 // ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Used by ValidateObjectAttribute to hold combined validation results of multiple objects.

@@ -1,12 +1,10 @@
 ﻿using System.Text.Json.Serialization.Metadata;
 using Avalonia.Controls;
 using FluentAvalonia.Styling;
-using HanumanInstitute.Apps;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using HanumanInstitute.PowerliminalsPlayer.Views;
-using HanumanInstitute.Services;
 using LazyCache.Splat;
 using Splat;
 

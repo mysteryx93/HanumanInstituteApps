@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Common.Services;
-using HanumanInstitute.MvvmDialogs;
+﻿using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.Apps;
@@ -40,7 +39,7 @@ public abstract class MainViewModelBase<TSettings> : BaseWithSettings<TSettings>
         }
         else
         {
-            await _appUpdateService.CheckForUpdatesAsync(this).ConfigureAwait(false);
+            await _appUpdateService.CheckForUpdatesAsync(this);
         }
         _appUpdateService = null!; // We don't need anymore.
     }

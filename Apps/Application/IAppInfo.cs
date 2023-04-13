@@ -7,10 +7,19 @@ namespace HanumanInstitute.Apps;
 /// </summary>
 public interface IAppInfo
 {
+    // /// <summary>
+    // /// For updates, the file format of released files, where {0} is replaced by the version number.
+    // /// </summary>
+    // string GitHubFileFormat { get; }
+    
     /// <summary>
-    /// For updates, the file format of released files, where {0} is replaced by the version number.
+    /// The link where to download the latest version. 
     /// </summary>
-    string GitHubFileFormat { get; }
+    string DownloadInfoUrl { get; }
+    /// <summary>
+    /// A unique identifier for the application.
+    /// </summary>
+    AppIdentifier Id { get; }
     /// <summary>
     /// The name of the application.
     /// </summary>

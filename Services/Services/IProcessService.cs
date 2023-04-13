@@ -1,5 +1,4 @@
-﻿// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+﻿namespace HanumanInstitute.Services;
 
 /// <summary>
 /// Allows the creation and management of system processes.

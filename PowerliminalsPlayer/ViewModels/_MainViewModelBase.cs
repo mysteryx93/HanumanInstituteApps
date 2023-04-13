@@ -1,5 +1,4 @@
-﻿using HanumanInstitute.Apps;
-using HanumanInstitute.MvvmDialogs;
+﻿using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 namespace HanumanInstitute.PowerliminalsPlayer.ViewModels;

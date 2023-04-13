@@ -2,8 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-// ReSharper disable CheckNamespace
-namespace HanumanInstitute.Common.Services;
+namespace HanumanInstitute.Services;
 
 /// <inheritdoc />
 public class SerializationService : ISerializationService

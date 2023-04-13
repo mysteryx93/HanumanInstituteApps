@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using HanumanInstitute.Apps;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 
