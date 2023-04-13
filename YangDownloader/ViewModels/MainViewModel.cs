@@ -5,6 +5,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.Downloads;
 using HanumanInstitute.FFmpeg;
@@ -26,7 +27,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
         IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo,
-        IClipboard clipboard, IEnvironmentService environment) :
+        IClipboard clipboard, IEnvironmentService environment, IAdRotatorViewModel adRotator) :
         base(settings, appUpdateService, environment)
     {
         _downloadManager = downloadManager;
@@ -35,6 +36,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
         _fileSystem = fileSystem;
         _ffmpegInfo = ffmpegInfo;
         _clipboard = clipboard;
+        AdRotator = adRotator;
 
         PreferredVideo = new ListItemCollectionView<StreamContainerOption>()
         {
@@ -69,6 +71,8 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
             .Select(x => x.Any())
             .ToProperty(this, x => x.HasDownloads);
     }
+    
+    public IAdRotatorViewModel AdRotator { get; }
 
     /// <inheritdoc />
     public event EventHandler? RequestClose;

@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
     xmlns:views="clr-namespace:HanumanInstitute.YangDownloader.Views"
     xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
+    xmlns:ad="clr-namespace:HanumanInstitute.Apps.AdRotator;assembly=HanumanInstitute.Apps"
     x:Class="HanumanInstitute.YangDownloader.Views.MainView"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     MinHeight="260" MinWidth="590" d:DesignWidth="590" d:DesignHeight="260"
@@ -22,16 +23,19 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
     <Grid>
-        <Grid Margin="10" RowDefinitions="Auto,*">
-            <Button Grid.Row="0" Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Content="I" Margin="0,0,38,0"
-                    Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
-            <Button Grid.Row="0" Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
+        <Grid Margin="10" RowDefinitions="Auto,Auto,*">
+            <Grid Row="0" IsVisible="{Binding !Settings.IsLicenseValid}" Margin="0,-8,0,2">
+                <ad:AdRotator DataContext="{Binding AdRotator}" />
+            </Grid>
+            <Button Grid.Row="1" Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Content="I" Margin="0,0,38,0"
+                        Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
+            <Button Grid.Row="1" Classes="round" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
                     Command="{Binding ViewModel.ShowSettings, RelativeSource={RelativeSource AncestorType=views:MainView}}">
                 <ui:SymbolIcon Symbol="Settings" FontSize="20" />
             </Button>
             
-            <StackPanel Grid.Row="0">
+            <StackPanel Grid.Row="1">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Preferred Video:" VerticalAlignment="Center" />
                     <ComboBox Width="85" Items="{Binding PreferredVideo}" Margin="5,0,10,0" x:CompileBindings="False"
@@ -114,7 +118,7 @@
                     </Grid>
                 </Grid>
             </StackPanel>
-            <ListBox Grid.Row="1" Items="{Binding Downloads}" SelectionMode="Single" Background="{x:Null}"
+            <ListBox Grid.Row="2" Items="{Binding Downloads}" SelectionMode="Single" Background="{x:Null}"
                      IsVisible="{Binding HasDownloads, Mode=OneWay}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">

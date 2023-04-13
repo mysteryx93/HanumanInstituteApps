@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.Apps.AdRotator;
 using LazyCache;
@@ -46,6 +47,7 @@ public class HanumanInstituteHttpClient : HttpClient, IHanumanInstituteHttpClien
         }
         catch (HttpRequestException) { }
         catch (TaskCanceledException) { }
+        catch (JsonException) { }
         return null;
     }
 
@@ -59,6 +61,7 @@ public class HanumanInstituteHttpClient : HttpClient, IHanumanInstituteHttpClien
         }
         catch (HttpRequestException) { }
         catch (TaskCanceledException) { }
+        catch (JsonException) { }
         return null;
     }
 

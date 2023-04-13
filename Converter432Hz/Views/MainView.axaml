@@ -18,7 +18,6 @@
         xmlns:ad="clr-namespace:HanumanInstitute.Apps.AdRotator;assembly=HanumanInstitute.Apps"
         d:DataContext="{x:Static local:ViewModelLocator.Main}" x:DataType="vm:MainViewModel">
     <Window.Resources>
-        <av:PercentageConverter x:Key="PercentageConverter" />
         <av:BooleanToStringConverter x:Key="BitrateConverter" TrueValue="CBR" FalseValue="VBR" />
     </Window.Resources>
     <Grid>
@@ -29,10 +28,13 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Column="0" Grid.Row="0">
-                <ad:AdRotator DataContext="{Binding AdRotator}" />
+                <Grid Margin="0,-8,0,2" IsVisible="{Binding !Settings.IsLicenseValid}">
+                    <ad:AdRotator DataContext="{Binding AdRotator}" />
+                </Grid>
                 <Grid>
                     <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="DemiBold" Text="Sources " />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,2">
@@ -49,8 +51,10 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <TextBlock FontSize="16" FontWeight="DemiBold" Margin="0,10,0,2" Text="Destination Folder" />
-                <Grid IsEnabled="{Binding !Encoder.IsProcessing}">
+            </StackPanel>
+            <StackPanel Grid.Column="0" Grid.Row="1">
+                <TextBlock FontSize="16" FontWeight="DemiBold" Text="Destination Folder" />
+                <Grid IsEnabled="{Binding !Encoder.IsProcessing}" Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -61,7 +65,7 @@
                     </Button>
                 </Grid>
             </StackPanel>
-            <Grid Grid.Column="0" Grid.Row="1" Margin="0,8,0,0">
+            <Grid Grid.Column="0" Grid.Row="2" Margin="0,12,0,0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
                 </StackPanel>
@@ -144,7 +148,7 @@
                     </Button>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">
+            <Grid Grid.Column="1" Grid.Row="1" RowSpan="2" Margin="10,0,0,0">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center"
                                Text="When destination file exists" />

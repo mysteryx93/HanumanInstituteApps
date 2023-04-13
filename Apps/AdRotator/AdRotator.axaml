@@ -15,7 +15,7 @@
                 <InvokeCommandAction Command="{Binding OpenLink}" />
             </RoutedEventTriggerBehavior>
         </Interaction.Behaviors>
-        <Viewbox Margin="4">
+        <Viewbox Margin="2,1,2,1">
             <mk:MarkdownScrollViewer Markdown="{Binding Current.Markdown}">
                 <mk:MarkdownScrollViewer.Styles>
                     <Style Selector="ctxt|CTextBlock">

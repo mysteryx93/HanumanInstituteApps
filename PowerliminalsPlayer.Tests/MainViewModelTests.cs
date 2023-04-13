@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.MediaPlayer.Avalonia.Bass;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -75,7 +76,8 @@ public class MainViewModelTests
     protected IPathFixer PathFixer => _pathFixer ??= new PathFixer(MockFileSystem, DialogService); 
     private IPathFixer _pathFixer;
 
-    protected MainViewModel Model => _model ??= new MainViewModel(MockAppSettings.Object, MockAppUpdate.Object, AppPath, MockFileSystem, DialogService, PathFixer, new FakeEnvironmentService());
+    protected MainViewModel Model => _model ??= new MainViewModel(MockAppSettings.Object, MockAppUpdate.Object, AppPath, MockFileSystem, DialogService, PathFixer, 
+        new FakeEnvironmentService(), new AdRotatorViewModelDesign());
     private MainViewModel _model;
     
     public Mock<IAppUpdateService> MockAppUpdate => _mockAppUpdate ??= new Mock<IAppUpdateService>();

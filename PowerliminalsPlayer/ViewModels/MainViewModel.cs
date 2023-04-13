@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
@@ -19,19 +20,22 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IAppPathService appPath, 
-        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment) :
+        IFileSystemService fileSystem, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment, IAdRotatorViewModel adRotator) :
         base(settings, appUpdateService, environment)
     {
         _appPath = appPath;
         _fileSystem = fileSystem;
         _dialogService = dialogService;
         _pathFixer = pathFixer;
+        AdRotator = adRotator;
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(200))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe((_) => ReloadFiles());
     }
+    
+    public IAdRotatorViewModel AdRotator { get; }
 
     public override async void OnLoaded()
     {

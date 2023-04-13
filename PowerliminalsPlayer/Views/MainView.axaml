@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignHeight="380"
-        Title="Powerliminals Player" MinWidth="680" MinHeight="210"
+        Title="Powerliminals Player" MinWidth="680" MinHeight="270"
         Icon="/Assets/App.ico" Classes="gradient"
         xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
         xmlns:media="clr-namespace:HanumanInstitute.MediaPlayer.Avalonia;assembly=MediaPlayer.Avalonia"
@@ -13,6 +13,7 @@
         xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
         xmlns:views="clr-namespace:HanumanInstitute.PowerliminalsPlayer.Views"
         xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
+        xmlns:ad="clr-namespace:HanumanInstitute.Apps.AdRotator;assembly=HanumanInstitute.Apps"
         av:SizeExtension.TrackSize="True"
         av:SizeExtension.Width="{Binding Settings.Width, Mode=TwoWay}"
         av:SizeExtension.Height="{Binding Settings.Height, Mode=TwoWay}"
@@ -23,7 +24,7 @@
         <av:BooleanToStringConverter x:Key="BooleanToStringConverter" TrueValue="Resume" FalseValue="Pause All" />
     </Window.Resources>
     <Grid ColumnDefinitions="*,302">
-        <Grid Column="0" Margin="10,5,10,5" RowDefinitions="48,Auto,Auto,*,30">
+        <Grid Column="0" Margin="10,5,10,5" RowDefinitions="48,Auto,Auto,*,Auto,30">
             <Grid Row="0">
                 <StackPanel Orientation="Horizontal">
                     <Expander x:Name="FoldersExpander" Header="Folders" Height="90" Width="130" VerticalAlignment="Top"
@@ -92,7 +93,10 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Grid>
-            <Grid Row="4">
+            <Grid Row="4" Margin="0,-2" IsVisible="{Binding !Settings.IsLicenseValid}">
+                <ad:AdRotator DataContext="{Binding AdRotator}" />
+            </Grid>
+            <Grid Row="5">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Classes="round" Content="Clear"
                             Width="70" TabIndex="9" Command="{Binding Clear}" />
@@ -104,14 +108,6 @@
                 <Button Classes="round" Width="85" TabIndex="9"
                         Content="{Binding IsPaused, Converter={StaticResource BooleanToStringConverter}}"
                         Command="{Binding Pause}" />
-                <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" FontWeight="Bold">
-                    <!--
-            <Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals"
-                       wpf:HyperlinkExtensions.NavigateInBrowser="True">
-                Get Powerliminals
-            </Hyperlink>
-            -->
-                </TextBlock>
             </Grid>
         </Grid>
         <ScrollViewer Grid.Column="1" TabIndex="12">

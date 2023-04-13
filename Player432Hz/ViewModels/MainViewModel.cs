@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Reactive.Linq;
 using Avalonia.Input;
+using HanumanInstitute.Apps.AdRotator;
 using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
@@ -18,7 +19,7 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
     private readonly IPathFixer _pathFixer;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IPlaylistViewModelFactory playlistFactory,
-        IFilesListViewModel filesListViewModel, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment) : 
+        IFilesListViewModel filesListViewModel, IDialogService dialogService, IPathFixer pathFixer, IEnvironmentService environment, IAdRotatorViewModel adRotator) : 
         base(settings, appUpdateService, environment)
     {
         _playlistFactory = playlistFactory;
@@ -26,10 +27,13 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>
         _filesListViewModel = filesListViewModel;
         _dialogService = dialogService;
         _pathFixer = pathFixer;
+        AdRotator = adRotator;
 
         Playlists.WhenAnyValue(x => x.CurrentItem).Subscribe(_ => Playlists_CurrentChanged());
         // ConvertFromSettings();
     }
+    
+    public IAdRotatorViewModel AdRotator { get; }
 
     public override async void OnLoaded()
     {

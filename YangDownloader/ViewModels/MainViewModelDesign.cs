@@ -1,4 +1,5 @@
-﻿using HanumanInstitute.Downloads;
+﻿using HanumanInstitute.Apps.AdRotator;
+using HanumanInstitute.Downloads;
 using HanumanInstitute.MvvmDialogs.Avalonia;
 using Splat;
 
@@ -9,7 +10,7 @@ public class MainViewModelDesign : MainViewModel
     public MainViewModelDesign() : base(Locator.Current.GetService<ISettingsProvider<AppSettingsData>>()!,
         Locator.Current.GetService<IAppUpdateService>()!,
         Locator.Current.GetService<IDownloadManager>()!, new YouTubeStreamSelector(null),
-        new DialogService(), Locator.Current.GetService<IFileSystemService>()!, null, Application.Current!.Clipboard!, new EnvironmentService())
+        new DialogService(), Locator.Current.GetService<IFileSystemService>()!, null, Application.Current!.Clipboard!, new EnvironmentService(), new AdRotatorViewModelDesign())
     {
         DisplayDownloadInfo = true;
         VideoTitle = "This is a very long title! This is a very long title! This is a very long title! ";
