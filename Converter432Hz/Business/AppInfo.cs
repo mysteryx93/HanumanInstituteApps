@@ -23,7 +23,7 @@ public class AppInfo : IAppInfo
     public string LicenseInfo => "This is an open source software. The free version only has a single restriction: encoding entire folder hierarchies. This is a lifetime license for this app and all future updates.";
 
     /// <inheritdoc />
-    public string BuyLicenseText => "Get license for $16.95"; 
+    public string BuyLicenseText => "Get license for $8.97"; 
 
     /// <inheritdoc />
     public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=0";
