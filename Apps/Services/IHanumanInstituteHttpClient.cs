@@ -11,7 +11,7 @@ public interface IHanumanInstituteHttpClient
     /// Returns the latest app version available for download, and latest ads date.
     /// </summary>
     /// <returns>An object containing version info.</returns>
-    Task<HanumanInstituteHttpClient.AppVersionQuery?> QueryVersionAsync();
+    Task<AppVersionQuery?> QueryVersionAsync();
     /// <summary>
     /// Returns updated ads from the server.
     /// </summary>

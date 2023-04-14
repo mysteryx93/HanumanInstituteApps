@@ -7,7 +7,7 @@ namespace HanumanInstitute.Player432Hz.Business;
 [JsonSerializable(typeof(List<SettingsPlaylistItem>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(AdInfo))]
-[JsonSerializable(typeof(HanumanInstituteHttpClient.AppVersionQuery))]
+[JsonSerializable(typeof(AppVersionQuery))]
 public partial class SourceGenerationContext : JsonSerializerContext
 {
 }

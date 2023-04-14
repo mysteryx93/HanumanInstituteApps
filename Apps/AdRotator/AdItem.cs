@@ -15,6 +15,11 @@ public class AdItem : ReactiveObject
     public int Id { get; set; }
     
     /// <summary>
+    /// The apps for which the ad applies, or null for all.
+    /// </summary>
+    public int[]? Apps { get; set; }
+    
+    /// <summary>
     /// The ad to display on desktop, in markdown format.
     /// </summary>
     [Reactive]

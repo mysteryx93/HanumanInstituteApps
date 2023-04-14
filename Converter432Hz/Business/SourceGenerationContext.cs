@@ -5,7 +5,7 @@ namespace HanumanInstitute.Converter432Hz.Business;
 
 [JsonSerializable(typeof(AppSettingsData))]
 [JsonSerializable(typeof(AdInfo))]
-[JsonSerializable(typeof(HanumanInstituteHttpClient.AppVersionQuery))]
+[JsonSerializable(typeof(AppVersionQuery))]
 public partial class SourceGenerationContext : JsonSerializerContext
 {
 }

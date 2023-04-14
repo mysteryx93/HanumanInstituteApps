@@ -6,7 +6,7 @@ namespace HanumanInstitute.PowerliminalsPlayer.Business;
 [JsonSerializable(typeof(AppSettingsData))]
 [JsonSerializable(typeof(PlayingItem))]
 [JsonSerializable(typeof(AdInfo))]
-[JsonSerializable(typeof(HanumanInstituteHttpClient.AppVersionQuery))]
+[JsonSerializable(typeof(AppVersionQuery))]
 public partial class SourceGenerationContext : JsonSerializerContext
 {
 }
