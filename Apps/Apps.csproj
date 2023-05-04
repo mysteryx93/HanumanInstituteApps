@@ -10,17 +10,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Avalonia\Avalonia.csproj" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0-preview7" />
     <PackageReference Include="ConfigureAwait.Fody" Version="3.3.2" />
-    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview6" />
+    <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview7" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia" Version="2.0.0-preview7" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs.Avalonia.Fluent" Version="2.0.0-preview7" />
+    <PackageReference Include="IPinfo" Version="2.1.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="LazyCache.Splat" Version="1.0.0" />
     <PackageReference Include="Markdown.Avalonia.Tight" Version="11.0.0-b1" />
-    <PackageReference Include="ReactiveUI.Fody" Version="18.4.26" />
+    <PackageReference Include="ReactiveUI.Fody" Version="18.4.34" />
     <PackageReference Include="Splat" Version="14.6.8" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>

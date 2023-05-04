@@ -21,13 +21,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Theme" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="20,0,0,0">
-                        <ComboBox Width="130" Items="{Binding ThemeList}" x:CompileBindings="False"
+                        <ComboBox Width="130" ItemsSource="{Binding ThemeList}" x:CompileBindings="False"
                                   SelectedItem="{Binding ThemeList.CurrentItem}" />
                     </Grid>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
-                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
+                    <ComboBox Margin="12,0,0,0" Width="105" ItemsSource="{Binding CheckForUpdateList}" x:CompileBindings="False"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
@@ -46,7 +46,7 @@
                 <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
                     <TextBlock Text="Output sample rate" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="10,0,0,0">
-                        <ComboBox Width="115" Items="{Binding OutputSampleRateList}" x:CompileBindings="False"
+                        <ComboBox Width="115" ItemsSource="{Binding OutputSampleRateList}" x:CompileBindings="False"
                                   SelectedItem="{Binding OutputSampleRateList.CurrentItem}" />
                     </Grid>
                 </StackPanel>

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input.Platform;
 using HanumanInstitute.Apps.AdRotator;
+using HanumanInstitute.Avalonia;
 using HanumanInstitute.MvvmDialogs;
 using Splat;
 
@@ -26,9 +27,8 @@ public static class SplatContainerExtensions
             GetService<IProcessService>(),
             GetService<IAppInfo>(),
             GetService<IAdRotatorViewModel>()));
-        
-        services.Register<IClipboard>(() => Application.Current!.Clipboard);
 
+        SplatRegistrations.RegisterLazySingleton<IClipboardService, ClipboardService>();
         // SplatRegistrations.Register<IAppUpdateService, AppUpdateService<TSettings>>();
         SplatRegistrations.RegisterLazySingleton<ILicenseValidator, LicenseValidator>();
         SplatRegistrations.RegisterLazySingleton<IAppPathServiceBase, AppPathServiceBase>();

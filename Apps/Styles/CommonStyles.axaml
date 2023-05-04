@@ -13,13 +13,13 @@
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
     </Style>
     
-    <Style Selector="Button.round">
+    <Style Selector="Button.round, ToggleButton.round">
         <Setter Property="Height" Value="26" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="CornerRadius" Value="14" />
     </Style>
-    <Style Selector="Button.round:disabled">
+    <Style Selector="Button.round:disabled, ToggleButton.round:disabled">
         <Setter Property="Opacity" Value="0.5" />
     </Style>
 
@@ -133,24 +133,26 @@
             </ControlTemplate>
         </Setter>
 
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
-        </Style>
         <Style Selector="^:checked /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarHoverBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
             <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
         </Style>
-        <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarCheckedHoverBrush}" />
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
         </Style>
-        <Style Selector="^:pressed /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource MediaPlayerToolbarPressedBrush}" />
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
         </Style>
-        <Style Selector="^:disabled /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Opacity" Value="{DynamicResource MediaPlayerDisabledOpacity}" />
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundDisabled}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
         </Style>
-
+        
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="FontFamily" Value="{TemplateBinding FontFamily}" />
         </Style>

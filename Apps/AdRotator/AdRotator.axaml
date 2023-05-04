@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="400" Height="75"
              x:Class="HanumanInstitute.Apps.AdRotator.AdRotator" BorderThickness="2" BorderBrush="{DynamicResource ComboBoxBorderBrush}"
              d:DataContext="{x:Static adRotator:AdRotatorViewModelDesign.Instance}" x:DataType="adRotator:AdRotatorViewModel">
-    <Grid>
+    <Grid Background="Transparent">
         <Interaction.Behaviors>
             <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.PointerPressedEvent}">
                 <InvokeCommandAction Command="{Binding OpenLink}" />
@@ -21,11 +21,26 @@
                     <Style Selector="ctxt|CTextBlock">
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="IsHitTestVisible" Value="False"/>
+                        <Setter Property="TextWrapping" Value="NoWrap" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                    </Style>
+                    <Style Selector="ctxt|CTextBlock.Heading1">
+                        <Setter Property="FontSize" Value="20" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </Style>
+                    <Style Selector="ctxt|CTextBlock.Heading2">
+                        <Setter Property="FontSize" Value="16" />
+                    </Style>
+                    <Style Selector="ctxt|CTextBlock.Heading3">
+                        <Setter Property="FontSize" Value="14" />
                     </Style>
                     <Style Selector="Grid.List">
                         <Setter Property="Margin" Value="0"/>
                     </Style>
-                    <Style Selector=".List ctxt|CTextBlock.ListMarker">
+                    <Style Selector="Grid.List ctxt|CTextBlock">
+                        <Setter Property="TextAlignment" Value="Left" />
+                    </Style>
+                    <Style Selector="Grid.List ctxt|CTextBlock.ListMarker">
                         <Setter Property="Margin" Value="2,0,4,0"/>
                     </Style>
                 </mk:MarkdownScrollViewer.Styles>

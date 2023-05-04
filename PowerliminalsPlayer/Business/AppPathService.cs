@@ -26,7 +26,7 @@ public class AppPathService : IAppPathService
 
     /// <inheritdoc />
     public string UnhandledExceptionLogPath => _unhandledExceptionLogPath ??=
-        Combine(_environment.ApplicationDataPath, @"Natural Grounding Player\Log.txt");
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\Log.txt");
     private string? _unhandledExceptionLogPath;
 
     /// <inheritdoc />

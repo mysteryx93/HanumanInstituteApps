@@ -44,7 +44,7 @@
                     </StackPanel>
                 </Grid>
                 <ListBox Height="100"
-                         Items="{Binding Encoder.Sources}" SelectedIndex="{Binding SourcesSelectedIndex}">
+                         ItemsSource="{Binding Encoder.Sources}" SelectedIndex="{Binding SourcesSelectedIndex}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
@@ -70,7 +70,7 @@
                     <TextBlock FontSize="16" FontWeight="DemiBold" Text="Processing" />
                 </StackPanel>
                 <ScrollViewer Margin="0,20,0,0">
-                    <ItemsRepeater Items="{Binding Encoder.ProcessingFiles}" Grid.IsSharedSizeScope="True">
+                    <ItemsRepeater ItemsSource="{Binding Encoder.ProcessingFiles}" Grid.IsSharedSizeScope="True">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate DataType="{x:Type bass:ProcessingItem}">
                                 <Grid>
@@ -104,7 +104,7 @@
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Output Format" />
                         <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
-                                  Items="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
+                                  ItemsSource="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitrateVisible}">
@@ -115,20 +115,20 @@
                                     Command="{Binding ToggleFixedBitrate}" IsVisible="{Binding IsToggleBitrateVisible}" />
                         </StackPanel>
                         <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
-                                  Items="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
+                                  ItemsSource="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitsPerSampleVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
                         <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
-                                  Items="{Binding BitsPerSampleList}"
+                                  ItemsSource="{Binding BitsPerSampleList}"
                                   SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
                         <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
-                                  Items="{Binding SampleRateList}"
+                                  ItemsSource="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>
                     </Grid>
@@ -153,7 +153,7 @@
                     <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center"
                                Text="When destination file exists" />
                     <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center" x:CompileBindings="False"
-                              Items="{Binding FileExistsActionList}"
+                              ItemsSource="{Binding FileExistsActionList}"
                               SelectedItem="{Binding FileExistsActionList.CurrentItem, Mode=TwoWay}">
                     </ComboBox>
                 </StackPanel>

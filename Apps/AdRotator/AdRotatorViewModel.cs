@@ -17,7 +17,7 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
     private readonly IRandomGenerator _randomGenerator;
     private readonly IHanumanInstituteHttpClient _httpClient;
     private readonly Timer _timer;
-    
+
     /// <summary>
     /// Initializes a new instance of the AdRotator class.
     /// </summary>
@@ -31,11 +31,14 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
         _randomGenerator = randomGenerator;
         _httpClient = httpClient;
 
-        // Change ad every 2 minutes.
+        // Change ad every minutes.
         _timer = new Timer(TimeSpan.FromMinutes(2));
         _timer.Elapsed += (_, _) => SetRandomAd();
         _timer.Start();
-
+        
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (httpClient == null) { return; }
+        
         var _ = LoadAsync().ContinueWith(x =>
         {
             if (x.Exception != null)
@@ -81,14 +84,14 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
     {
         if (!Enabled) { return; }
 
-        try
-        {
-            AdInfo = await _serialization.DeserializeFromFileAsync<AdInfo>(_appPaths.AdInfoPath, _serializerContext);
-        }
-        catch
-        {
-            await LoadFromServerAsync();
-        }
+        // try
+        // {
+        AdInfo = await _serialization.DeserializeFromFileAsync<AdInfo>(_appPaths.AdInfoPath, _serializerContext);
+        // }
+        // catch
+        // {
+        //     await LoadFromServerAsync();
+        // }
         if (!AdInfo.Ads.Any())
         {
             await LoadDefaultAsync();
@@ -124,6 +127,14 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
 
     private void SetRandomAd()
     {
-        Current = AdInfo.Ads.Any() ? AdInfo.Ads[_randomGenerator.GetInt(AdInfo.Ads.Count)] : null;
+        var newAd = GetRandomAd();
+        while (AdInfo.Ads.Count > 1 && newAd == Current)
+        {
+            newAd = GetRandomAd();
+        }
+        Current = newAd;
+        // Current = AdInfo.Ads.FirstOrDefault(x => x.Id == 101);
     }
+    
+    private AdItem? GetRandomAd() => AdInfo.Ads.Any() ? AdInfo.Ads[_randomGenerator.GetInt(AdInfo.Ads.Count)] : null;
 }

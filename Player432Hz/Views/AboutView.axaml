@@ -37,13 +37,10 @@
                     <TextBlock Text="License" VerticalAlignment="Center" />
                     <TextBox Width="250" Margin="10,0,10,0"  Text="{Binding License}" IsReadOnly="{Binding Settings.IsLicenseValid}" />
                     <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" IsVisible="{Binding !Settings.IsLicenseValid}" />
-                    <ui:SymbolIcon Symbol="CheckmarkFilled" FontSize="20" Foreground="Green" IsVisible="{Binding Settings.IsLicenseValid}" />
+                    <ui:SymbolIcon Symbol="Checkmark" FontSize="20" Foreground="Green" IsVisible="{Binding Settings.IsLicenseValid}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
-                <Grid>
-                    <ui:HyperlinkButton Content="This project is sponsored by Isagenix" NavigateUri="https://www.spiritualselftransformation.com/isagenix" />
-                </Grid>
                 <Grid>
                     <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
                     <Button HorizontalAlignment="Right" Width="100" Classes="round"

@@ -23,7 +23,7 @@ public class MainViewModelTests : TestsBase
     {
         SetTitle();
         return new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null, 
-            Mock.Of<IClipboard>(), new FakeEnvironmentService(), new AdRotatorViewModelDesign())
+            Mock.Of<IClipboardService>(), new FakeEnvironmentService(), new AdRotatorViewModelDesign())
         {
             DownloadUrl = "https://www.youtube.com/watch?v=4OqXWzekVw4"
         };
@@ -107,7 +107,7 @@ public class MainViewModelTests : TestsBase
     public void Constructor_Valid_HasInitialState()
     {
         _model = new MainViewModel(FakeSettings, MockAppUpdate.Object, MockDownloadManager.Object, StreamSelector, DialogService, FakeFileSystem, null, 
-            Mock.Of<IClipboard>(), new FakeEnvironmentService(), new AdRotatorViewModelDesign());
+            Mock.Of<IClipboardService>(), new FakeEnvironmentService(), new AdRotatorViewModelDesign());
 
         Assert.NotEmpty(Model.PreferredVideo);
         Assert.Equal(0, Model.PreferredVideo.CurrentPosition);

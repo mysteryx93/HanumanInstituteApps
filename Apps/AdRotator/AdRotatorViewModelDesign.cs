@@ -2,16 +2,16 @@
 
 public class AdRotatorViewModelDesign : AdRotatorViewModel
 {
-    public static AdRotatorViewModelDesign Instance => new AdRotatorViewModelDesign(); 
+    public static AdRotatorViewModelDesign Instance => new(); 
     
     public AdRotatorViewModelDesign() : base(null!, null!, null!, null!, null!, null!)
     {
+        Enabled = false;
         Current = new AdItem()
         {
-            Markdown = @"**Sign up for the Force of Life Free Training to**  
-* See what is keeping you stuck so that you can turn the situation around  
-* Understand the true power hidden within you  
-* Open the door to stepping into your greater path, purpose and freedom"
+            Markdown = @"Do you want to improve your finances?
+**Get a God & Money Reading**
+Measure the aspects of your personality that have the most impact on money"
         };
     }
 }

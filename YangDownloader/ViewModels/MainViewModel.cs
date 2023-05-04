@@ -23,11 +23,11 @@ public class MainViewModel : MainViewModelBase<AppSettingsData>, ICloseable
     private readonly IDialogService _dialogService;
     private readonly IFileSystemService _fileSystem;
     private readonly IMediaInfoReader? _ffmpegInfo;
-    private readonly IClipboard _clipboard;
+    private readonly IClipboardService _clipboard;
 
     public MainViewModel(ISettingsProvider<AppSettingsData> settings, IAppUpdateService appUpdateService, IDownloadManager downloadManager,
         IYouTubeStreamSelector streamSelector, IDialogService dialogService, IFileSystemService fileSystem, IMediaInfoReader? ffmpegInfo,
-        IClipboard clipboard, IEnvironmentService environment, IAdRotatorViewModel adRotator) :
+        IClipboardService clipboard, IEnvironmentService environment, IAdRotatorViewModel adRotator) :
         base(settings, appUpdateService, environment)
     {
         _downloadManager = downloadManager;

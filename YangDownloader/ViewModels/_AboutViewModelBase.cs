@@ -121,6 +121,10 @@ public abstract class AboutViewModelBase<TSettings> : ReactiveObject, IModalDial
                 await _adRotator.LoadFromServerAsync();
             }
         }
+        else
+        {
+            CheckForUpdateText = "Check for updates failed";
+        }
     }
 
     /// <summary>

@@ -1,11 +1,59 @@
 {
-  "LastUpdated": "2013-04-13T00:00:00",
+  "LastUpdated": "2013-05-04T00:00:00",
   "Ads": [
     {
       "Id": 1,
+      "Apps": null,
+      "Start": null,
+      "End": null,
       "Markdown": "**Sign up for the Force of Life Free Training to**  \n* See what is keeping you stuck so that you can turn the situation around  \n* Understand the true power hidden within you  \n* Open the door to stepping into your greater path, purpose and freedom",
       "MarkdownMobile": "**Sign up for the Force of Life Free Training**",
       "NavigateUrl": "https://www.forceoflife.net/"
+    },
+    {
+      "Id": 2,
+      "Apps": null,
+      "Start": null,
+      "End": null,
+      "Markdown": "Do you want to improve your finances?  \n**Get a God & Money Energy Reading**  \nMeasure what has the most impact on money",
+      "MarkdownMobile": null,
+      "NavigateUrl": "https://www.spiritualselftransformation.com/god-money-reading"
+    },
+    {
+      "Id": 3,
+      "Apps": null,
+      "Start": null,
+      "End": null,
+      "Markdown": "Want to achieve more with your life?  \n**Get Soul Alignment Energy Reading**  \nIdentify the real issues holding you back",
+      "MarkdownMobile": null,
+      "NavigateUrl": "https://www.spiritualselftransformation.com/soul-alignment-reading"
+    },
+    {
+      "Id": 100,
+      "Apps": null,
+      "Start": null,
+      "End": null,
+      "Markdown": "# If you want continual energy healing support  \n# We have a team of 15 monks sending healing energy 5h each day  \n### Click to learn about Project Varanasi",
+      "MarkdownMobile": null,
+      "NavigateUrl": "https://www.spiritualselftransformation.com/project-varanasi"
+    },
+    {
+      "Id": 101,
+      "Apps": null,
+      "Start": null,
+      "End": null,
+      "Markdown": "Help poor and needy children and women in Pakistan  \nwho are neglected by their Home, school and society  \n**Donate to the Charland Academy Now**",
+      "MarkdownMobile": null,
+      "NavigateUrl": "https://opencollective.com/pakistan-academy"
+    },
+    {
+      "Id": 200,
+      "Apps": null,
+      "Start": null,
+      "End": null,
+      "Markdown": "## Simply your meals, lose weight and improve your health  \n# Improve your Nutrition with Isagenix  \n### Click for more info",
+      "MarkdownMobile": null,
+      "NavigateUrl": "https://www.spiritualselftransformation.com/isagenix"
     }
   ]
 }

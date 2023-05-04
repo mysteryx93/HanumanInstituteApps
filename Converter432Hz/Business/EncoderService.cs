@@ -207,7 +207,7 @@ public class EncoderService : ReactiveValidationObject, IEncoderService
         var file = new ProcessingItem(fileItem);
         try
         {
-            await _dispatcher.InvokeAsync(() => ProcessingFiles.Add(file)).ConfigureAwait(false);
+            _dispatcher.Post(() => ProcessingFiles.Add(file));
 
             await SetDestination(file, cancellationToken).ConfigureAwait(false);
 

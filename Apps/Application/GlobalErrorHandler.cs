@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Threading;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
@@ -71,7 +73,12 @@ public class GlobalErrorHandler : IObserver<Exception>
     {
         if (LogPath.HasValue())
         {
-            System.IO.File.WriteAllText(LogPath, ex.ToString());
+            var logDir = Path.GetDirectoryName(LogPath)!;
+            if (!Directory.Exists(logDir))
+            {
+                Directory.CreateDirectory(logDir);
+            }
+            File.WriteAllText(LogPath, ex.ToString());
             new Process { StartInfo = new ProcessStartInfo(LogPath) { UseShellExecute = true } }.Start();
             // Text editor gets killed after 1 second in the IDE, but stays open if app is run directly. 
             Thread.Sleep(TimeSpan.FromSeconds(1));

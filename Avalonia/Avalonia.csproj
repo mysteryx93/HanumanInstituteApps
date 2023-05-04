@@ -10,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview7" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
