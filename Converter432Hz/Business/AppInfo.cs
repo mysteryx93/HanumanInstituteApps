@@ -20,7 +20,7 @@ public class AppInfo : IAppInfo
     public string AppDescription => "Converts and re-encodes music to 432Hz";
 
     /// <inheritdoc />
-    public string LicenseInfo => "This is an open source software. The free version only has a single restriction: encoding entire folder hierarchies. This is a lifetime license for this app and all future updates.";
+    public string LicenseInfo => "This is an open source software and provides all features for free. We run our own ads to support the development of these apps and share no data to 3rd parties. Get a lifetime app license to remove the ads and support us!";
 
     /// <inheritdoc />
     public string BuyLicenseText => "Get license for $8.97"; 
