@@ -12,7 +12,7 @@ public class FakeFileSystemService : FileSystemService
     { }
 
     public FakeFileSystemService(IDictionary<string, MockFileData> files, string currentDirectory = "") :
-        base(new MockFileSystem(files, currentDirectory), Mock.Of<IWindowsApiService>())
+        base(new MockFileSystem(files, currentDirectory))
     { }
 
     // public virtual void DeleteFileSilent(string path) { }

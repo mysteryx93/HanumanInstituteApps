@@ -29,7 +29,7 @@ public class EncoderServiceTests : TestsBase
     public IPitchDetector PitchDetector => _pitchDetector ??= new PitchDetector(FileSystem);
     private IPitchDetector _pitchDetector;
 
-    public FileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
+    public FileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem());
     private FileSystemService _fileSystem;
 
     public DialogService DialogService =>

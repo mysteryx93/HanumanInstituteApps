@@ -11,12 +11,10 @@ namespace HanumanInstitute.Services;
 public class FileSystemService : IFileSystemService
 {
     private readonly IFileSystem _fileSystem;
-    private readonly IWindowsApiService _windowsApi;
     
-    public FileSystemService(IFileSystem fileSystemService, IWindowsApiService windowsApiService)
+    public FileSystemService(IFileSystem fileSystemService)
     {
         _fileSystem = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
-        _windowsApi = windowsApiService ?? throw new ArgumentNullException(nameof(windowsApiService));
     }
 
     public IDirectory Directory => _fileSystem.Directory;
@@ -100,18 +98,18 @@ public class FileSystemService : IFileSystemService
         return new string(output);
     }
 
-    /// <inheritdoc />
-    public virtual void MoveToRecycleBin(string path) => MoveToRecycleBin(path, false);
-
-    /// <inheritdoc />
-    public virtual void MoveToRecycleBin(string path, bool displayWarning)
-    {
-        var flags = ApiFileOperationFlags.AllowUndo | ApiFileOperationFlags.NoConfirmation;
-        flags |= displayWarning ? ApiFileOperationFlags.WantNukeWarning : ApiFileOperationFlags.NoErrorUi | ApiFileOperationFlags.Silent;
-        _windowsApi.ShFileOperation(ApiFileOperationType.Delete, path, flags);
-        if (File.Exists(path))
-        {
-            throw new IOException(string.Format(CultureInfo.InvariantCulture, Resources.CannotDeleteFile, path));
-        }
-    }
+    // /// <inheritdoc />
+    // public virtual void MoveToRecycleBin(string path) => MoveToRecycleBin(path, false);
+    //
+    // /// <inheritdoc />
+    // public virtual void MoveToRecycleBin(string path, bool displayWarning)
+    // {
+    //     var flags = ApiFileOperationFlags.AllowUndo | ApiFileOperationFlags.NoConfirmation;
+    //     flags |= displayWarning ? ApiFileOperationFlags.WantNukeWarning : ApiFileOperationFlags.NoErrorUi | ApiFileOperationFlags.Silent;
+    //     _windowsApi.ShFileOperation(ApiFileOperationType.Delete, path, flags);
+    //     if (File.Exists(path))
+    //     {
+    //         throw new IOException(string.Format(CultureInfo.InvariantCulture, Resources.CannotDeleteFile, path));
+    //     }
+    // }
 }

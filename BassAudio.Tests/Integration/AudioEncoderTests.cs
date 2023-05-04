@@ -29,7 +29,7 @@ public class AudioEncoderTests : TestsBase
 
     public EncodeSettings Settings { get; set; } = new() { QualityOrSpeed = 2 };
 
-    public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
+    public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem());
     private IFileSystemService _fileSystem;
 
     public ProcessingItem CreateSourceShort(EncodeFormat dstFormat = EncodeFormat.Mp3, EncodeFormat srcFormat = EncodeFormat.Mp3) =>

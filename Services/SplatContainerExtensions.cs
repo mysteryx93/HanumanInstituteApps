@@ -20,11 +20,9 @@ public static class SplatContainerExtensions
         SplatRegistrations.RegisterLazySingleton<IFileSystem, FileSystem>();
         SplatRegistrations.RegisterLazySingleton<IProcessService, ProcessService>();
         SplatRegistrations.RegisterLazySingleton<IEnvironmentService, EnvironmentService>();
-        SplatRegistrations.RegisterLazySingleton<IWindowsApiService, WindowsApiService>();
-        SplatRegistrations.RegisterLazySingleton<IUpdateService, UpdateService>();
-        SplatRegistrations.RegisterLazySingleton<ISyndicationFeedService, SyndicationFeedService>();
         SplatRegistrations.RegisterLazySingleton<IPathFixer, PathFixer>();
         SplatRegistrations.RegisterLazySingleton<IRandomGenerator, RandomGenerator>();
+        // SplatRegistrations.RegisterLazySingleton<IWindowsApiService, WindowsApiService>();
 
         SplatRegistrations.SetupIOC();
 

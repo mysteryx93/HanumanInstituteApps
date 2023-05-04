@@ -52,16 +52,16 @@ public interface IFileSystemService : IFileSystem
     /// <returns></returns>
     string SanitizeFileName(string fileName, char replacementChar = '_');
     
-    /// <summary>
-    /// Send a file or path silently to the recycle bin. Suppress dialog, suppress errors, delete if too large.
-    /// </summary>
-    /// <param name="path">Location of directory or file to recycle.</param>
-    void MoveToRecycleBin(string path);
-    
-    /// <summary>
-    /// Sends a file or path to the recycle bin.
-    /// </summary>
-    /// <param name="displayWarning">Whether to display a warning if file is too large for the recycle bin.</param>
-    /// <param name="path">Location of directory or file to recycle.</param>
-    void MoveToRecycleBin(string path, bool displayWarning);
+    // /// <summary>
+    // /// Send a file or path silently to the recycle bin. Suppress dialog, suppress errors, delete if too large.
+    // /// </summary>
+    // /// <param name="path">Location of directory or file to recycle.</param>
+    // void MoveToRecycleBin(string path);
+    //
+    // /// <summary>
+    // /// Sends a file or path to the recycle bin.
+    // /// </summary>
+    // /// <param name="displayWarning">Whether to display a warning if file is too large for the recycle bin.</param>
+    // /// <param name="path">Location of directory or file to recycle.</param>
+    // void MoveToRecycleBin(string path, bool displayWarning);
 }

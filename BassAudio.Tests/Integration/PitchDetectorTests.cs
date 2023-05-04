@@ -24,7 +24,7 @@ public class PitchDetectorTests : TestsBase
         return new PitchDetectorWithDebug(FileSystem);
     }
 
-    public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem(), new WindowsApiService());
+    public IFileSystemService FileSystem => _fileSystem ??= new FileSystemService(new FileSystem());
     private IFileSystemService _fileSystem;
 
     public IAppCache AppCache => _appCache ??= new CachingService();
