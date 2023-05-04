@@ -159,5 +159,13 @@
         <Style Selector="^ /template/ ContentPresenter">
             <Setter Property="FontSize" Value="{TemplateBinding FontSize}" />
         </Style>
+        
+        <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Duration="00:00:00.0" Property="Background" />
+                </Transitions>
+            </Setter>
+        </Style>
     </Style>
 </Styles>
