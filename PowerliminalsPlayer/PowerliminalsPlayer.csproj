@@ -5,7 +5,7 @@
     <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
-    <AssemblyVersion>3.1.1</AssemblyVersion>
+    <AssemblyVersion>3.1.2</AssemblyVersion>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer</RootNamespace>
     <Configurations>Release;Debug</Configurations>
