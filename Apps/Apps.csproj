@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <AssemblyName>HanumanInstitute.Apps</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
