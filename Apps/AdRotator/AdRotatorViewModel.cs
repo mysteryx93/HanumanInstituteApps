@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization.Metadata;
 using System.Timers;
@@ -84,14 +85,14 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
     {
         if (!Enabled) { return; }
 
-        // try
-        // {
-        AdInfo = await _serialization.DeserializeFromFileAsync<AdInfo>(_appPaths.AdInfoPath, _serializerContext);
-        // }
-        // catch
-        // {
-        //     await LoadFromServerAsync();
-        // }
+        try
+        {
+            AdInfo = await _serialization.DeserializeFromFileAsync<AdInfo>(_appPaths.AdInfoPath, _serializerContext);
+        }
+        catch
+        {
+            await LoadFromServerAsync();
+        }
         if (!AdInfo.Ads.Any())
         {
             await LoadDefaultAsync();
