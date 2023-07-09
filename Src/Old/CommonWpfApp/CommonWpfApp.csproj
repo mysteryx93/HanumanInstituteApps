@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>HanumanInstitute.CommonWpfApp</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="_FFmpegUserInterfaceManager.cs" />
+    <Compile Remove="_FileFolderDialog.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="_FFmpegUserInterfaceManager.cs" />
+    <None Include="_FileFolderDialog.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
+    <PackageReference Include="MvvmDialogs" Version="8.0.0" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommonWpf\CommonWpf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

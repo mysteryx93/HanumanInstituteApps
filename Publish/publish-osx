@@ -1,0 +1,88 @@
+#!/bin/bash
+echo "Create OSX application bundle for .NET project"
+
+if [ -z "$1" ] ; then
+  echo "Syntax: publish-osx AppName [runtime]"
+  echo "Runtime: osx-x64 or osx-arm64"
+  exit 1
+fi
+runtime=$2
+if [ -z "$2" ] ; then
+  runtime="osx-x64"
+fi
+
+# Read from Directory.Build.props and project file: AssemblyVersion, Product, LSApplicationCategoryType
+proj1="../Src/Directory.Build.props"
+proj2="../Src/App.$1/$1.Desktop/$1.Desktop.csproj"
+version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $proj1)
+if [ -z "$version" ] ; then
+  version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $proj2)
+  if [ -z "$version" ] ; then
+    echo "AssemblyVersion is missing from project file."
+    exit 1
+  fi
+fi
+product=$(grep -oPm1 "(?<=<Product>)[^<]+" $proj1)
+if [ -z "$product" ] ; then
+  product=$(grep -oPm1 "(?<=<Product>)[^<]+" $proj2)
+  if [ -z "$product" ] ; then
+      echo "Product is missing from project file."
+      exit 1
+  fi
+fi
+category=$(grep -oPm1 "(?<=<LSApplicationCategoryType>)[^<]+" $proj1)
+if [ -z "$category" ] ; then
+  category=$(grep -oPm1 "(?<=<LSApplicationCategoryType>)[^<]+" $proj2)
+  if [ -z "$category" ] ; then
+      echo "LSApplicationCategoryType is missing from project file. See Apple documentation."
+      exit 1
+  fi
+fi
+
+case "$runtime" in
+    "osx-x64") arch="MacOS_x64" ;;
+    "osx-arm64") arch="MacOS_arm64" ;;
+    *) arch="$runtime" ;;
+esac
+
+bundlePath="../Src/App.$1/$1.Desktop/bin/Publish/$runtime"
+publishPath=$bundlePath/$1.app/Contents/MacOS
+outPath="$version/"
+outFile="$1-${version}_${arch}.zip"
+echo "Runtime = $runtime"
+echo "AppName = $1"
+echo "Version = $version"
+echo "Category = $category"
+echo "BundlePath = $bundlePath"
+echo "Output = $outPath/$outFile"
+echo
+rm -rf "$bundlePath" 2>/dev/null
+
+dotnet publish "$proj2" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o "$publishPath"
+find "$publishPath" -maxdepth 1 -type f -name "*.xml" -delete
+
+osxApp="$bundlePath/$1.app"
+echo "Creating OSX app bundle... $osxApp"
+mkdir -p "$osxApp/Contents/Resources"
+
+cp -af "../Src/App.$1/Deploy/App.icns" "$osxApp/Contents/Resources/$1.icns"
+cp -af "Info.plist" "$osxApp/Contents/Info.plist"
+cp -af "App.entitlements" "$osxApp/Contents/$1.entitlements"
+
+# Replace strings in Info.plist template
+sed -i "s/#VERSION/$version/g" "$osxApp/Contents/Info.plist" 2>/dev/null    # Linux
+sed -i '' "s/#VERSION/$version/g" "$osxApp/Contents/Info.plist" 2>/dev/null # macOS
+sed -i "s/#APP/$1/g" "$osxApp/Contents/Info.plist" 2>/dev/null    # Linux
+sed -i '' "s/#APP/$1/g" "$osxApp/Contents/Info.plist" 2>/dev/null # macOS
+sed -i "s/#PRODUCT/$product/g" "$osxApp/Contents/Info.plist" 2>/dev/null    # Linux
+sed -i '' "s/#PRODUCT/$product/g" "$osxApp/Contents/Info.plist" 2>/dev/null # macOS
+sed -i "s/#CATEGORY/$category/g" "$osxApp/Contents/Info.plist" 2>/dev/null    # Linux
+sed -i '' "s/#CATEGORY/$category/g" "$osxApp/Contents/Info.plist" 2>/dev/null # macOS
+
+# Create ZIP file
+mkdir -p "$outPath"
+outPath=$(readlink --canonicalize "$outPath/$outFile")
+echo "Creating ZIP file: $outPath"
+rm -f "$outPath"
+cd "$bundlePath" || { exit 127; }
+zip -6 -r "$outPath" ./*

@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64;osx-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'==''">
+    <Content Include="win-x64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x86'">
+    <Content Include="win-x86\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-x64' or '$(RuntimeIdentifier)'==''">
+    <Content Include="linux-x64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-arm64'">
+    <Content Include="linux-arm64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='osx-x64'">
+    <Content Include="osx-x64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='osx-arm64'">
+    <Content Include="osx-x64\**" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

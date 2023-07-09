@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>HanumanInstitute.Converter432Hz.Tests</RootNamespace>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.29" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Apps.Tests\Apps.Tests.csproj" />
+    <ProjectReference Include="..\Converter432Hz\Converter432Hz.csproj" />
+    <ProjectReference Include="..\..\..\Dll\BassEnc\BassEncDlls.csproj" />
+    <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="SourceLong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceShort.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

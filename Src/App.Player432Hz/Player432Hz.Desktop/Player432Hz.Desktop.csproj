@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>Player432Hz</AssemblyName>
+    <RootNamespace>HanumanInstitute.Player432Hz.Desktop</RootNamespace>
+    <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <ApplicationIcon>..\Deploy\App.ico</ApplicationIcon>
+    <Product>432Hz Player</Product>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <LSApplicationCategoryType>public.app-category.music</LSApplicationCategoryType>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0"/>
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Player432Hz\Player432Hz.csproj"/>
+  </ItemGroup>
+</Project>

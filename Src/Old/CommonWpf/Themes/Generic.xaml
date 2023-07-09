@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:wpf="clr-namespace:HanumanInstitute.CommonWpf">
+
+    <Style TargetType="{x:Type wpf:ZoomViewer}" BasedOn="{StaticResource {x:Type ContentControl}}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type wpf:ZoomViewer}">
+                    <ScrollViewer x:Name="PART_Scroll" HorizontalScrollBarVisibility="Auto" SnapsToDevicePixels="True"
+                            VerticalScrollBarVisibility="Auto" CanContentScroll="True" Focusable="False"
+                            wpf:ScrollViewerBinding.HorizontalOffset="{Binding ScrollHorizontalOffset, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                            wpf:ScrollViewerBinding.VerticalOffset="{Binding ScrollVerticalOffset, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                        <Border Width="{Binding ZoomWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                Height="{Binding ZoomHeight, RelativeSource={RelativeSource TemplatedParent}}"
+                                Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" Cursor="{TemplateBinding Cursor}">
+                            <Canvas RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode, RelativeSource={RelativeSource TemplatedParent}}" SnapsToDevicePixels="True">
+                                <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                <Canvas.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform
+                                                ScaleX="{Binding Zoom, RelativeSource={RelativeSource TemplatedParent}}"
+                                                ScaleY="{Binding Zoom, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </TransformGroup>
+                                </Canvas.RenderTransform>
+                            </Canvas>
+                        </Border>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

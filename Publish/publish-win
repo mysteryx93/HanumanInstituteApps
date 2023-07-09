@@ -1,0 +1,54 @@
+#!/bin/bash
+echo "Create Windows zip package for .NET project"
+
+if [ -z "$1" ] ; then
+  echo "Syntax: publish-win AppName [runtime]"
+  echo "Runtime: win-x64 or win-x86"
+  exit 1
+fi
+runtime=$2
+if [ -z "$2" ] ; then
+  runtime="win-x64"
+fi
+
+# Read from Directory.Build.props and project file: AssemblyVersion, Product, LSApplicationCategoryType
+projShared="../Src/Directory.Build.props"
+proj="../Src/App.$1/$1.Desktop/$1.Desktop.csproj"
+version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $projShared)
+if [ -z "$version" ] ; then
+  version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $proj)
+  if [ -z "$version" ] ; then
+    echo "AssemblyVersion is missing from project file."
+    exit 1
+  fi
+fi
+
+
+case "$runtime" in
+    "win-x64") arch="Win_x64" ;;
+    "win-x86") arch="Win_x86" ;;
+    *) arch="$runtime" ;;
+esac
+
+
+publishPath="../Src/App.$1/$1.Desktop/bin/Publish/$runtime"
+outPath="$version"
+outFile="$1-${version}_${arch}.zip"
+echo "Runtime = $runtime"
+echo "AppName = $1"
+echo "Version = $version"
+echo "PublishPath = $publishPath"
+echo "Output = $outPath/$outFile"
+echo
+rm -rf "$publishPath" 2>/dev/null
+
+dotnet publish "$proj" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o $publishPath
+rm "$publishPath/*.xml"
+
+# Create ZIP file
+mkdir -p "$outPath"
+outPath=$(readlink --canonicalize "$outPath/$outFile")
+echo "Creating ZIP file: $outPath"
+rm -f "$outPath"
+cd "$publishPath" || { exit 127; }
+zip -6 -r "$outPath" ./*

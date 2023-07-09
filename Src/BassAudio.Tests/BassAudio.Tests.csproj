@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>HanumanInstitute.BassAudio.Tests</AssemblyName>
+    <RootNamespace>HanumanInstitute.BassAudio.Tests</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BassAudio\BassAudio.csproj" />
+    <ProjectReference Include="..\Apps.Tests\Apps.Tests.csproj" />
+    <ProjectReference Include="..\..\Dll\BassEnc\BassEncDlls.csproj" />
+    <ProjectReference Include="..\..\Dll\Bass\BassDlls.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="SourceShort.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceLong2.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceLong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceShort.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceSampleRateHigh.flac">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SourceSampleRateLow.flac">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,57 @@
+#!/bin/bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+echo "Create Linux AppImage bundle for .NET project"
+
+if [ -z "$1" ] ; then
+  echo "Syntax: publish-linux AppName [runtime] [kind]"
+  echo "Runtime: linux-x64 or linux-arm64 (default=linux-x64)"
+  echo "Kind: zip|appimage|deb|rpm|flatpak|setup (default=appimage)"
+  exit 1
+fi
+runtime=$2
+if [ -z "$2" ] ; then
+  runtime="linux-x64"
+fi
+kind=$3
+if [ -z "$3" ] ; then
+  kind="appimage"
+fi
+
+# Read from Directory.Build.props and project file: AssemblyVersion
+proj1="../Src/Directory.Build.props"
+proj2="../Src/App.$1/$1.Desktop/$1.csproj"
+version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $proj1)
+if [ -z "$version" ] ; then
+  version=$(grep -oPm1 "(?<=<AssemblyVersion>)[^<]+" $proj2)
+  if [ -z "$version" ] ; then
+    echo "AssemblyVersion is missing from project file."
+    exit 1
+  fi
+fi
+
+case "$runtime" in
+    "linux-x64") arch="Linux_x64"; image="x86_64" ;;
+    "linux-arm64") arch="Linux_arm64"; image="aarch64" ;;
+    *) arch="$runtime"; image="$runtime" ;;
+esac
+case "$kind" in
+    "zip") ext=".zip" ;;
+    "appimage") ext=".AppImage" ;;
+    "deb") ext=".deb" ;;
+    "rpm") ext=".rpm" ;;
+    "flatpak") ext=".flatpak" ;;
+    *) ext="" ;;
+esac
+
+
+#outPath="../Publish/${version}"
+outFile="${1}-${version}_${arch}${ext}"
+echo "Runtime = $runtime"
+echo "AppName = $1"
+echo "Version = $version"
+echo "Output = $version/$outFile"
+echo
+
+mkdir -p "${version}"
+
+pupnet "../Src/App.${1}/Deploy/pupnet.conf" -y -r $runtime -v $version -o "../../../Publish/${version}/${outFile}" -k $kind

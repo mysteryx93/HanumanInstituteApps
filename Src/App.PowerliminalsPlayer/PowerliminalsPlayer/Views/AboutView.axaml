@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:apps="clr-namespace:HanumanInstitute.Apps;assembly=HanumanInstitute.Apps"
+        xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
+        mc:Ignorable="d" MinWidth="520" Width="520" MaxWidth="520" MinHeight="360" Height="360" MaxHeight="360" 
+        x:Class="HanumanInstitute.PowerliminalsPlayer.Views.AboutView"
+        Title="Information" Classes="gradient"
+        CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static local:ViewModelLocator.About}" x:DataType="vm:AboutViewModel">
+    <Window.Resources>
+        <apps:VersionConverter x:Key="VersionConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid Margin="10,8,10,4">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Svg Path="/Assets/App.svg" Width="48" Height="48" Margin="0,0,12,0" />
+                    <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding AppInfo.AppName}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock FontSize="24" Text="{Binding AppVersion, Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppInfo.AppDescription}" HorizontalAlignment="Center" />
+                <ui:HyperlinkButton HorizontalAlignment="Center" Margin="0,5,0,0" 
+                                    NavigateUri="https://github.com/mysteryx93/NaturalGroundingPlayer/releases" Content="{Binding CheckForUpdateText}" />
+                <ui:HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" HorizontalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Margin="0,10,0,10" Text="Author: " HorizontalAlignment="Center" />
+                    <ui:HyperlinkButton Content="Etienne Charland" NavigateUri="https://www.spiritualselftransformation.com/" />
+                </StackPanel>
+
+                <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding !Settings.IsLicenseValid}" 
+                           Text="{Binding AppInfo.LicenseInfo}" />
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,10" HorizontalAlignment="Center">
+                    <TextBlock Text="License" VerticalAlignment="Center" />
+                    <TextBox Width="250" Margin="10,0,10,0"  Text="{Binding License}" IsReadOnly="{Binding Settings.IsLicenseValid}" />
+                    <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" IsVisible="{Binding !Settings.IsLicenseValid}" />
+                    <ui:SymbolIcon Symbol="Checkmark" FontSize="20" Foreground="Green" IsVisible="{Binding Settings.IsLicenseValid}" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                <Grid>
+                    <ui:HyperlinkButton Content="Get the Powerliminals Pack" HorizontalAlignment="Right" NavigateUri="https://www.spiritualselftransformation.com/powerliminals-nonrivalry" />
+                </Grid>
+                <Grid>
+                    <CheckBox Content="Do not show on startup" IsChecked="{Binding !ShowInfoOnStartup}" />
+                    <Button HorizontalAlignment="Right" Width="100" Classes="round"
+                            Command="{Binding Close}" IsDefault="True" IsCancel="true" Content="Close" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

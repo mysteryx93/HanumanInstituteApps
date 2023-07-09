@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Command</Title>
+      <Author>Etienne Charland</Author>
+      <Description>Adds a ICommand to a WPF project.</Description>
+      <Shortcut>hicommand</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>NameUpper</ID>
+          <ToolTip>Replace with the command name starting with uppercase.</ToolTip>
+          <Default>Upper</Default>
+        </Literal>
+        <Literal>
+          <ID>NameLower</ID>
+          <ToolTip>Replace with the command name starting with lowercase.</ToolTip>
+          <Default>lower</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="CSharp">
+        <![CDATA[
+        public ICommand $NameUpper$Command => CommandHelper.InitCommand(ref _$NameLower$Command, On$NameUpper$, () => Can$NameUpper$);
+        private RelayCommand? _$NameLower$Command;
+        private bool Can$NameUpper$ => true;
+        private void On$NameUpper$()
+        {
+            if (!Can$NameUpper$) { return; }
+            
+        }
+        ]]>
+      </Code>
+      <Imports>
+        <Import>
+          <Namespace>System.Windows.Input</Namespace>
+        </Import>
+        <Import>
+          <Namespace>GalaSoft.MvvmLight.CommandWpf</Namespace>
+        </Import>
+        <Import>
+          <Namespace>HanumanInstitute.CommonWpfApp</Namespace>
+        </Import>
+      </Imports>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

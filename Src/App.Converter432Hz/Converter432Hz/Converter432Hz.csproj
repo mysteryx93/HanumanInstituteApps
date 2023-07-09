@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Converter432Hz.Core</AssemblyName>
+    <RootNamespace>HanumanInstitute.Converter432Hz</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BassAudio\BassAudio.csproj" />
+    <ProjectReference Include="..\..\Apps\Apps.csproj" />
+    <ProjectReference Include="..\..\Avalonia\Avalonia.csproj" />
+    <ProjectReference Include="..\..\Services\Services.csproj" />
+    <ProjectReference Include="..\..\..\Dll\BassEnc\BassEncDlls.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LazyCache" Version="2.4.0" />
+    <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Tags" Version="3.1.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="19.2.1" />
+    <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

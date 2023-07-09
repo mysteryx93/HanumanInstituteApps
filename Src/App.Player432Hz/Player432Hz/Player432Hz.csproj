@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Player432Hz.Core</AssemblyName>
+    <RootNamespace>HanumanInstitute.Player432Hz</RootNamespace>
+    <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
+    <ProjectReference Include="..\..\..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
+    <ProjectReference Include="..\..\BassAudio\BassAudio.csproj" />
+    <ProjectReference Include="..\..\Apps\Apps.csproj" />
+    <ProjectReference Include="..\..\Avalonia\Avalonia.csproj" />
+    <ProjectReference Include="..\..\Services\Services.csproj" />
+    <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI.Fody" Version="19.2.1" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:yangDownloader="clr-namespace:HanumanInstitute.YangDownloader"
+             xmlns:ui="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             x:Class="HanumanInstitute.YangDownloader.App">
+    <Application.DataTemplates>
+        <yangDownloader:ViewLocator />
+    </Application.DataTemplates>
+    <Application.Styles>
+        <ui:FluentAvaloniaTheme PreferSystemTheme="False" CustomAccentColor="#e50000" />
+        <StyleInclude Source="avares://HanumanInstitute.Apps/Styles/CommonStyles.axaml" />
+        <!-- <StyleInclude Source="avares://FluentAvalonia.UI.Windowing/Styles/FAWindowingStyles.axaml" /> -->
+    </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://HanumanInstitute.Apps/Styles/CommonResources.axaml" />
+                <ResourceInclude Source="avares://MediaPlayer.Avalonia/Styles/Default/Theme.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

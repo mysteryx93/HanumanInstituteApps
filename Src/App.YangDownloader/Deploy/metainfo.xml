@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>converter432hz</id>
+	<metadata_license>MIT</metadata_license>
+	<project_license>MIT</project_license>
+	<name>Converter432Hz</name>
+	<summary>Converts and re-encodes music to 432Hz</summary>
+	<description>
+		<p>Converts and re-encodes music to 432Hz</p>
+	</description>
+	<launchable type="desktop-id">converter432hz.desktop</launchable>
+	<url type="homepage">https://github.com/mysteryx93/HanumanInstituteApps</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://github.com/mysteryx93/HanumanInstituteApps/Screenshots/Converter432hz.png</image>
+		</screenshot>
+	</screenshots>
+	<provides>
+		<id>converter432hz.desktop</id>
+	</provides>
+</component>

@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>HanumanInstitute.NaturalGroundingPlayer.Business</RootNamespace>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataAccess\**" />
+    <EmbeddedResource Remove="DataAccess\**" />
+    <None Remove="DataAccess\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AutoPitchBusiness.cs" />
+    <Compile Remove="DistributionGraphBusiness.cs" />
+    <Compile Remove="DownloadPlaylistBusiness.cs" />
+    <Compile Remove="EditPlaylistBusiness.cs" />
+    <Compile Remove="EditVideoBusiness.cs" />
+    <Compile Remove="FilterPresets.cs" />
+    <Compile Remove="MoveFilesBusiness.cs" />
+    <Compile Remove="PlayerBusiness.cs" />
+    <Compile Remove="SyncBusiness.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="AutoPitchBusiness.cs" />
+    <None Include="DistributionGraphBusiness.cs" />
+    <None Include="DownloadPlaylistBusiness.cs" />
+    <None Include="EditPlaylistBusiness.cs" />
+    <None Include="EditVideoBusiness.cs" />
+    <None Include="FilterPresets.cs" />
+    <None Include="MoveFilesBusiness.cs" />
+    <None Include="PlayerBusiness.cs" />
+    <None Include="SyncBusiness.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.5" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.29" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj" />
+    <ProjectReference Include="..\CommonServices\CommonServices.csproj" />
+    <ProjectReference Include="..\CommonWpfApp\CommonWpfApp.csproj" />
+    <ProjectReference Include="..\Downloads\Downloads.csproj" />
+  </ItemGroup>
+
+</Project>

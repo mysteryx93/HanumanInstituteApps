@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.PowerliminalsPlayer"
+        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.PowerliminalsPlayer.ViewModels"
+        mc:Ignorable="d" MinWidth="290" Width="290" MaxWidth="290" MinHeight="260" Height="260" MaxHeight="260"
+        x:Class="HanumanInstitute.PowerliminalsPlayer.Views.SettingsView"
+        Title="Settings" Classes="gradient"
+        CanResize="False" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
+    <Grid>
+        <Grid Margin="10">
+            <StackPanel>
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel">
+                        <Setter Property="Margin" Value="0,0,0,8"></Setter>
+                    </Style>
+                </StackPanel.Styles>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Theme" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="20,0,0,0">
+                        <ComboBox Width="130" Items="{Binding ThemeList}" x:CompileBindings="False"
+                                  SelectedItem="{Binding ThemeList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
+                              SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
+                </StackPanel>
+                <CheckBox IsChecked="{Binding Settings.AntiAlias}">Apply anti-alias filter</CheckBox>
+                <StackPanel Orientation="Horizontal" IsEnabled="{Binding Settings.AntiAlias}">
+                    <TextBlock Text="Anti-alias length (8 - 128)  " VerticalAlignment="Center" />
+                    <NumericUpDown Value="{Binding Settings.AntiAliasLength}" Width="80" Minimum="8" Maximum="128" />
+                </StackPanel>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Performance" />
+                    <Slider Grid.Column="1" HorizontalAlignment="Center" Width="120" Minimum="0" Maximum="5"
+                            TickFrequency="1" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
+                            Value="{Binding Settings.PerformanceQuality}">
+                    </Slider>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="Quality" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
+                    <TextBlock Text="Output sample rate" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="10,0,0,0">
+                        <ComboBox Width="115" Items="{Binding OutputSampleRateList}" x:CompileBindings="False"
+                                  SelectedItem="{Binding OutputSampleRateList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Margin" Value="3,0,0,0" />
+                    </Style>
+                </StackPanel.Styles>
+                <Button Width="65" Classes="round" Command="{Binding RestoreDefault}" Content="Default" />
+                <Button Width="65" Classes="round" Command="{Binding Apply}" Content="Apply" />
+                <Button Width="65" Classes="round accent" Command="{Binding Ok}" IsDefault="True" Content="OK" />
+                <Button Width="65" Classes="round" Command="{Binding Cancel}" IsCancel="true" Content="Cancel" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

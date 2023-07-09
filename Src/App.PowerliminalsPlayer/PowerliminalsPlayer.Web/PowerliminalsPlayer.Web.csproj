@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <WasmMainJSPath>AppBundle\main.js</WasmMainJSPath>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="AppBundle\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Web" Version="11.0.0-rc1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\PowerliminalsPlayer\PowerliminalsPlayer.csproj"/>
+    </ItemGroup>
+</Project>

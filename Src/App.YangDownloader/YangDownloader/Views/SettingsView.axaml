@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HanumanInstitute.YangDownloader"
+        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:vm="clr-namespace:HanumanInstitute.YangDownloader.ViewModels"
+        xmlns:av="clr-namespace:HanumanInstitute.Avalonia;assembly=HanumanInstitute.Avalonia"
+        mc:Ignorable="d" MinWidth="350" Width="350" MinHeight="200" Height="200"
+        x:Class="HanumanInstitute.YangDownloader.Views.SettingsView"
+        Title="Settings" Classes="gradient"
+        ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        d:DataContext="{x:Static local:ViewModelLocator.Settings}" x:DataType="vm:SettingsViewModel">
+    <Window.Resources>
+        <av:BooleanToBrushConverter x:Key="BooleanToBrushConverter">
+            <av:BooleanToBrushConverter.TrueValue>
+                <SolidColorBrush Color="Green" /> 
+            </av:BooleanToBrushConverter.TrueValue>
+            <av:BooleanToBrushConverter.FalseValue>
+                <SolidColorBrush Color="Red" /> 
+            </av:BooleanToBrushConverter.FalseValue>
+        </av:BooleanToBrushConverter>
+    </Window.Resources>
+    <Grid>
+        <Grid Margin="10">
+            <StackPanel>
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel">
+                        <Setter Property="Margin" Value="0,0,0,8"></Setter>
+                    </Style>
+                </StackPanel.Styles>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Theme" VerticalAlignment="Center" />
+                    <Grid Width="80" Margin="20,0,0,0">
+                        <ComboBox Width="130" Items="{Binding ThemeList}" x:CompileBindings="False"
+                                  SelectedItem="{Binding ThemeList.CurrentItem}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                    <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
+                    <ComboBox Margin="12,0,0,0" Width="105" Items="{Binding CheckForUpdateList}" x:CompileBindings="False"
+                              SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
+                </StackPanel>
+                <TextBlock Grid.Column="0" Text="Save to Folder" HorizontalAlignment="Left"/>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBox Grid.Column="1" av:FocusExtensions.FocusOnLoaded="True"
+                             Text="{Binding Settings.DestinationFolder}">
+                        <Interaction.Behaviors>
+                            <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.LostFocusEvent}">
+                                <InvokeCommandAction Command="{Binding TestDestinationPath}" />
+                            </RoutedEventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </TextBox>
+                    <Button Classes="round" Grid.Column="2" Width="35"
+                            Command="{Binding BrowseDestination}">
+                        <ui:SymbolIcon Symbol="OpenFolder" FontSize="20" />
+                    </Button>
+                </Grid>
+                <TextBlock Grid.Column="0" Text="{Binding DestinationPathError}" HorizontalAlignment="Left" 
+                           FontSize="12" Foreground="Red" Height="16" />
+                <!--<TextBlock Grid.Column="0" Text="FFmpeg Path" HorizontalAlignment="Left" />
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBox Grid.Column="1" hic:FocusExtensions.FocusOnLoaded="True" 
+                             Text="{Binding Settings.FFmpegPath}">
+                        <Interaction.Behaviors>
+                            <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.LostFocusEvent}">
+                                <InvokeCommandAction Command="{Binding TestFFmpeg}" />
+                            </RoutedEventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </TextBox>
+                    <Button Classes="round" Grid.Column="2" Width="35"
+                            Command="{Binding BrowseFFmpeg}">
+                        <ui:SymbolIcon Symbol="OpenFile" FontSize="20" />
+                    </Button>
+                </Grid>
+                <TextBlock Grid.Column="0" Text="{Binding FFmpegVersion}" HorizontalAlignment="Left" FontSize="12"
+                           Foreground="{Binding IsFFmpegPathValid, Converter={StaticResource BooleanToBrushConverter}}" />-->
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Margin" Value="3,0,0,0" />
+                    </Style>
+                </StackPanel.Styles>
+                <Button Width="65" Classes="round" Command="{Binding RestoreDefault}" Content="Default" />
+                <Button Width="65" Classes="round" Command="{Binding Apply}" Content="Apply" />
+                <Button Width="65" Classes="round accent" Command="{Binding Ok}" IsDefault="True" Content="OK" />
+                <Button Width="65" Classes="round" Command="{Binding Cancel}" IsCancel="true" Content="Cancel" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
