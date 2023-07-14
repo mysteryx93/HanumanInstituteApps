@@ -1,0 +1,13 @@
+﻿<Page x:Class="NaturalGroundingPlayer.SetupWizardPage6"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d"
+	Title="Page1" Loaded="Page_Loaded" Height="300" Width="500">
+
+    <Grid>
+        <TextBlock Margin="10" TextWrapping="Wrap"><Run Text="You may download the latest version of MPC-HC and madVR to replace those automatically installed by SVP."/><LineBreak/><Run/><LineBreak/><Run Text="MPC-HC"/><Run Text=", s"/><Run Text="elect "/><Run Text="32-bit (x86)"/><Run Text=" and install it"/><LineBreak/><Hyperlink NavigateUri="http://mpc-hc.org/downloads/"><Run Text="http://mpc-hc.org/downloads/"/></Hyperlink><LineBreak/><Run/><LineBreak/><Run Text="madVR, download the Zip file at the top"/><LineBreak/><Hyperlink NavigateUri="http://forum.doom9.org/showthread.php?t=146228"><Run Text="http://forum.doom9.org/showthread.php?t=146228"/></Hyperlink><LineBreak/><Run/><LineBreak/><Run Text="Unzip the ZIP files into wherever you have SVP installed"/><LineBreak/><Run Text="C:\Program Files (x86)\SVP"/><Run Text=" 4"/><Run Text="\madVR"/><Run Text="\"/></TextBlock>
+
+    </Grid>
+</Page>

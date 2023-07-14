@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>NaturalGroundingPlayer.Core</AssemblyName>
+    <RootNamespace>HanumanInstitute.NaturalGroundingPlayer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Apps\Apps.csproj" />
+    <ProjectReference Include="..\..\Avalonia\Avalonia.csproj" />
+    <ProjectReference Include="..\..\Services\Services.csproj" />
+    <ProjectReference Include="..\NaturalGroundingPlayer.Business\NaturalGroundingPlayer.Business.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
+    <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Old\**" />
+  </ItemGroup>
+</Project>

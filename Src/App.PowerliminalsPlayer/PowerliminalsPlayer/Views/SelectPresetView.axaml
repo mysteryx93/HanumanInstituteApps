@@ -29,7 +29,7 @@
         </Grid>
         <Grid Row="1">
             <ListBox x:Name="PresetList" BorderThickness="0" TabIndex="1"
-                     Items="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                     ItemsSource="{Binding AppData.Presets}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                      Background="{x:Null}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

@@ -99,6 +99,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvvmDialogs.Avalonia.Messag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvvmDialogs.Avalonia.Fluent", "..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia.Fluent\MvvmDialogs.Avalonia.Fluent.csproj", "{6A70D7A9-DCB9-4CD9-A322-7AADBC93AC6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer", "App.NaturalGroundingPlayer\NaturalGroundingPlayer\NaturalGroundingPlayer.csproj", "{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.Android", "App.NaturalGroundingPlayer\NaturalGroundingPlayer.Android\NaturalGroundingPlayer.Android.csproj", "{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.Desktop", "App.NaturalGroundingPlayer\NaturalGroundingPlayer.Desktop\NaturalGroundingPlayer.Desktop.csproj", "{8365BCCE-98B1-4464-97D8-3E65BE52AB72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.iOS", "App.NaturalGroundingPlayer\NaturalGroundingPlayer.iOS\NaturalGroundingPlayer.iOS.csproj", "{0696F4B6-65CD-446D-B82D-9DD252FCCF19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App.NaturalGroundingPlayer", "App.NaturalGroundingPlayer", "{A2B9C100-4711-4C25-9774-86FE944D55A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaturalGroundingPlayer.Business", "App.NaturalGroundingPlayer\NaturalGroundingPlayer.Business\NaturalGroundingPlayer.Business.csproj", "{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -257,6 +269,26 @@ Global
 		{6A70D7A9-DCB9-4CD9-A322-7AADBC93AC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A70D7A9-DCB9-4CD9-A322-7AADBC93AC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A70D7A9-DCB9-4CD9-A322-7AADBC93AC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8365BCCE-98B1-4464-97D8-3E65BE52AB72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8365BCCE-98B1-4464-97D8-3E65BE52AB72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8365BCCE-98B1-4464-97D8-3E65BE52AB72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8365BCCE-98B1-4464-97D8-3E65BE52AB72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0696F4B6-65CD-446D-B82D-9DD252FCCF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0696F4B6-65CD-446D-B82D-9DD252FCCF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0696F4B6-65CD-446D-B82D-9DD252FCCF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0696F4B6-65CD-446D-B82D-9DD252FCCF19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -303,5 +335,10 @@ Global
 		{F1E4E616-5986-4D21-AD3A-A1C1A6718A0C} = {F9C7F9DA-0464-4BC9-9E97-696A4FC8D86D}
 		{0832D7A8-1969-4B37-B8C7-6F47F6B3A2FE} = {F9C7F9DA-0464-4BC9-9E97-696A4FC8D86D}
 		{6A70D7A9-DCB9-4CD9-A322-7AADBC93AC6C} = {F9C7F9DA-0464-4BC9-9E97-696A4FC8D86D}
+		{EC52F9C3-3B2F-436B-95E0-C2BC85371D1E} = {A2B9C100-4711-4C25-9774-86FE944D55A2}
+		{E4BB85E9-BD9F-40ED-BCE8-078C067ADE16} = {A2B9C100-4711-4C25-9774-86FE944D55A2}
+		{8365BCCE-98B1-4464-97D8-3E65BE52AB72} = {A2B9C100-4711-4C25-9774-86FE944D55A2}
+		{0696F4B6-65CD-446D-B82D-9DD252FCCF19} = {A2B9C100-4711-4C25-9774-86FE944D55A2}
+		{34093FE5-E9E7-4B5F-ADD4-EABEEC74F5E8} = {A2B9C100-4711-4C25-9774-86FE944D55A2}
 	EndGlobalSection
 EndGlobal

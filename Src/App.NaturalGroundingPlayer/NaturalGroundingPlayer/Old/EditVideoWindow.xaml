@@ -1,0 +1,119 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.EditVideoWindow"
+        Title="Edit Video" Height="380" Width="658" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closing="Window_Closing">
+    <Window.Resources>
+        <Business:RatingConverter x:Key="RatingConverter"/>
+        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
+    </Window.Resources>
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="106"/>
+            <ColumnDefinition Width="269"/>
+            <ColumnDefinition Width="71"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TextBlock HorizontalAlignment="Left" Margin="10,17,0,0" Text="Artist" VerticalAlignment="Top" Height="16" Width="65"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,14,0,0" VerticalAlignment="Top" Width="241" Text="{Binding Artist, Mode=TwoWay}" TabIndex="1" MaxLength="50"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,45,0,0" Text="Title" VerticalAlignment="Top" Height="16" Width="65"/>
+        <TextBox x:Name="TitleText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,42,0,0" VerticalAlignment="Top" Width="241" Text="{Binding Title, Mode=TwoWay}" TabIndex="2" MaxLength="50"/>
+        <ComboBox x:Name="CategoryCombo" Grid.Column="1" HorizontalAlignment="Left" Margin="0,98,0,0" VerticalAlignment="Top" Width="241" IsEditable="True" Height="22" SelectedValue="{Binding MediaCategoryId, Mode=TwoWay}" TabIndex="4" LostKeyboardFocus="CategoryCombo_LostKeyboardFocus" DisplayMemberPath="Name" SelectedValuePath="MediaCategoryId" />
+        <TextBlock HorizontalAlignment="Left" Margin="10,101,0,0" Text="Category" VerticalAlignment="Top" Height="16" Width="65"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top" Height="16" Width="96"><Run Text="Download "/><Run Text="Name"/></TextBlock>
+        <TextBox x:Name="DownloadNameText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,125,0,0" VerticalAlignment="Top" Width="214" Text="{Binding DownloadName, Mode=TwoWay}" TabIndex="5" MaxLength="100"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,156,0,0" VerticalAlignment="Top" Height="16" Width="85"><Run Text="Download"/><Run Text=" "/><Run Text="URL"/></TextBlock>
+        <TextBox x:Name="DownloadUrlText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,153,0,0" VerticalAlignment="Top" Width="241" Text="{Binding DownloadUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="7" MaxLength="100" LostFocus="DownloadUrlText_LostFocus"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,184,0,0" Text="Buy URL" VerticalAlignment="Top" Height="16" Width="85"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,181,0,0" VerticalAlignment="Top" Width="241" Text="{Binding BuyUrl, Mode=TwoWay}" TabIndex="8" MaxLength="100"/>
+        <Button x:Name="YouTubeSearchButton" Content="S" Grid.Column="1" HorizontalAlignment="Left" Margin="219,125,0,0" VerticalAlignment="Top" Width="22" Height="22" Click="YouTubeSearchButton_Click" TabIndex="6"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,212,0,0" VerticalAlignment="Top" Height="16" Width="99" Text="Start/End/Length" Grid.ColumnSpan="2"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,209,0,0" VerticalAlignment="Top" Width="50" Text="{Binding StartPos, Converter={StaticResource MediaTimeConverter}, Mode=TwoWay}" TabIndex="9"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="55,209,0,0" VerticalAlignment="Top" Width="50" Text="{Binding EndPos, Converter={StaticResource MediaTimeConverter}, Mode=TwoWay}" TabIndex="10"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="110,209,0,0" VerticalAlignment="Top" Width="50" IsReadOnly="True" Text="{Binding Length, Converter={StaticResource MediaTimeConverter}, Mode=TwoWay}" TabIndex="11">
+            <TextBox.Background>
+                <SolidColorBrush Color="#FFE6E6E6"/>
+            </TextBox.Background>
+        </TextBox>
+        <TextBlock HorizontalAlignment="Left" Margin="10,240,0,0" VerticalAlignment="Top" Height="16" Width="85" Text="File Name"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="27,237,0,0" VerticalAlignment="Top" Width="214" IsReadOnly="True" Text="{Binding FileName, Mode=TwoWay}" TabIndex="14">
+            <TextBox.Background>
+                <SolidColorBrush Color="#FFE6E6E6"/>
+            </TextBox.Background>
+        </TextBox>
+        <Button x:Name="SaveButton" Content="_Save" Grid.Column="3" Margin="105,307,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" IsDefault="True" Click="SaveButton_Click" TabIndex="45"/>
+        <Button x:Name="CancelButton" Content="_Cancel" HorizontalAlignment="Left" Margin="8,307,0,0" VerticalAlignment="Top" Width="75" Height="22" Grid.Column="2" IsCancel="True" Click="CancelButton_Click" TabIndex="43" Grid.ColumnSpan="2"/>
+        <Button x:Name="PlayButton" Content="_Play" Margin="21,307,0,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Left" Width="75" Click="PlayButton_Click" Grid.Column="3" TabIndex="44"/>
+        <Grid x:Name="RatingsGrid" Grid.ColumnSpan="2" Grid.Column="2" Margin="0,6,0,64">
+            <TextBlock HorizontalAlignment="Left" Text="Physical" VerticalAlignment="Top" Width="64" Height="16" Margin="0,46,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Emotional" VerticalAlignment="Top" Width="64" Height="16" Margin="0,74,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Spiritual" VerticalAlignment="Top" Width="64" Height="16" Margin="0,102,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Love" VerticalAlignment="Top" Width="64" Height="16" Margin="0,158,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Egoless" VerticalAlignment="Top" Width="64" Height="16" Margin="0,130,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Masculine" VerticalAlignment="Top" Width="67" Height="16" TextAlignment="Center" Margin="69,4,0,0"/>
+            <TextBlock HorizontalAlignment="Left" Text="Feminine" VerticalAlignment="Top" Width="67" Height="16" TextAlignment="Center" Margin="166,4,0,0"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="69,43,0,0" VerticalAlignment="Top" Width="33" Text="{Binding PM.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="20" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="166,43,0,0" VerticalAlignment="Top" Width="33" Text="{Binding PF.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="26" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="69,71,0,0" VerticalAlignment="Top" Width="33" Text="{Binding EM.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="22" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="166,71,0,0" VerticalAlignment="Top" Width="33" Text="{Binding EF.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="28" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="69,99,0,0" VerticalAlignment="Top" Width="33" Text="{Binding SM.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="24" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="166,99,0,0" VerticalAlignment="Top" Width="33" Text="{Binding SF.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="30" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="117,155,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Love.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="34" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="117,127,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Egoless.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="32" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="117,183,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Custom1.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="37" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="117,211,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Custom2.Height, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="40" LostKeyboardFocus="EditRating_LostFocus"/>
+            <ComboBox x:Name="Custom1Combo" HorizontalAlignment="Left" Margin="0,183,0,0" VerticalAlignment="Top" Width="112" Height="22" DisplayMemberPath="Name" Text="{Binding Custom1Text, Mode=TwoWay}" TabIndex="36" IsEditable="True" LostKeyboardFocus="CustomCombo_LostFocus"/>
+            <ComboBox x:Name="Custom2Combo" HorizontalAlignment="Left" Margin="0,211,0,0" VerticalAlignment="Top" Width="112" IsEditable="True" Height="22" DisplayMemberPath="Name" Text="{Binding Custom2Text, Mode=TwoWay}" TabIndex="39" LostKeyboardFocus="CustomCombo_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="103,43,0,0" VerticalAlignment="Top" Width="33" Text="{Binding PM.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="21" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="103,71,0,0" VerticalAlignment="Top" Width="33" Text="{Binding EM.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="23" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="103,99,0,0" VerticalAlignment="Top" Width="33" Text="{Binding SM.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="25" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="151,155,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Love.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="35" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="151,127,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Egoless.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="33" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="151,183,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Custom1.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="38" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="151,211,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Custom2.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="41" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="200,43,0,0" VerticalAlignment="Top" Width="33" Text="{Binding PF.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="27" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="200,71,0,0" VerticalAlignment="Top" Width="33" Text="{Binding EF.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="29" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="200,99,0,0" VerticalAlignment="Top" Width="33" Text="{Binding SF.Depth, Converter={StaticResource RatingConverter}, Mode=TwoWay}" TabIndex="31" LostKeyboardFocus="EditRating_LostFocus"/>
+            <TextBlock HorizontalAlignment="Left" Text="Height" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="69,23,0,0" FontSize="10"/>
+            <TextBlock HorizontalAlignment="Left" Text="Depth" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="103,23,0,0" FontSize="10"/>
+            <TextBlock HorizontalAlignment="Left" Text="Height" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="166,23,0,0" FontSize="10"/>
+            <TextBlock HorizontalAlignment="Left" Text="Depth" VerticalAlignment="Top" Width="33" Height="16" TextAlignment="Center" Margin="200,23,0,0" FontSize="10"/>
+            <TextBlock x:Name="PMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,46,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,74,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="SMValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="138,102,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="PFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,46,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,74,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="SFValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="235,102,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="LoveValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,158,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="EgolessValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,130,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="Custom1ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,186,0,0" Foreground="#FF07D107"/>
+            <TextBlock x:Name="Custom2ValueText" HorizontalAlignment="Left" VerticalAlignment="Top" Width="28" Height="16" Margin="186,214,0,0" Foreground="#FF07D107"/>
+            <TextBlock HorizontalAlignment="Left" Margin="109,235,0,0" VerticalAlignment="Top" FontSize="10"><Run Text="Height * Depth * "/><Run Text="0"/><Run Text=".1"/><Run Text="1"/><Run Text=" = Power"/></TextBlock>
+        </Grid>
+        <TextBlock x:Name="ErrorText" HorizontalAlignment="Left" Margin="10,310,0,0" VerticalAlignment="Top" Width="278" Foreground="Red" Grid.ColumnSpan="2" Height="16"/>
+        <Button x:Name="FileBindingButton" Content="B" Grid.Column="1" HorizontalAlignment="Left" Margin="0,237,0,0" VerticalAlignment="Top" Width="22" Height="22" Click="FileBindingButton_Click" TabIndex="13">
+            <Button.ContextMenu>
+                <ContextMenu >
+                    <MenuItem x:Name="menuPlay" Header="_Play" Click="PlayButton_Click" />
+                    <MenuItem x:Name="menuEdit" Header="_Edit" Click="menuEdit_Click" />
+                    <MenuItem x:Name="menuMoveFile" Header="_Move to Default Location" Click="menuMoveFile_Click" />
+                    <MenuItem x:Name="menuSelectFile" Header="_Select Another File..." Click="menuSelectFile_Click" />
+                    <MenuItem x:Name="menuDownloadVideo" Header="Do_wnload File" Click="menuDownloadVideo_Click" />
+                    <MenuItem x:Name="menuExtractAudio" Header="Extract _Audio..." Click="menuExtractAudio_Click" />
+                    <MenuItem x:Name="menuRemoveBinding" Header="_Remove Binding" Click="menuRemoveBinding_Click" />
+                    <MenuItem x:Name="menuDeleteVideo" Header="Delete Attached _File" Click="menuDeleteVideo_Click" />
+                    <MenuItem x:Name="menuDeleteEntry" Header="_Delete This Entry" Click="menuDeleteEntry_Click" />
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
+        <TextBlock HorizontalAlignment="Left" Margin="10,73,0,0" Text="Album" VerticalAlignment="Top" Height="16" Width="65"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="0,70,0,0" VerticalAlignment="Top" Width="241" Text="{Binding Album, Mode=TwoWay}" TabIndex="3" MaxLength="50"/>
+        <TextBlock HorizontalAlignment="Left" Text="Preference" VerticalAlignment="Top" Width="73" Height="16" Margin="0,260,0,0" Grid.ColumnSpan="2" Grid.Column="2"/>
+        <TextBox x:Name="PreferenceText" HorizontalAlignment="Left" Height="23" Margin="63,257,0,0" VerticalAlignment="Top" Width="33" Text="{Binding Preference, Converter={StaticResource RatingConverter}, Mode=TwoWay, ConverterParameter=10}" TabIndex="42" Grid.Column="3"/>
+        <TextBox x:Name="DimensionText" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="165,209,0,0" VerticalAlignment="Top" Width="76" IsReadOnly="True" Text="{Binding Dimension, Mode=OneWay}" TabIndex="12" Background="#FFE6E6E6"/>
+        <CheckBox Content="Personal (can export)" HorizontalAlignment="Left" Margin="10,286,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.ColumnSpan="2" IsChecked="{Binding IsPersonal, Mode=TwoWay}" TabIndex="18" />
+        <CheckBox Content="Disable SVP" HorizontalAlignment="Left" Margin="39,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding DisableSvp, Mode=TwoWay}" TabIndex="16" />
+        <CheckBox Content="Disable MadVR" HorizontalAlignment="Left" Margin="136,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" Grid.Column="1" IsChecked="{Binding DisableMadVr, Mode=TwoWay}" TabIndex="17" />
+        <CheckBox x:Name="DisablePitchCheckBox"  Content="Disable 432hz Pitch" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.5" IsChecked="{Binding DisablePitch, Mode=TwoWay}" TabIndex="15" Grid.ColumnSpan="2" />
+    </Grid>
+</Window>

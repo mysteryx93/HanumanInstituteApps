@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>HanumanInstitute.NaturalGroundingPlayer.Business</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.5" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.3.3" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.29" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Downloads\Downloads.csproj" />
+    <ProjectReference Include="..\..\Services\Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Remove="Old\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Old\**" />
+  </ItemGroup>
+</Project>

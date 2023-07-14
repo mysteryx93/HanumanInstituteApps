@@ -1,0 +1,89 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Business="clr-namespace:Business;assembly=Business" x:Class="NaturalGroundingPlayer.BuyResourcesWindow"
+        Title="Buy Resources" Height="503" Width="564" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <Business:RatingConverter x:Key="RatingConverter"/>
+        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+    </Window.Resources>
+    <Grid Style="{DynamicResource GradiantBackground}">
+        <ListView x:Name="VideosView" TabIndex="7" SelectionMode="Single" SelectedValuePath="MediaId" Margin="10,93,9,37" ButtonBase.Click="VideosView_ColumnHeaderClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Artist, Mode=OneWay}" Header="Artist" Width="100"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Title, Mode=OneWay}" Header="Title" Width="200"/>
+                    <GridViewColumn Header="Length" Width="50" HeaderStringFormat="Length">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Length, Converter={StaticResource MediaTimeConverter}, Mode=OneWay}" HorizontalAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Preference, Converter={StaticResource RatingConverter}, Mode=OneWay}" Header="Pref" Width="35"/>
+                    <GridViewColumn Header="Inten" Width="35" HeaderStringFormat="Intensity">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Intensity, Converter={StaticResource RatingConverter}, Mode=OneWay}" Foreground="{Binding Intensity, Converter={StaticResource RatingToColorConverter}, Mode=OneWay}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn x:Name="CustomColumn" Width="35" HeaderStringFormat="Custom">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Custom, Converter={StaticResource RatingConverter}, Mode=OneWay}" Foreground="{Binding Custom, Converter={StaticResource RatingToColorConverter}, Mode=OneWay}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" DataContext="{Binding Items}" Background="#FF00AE20">
+                                <TextBlock Margin="6">
+                                    <Hyperlink NavigateUri="{Binding Path=BuyUrl}" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None">
+                                        <TextBlock Text="{Binding Path=BuyName}" FontSize="16" Foreground="Black" FontWeight="Bold" />
+                                        <!--<TextBlock Text="{Binding Path=BuyUrl, StringFormat=' ({0})'}" FontSize="16" Foreground="#FFC8FBC8" />-->
+                                        <TextBlock Text=" (click to purchase)" FontSize="16" Foreground="Black" />
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <EventSetter Event="Control.MouseDoubleClick" Handler="VideosView_ItemDoubleClick"/>
+                    <EventSetter Event="Control.MouseRightButtonUp" Handler="VideosView_ItemRightButtonUp"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FileExists}" Value="False">
+                            <Setter Property="Background" Value="#FFFFDADA" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <Button x:Name="EditButton" Width="75" VerticalAlignment="Bottom" TabIndex="10" Margin="0,0,10,10" IsDefault="True" Height="22" HorizontalAlignment="Right" Content="Edit" Click="EditButton_Click"/>
+        <Button x:Name="CloseButton" Width="75" VerticalAlignment="Bottom" TabIndex="9" Margin="0,0,90,10" IsCancel="True" Height="22" HorizontalAlignment="Right" Content="Close" Click="CloseButton_Click"/>
+        <CheckBox x:Name="ShowMissing" Content="Show Only _Missing" HorizontalAlignment="Left" Margin="10,0,0,13" VerticalAlignment="Bottom" RenderTransformOrigin="0.235,-0.25" TabIndex="8" Click="ShowMissing_Click"/>
+        <TextBox x:Name="SearchText" Width="164" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="56,65,0,0" Height="23" HorizontalAlignment="Left" PreviewKeyDown="SearchText_PreviewKeyDown" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,67,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingCategoryCombo" HorizontalAlignment="Left" Margin="281,66,0,0" VerticalAlignment="Top" Width="142" SelectionChanged="Settings_Changed" SelectedIndex="0" TabIndex="2" Text="{Binding RatingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="Name" />
+        <TextBlock VerticalAlignment="Top" Text="Rating" Margin="240,67,0,0" HorizontalAlignment="Left"/>
+        <ComboBox x:Name="RatingOperatorCombo" HorizontalAlignment="Left" Margin="428,66,0,0" VerticalAlignment="Top" Width="46" SelectionChanged="Settings_Changed" SelectedIndex="{Binding RatingOperator, Converter={StaticResource EnumToIntConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="3">
+            <ComboBoxItem Content="&gt;=" />
+            <ComboBoxItem Content="=" />
+            <ComboBoxItem Content="&lt;" />
+        </ComboBox>
+        <TextBox x:Name="RatingValueText" Width="40" VerticalAlignment="Top" TabIndex="4" TextChanged="Settings_Changed" Margin="479,65,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding RatingValue, ConverterParameter=12, Converter={StaticResource RatingConverter}, Mode=TwoWay}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold"><Hyperlink NavigateUri="https://www.spiritualselftransformation.com/powerliminals" RequestNavigate="Hyperlink_RequestNavigate" ><Run Text="Get Powerliminals"/></Hyperlink></TextBlock>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="12,28,0,0" TextWrapping="Wrap" Text="Many of the traditional resources below are out of stock. Register to be notified when they become available, and if enough people request it, they might refill their stocks. They've done so a few times." VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

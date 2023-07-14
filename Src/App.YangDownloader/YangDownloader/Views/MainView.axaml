@@ -38,7 +38,7 @@
             <StackPanel Grid.Row="1">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Preferred Video:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding PreferredVideo}" Margin="5,0,10,0" x:CompileBindings="False"
+                    <ComboBox Width="85" ItemsSource="{Binding PreferredVideo}" Margin="5,0,10,0" x:CompileBindings="False"
                               SelectedItem="{Binding PreferredVideo.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -47,7 +47,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <TextBlock Text="Audio:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding PreferredAudio}" Margin="5,0,10,0" x:CompileBindings="False"
+                    <ComboBox Width="85" ItemsSource="{Binding PreferredAudio}" Margin="5,0,10,0" x:CompileBindings="False"
                               SelectedItem="{Binding PreferredAudio.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -56,7 +56,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <TextBlock Text="Quality:" VerticalAlignment="Center" />
-                    <ComboBox Width="85" Items="{Binding MaxQuality}" Margin="5,0,0,0" x:CompileBindings="False"
+                    <ComboBox Width="85" ItemsSource="{Binding MaxQuality}" Margin="5,0,0,0" x:CompileBindings="False"
                               SelectedItem="{Binding MaxQuality.CurrentItem}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -118,7 +118,7 @@
                     </Grid>
                 </Grid>
             </StackPanel>
-            <ListBox Grid.Row="2" Items="{Binding Downloads}" SelectionMode="Single" Background="{x:Null}"
+            <ListBox Grid.Row="2" ItemsSource="{Binding Downloads}" SelectionMode="Single" Background="{x:Null}"
                      IsVisible="{Binding HasDownloads, Mode=OneWay}">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">

@@ -1,0 +1,55 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:w="clr-namespace:NaturalGroundingPlayer"
+        xmlns:NaturalGroundingPlayer="clr-namespace:NaturalGroundingPlayer" 
+        xmlns:Business="clr-namespace:Business;assembly=Business" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="NaturalGroundingPlayer.ManualPlayerWindow"
+        x:Name="window"
+        Title="Natural Grounding Player" Height="440" Width="600" Closing="window_Closing" Loaded="window_Loaded" MinWidth="510" MinHeight="300" PreviewKeyDown="window_PreviewKeyDown">
+    <Window.Resources>
+        <Business:MediaTimeConverter x:Key="MediaTimeConverter"/>
+        <Business:RatingConverter x:Key="RatingConverter"/>
+        <Business:EnumToIntConverter x:Key="EnumToIntConverter"/>
+        <Business:RatingToColorConverter x:Key="RatingToColorConverter"/>
+        <RoutedUICommand x:Key="Play" Text="Play" />
+        <RoutedUICommand x:Key="PlayNext" Text="Play Next" />
+    </Window.Resources>
+    <Control.CommandBindings>
+        <CommandBinding Command="{StaticResource Play}" Executed="CommandBinding_Play" />
+        <CommandBinding Command="{StaticResource PlayNext}" Executed="CommandBinding_PlayNext" />
+    </Control.CommandBindings>
+    <Control.InputBindings>
+        <KeyBinding Key="Enter" Command="{StaticResource Play}" />
+        <KeyBinding Key="Enter" Command="{StaticResource PlayNext}" Modifiers="Ctrl" />
+    </Control.InputBindings>
+    <DockPanel>
+        <ContentControl x:Name="MainMenuContainer" DockPanel.Dock="Top" Focusable="False" />
+        <Grid Margin="0,0,0,0" Style="{DynamicResource GradiantBackground}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="401*"/>
+                <RowDefinition x:Name="LayersRow" Height="0"/>
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="txtCurrentVideo" HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Width="167" Height="16" Margin="0,68,0,0"/>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="Now Playing" VerticalAlignment="Top" Width="79" Height="16" Margin="0,51,88,0"/>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="Session Time" VerticalAlignment="Top" Width="79" Height="16" Margin="0,342,88,0"/>
+            <TextBlock x:Name="txtSessionTime" HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="16" Margin="0,358,47,0"/>
+            <ContentControl x:Name="RatingViewerContainer" HorizontalAlignment="Right" Width="167" Height="248" VerticalAlignment="Top" Margin="0,93,0,0" Focusable="False" TabIndex="5" />
+            <ContentControl x:Name="LayersContainer" Margin="10,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="500" Grid.Row="1" Focusable="False" />
+            <TextBox x:Name="SearchText" Width="150" VerticalAlignment="Top" TabIndex="1" TextChanged="Settings_Changed" Margin="60,6,0,0" Height="23" HorizontalAlignment="Left" Text="{Binding Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock VerticalAlignment="Top" Text="Search" Margin="12,8,0,0" HorizontalAlignment="Left"/>
+            <Slider x:Name="RatioSlider" HorizontalAlignment="Right" Margin="0,8,13,0" VerticalAlignment="Top" Width="99" Maximum="1" Minimum="-1" TickPlacement="BottomRight" TabIndex="4" Value="{Binding RatingRatio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="RatioSlider_ValueChanged" SmallChange="0.2" />
+            <TextBlock HorizontalAlignment="Right" Margin="0,23,77,0" Text="Height" VerticalAlignment="Top" FontSize="10"/>
+            <TextBlock HorizontalAlignment="Right" Margin="0,23,19,0" Text="Depth" VerticalAlignment="Top" FontSize="10"/>
+            <TextBlock HorizontalAlignment="Right" Margin="0,8,127,0" Text="Priority" VerticalAlignment="Top"/>
+            <NaturalGroundingPlayer:MediaGrid x:Name="MediaList" Margin="10,36,176,10" Width="Auto" Height="Auto" ItemDoubleClick="MediaList_ItemDoubleClick" TabIndex="3" />
+            <xctk:SplitButton x:Name="PlayButton" Content="Play" HorizontalAlignment="Left" Margin="227,7,0,0" VerticalAlignment="Top" Width="99" Click="PlayButton_Click" TabIndex="2">
+                <xctk:SplitButton.DropDownContent>
+                    <StackPanel>
+                        <MenuItem x:Name="MenuPlay" Header="Play" Click="MenuPlay_Click" InputGestureText="Enter" />
+                        <MenuItem x:Name="MenuPlayNext" Header="Play Next" Click="MenuPlay_Click" InputGestureText="Ctrl+Enter" />
+                    </StackPanel>
+                </xctk:SplitButton.DropDownContent>
+            </xctk:SplitButton>
+        </Grid>
+    </DockPanel>
+</Window>
