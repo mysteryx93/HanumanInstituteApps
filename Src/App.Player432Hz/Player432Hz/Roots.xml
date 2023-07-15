@@ -1,5 +1,5 @@
 ﻿<linker>
   <!-- Can be removed if CompiledBinding and no reflection are used -->
-  <assembly fullname="Player432Hz" preserve="All" />
+  <assembly fullname="Player432Hz.Core" preserve="All" />
   <assembly fullname="Avalonia.Themes.Fluent" preserve="All" />
 </linker>

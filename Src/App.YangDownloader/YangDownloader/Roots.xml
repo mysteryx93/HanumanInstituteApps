@@ -1,6 +1,5 @@
 ﻿<linker>
     <!-- Can be removed if CompiledBinding and no reflection are used -->
-    <assembly fullname="YangDownloader" preserve="All"/>
-    <assembly fullname="Avalonia.Themes.Fluent" preserve="All"/>
+    <assembly fullname="YangDownloader.Core" preserve="All"/>
     <assembly fullname="YoutubeExplode" preserve="All"/>
 </linker>

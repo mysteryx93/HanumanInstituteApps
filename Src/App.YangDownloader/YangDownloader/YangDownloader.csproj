@@ -5,6 +5,9 @@
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <TrimmerRootDescriptor Include="Roots.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
