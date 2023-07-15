@@ -2,4 +2,9 @@
     <!-- Can be removed if CompiledBinding and no reflection are used -->
     <assembly fullname="YangDownloader.Core" preserve="All"/>
     <assembly fullname="YoutubeExplode" preserve="All"/>
+    <assembly fullname="Avalonia.Base">
+        <type fullname="Avalonia.Controls.WindowBase">
+            <event name="Activated" />
+        </type>
+    </assembly>
 </linker>

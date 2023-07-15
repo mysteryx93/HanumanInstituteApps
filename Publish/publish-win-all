@@ -1,11 +1,19 @@
-./publish-win Player432Hz win-x64
-./publish-win Player432Hz win-x86
+./publish-win Player432Hz win-x64 zip
+./publish-win Player432Hz win-x86 zip
+./publish-win Player432Hz win-x64 setup
+./publish-win Player432Hz win-x86 setup
 
-./publish-win Converter432Hz win-x64
-./publish-win Converter432Hz win-x86
+./publish-win Converter432Hz win-x64 zip
+./publish-win Converter432Hz win-x86 zip
+./publish-win Converter432Hz win-x64 setup
+./publish-win Converter432Hz win-x86 setup
 
-./publish-win PowerliminalsPlayer win-x64
-./publish-win PowerliminalsPlayer win-x86
+./publish-win PowerliminalsPlayer win-x64 zip
+./publish-win PowerliminalsPlayer win-x86 zip
+./publish-win PowerliminalsPlayer win-x64 setup
+./publish-win PowerliminalsPlayer win-x86 setup
 
-./publish-win YangDownloader win-x64
-./publish-win YangDownloader win-x86
+./publish-win YangDownloader win-x64 zip
+./publish-win YangDownloader win-x86 zip
+./publish-win YangDownloader win-x64 setup
+./publish-win YangDownloader win-x86 setup

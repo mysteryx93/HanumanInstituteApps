@@ -11,15 +11,13 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\MediaPlayerUI.NET\Avalonia.Bass\MediaPlayer.Avalonia.Bass.csproj" />
-    <ProjectReference Include="..\..\..\..\MediaPlayerUI.NET\Avalonia\MediaPlayer.Avalonia.csproj" />
     <ProjectReference Include="..\..\BassAudio\BassAudio.csproj" />
     <ProjectReference Include="..\..\Apps\Apps.csproj" />
     <ProjectReference Include="..\..\Avalonia\Avalonia.csproj" />
     <ProjectReference Include="..\..\Services\Services.csproj" />
-    <ProjectReference Include="..\..\..\Dll\BassEnc\BassEncDlls.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\..\Dll\FFmpeg\FFmpegExe.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\Dll\BassEnc\BassEncDlls.csproj" />
+    <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" />
+    <ProjectReference Include="..\..\..\Dll\FFmpeg\FFmpegExe.csproj" />
     <ProjectReference Include="..\..\Downloads\Downloads.csproj" />
   </ItemGroup>
   <ItemGroup>
