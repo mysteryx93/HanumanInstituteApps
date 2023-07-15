@@ -17,7 +17,7 @@ public class MainActivity : AvaloniaMainActivity<App>
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         return base.CustomizeAppBuilder(builder)
-            .WithInterFont()
+            //.WithInterFont()
             .UseReactiveUI();
     }
 }

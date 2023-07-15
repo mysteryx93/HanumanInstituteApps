@@ -18,7 +18,7 @@
         <Grid Margin="10,8,10,4">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Svg Path="../Deploy/App.svg" Width="48" Height="48" Margin="0,0,12,0" />
+                    <Svg Path="/Assets/App.svg" Width="48" Height="48" Margin="0,0,12,0" />
                     <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding AppInfo.AppName}" Margin="0,0,8,0" VerticalAlignment="Center" />
                     <TextBlock FontSize="24" Text="{Binding AppVersion, Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" />
                 </StackPanel>

@@ -30,7 +30,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs\MvvmDialogs.csproj" />
-  </ItemGroup>
 </Project>

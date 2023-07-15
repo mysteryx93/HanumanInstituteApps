@@ -43,7 +43,7 @@ public static class AppStarter
         where TApp : Application, new()
         => AppBuilder.Configure<TApp>()
             .UsePlatformDetect()
-            .WithInterFont()
+            //.WithInterFont()
             .LogToTrace()
             .UseReactiveUI();
 

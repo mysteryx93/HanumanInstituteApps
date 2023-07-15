@@ -4,10 +4,7 @@
     <RootNamespace>HanumanInstitute.Apps</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia.Fluent\MvvmDialogs.Avalonia.Fluent.csproj" />
-    <ProjectReference Include="..\..\..\HanumanInstitute.MvvmDialogs\src\MvvmDialogs.Avalonia\MvvmDialogs.Avalonia.csproj" />
     <ProjectReference Include="..\Avalonia\Avalonia.csproj" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.0" />
     <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0.1" />
     <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.0.1" />

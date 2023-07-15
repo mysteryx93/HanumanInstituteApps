@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>Yang Downloader</AssemblyName>
+    <AssemblyName>YangDownloader</AssemblyName>
     <RootNamespace>HanumanInstitute.YangDownloader.Desktop</RootNamespace>
     <RuntimeIdentifiers>win-x64;win-x86;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <ApplicationIcon>..\Deploy\App.ico</ApplicationIcon>
