@@ -85,7 +85,7 @@ public class MainViewModelTests
     
     protected void SetDialogManagerOpenFolder(string result) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(
-                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object,string>>()))
+                It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(), It.IsAny<Func<object,string>>()))
             .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(result?.ReplaceDirectorySeparator()) }));
 
     private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :

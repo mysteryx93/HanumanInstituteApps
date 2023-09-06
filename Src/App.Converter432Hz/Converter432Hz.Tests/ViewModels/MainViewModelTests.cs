@@ -67,12 +67,12 @@ public class MainViewModelTests : TestsBase
 
     protected void SetOpenFilesResult(string[] values) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFileDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+                It.IsAny<Func<object, string>>()))
             .Returns(() => Task.FromResult<object>(values.Select(GetFileMock).ToList()));
     
     protected void SetOpenFolderResult(string value) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+                It.IsAny<Func<object, string>>()))
             .Returns(() => Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(value) }));
 
     private IDialogStorageFile GetFileMock(string path) => path == null ? null :
@@ -140,7 +140,7 @@ public class MainViewModelTests : TestsBase
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFileDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
+                It.IsAny<Func<object, string>>()),
             Times.Once);
         Assert.Empty(Model.Encoder.Sources);
     }
@@ -199,7 +199,7 @@ public class MainViewModelTests : TestsBase
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
+                It.IsAny<Func<object, string>>()),
             Times.Once);
         Assert.Empty(Model.Encoder.Sources);
     }
@@ -309,7 +309,7 @@ public class MainViewModelTests : TestsBase
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
+                It.IsAny<Func<object, string>>()),
             Times.Once);
         Assert.Equal(dest, Model.Encoder.Destination);
     }

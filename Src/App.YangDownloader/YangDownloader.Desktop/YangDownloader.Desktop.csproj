@@ -14,10 +14,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0"/>
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0"/>
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\YangDownloader\YangDownloader.csproj"/>
+    <ProjectReference Include="..\YangDownloader\YangDownloader.csproj" />
   </ItemGroup>
 </Project>

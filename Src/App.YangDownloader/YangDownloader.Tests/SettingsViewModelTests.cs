@@ -33,7 +33,7 @@ public class SettingsViewModelTests: TestsBase
 
     protected void SetBrowseDestination(string value) =>
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+                It.IsAny<Func<object, string>>()))
             .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(value) }));
 
     private IDialogStorageFolder GetFolderMock(string path) => path == null ? null :
@@ -51,7 +51,7 @@ public class SettingsViewModelTests: TestsBase
         Assert.Equal(dest, Model.Settings.DestinationFolder);
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
+                It.IsAny<Func<object, string>>()),
             Times.Once);
     }
 

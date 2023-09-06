@@ -4,17 +4,17 @@
     <RootNamespace>HanumanInstitute.Services</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.0.0-rc1" />
+    <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.0.0" />
     <PackageReference Include="HanumanInstitute.Validators" Version="1.2.2" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
-    <PackageReference Include="Splat" Version="14.6.37" />
+    <PackageReference Include="Splat" Version="14.7.1" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="19.2.29" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.69" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>

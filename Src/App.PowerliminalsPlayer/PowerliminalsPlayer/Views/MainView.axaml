@@ -85,7 +85,7 @@
                                     <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.DoubleTappedEvent}">
                                         <InvokeCommandAction
                                             Command="{Binding ViewModel.Play, RelativeSource={RelativeSource AncestorType=views:MainView}}"
-                                            CommandParameter="{x:Null}" />
+                                             />
                                     </RoutedEventTriggerBehavior>
                                 </Interaction.Behaviors>
                             </TextBlock>

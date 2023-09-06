@@ -21,7 +21,7 @@ public class PlaylistViewModelTests : TestsBase
     public Mock<IDialogManager> MockDialogManager => _mockDialogManager ??= InitMock<IDialogManager>(mock =>
     {
         mock.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
-                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<Func<object, string>>()))
             .Returns(Task.FromResult<object>(null));
     });
     private Mock<IDialogManager> _mockDialogManager;
@@ -38,7 +38,7 @@ public class PlaylistViewModelTests : TestsBase
     private void SetDialogFolder()
     {
         MockDialogManager.Setup(x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(),
-                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()))
+                It.IsAny<OpenFolderDialogSettings>(), It.IsAny<Func<object, string>>()))
             .Returns(Task.FromResult<object>(new List<IDialogStorageFolder> { GetFolderMock(DialogFolderPath) }));
     }
     
@@ -70,7 +70,7 @@ public class PlaylistViewModelTests : TestsBase
 
         MockDialogManager.Verify(
             x => x.ShowFrameworkDialogAsync(It.IsAny<INotifyPropertyChanged>(), It.IsAny<OpenFolderDialogSettings>(),
-                It.IsAny<AppDialogSettingsBase>(), It.IsAny<Func<object, string>>()),
+                It.IsAny<Func<object, string>>()),
             Times.Once);
     }
 
