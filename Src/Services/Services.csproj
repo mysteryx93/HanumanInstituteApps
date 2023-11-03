@@ -9,7 +9,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
-    <PackageReference Include="Splat" Version="14.7.1" />
+    <PackageReference Include="Splat" Version="14.8.6" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -49,7 +49,7 @@
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="to " VerticalAlignment="Center"
                                    HorizontalAlignment="Center" />
                         <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Settings.PitchTo}" Minimum="1"
-                                       Maximum="10000" />
+                                       Maximum="10000" />100
                         <TextBlock Grid.Row="1" Grid.Column="3" Text=" Hz" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Foreground="Red"
                                    Margin="12,0,0,0"
