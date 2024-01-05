@@ -23,8 +23,8 @@
 ./bass-download.sh bass_ofr files/z/2
 #* ./bass-download.sh bass_dts
 #* ./bass-download.sh BASSZXTUNE
-./bass-download.sh bass_adx stuff
-./bass-download.sh bass_aix stuff
+./bass-download.sh bass_adx stuff .
+./bass-download.sh bass_aix stuff .
 #./bass-download.sh bass_wadsp files/z/4
 #./bass-download.sh bass_vst files/z/5
 #./bass-download.sh bass_winamp files/z/1
