@@ -33,12 +33,6 @@ public static class ViewModelLocator
         container.AddDownloads();
         container.AddLazyCache();
         
-        var viewLocator = new StrongViewLocator()
-            .Register<AboutViewModel, AboutView>()
-            .Register<EncodeSettingsViewModel, EncodeSettingsView>()
-            .Register<MainViewModel, MainView>()
-            .Register<SettingsViewModel, SettingsView>();
-        
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
             viewLocator: new ViewLocator(),
             dialogFactory: new DialogFactory().AddFluent()),

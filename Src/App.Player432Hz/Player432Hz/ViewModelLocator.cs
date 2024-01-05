@@ -30,13 +30,8 @@ public static class ViewModelLocator
         container.AddBassAudio();
         container.AddLazyCache();
         
-        var viewLocator = new StrongViewLocator()
-            .Register<AboutViewModel, AboutView>()
-            .Register<MainViewModel, MainView>()
-            .Register<SettingsViewModel, SettingsView>();
-        
         container.Register(() => (IDialogService)new DialogService(new DialogManager(
-            viewLocator: viewLocator,
+            viewLocator: new ViewLocator(),
             dialogFactory: new DialogFactory().AddFluent()),
             viewModelFactory: t => Locator.Current.GetService(t)));
         container.Register(() => (IBassDevice)BassDevice.Instance);

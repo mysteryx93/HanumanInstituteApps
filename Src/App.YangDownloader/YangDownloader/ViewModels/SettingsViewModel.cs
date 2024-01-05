@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
 using HanumanInstitute.FFmpeg;
+using HanumanInstitute.MvvmDialogs.FileSystem;
 using HanumanInstitute.MvvmDialogs.FrameworkDialogs;
 using ReactiveUI;
 
@@ -38,7 +39,7 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
         var options = new OpenFolderDialogSettings()
         {
             Title = "Select destination folder",
-            InitialDirectory = Settings.DestinationFolder
+            SuggestedStartLocation = new DesktopDialogStorageFolder(Settings.DestinationFolder)
         };
         var result = await _dialogService.ShowOpenFolderDialogAsync(this, options).ConfigureAwait(false);
         if (result != null)

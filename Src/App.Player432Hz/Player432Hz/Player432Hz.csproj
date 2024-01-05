@@ -15,7 +15,7 @@
     <ProjectReference Include="..\..\..\Dll\Bass\BassDlls.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.39" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.93">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

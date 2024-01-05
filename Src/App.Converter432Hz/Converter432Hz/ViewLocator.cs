@@ -1,11 +1,18 @@
+using HanumanInstitute.Converter432Hz.Views;
 using HanumanInstitute.MvvmDialogs.Avalonia;
+
 namespace HanumanInstitute.Converter432Hz;
 
 /// <summary>
 /// Maps view models to views.
 /// </summary>
-public class ViewLocator : ViewLocatorBase
+public class ViewLocator : StrongViewLocator
 {
-    /// <inheritdoc />
-    protected override string GetViewName(object viewModel) => viewModel.GetType().FullName!.Replace("ViewModel", "View");
+    public ViewLocator()
+    {
+        Register<AboutViewModel, AboutView>();
+        Register<AskFileActionViewModel, AskFileActionView>();
+        Register<MainViewModel, MainView>();
+        Register<SettingsViewModel, SettingsView>();
+    }
 }

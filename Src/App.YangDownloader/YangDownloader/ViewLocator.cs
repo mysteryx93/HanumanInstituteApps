@@ -1,12 +1,18 @@
 using HanumanInstitute.MvvmDialogs.Avalonia;
+using HanumanInstitute.YangDownloader.Views;
 
 namespace HanumanInstitute.YangDownloader;
 
 /// <summary>
 /// Maps view models to views.
 /// </summary>
-public class ViewLocator : ViewLocatorBase
+public class ViewLocator : StrongViewLocator
 {
-    /// <inheritdoc />
-    protected override string GetViewName(object viewModel) => viewModel.GetType().FullName!.Replace("ViewModel", "View");
+    public ViewLocator()
+    {
+        Register<AboutViewModel, AboutView>();
+        Register<EncodeSettingsViewModel, EncodeSettingsView>();
+        Register<MainViewModel, MainView>();
+        Register<SettingsViewModel, SettingsView>();
+    }
 }
