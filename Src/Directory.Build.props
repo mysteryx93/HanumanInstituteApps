@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <AssemblyVersion>3.2</AssemblyVersion>
+    <AssemblyVersion>3.3</AssemblyVersion>
     <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
     <NeutralLanguage>en-US</NeutralLanguage>
