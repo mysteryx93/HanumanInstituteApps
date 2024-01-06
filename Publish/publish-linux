@@ -54,4 +54,4 @@ echo
 
 mkdir -p "${version}"
 
-pupnet "../Src/App.${1}/Deploy/pupnet.conf" -y -r $runtime -v $version -o "../../../Publish/${version}/${outFile}" -k $kind
+/home/hanuman/.dotnet/tools/pupnet "../Src/App.${1}/Deploy/pupnet.conf" -y -r $runtime -v $version -o "../../../Publish/${version}/${outFile}" -k $kind
