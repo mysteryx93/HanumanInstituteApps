@@ -4,7 +4,7 @@ public class AdRotatorViewModelDesign : AdRotatorViewModel
 {
     public static AdRotatorViewModelDesign Instance => new(); 
     
-    public AdRotatorViewModelDesign() : base(null!, null!, null!, null!, null!, null!)
+    public AdRotatorViewModelDesign() : base(null!, null!, null!, null!, null!, null!, null!)
     {
         Enabled = false;
         Current = new AdItem()

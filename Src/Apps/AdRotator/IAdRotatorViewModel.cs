@@ -6,6 +6,10 @@
 public interface IAdRotatorViewModel
 {
     /// <summary>
+    /// Gets or sets the application being run.
+    /// </summary>
+    public AppIdentifier AppId { get; set; }
+    /// <summary>
     /// Gets or sets whether the AdRotator is enabled.
     /// </summary>
     bool Enabled { get; set; }

@@ -17,13 +17,14 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
     private readonly IAppPathServiceBase _appPaths;
     private readonly IRandomGenerator _randomGenerator;
     private readonly IHanumanInstituteHttpClient _httpClient;
+    private readonly IEnvironmentService _envService;
     private readonly Timer _timer;
 
     /// <summary>
     /// Initializes a new instance of the AdRotator class.
     /// </summary>
     public AdRotatorViewModel(IProcessService processService, ISerializationService serialization, IJsonTypeInfoResolver serializerContext,
-        IAppPathServiceBase appPaths, IRandomGenerator randomGenerator, IHanumanInstituteHttpClient httpClient)
+        IAppPathServiceBase appPaths, IRandomGenerator randomGenerator, IHanumanInstituteHttpClient httpClient, IEnvironmentService envService)
     {
         _processService = processService;
         _serialization = serialization;
@@ -31,9 +32,10 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
         _appPaths = appPaths;
         _randomGenerator = randomGenerator;
         _httpClient = httpClient;
+        _envService = envService;
 
         // Change ad every minutes.
-        _timer = new Timer(TimeSpan.FromMinutes(2));
+        _timer = new Timer(TimeSpan.FromSeconds(5));
         _timer.Elapsed += (_, _) => SetRandomAd();
         _timer.Start();
         
@@ -48,6 +50,9 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
             }
         });
     }
+    
+    /// <inheritdoc />
+    public AppIdentifier AppId { get; set; }
 
     /// <inheritdoc />
     public bool Enabled
@@ -88,6 +93,7 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
         try
         {
             AdInfo = await _serialization.DeserializeFromFileAsync<AdInfo>(_appPaths.AdInfoPath, _serializerContext);
+            FilterAds();
         }
         catch
         {
@@ -111,6 +117,7 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
             {
                 AdInfo = result;
                 await _serialization.SerializeToFileAsync(AdInfo, _appPaths.AdInfoPath, _serializerContext);
+                FilterAds();
             }
         }
         catch
@@ -124,6 +131,16 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("HanumanInstitute.Apps.AdRotator.DefaultAds.json");
         AdInfo = await _serialization.DeserializeAsync<AdInfo>(stream!, _serializerContext);
         await _serialization.SerializeToFileAsync(AdInfo, _appPaths.AdInfoPath, _serializerContext);
+        FilterAds();
+    }
+
+    private void FilterAds()
+    {
+        AdInfo.Ads = AdInfo.Ads.Where(x =>
+            (x.Start == null || x.Start < _envService.Now) &&
+            (x.End == null || x.End > _envService.Now) &&
+            (x.Apps == null || x.Apps.Contains((int)AppId))
+            ).ToList();
     }
 
     private void SetRandomAd()
