@@ -2,6 +2,7 @@
 
 ./bass-download.sh bass
 ./bass-download.sh bassflac
+./bass-download.sh bassmidi
 ./bass-download.sh basswv
 ./bass-download.sh bassopus
 ./bass-download.sh bassdsd
