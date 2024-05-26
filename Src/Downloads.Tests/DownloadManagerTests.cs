@@ -372,7 +372,7 @@ public class DownloadManagerTests : TestsBase
         });
 
         Assert.Equal(DownloadStatus.Success, result);
-        Assert.Equal(NewFileSize, FileSystem.FileInfo.FromFileName(DestFile).Length);
+        Assert.Equal(NewFileSize, FileSystem.FileInfo.New(DestFile).Length);
     }
 
     [Fact]

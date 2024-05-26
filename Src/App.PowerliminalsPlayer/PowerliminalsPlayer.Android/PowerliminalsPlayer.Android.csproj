@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0-android</TargetFramework>
+    <TargetFramework>net8.0-android</TargetFramework>
     <RootNamespace>HanumanInstitute.PowerliminalsPlayer.Android</RootNamespace>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
     <ApplicationId>com.CompanyName.PowerliminalsPlayer</ApplicationId>
@@ -16,8 +16,8 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.0.6" />
-    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.5" />
+    <PackageReference Include="Avalonia.Android" Version="11.1.0-beta2" />
+    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PowerliminalsPlayer\PowerliminalsPlayer.csproj" />

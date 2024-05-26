@@ -136,7 +136,7 @@ public sealed class DownloadTask : IDownloadTask
         return true;
 
         bool FileHasMinSize(string file, long minSize = 1) =>
-            _fileSystem.File.Exists(file) && _fileSystem.FileInfo.FromFileName(file).Length >= minSize;
+            _fileSystem.File.Exists(file) && _fileSystem.FileInfo.New(file).Length >= minSize;
     }
 
     /// <summary>
@@ -294,7 +294,7 @@ public sealed class DownloadTask : IDownloadTask
     /// </summary>
     private void DeleteTempFiles()
     {
-        if (_fileSystem.File.Exists(Destination) && _fileSystem.FileInfo.FromFileName(Destination).Length == 0)
+        if (_fileSystem.File.Exists(Destination) && _fileSystem.FileInfo.New(Destination).Length == 0)
         {
             _fileSystem.File.Delete(Destination);
         }
