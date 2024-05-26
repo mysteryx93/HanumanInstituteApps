@@ -27,7 +27,7 @@ public class AppInfo : IAppInfo
     public string BuyLicenseText => "Get license for $5.97"; 
 
     /// <inheritdoc />
-    public string BuyLicenseUrl => "https://store.spiritualselftransformation.com/apps?id=1";
+    public string BuyLicenseUrl => "https://store.hanumaninstitute.com/apps?id=1";
 
     /// <inheritdoc />
     public KeyByteSet[] KeyByteSets => new[]

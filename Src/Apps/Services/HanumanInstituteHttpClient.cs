@@ -16,7 +16,7 @@ public class HanumanInstituteHttpClient : IHanumanInstituteHttpClient
     private readonly IEnvironmentService _environment;
     private readonly IAppCache _cache;
 
-    private const string BaseUrl = "https://store.spiritualselftransformation.com/api/";
+    private const string BaseUrl = "https://store.hanumaninstitute.com/api/";
     private const string QueryVersionUrl = BaseUrl + "app-version?app={0}&os={1}";
     private const string GetAdsUrl = BaseUrl + "app-ads";
     private const string LinkTrackerUrl = BaseUrl + "app-click?app={0}&os={1}&ad={2}";
@@ -29,6 +29,7 @@ public class HanumanInstituteHttpClient : IHanumanInstituteHttpClient
         IJsonTypeInfoResolver serializerContext, IEnvironmentService environment, IAppCache cache)
     {
         _httpClient = httpClient;
+        _httpClient.Timeout = TimeSpan.FromSeconds(10);
         _appInfo = appInfo;
         _serializationService = serializationService;
         _serializerContext = serializerContext;
