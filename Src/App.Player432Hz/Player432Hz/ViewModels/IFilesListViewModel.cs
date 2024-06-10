@@ -12,6 +12,16 @@ public interface IFilesListViewModel
     /// Gets the list of files and selection properties.
     /// </summary>
     ICollectionView<FileItem> Files { get; }
+    
+    /// <summary>
+    /// Returns the list of files filtered based on search.
+    /// </summary>
+    ICollectionView<FileItem> FilesFiltered { get; }
+    
+    /// <summary>
+    /// Gets or sets a search term to filter the list of files on.
+    /// </summary>
+    string Search { get; set; }
 
     /// <summary>
     /// Sets the folder paths from which to load files.

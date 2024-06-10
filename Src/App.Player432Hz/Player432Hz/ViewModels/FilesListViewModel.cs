@@ -17,6 +17,22 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
         _fileLocator = fileLocator;
         _playlistPlayer = playlistPlayer;
     }
+
+    /// <inheritdoc />
+    public string Search
+    {
+        get => _search;
+        set
+        {
+            _search = value;
+            this.RaisePropertyChanged();
+            _filesFiltered.Source.Clear();
+            _filesFiltered.AddRange(_files.Source
+                .Where(x => x.Name.Contains(_search, StringComparison.CurrentCultureIgnoreCase)));
+            this.RaisePropertyChanged(nameof(FilesFiltered));
+        }
+    }
+    private string _search = string.Empty;
     
     /// <inheritdoc />
     public ICollectionView<FileItem> Files
@@ -34,12 +50,28 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     private readonly ICollectionView<FileItem> _files = new CollectionView<FileItem>();
 
     /// <inheritdoc />
+    public ICollectionView<FileItem> FilesFiltered
+    {
+        get
+        {
+            if (!_loaded)
+            {
+                Load();
+                _loaded = true;
+            }
+            return _filesFiltered;
+        }
+    }
+    private readonly ICollectionView<FileItem> _filesFiltered = new CollectionView<FileItem>();
+
+    /// <inheritdoc />
     public void SetPaths(IEnumerable<string>? paths)
     {
         _paths = paths?.ToList();
         _files.Source.Clear();
         _loaded = false;
         this.RaisePropertyChanged(nameof(Files));
+        this.RaisePropertyChanged(nameof(FilesFiltered));
     }
     private List<string>? _paths;
     private bool _loaded;
@@ -50,9 +82,12 @@ public class FilesListViewModel : ReactiveObject, IFilesListViewModel
     private void Load()
     {
         _files.Source.Clear();
+        _filesFiltered.Source.Clear();
         if (_paths != null)
         {
             _files.Source.AddRange(_fileLocator.GetAudioFiles(_paths));
+            _filesFiltered.AddRange(_files.Source
+                .Where(x => x.Name.Contains(_search, StringComparison.CurrentCultureIgnoreCase)));
         }
     }
     

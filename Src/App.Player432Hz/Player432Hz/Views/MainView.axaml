@@ -61,7 +61,7 @@
                     <Grid VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Folders" FontWeight="Bold" VerticalAlignment="Center" />
-                            <TextBox Width="120"
+                            <TextBox Width="120" 
                                      Text="{Binding Name, Mode=TwoWay}" TabIndex="4" Margin="15,0,15,0" />
                             <Button Classes="round" Width="35" TabIndex="6" Margin="0,0,3,0"
                                     Command="{Binding AddFolderCommand, Mode=OneWay}">
@@ -87,7 +87,10 @@
                 <Grid Row="1" DataContext="{x:Static local:ViewModelLocator.FilesList}" Margin="0,6,0,0"
                       x:DataType="vm:IFilesListViewModel">
                     <Grid VerticalAlignment="Top">
-                        <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Files" FontWeight="Bold" VerticalAlignment="Center" />
+                            <TextBox Width="120" Text="{Binding Search, Mode=TwoWay}" TabIndex="8" Margin="32,0,15,0" Watermark="Search" />
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <ToggleButton Classes="toolbar round icon" Content="U" Width="35" ToolTip.Tip="Shuffle" FontSize="16"
                                           IsChecked="{Binding ViewModel.Settings.Shuffle, RelativeSource={RelativeSource AncestorType=views:MainView}, Mode=TwoWay}" />
@@ -95,7 +98,7 @@
                         </StackPanel>
                     </Grid>
                     <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
-                             ItemsSource="{Binding Files.Source}" SelectedItem="{Binding Files.CurrentItem}">
+                             ItemsSource="{Binding FilesFiltered.Source}" SelectedItem="{Binding Files.CurrentItem}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" x:CompileBindings="True" x:DataType="models:FileItem">
