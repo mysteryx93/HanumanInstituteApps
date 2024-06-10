@@ -39,8 +39,10 @@ public class SettingsViewModel : SettingsViewModelBase<AppSettingsData>
         var options = new OpenFolderDialogSettings()
         {
             Title = "Select destination folder",
-            SuggestedStartLocation = new DesktopDialogStorageFolder(Settings.DestinationFolder)
+            SuggestedStartLocation = string.IsNullOrWhiteSpace(Settings.DestinationFolder) || !_fileSystem.Directory.Exists(Settings.DestinationFolder) ? null :
+                new DesktopDialogStorageFolder(Settings.DestinationFolder)
         };
+        
         var result = await _dialogService.ShowOpenFolderDialogAsync(this, options).ConfigureAwait(false);
         if (result != null)
         {
