@@ -26,4 +26,9 @@ public class AppPathService : AppPathServiceBase, IAppPathService
     /// <inheritdoc />
     public string ConfigFile => _configFile ??= GetStoragePath("432HzConverterConfig.json");
     private string? _configFile;
+    
+    /// <inheritdoc />
+    public string MidiSoundsFile => _midiSoundsFile ??= 
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\midisounds.sf2");
+    private string? _midiSoundsFile;
 }

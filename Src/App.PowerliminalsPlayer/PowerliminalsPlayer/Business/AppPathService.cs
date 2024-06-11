@@ -34,6 +34,11 @@ public class AppPathService : IAppPathService
         Combine(_environment.ApplicationDataPath, @"Hanuman Institute\PowerliminalsPlayerConfig.json");
     private string? _configFile;
     
+    /// <inheritdoc />
+    public string MidiSoundsFile => _midiSoundsFile ??= 
+        Combine(_environment.ApplicationDataPath, @"Hanuman Institute\midisounds.sf2");
+    private string? _midiSoundsFile;
+    
     /// <summary>
     /// Combines two paths while replacing folder separator chars with platform-specific char.
     /// </summary>

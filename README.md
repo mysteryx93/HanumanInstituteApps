@@ -6,6 +6,10 @@ They were developed using cutting-edge programming practices, and I wrote a tuto
 
 Supports Windows, Linux and MacOS. Possibly Android and iOS in the future.
 
+**For MIDI support:** download the sound font of your choice in SF2 format ([a list is available here](https://adieusounds.com/blogs/news/15-free-soundfonts-to-elevate-your-music-production-in-2024)). Place the file in the following location (replacing 'myuser' with your actual user)
+- Windows: `C:\Users\myuser\AppData\Roaming\Hanuman Institute\midisounds.sf2`
+- Linux: `/home/myuser/.config/Hanuman Institute/midisounds.sf2`
+
 ### 432Hz Player: Plays music in 432Hz
 
 Most music is recorded in 440Hz. Many people claim that 432Hz resonates more with the heart whereas 440Hz resonates more with the brain, and that 432Hz music feels better. Try it yourself. Play a music in 440Hz and in 432Hz, and see which one you prefer. Most people choose the 432Hz version, and it's hard to go back to 440Hz.

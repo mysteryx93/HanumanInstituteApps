@@ -15,4 +15,8 @@ public interface IAppPathService : IAppPathServiceBase
     /// Returns the Uri where the application settings file is stored.
     /// </summary>
     string ConfigFile { get; }
+    /// <summary>
+    /// Returns the path where midi sound font will be read from, if present.
+    /// </summary>
+    string MidiSoundsFile { get; }
 }

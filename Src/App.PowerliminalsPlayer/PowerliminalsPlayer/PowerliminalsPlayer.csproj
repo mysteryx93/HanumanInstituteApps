@@ -8,6 +8,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BassAudio\BassAudio.csproj" />
     <ProjectReference Include="..\..\Apps\Apps.csproj" />
     <ProjectReference Include="..\..\Avalonia\Avalonia.csproj" />
     <ProjectReference Include="..\..\Services\Services.csproj" />
