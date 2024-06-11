@@ -10,6 +10,8 @@ Supports Windows, Linux and MacOS. Possibly Android and iOS in the future.
 - Windows: `C:\Users\myuser\AppData\Roaming\Hanuman Institute\midisounds.sf2`
 - Linux: `/home/myuser/.config/Hanuman Institute/midisounds.sf2`
 
+To support the development of these apps, look at our new products: [selling very high-frequency jewelry and herbal extracts](https://alchemistgems.com), shipping internationally. Also of interest, we released a [list of all supplements on the market, measuring their efficiency and comparing them.](https://alchemistgems.com/supplements-efficiency-list)
+
 ### 432Hz Player: Plays music in 432Hz
 
 Most music is recorded in 440Hz. Many people claim that 432Hz resonates more with the heart whereas 440Hz resonates more with the brain, and that 432Hz music feels better. Try it yourself. Play a music in 440Hz and in 432Hz, and see which one you prefer. Most people choose the 432Hz version, and it's hard to go back to 440Hz.
