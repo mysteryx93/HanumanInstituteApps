@@ -58,7 +58,8 @@ echo "Output = $outPath/$outFile"
 echo
 rm -rf "$bundlePath" 2>/dev/null
 
-dotnet publish "$proj2" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o "$publishPath"
+#dotnet publish "$proj2" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o "$publishPath"
+dotnet publish "$proj2" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -o "$publishPath"
 find "$publishPath" -maxdepth 1 -type f -name "*.xml" -delete
 
 osxApp="$bundlePath/$1.app"

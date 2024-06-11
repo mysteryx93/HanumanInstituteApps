@@ -42,7 +42,7 @@ echo "Output = $outPath/$outFile"
 echo
 rm -rf "$publishPath" 2>/dev/null
 
-dotnet publish "$proj" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o $publishPath
+dotnet publish "$proj" -r $runtime -c Release --self-contained=true -p:PublishSingleFile=true -o $publishPath
 rm "$publishPath/*.xml"
 
 # Create ZIP file
