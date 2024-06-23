@@ -35,7 +35,7 @@ public class AdRotatorViewModel : ReactiveObject, IAdRotatorViewModel
         _envService = envService;
 
         // Change ad every minutes.
-        _timer = new Timer(TimeSpan.FromSeconds(5));
+        _timer = new Timer(TimeSpan.FromSeconds(60));
         _timer.Elapsed += (_, _) => SetRandomAd();
         _timer.Start();
         
