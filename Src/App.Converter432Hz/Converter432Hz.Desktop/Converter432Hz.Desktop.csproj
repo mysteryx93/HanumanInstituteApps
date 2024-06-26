@@ -14,8 +14,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" Version="11.1.0-beta2" />
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-beta2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.0-rc1" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-rc1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Converter432Hz\Converter432Hz.csproj" />

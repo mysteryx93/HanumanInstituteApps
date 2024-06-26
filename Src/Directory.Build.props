@@ -23,6 +23,6 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebuggerSupport>false</DebuggerSupport>
     <DebugSymbols>false</DebugSymbols>
-<!--    <DebugType>None</DebugType> -->
+    <DebugType>None</DebugType>
   </PropertyGroup>
 </Project>

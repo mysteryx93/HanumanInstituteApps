@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.20.70" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="21.0.2" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="21.0.22" />
     <PackageReference Include="xunit" Version="2.8.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
