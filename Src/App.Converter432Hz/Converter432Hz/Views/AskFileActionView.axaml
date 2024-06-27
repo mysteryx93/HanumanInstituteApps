@@ -15,7 +15,7 @@
                 <TextBlock Text="Destination file already exists:" />
                 <TextBox Text="{Binding FilePath}" IsReadOnly="True" />
                 <TextBlock Text="What would you like to do?" Margin="0,10,0,2" />
-                <ListBox ItemsSource="{Binding Items}" x:CompileBindings="False"
+                <ListBox ItemsSource="{Binding Items}" 
                          SelectedItem="{Binding Items.CurrentItem}"
                          Classes="RadioButtonListBox" />
             </StackPanel>

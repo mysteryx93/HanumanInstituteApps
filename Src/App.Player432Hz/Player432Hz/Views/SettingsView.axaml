@@ -19,13 +19,12 @@
                 </StackPanel.Styles>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Theme" VerticalAlignment="Center" />
-                    <ComboBox Margin="20,0,0,0" Width="130" ItemsSource="{Binding ThemeList}" x:CompileBindings="false"
+                    <ComboBox Margin="20,0,0,0" Width="130" ItemsSource="{Binding ThemeList}" 
                               SelectedItem="{Binding ThemeList.CurrentItem}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Check for Updates" VerticalAlignment="Center" />
                     <ComboBox Margin="12,0,0,0" Width="105" ItemsSource="{Binding CheckForUpdateList}"
-                              x:CompileBindings="false"
                               SelectedItem="{Binding CheckForUpdateList.CurrentItem}" />
                 </StackPanel>
                 <StackPanel Margin="0">
@@ -63,7 +62,7 @@
                 <StackPanel Orientation="Horizontal" IsVisible="{Binding IsDeviceSampleRateVisible}">
                     <TextBlock Text="Output sample rate" VerticalAlignment="Center" />
                     <Grid Width="80" Margin="10,0,0,0">
-                        <ComboBox Width="115" ItemsSource="{Binding OutputSampleRateList}" x:CompileBindings="false"
+                        <ComboBox Width="115" ItemsSource="{Binding OutputSampleRateList}" 
                                   SelectedItem="{Binding OutputSampleRateList.CurrentItem}" />
                     </Grid>
                 </StackPanel>

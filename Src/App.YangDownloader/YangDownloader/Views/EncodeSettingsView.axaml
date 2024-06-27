@@ -18,7 +18,7 @@
             <StackPanel>
                 <Grid Margin="0,2,0,2">
                     <TextBlock VerticalAlignment="Center" Text="Output Format" />
-                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False" 
+                    <ComboBox HorizontalAlignment="Right" Width="110"  
                               ItemsSource="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                     </ComboBox>
                 </Grid>
@@ -29,20 +29,20 @@
                                 Content="{Binding Settings.FixedBitrate, Converter={StaticResource BitrateConverter}}"
                                 Command="{Binding ToggleFixedBitrate}" IsVisible="{Binding IsToggleBitrateVisible}" />
                     </StackPanel>
-                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
+                    <ComboBox HorizontalAlignment="Right" Width="110" 
                               ItemsSource="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24" IsVisible="{Binding IsBitsPerSampleVisible}">
                     <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
-                    <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
+                    <ComboBox HorizontalAlignment="Right" Width="110" 
                               ItemsSource="{Binding BitsPerSampleList}" SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0,2,0,2" Height="24">
                     <Grid>
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                        <ComboBox HorizontalAlignment="Right" Width="110" x:CompileBindings="False"
+                        <ComboBox HorizontalAlignment="Right" Width="110" 
                                   ItemsSource="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>

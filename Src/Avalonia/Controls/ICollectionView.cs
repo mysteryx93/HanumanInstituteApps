@@ -18,7 +18,7 @@ public interface ICollectionView<T>  : INotifyPropertyChanged, INotifyCollection
     /// Gets the current item in the view.
     /// </summary>
     /// <returns>The current item of the view. By default, the first item of the collection starts as the current item.</returns>
-    T? CurrentItem { get; }
+    T? CurrentItem { get; set; }
     /// <summary>
     /// Gets or sets the position of the currently selected item, or -1 if none is selected.
     /// </summary>

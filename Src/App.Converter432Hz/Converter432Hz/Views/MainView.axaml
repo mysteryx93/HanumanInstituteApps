@@ -99,11 +99,11 @@
                         <Button Classes="round icon" Width="35" HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Content="I"
                                 Command="{Binding ViewModel.ShowAbout, RelativeSource={RelativeSource AncestorType=views:MainView}}" />
-                        <!-- Command="{Binding $parent[views:MainView].ViewModel.ShowAbout}" x:CompileBindings="False"  -->
+                        <!-- Command="{Binding $parent[views:MainView].ViewModel.ShowAbout}" -->
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Output Format" />
-                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
+                        <ComboBox HorizontalAlignment="Right" Width="120" 
                                   ItemsSource="{Binding FormatsList}" SelectedItem="{Binding FormatsList.CurrentItem}">
                         </ComboBox>
                     </Grid>
@@ -114,20 +114,20 @@
                                     Content="{Binding Settings.Encode.FixedBitrate, Converter={StaticResource BitrateConverter}}"
                                     Command="{Binding ToggleFixedBitrate}" IsVisible="{Binding IsToggleBitrateVisible}" />
                         </StackPanel>
-                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
+                        <ComboBox HorizontalAlignment="Right" Width="120" 
                                   ItemsSource="{Binding BitrateList}" SelectedItem="{Binding BitrateList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2" IsVisible="{Binding IsBitsPerSampleVisible}">
                         <TextBlock VerticalAlignment="Center" Text="Bits Per Sample" />
-                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
+                        <ComboBox HorizontalAlignment="Right" Width="120" 
                                   ItemsSource="{Binding BitsPerSampleList}"
                                   SelectedItem="{Binding BitsPerSampleList.CurrentItem}">
                         </ComboBox>
                     </Grid>
                     <Grid Margin="0,2,0,2">
                         <TextBlock VerticalAlignment="Center" Text="Sample rate" />
-                        <ComboBox HorizontalAlignment="Right" Width="120" x:CompileBindings="False"
+                        <ComboBox HorizontalAlignment="Right" Width="120" 
                                   ItemsSource="{Binding SampleRateList}"
                                   SelectedItem="{Binding SampleRateList.CurrentItem}">
                         </ComboBox>
@@ -152,7 +152,7 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <TextBlock TextWrapping="Wrap" Width="120" TextAlignment="Center"
                                Text="When destination file exists" />
-                    <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center" x:CompileBindings="False"
+                    <ComboBox Margin="0,4,0,25" HorizontalAlignment="Center" 
                               ItemsSource="{Binding FileExistsActionList}"
                               SelectedItem="{Binding FileExistsActionList.CurrentItem, Mode=TwoWay}">
                     </ComboBox>

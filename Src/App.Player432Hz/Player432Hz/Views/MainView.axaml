@@ -32,7 +32,7 @@
                         <flu:SymbolIcon Symbol="Remove" FontSize="20" />
                     </Button>
                 </Grid>
-                <ListBox TabIndex="1" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
+                <ListBox TabIndex="1" Background="{x:Null}" Margin="0,28,0,0" 
                          ItemsSource="{Binding Playlists.Source}" SelectedItem="{Binding Playlists.CurrentItem}">
                     <ListBox.Styles>
                         <Style Selector="ListBoxItem">
@@ -42,7 +42,7 @@
                     </ListBox.Styles>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" Padding="14" x:CompileBindings="True"
+                            <TextBlock Text="{Binding Name}" Padding="14"
                                        x:DataType="vm:IPlaylistViewModel">
                                 <Interaction.Behaviors>
                                     <RoutedEventTriggerBehavior RoutedEvent="{x:Static InputElement.DoubleTappedEvent}">
@@ -80,7 +80,7 @@
                             <flu:SymbolIcon Symbol="Settings" FontSize="20" />
                         </Button>
                     </Grid>
-                    <ListBox TabIndex="5" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
+                    <ListBox TabIndex="5" Background="{x:Null}" Margin="0,28,0,0" 
                              ItemsSource="{Binding Folders.Source}" SelectedItem="{Binding Folders.CurrentItem}">
                     </ListBox>
                 </Grid>
@@ -97,11 +97,11 @@
                             <Button Classes="round" Content="Play" Width="75" TabIndex="9" Command="{Binding Play}" />
                         </StackPanel>
                     </Grid>
-                    <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0" x:CompileBindings="False"
+                    <ListBox TabIndex="8" Background="{x:Null}" Margin="0,28,0,0" 
                              ItemsSource="{Binding FilesFiltered.Source}" SelectedItem="{Binding Files.CurrentItem}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" x:CompileBindings="True" x:DataType="models:FileItem">
+                                <TextBlock Text="{Binding Name}" x:DataType="models:FileItem">
                                     <Interaction.Behaviors>
                                         <RoutedEventTriggerBehavior
                                             RoutedEvent="{x:Static InputElement.DoubleTappedEvent}">

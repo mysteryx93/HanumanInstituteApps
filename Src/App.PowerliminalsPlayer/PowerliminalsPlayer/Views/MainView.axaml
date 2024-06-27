@@ -55,7 +55,7 @@
                 </Button>
             </Grid>
             <Grid Row="1">
-                <ListBox TabIndex="5" Background="{x:Null}" Height="80" x:CompileBindings="False"
+                <ListBox TabIndex="5" Background="{x:Null}" Height="80" 
                          ItemsSource="{Binding Settings.Folders}"
                          SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
                          IsVisible="{Binding IsExpanded, ElementName=FoldersExpander}" />
@@ -71,7 +71,7 @@
                 </Grid>
             </Grid>
             <Grid Row="3">
-                <ListBox ItemsSource="{Binding Files.Source}" x:CompileBindings="False"
+                <ListBox ItemsSource="{Binding Files.Source}" 
                          SelectedItem="{Binding Files.CurrentItem, Mode=TwoWay}" TabIndex="8" Background="{x:Null}">
                     <ListBox.Styles>
                         <Style Selector="ListBoxItem">
