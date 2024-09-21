@@ -23,12 +23,12 @@
                     <TextBlock FontSize="24" Text="{Binding AppVersion, Converter={StaticResource VersionConverter}}" VerticalAlignment="Center" />
                 </StackPanel>
                 <TextBlock FontSize="18" Margin="0,5,0,0" Text="{Binding AppInfo.AppDescription}" HorizontalAlignment="Center" />
-                <ui:HyperlinkButton HorizontalAlignment="Center" Margin="0,5,0,0" 
+                <HyperlinkButton HorizontalAlignment="Center" Margin="0,5,0,0" 
                                     NavigateUri="https://github.com/mysteryx93/NaturalGroundingPlayer/releases" Content="{Binding CheckForUpdateText}" />
-                <ui:HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" HorizontalAlignment="Center" />
+                <HyperlinkButton Content="Get Support" NavigateUri="https://github.com/mysteryx93/HanumanInstituteApps/issues" HorizontalAlignment="Center" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Margin="0,10,0,10" Text="Author: " HorizontalAlignment="Center" />
-                    <ui:HyperlinkButton Content="Etienne Charland" NavigateUri="https://www.spiritualselftransformation.com/" />
+                    <HyperlinkButton Content="Etienne Charland" NavigateUri="https://www.spiritualselftransformation.com/" />
                 </StackPanel>
 
                 <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" IsVisible="{Binding !Settings.IsLicenseValid}" 
@@ -36,7 +36,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,20,0,10" HorizontalAlignment="Center">
                     <TextBlock Text="License" VerticalAlignment="Center" />
                     <TextBox Width="250" Margin="10,0,10,0"  Text="{Binding License}" IsReadOnly="{Binding Settings.IsLicenseValid}" />
-                    <ui:HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" IsVisible="{Binding !Settings.IsLicenseValid}" />
+                    <HyperlinkButton Content="{Binding AppInfo.BuyLicenseText}" NavigateUri="{Binding AppInfo.BuyLicenseUrl}" IsVisible="{Binding !Settings.IsLicenseValid}" />
                     <ui:SymbolIcon Symbol="Checkmark" FontSize="20" Foreground="Green" IsVisible="{Binding Settings.IsLicenseValid}" />
                 </StackPanel>
             </StackPanel>

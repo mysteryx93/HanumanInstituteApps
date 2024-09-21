@@ -92,7 +92,7 @@
         </Setter>
     </Style>
     
-    <Style Selector="ui|HyperlinkButton">
+    <Style Selector="HyperlinkButton">
         <Setter Property="Padding" Value="0" />
     </Style>
     

@@ -29,7 +29,7 @@ public sealed class DownloadTask : IDownloadTask
         _mediaMuxer = mediaMuxer;
         _audioEncoder = audioEncoder;
 
-        Destination = destination.CheckNotNullOrEmpty(nameof(destination));
+        Destination = Check.NotNullOrEmpty(Destination);
     }
 
     /// <inheritdoc />

@@ -16,7 +16,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-x64'">
+<!--  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-x64'">-->
+  <ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-x64' or '$(RuntimeIdentifier)'==''">
     <Content Include="linux-x64\**" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

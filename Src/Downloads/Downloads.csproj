@@ -12,7 +12,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="YoutubeExplode" Version="6.3.16" />
+    <PackageReference Include="YoutubeExplode" Version="6.4.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\HanumanInstitute.FFmpeg\FFmpeg\FFmpeg.csproj" />

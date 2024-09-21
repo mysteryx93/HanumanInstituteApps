@@ -5,16 +5,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
-    <PackageReference Include="HanumanInstitute.Validators" Version="1.2.2" />
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Include="HanumanInstitute.Validators" Version="2.1.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
     <PackageReference Include="LazyCache" Version="2.4.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
-    <PackageReference Include="Splat" Version="15.1.1" />
+    <PackageReference Include="Splat" Version="15.2.22" />
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.2.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.IO.Abstractions" Version="21.0.22" />
+    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
