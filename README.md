@@ -79,7 +79,7 @@ Here's a sample video <a href="https://www.spiritualselftransformation.com/files
 
 ## License
 
-Hanuman Institute Apps is an Open Source project distributed under the <a href="https://github.com/mysteryx93/NaturalGroundingPlayer/blob/master/Setup/LICENSE.md">MIT license</a>.
+Hanuman Institute Apps is an Open Source project distributed under the <a href="https://github.com/mysteryx93/NaturalGroundingPlayer/blob/master/LICENSE.md">MIT license</a>.
 
 The Natural Grounding Player is built with C#/.NET and Avalonia UI.
 
