@@ -33,7 +33,7 @@ proj=$(desktop_csproj "$app")
 publishPath="$repo_root/Src/App.$app/$app.Desktop/bin/Publish/$runtime"
 
 outDir=$(output_dir "$version")
-outFile="${app}-${version}_${arch}"
+outFile="${app}-${version}_${arch}-Setup"
 outPath="$outDir/$outFile"
 
 template="$publish_dir/installer.iss"
