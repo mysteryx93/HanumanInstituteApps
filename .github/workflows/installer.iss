@@ -16,6 +16,7 @@ AppPublisher=Hanuman Institute
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 #endif
+SetupIconFile={#PublishDir}\{#AppInternal}.exe
 DefaultDirName={autopf}\Hanuman Institute\{#AppInternal}
 DefaultGroupName=Hanuman Institute
 OutputDir={#OutputDir}
