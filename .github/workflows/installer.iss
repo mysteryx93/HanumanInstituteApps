@@ -4,6 +4,7 @@
 #define PublishDir "__PUBLISH_DIR__"
 #define OutputDir "__OUTPUT_DIR__"
 #define OutputFile "__OUTPUT_FILE__"
+#define IconFile "__ICON_FILE__"
 #define X64 "__X64__"
 
 [Setup]
@@ -16,7 +17,7 @@ AppPublisher=Hanuman Institute
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 #endif
-SetupIconFile={#PublishDir}\{#AppInternal}.exe
+SetupIconFile={#IconFile}
 DefaultDirName={autopf}\Hanuman Institute\{#AppInternal}
 DefaultGroupName=Hanuman Institute
 OutputDir={#OutputDir}

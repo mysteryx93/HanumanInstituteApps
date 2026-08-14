@@ -108,6 +108,12 @@ else
   x64="0"
 fi
 
+icon_file="$repo_root/Src/App.$app/Deploy/App.ico"
+[[ -f "$icon_file" ]] || {
+  echo "Icon not found: $icon_file" >&2
+  exit 1
+}
+
 replace_tokens \
   "$template" \
   "$issFile" \
@@ -117,6 +123,7 @@ replace_tokens \
   "__PUBLISH_DIR__" "$publishPath" \
   "__OUTPUT_DIR__" "$outDir" \
   "__OUTPUT_FILE__" "$outFile" \
+  "__ICON_FILE__" "$icon_file" \
   "__X64__" "$x64"
 
 "$iscc" "$issFile"
