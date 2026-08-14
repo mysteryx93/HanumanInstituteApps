@@ -183,16 +183,26 @@ jobs:
           echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
 
       - name: Publish
-        env:
+      env:
           APP: ${{ matrix.app }}
           RUNTIME: ${{ matrix.runtime }}
-        run: |
+      run: |
           set -euo pipefail
+
           case "${{ matrix.platform }}" in
-            win-x64|win-x86)     .github/workflows/publish-win "$APP" "$RUNTIME" ;;
-            linux-x64|linux-arm64) .github/workflows/publish-linux "$APP" "$RUNTIME" ;;
-            macos-x64|macos-arm64) .github/workflows/publish-osx "$APP" "$RUNTIME" ;;
-            *) echo "::error::Unsupported platform: ${{ matrix.platform }}"; exit 1 ;;
+          win-x64|win-x86)
+              bash .github/workflows/publish-win "$APP" "$RUNTIME"
+              ;;
+          linux-x64|linux-arm64)
+              bash .github/workflows/publish-linux "$APP" "$RUNTIME"
+              ;;
+          macos-x64|macos-arm64)
+              bash .github/workflows/publish-osx "$APP" "$RUNTIME"
+              ;;
+          *)
+              echo "::error::Unsupported platform: ${{ matrix.platform }}"
+              exit 1
+              ;;
           esac
 
       - name: Verify artifact
