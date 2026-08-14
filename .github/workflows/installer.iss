@@ -11,6 +11,7 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#AppVersion}
 UninstallDisplayName={#AppName}
+AppPublisher=Hanuman Institute
 #if X64 == "1"
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
