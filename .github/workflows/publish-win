@@ -33,7 +33,7 @@ proj=$(desktop_csproj "$app")
 publishPath="$repo_root/Src/App.$app/$app.Desktop/bin/Publish/$runtime"
 
 outDir=$(output_dir "$version")
-outFile="${app}-${version}_${arch}-Setup"
+outFile="${app}-${version}_${arch}_Setup"
 outPath="$outDir/$outFile"
 
 template="$publish_dir/installer.iss"
@@ -95,10 +95,18 @@ find "$publishPath" \
 mkdir -p "$outDir"
 rm -f -- "$outPath"
 
+product=$(read_product "$app")
+
+[[ -n "$product" ]] || {
+  echo "Product name is missing for $app." >&2
+  exit 1
+}
+
+# Use product name for display, internal name for the .exe if needed
 replace_tokens \
   "$template" \
   "$issFile" \
-  "__APP_NAME__" "$app" \
+  "__APP_NAME__" "$product" \
   "__APP_VERSION__" "$version" \
   "__PUBLISH_DIR__" "$publishPath" \
   "__OUTPUT_DIR__" "$outDir" \

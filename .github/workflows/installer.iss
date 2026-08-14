@@ -9,8 +9,8 @@ AppId={{YOUR-STABLE-APP-ID}}
 AppName={#AppName}
 AppVersion={#AppVersion}
 
-DefaultDirName={autopf}\{#AppName}
-DefaultGroupName=Hanuman Institute Apps
+DefaultDirName={autopf}\Hanuman Institute\{#AppName}
+DefaultGroupName=Hanuman Institute
 
 OutputDir={#OutputDir}
 OutputBaseFilename={#OutputFile}
@@ -23,7 +23,7 @@ WizardStyle=modern
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Hanuman Institute Apps\{#AppName}"; Filename: "{app}\{#AppName}.exe"
+Name: "{autoprograms}\Hanuman Institute\{#AppName}"; Filename: "{app}\{#AppName}.exe"
 
 [Run]
 Filename: "{app}\{#AppName}.exe"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
