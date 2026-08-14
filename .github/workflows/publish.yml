@@ -216,6 +216,48 @@ jobs:
               ;;
           esac
 
+      - name: Validate macOS app bundle
+        if: startsWith(matrix.platform, 'macos-')
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APP_BUNDLE=$(find source -type d -name "*.app" | head -n1)
+
+          if [[ -z "$APP_BUNDLE" ]]; then
+            echo "::error::No .app bundle found"
+            exit 1
+          fi
+
+          echo "Validating: $APP_BUNDLE"
+          echo
+
+          [[ -d "$APP_BUNDLE/Contents" ]] || { echo "::error::Missing Contents/"; exit 1; }
+          [[ -f "$APP_BUNDLE/Contents/Info.plist" ]] || { echo "::error::Missing Info.plist"; exit 1; }
+          [[ -d "$APP_BUNDLE/Contents/MacOS" ]] || { echo "::error::Missing MacOS/"; exit 1; }
+
+          EXEC=$(find "$APP_BUNDLE/Contents/MacOS" -type f -perm +111 | head -n1)
+          [[ -n "$EXEC" ]] || { echo "::error::No executable found in Contents/MacOS"; exit 1; }
+          echo "Executable: $EXEC"
+
+          file "$EXEC"
+          lipo -info "$EXEC" || true
+
+          echo
+          echo "=== codesign ==="
+          codesign -dv --verbose=4 "$APP_BUNDLE" 2>&1 || true
+          codesign --verify --deep --strict "$APP_BUNDLE" 2>&1 || echo "Note: codesign verify failed (common for unsigned CI builds)"
+
+          echo
+          echo "=== Info.plist ==="
+          plutil -lint "$APP_BUNDLE/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP_BUNDLE/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$APP_BUNDLE/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_BUNDLE/Contents/Info.plist" || true
+
+          echo
+          echo "macOS app bundle structure looks valid."
+
       - name: Verify artifact
         shell: bash
         run: |
