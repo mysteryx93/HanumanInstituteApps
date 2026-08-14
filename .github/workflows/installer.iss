@@ -26,6 +26,4 @@ Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Name: "{autoprograms}\Hanuman Institute Apps\{#AppName}"; Filename: "{app}\{#AppName}.exe"
 
 [Run]
-Filename: "{app}\{#AppName}.exe"
-Description: "Launch {#AppName}"
-Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppName}.exe"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
