@@ -176,9 +176,9 @@ jobs:
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
           mkdir -p "$HOME/.local/bin"
-          curl -fsSL -o "$HOME/.local/bin/appimagetool" \
+          curl -fsSL -o "$HOME/.local/bin/appimagetool-x86_64.AppImage" \
             "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
-          chmod +x "$HOME/.local/bin/appimagetool"
+          chmod +x "$HOME/.local/bin/appimagetool-x86_64.AppImage"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
 
