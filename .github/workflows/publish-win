@@ -102,6 +102,12 @@ product=$(read_product "$app")
   exit 1
 }
 
+if [[ "$runtime" == "win-x64" ]]; then
+  x64="1"
+else
+  x64="0"
+fi
+
 replace_tokens \
   "$template" \
   "$issFile" \
@@ -110,7 +116,8 @@ replace_tokens \
   "__APP_VERSION__" "$version" \
   "__PUBLISH_DIR__" "$publishPath" \
   "__OUTPUT_DIR__" "$outDir" \
-  "__OUTPUT_FILE__" "$outFile"
+  "__OUTPUT_FILE__" "$outFile" \
+  "__X64__" "$x64"
 
 "$iscc" "$issFile"
 

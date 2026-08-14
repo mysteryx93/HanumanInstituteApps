@@ -4,6 +4,7 @@
 #define PublishDir "__PUBLISH_DIR__"
 #define OutputDir "__OUTPUT_DIR__"
 #define OutputFile "__OUTPUT_FILE__"
+#define X64 "__X64__"
 
 [Setup]
 AppId={{YOUR-STABLE-APP-ID}}
@@ -11,7 +12,10 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#AppVersion}
 UninstallDisplayName={#AppName}
-__ARCH_FLAGS__
+#if X64 == "1"
+ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed=x64compatible
+#endif
 DefaultDirName={autopf}\Hanuman Institute\{#AppName}
 DefaultGroupName=Hanuman Institute
 OutputDir={#OutputDir}
