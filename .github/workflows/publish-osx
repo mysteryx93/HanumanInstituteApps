@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+if [[ -z "${1:-}" ]]; then
+  echo "Syntax: publish-osx AppName [runtime]"
+  echo "Runtime: osx-x64 or osx-arm64"
+  exit 1
+fi
+
+app=$1
+runtime=${2:-osx-x64}
+
+require_supported_app "$app"
+
+case "$runtime" in
+  osx-x64)
+    arch=MacOS_x64
+    ;;
+  osx-arm64)
+    arch=MacOS_arm64
+    ;;
+  *)
+    echo "Unsupported macOS runtime: $runtime" >&2
+    exit 1
+    ;;
+esac
+
+version=$(read_version "$app")
+product=$(read_product "$app")
+category=$(read_category "$app")
+proj=$(desktop_csproj "$app")
+
+[[ -n "$product" ]] || {
+  echo "Product is missing for $app." >&2
+  exit 1
+}
+
+[[ -n "$category" ]] || {
+  echo "LSApplicationCategoryType is missing for $app." >&2
+  exit 1
+}
+
+bundlePath="$repo_root/Src/App.$app/$app.Desktop/bin/Publish/$runtime"
+osxApp="$bundlePath/$app.app"
+publishPath="$osxApp/Contents/MacOS"
+hostExe="$publishPath/$app"
+
+outDir=$(output_dir "$version")
+outFile="${app}-${version}_${arch}.zip"
+outPath="$outDir/$outFile"
+
+echo "Runtime = $runtime"
+echo "AppName = $app"
+echo "Product = $product"
+echo "Category = $category"
+echo "Version = $version"
+echo "Source = $repo_root"
+echo "Output = $outPath"
+echo
+
+rm -rf -- "$bundlePath"
+
+dotnet publish "$proj" \
+  -r "$runtime" \
+  -c Release \
+  --self-contained true \
+  -p:UseAppHost=true \
+  -p:PublishSingleFile=true \
+  -o "$publishPath"
+
+find "$publishPath" \
+  -maxdepth 1 \
+  -type f \
+  -name '*.xml' \
+  -delete
+
+if [[ -f "$hostExe" ]]; then
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    codesign --remove-signature "$hostExe" 2>/dev/null || true
+  elif [[ -f "$publish_dir/strip-macos-codesign.py" ]]; then
+    python3 "$publish_dir/strip-macos-codesign.py" "$hostExe"
+  fi
+
+  chmod +x "$hostExe"
+fi
+
+find "$publishPath" \
+  -maxdepth 1 \
+  -type f \
+  -name '*.dylib' \
+  -exec chmod +x {} \;
+
+mkdir -p "$osxApp/Contents/Resources"
+
+cp -af \
+  "$repo_root/Src/App.$app/Deploy/App.icns" \
+  "$osxApp/Contents/Resources/$app.icns"
+
+cp -af \
+  "$publish_dir/Info.plist" \
+  "$osxApp/Contents/Info.plist"
+
+cp -af \
+  "$publish_dir/App.entitlements" \
+  "$osxApp/Contents/$app.entitlements"
+
+plist="$osxApp/Contents/Info.plist"
+
+replace_tokens \
+  "$plist" \
+  "$plist.tmp" \
+  "#VERSION" "$version" \
+  "#APP" "$app" \
+  "#PRODUCT" "$product" \
+  "#CATEGORY" "$category"
+
+mv -- "$plist.tmp" "$plist"
+
+mkdir -p "$outDir"
+rm -f -- "$outPath"
+
+(
+  cd "$bundlePath"
+  zip -6 -r "$outPath" ./*
+)
+
+[[ -s "$outPath" ]] || {
+  echo "macOS package was not created: $outPath" >&2
+  exit 1
+}
+
+echo "Created: $outPath"

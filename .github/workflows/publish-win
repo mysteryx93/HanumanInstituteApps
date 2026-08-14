@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+if [[ -z "${1:-}" ]]; then
+  echo "Syntax: publish-win AppName [runtime]"
+  echo "Runtime: win-x64 or win-x86"
+  exit 1
+fi
+
+app=$1
+runtime=${2:-win-x64}
+
+require_supported_app "$app"
+
+case "$runtime" in
+  win-x64)
+    arch=Win_x64
+    ;;
+  win-x86)
+    arch=Win_x86
+    ;;
+  *)
+    echo "Unsupported Windows runtime: $runtime" >&2
+    exit 1
+    ;;
+esac
+
+version=$(read_version "$app")
+proj=$(desktop_csproj "$app")
+
+publishPath="$repo_root/Src/App.$app/$app.Desktop/bin/Publish/$runtime"
+
+outDir=$(output_dir "$version")
+outFile="${app}-${version}_${arch}-Setup.exe"
+outPath="$outDir/$outFile"
+
+template="$publish_dir/installer.iss"
+issFile="$RUNNER_TEMP/${app}-${runtime}.iss"
+
+echo "Runtime     = $runtime"
+echo "AppName     = $app"
+echo "Version     = $version"
+echo "Source      = $repo_root"
+echo "Project     = $proj"
+echo "PublishPath = $publishPath"
+echo "Template    = $template"
+echo "Output      = $outPath"
+echo
+
+[[ -f "$template" ]] || {
+  echo "Missing shared Inno Setup template: $template" >&2
+  exit 1
+}
+
+iscc=""
+
+for candidate in \
+  "$(command -v ISCC.exe 2>/dev/null || true)" \
+  "/c/Program Files (x86)/Inno Setup 6/ISCC.exe" \
+  "/c/Program Files/Inno Setup 6/ISCC.exe"
+do
+  if [[ -n "$candidate" && -f "$candidate" ]]; then
+    iscc="$candidate"
+    break
+  fi
+done
+
+[[ -n "$iscc" ]] || {
+  echo "Inno Setup compiler (ISCC.exe) was not found." >&2
+  exit 1
+}
+
+rm -rf -- "$publishPath"
+
+dotnet publish "$proj" \
+  -r "$runtime" \
+  -c Release \
+  --self-contained true \
+  -p:PublishSingleFile=true \
+  -o "$publishPath"
+
+find "$publishPath" \
+  -maxdepth 1 \
+  -type f \
+  -name '*.xml' \
+  -delete
+
+[[ -f "$publishPath/$app.exe" ]] || {
+  echo "Published executable was not found: $publishPath/$app.exe" >&2
+  exit 1
+}
+
+mkdir -p "$outDir"
+rm -f -- "$outPath"
+
+replace_tokens \
+  "$template" \
+  "$issFile" \
+  "__APP_NAME__" "$app" \
+  "__APP_VERSION__" "$version" \
+  "__PUBLISH_DIR__" "$publishPath" \
+  "__OUTPUT_DIR__" "$outDir" \
+  "__OUTPUT_FILE__" "$outFile"
+
+"$iscc" "$issFile"
+
+[[ -s "$outPath" ]] || {
+  echo "Inno Setup package was not created: $outPath" >&2
+  exit 1
+}
+
+echo "Created: $outPath"

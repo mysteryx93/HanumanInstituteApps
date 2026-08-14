@@ -1,0 +1,77 @@
+name: Forgejo SSH Test
+
+on:
+  workflow_dispatch:
+
+env:
+  FORGEJO_HOST: git.hanumaninstitute.com
+  FORGEJO_REPOSITORY: git@git.hanumaninstitute.com:hanuman/HanumanInstituteApps.git
+  FORGEJO_PORT: 222
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure Forgejo SSH
+        env:
+          FORGEJO_SSH_KEY: ${{ secrets.FORGEJO_SSH_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${FORGEJO_SSH_KEY:-}" ]]; then
+            echo "::error::FORGEJO_SSH_KEY is empty"
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          # Write the private key cleanly
+          printf '%s\n' "$(printf '%s' "$FORGEJO_SSH_KEY" | tr -d '\r')" > ~/.ssh/forgejo_deploy_key
+          chmod 600 ~/.ssh/forgejo_deploy_key
+
+          echo "=== Private key fingerprint ==="
+          ssh-keygen -lf ~/.ssh/forgejo_deploy_key
+
+          echo
+          echo "=== Derived public key ==="
+          ssh-keygen -y -f ~/.ssh/forgejo_deploy_key
+
+          # Scan the correct port (222)
+          echo
+          echo "=== Adding host key for port ${FORGEJO_PORT} ==="
+          ssh-keyscan -p "${FORGEJO_PORT}" -H "${FORGEJO_HOST}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+          echo "Known hosts entries:"
+          ssh-keygen -lf ~/.ssh/known_hosts
+
+      - name: Verbose SSH authentication test
+        run: |
+          set +e
+
+          echo "=== Attempting SSH -T on port ${FORGEJO_PORT} ==="
+          ssh -vvv \
+            -p "${FORGEJO_PORT}" \
+            -i ~/.ssh/forgejo_deploy_key \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o PreferredAuthentications=publickey \
+            -o StrictHostKeyChecking=yes \
+            -T git@"${FORGEJO_HOST}" 2>&1 | tee /tmp/ssh.log
+
+          echo
+          echo "SSH exit code: $?"
+          echo
+          echo "=== Critical lines ==="
+          grep -E 'Offering public key|Server accepts key|Authentications that can continue|Permission denied|Host key|identity file' /tmp/ssh.log || true
+
+      - name: Test git ls-remote
+        run: |
+          set -euo pipefail
+
+          export GIT_SSH_COMMAND="ssh -p ${FORGEJO_PORT} -i $HOME/.ssh/forgejo_deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o PreferredAuthentications=publickey -o StrictHostKeyChecking=yes"
+
+          echo "=== git ls-remote ==="
+          git ls-remote "${FORGEJO_REPOSITORY}"

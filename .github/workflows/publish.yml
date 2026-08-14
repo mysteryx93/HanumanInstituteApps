@@ -1,0 +1,238 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: Application
+        type: choice
+        required: true
+        default: All
+        options:
+          - All
+          - Player432Hz
+          - Converter432Hz
+          - PowerliminalsPlayer
+          - YangDownloader
+
+      platform:
+        description: Platform
+        type: choice
+        required: true
+        default: All
+        options:
+          - All
+          - win-x64
+          - win-x86
+          - linux-x64
+          - linux-arm64
+          - macos-x64
+          - macos-arm64
+
+      publish_release:
+        description: Publish artifacts to GitHub Release
+        type: boolean
+        required: true
+        default: false
+
+concurrency:
+  group: publish-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_VERSION: 10.0.x
+  FORGEJO_HOST: git.hanumaninstitute.com
+  FORGEJO_PORT: 222
+  FORGEJO_REPOSITORY: git@git.hanumaninstitute.com:hanuman/HanumanInstituteApps.git
+  SOURCE_DIR: ${{ github.workspace }}/source
+  PUBLISH_OUT: ${{ github.workspace }}/artifacts
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      matrix: ${{ steps.meta.outputs.matrix }}
+
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+
+      - name: Configure Forgejo SSH
+        env:
+          FORGEJO_SSH_KEY: ${{ secrets.FORGEJO_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
+          printf '%s\n' "$(printf '%s' "$FORGEJO_SSH_KEY" | tr -d '\r')" > ~/.ssh/forgejo_deploy_key
+          chmod 600 ~/.ssh/forgejo_deploy_key
+
+          ssh-keyscan -p "$FORGEJO_PORT" -H "$FORGEJO_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Checkout Forgejo source
+        run: |
+          set -euo pipefail
+          export GIT_SSH_COMMAND="ssh -p $FORGEJO_PORT -i $HOME/.ssh/forgejo_deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes"
+
+          rm -rf "$SOURCE_DIR"
+          git clone --depth 1 "$FORGEJO_REPOSITORY" "$SOURCE_DIR"
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          REQUESTED_APP: ${{ inputs.app }}
+          REQUESTED_PLATFORM: ${{ inputs.platform }}
+        run: |
+          set -euo pipefail
+
+          apps='["Player432Hz","Converter432Hz","PowerliminalsPlayer","YangDownloader"]'
+          platforms='["win-x64","win-x86","linux-x64","linux-arm64","macos-x64","macos-arm64"]'
+
+          [[ "$REQUESTED_APP" != "All" ]] && apps=$(jq -cn --arg a "$REQUESTED_APP" '[$a]')
+          [[ "$REQUESTED_PLATFORM" != "All" ]] && platforms=$(jq -cn --arg p "$REQUESTED_PLATFORM" '[$p]')
+
+          props="$SOURCE_DIR/Src/Directory.Build.props"
+          [[ -f "$props" ]] || { echo "::error::Missing $props"; exit 1; }
+
+          version=$(sed -n 's/.*<AssemblyVersion>\([^<]*\)<\/AssemblyVersion>.*/\1/p' "$props" | head -n1)
+          [[ -n "$version" ]] || { echo "::error::AssemblyVersion not found"; exit 1; }
+
+          matrix=$(jq -cn --argjson apps "$apps" --argjson platforms "$platforms" '
+            {
+              include: [
+                $apps[] as $app | $platforms[] as $platform |
+                {
+                  app: $app,
+                  platform: $platform,
+                  runner: (if ($platform | startswith("win-")) then "windows-latest"
+                           elif ($platform | startswith("linux-")) then "ubuntu-latest"
+                           else "macos-latest" end),
+                  runtime: (if $platform == "macos-x64" then "osx-x64"
+                            elif $platform == "macos-arm64" then "osx-arm64"
+                            else $platform end)
+                }
+              ]
+            }')
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
+          echo "Matrix: $matrix"
+
+  publish:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+
+      - name: Configure Forgejo SSH
+        env:
+          FORGEJO_SSH_KEY: ${{ secrets.FORGEJO_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
+          printf '%s\n' "$(printf '%s' "$FORGEJO_SSH_KEY" | tr -d '\r')" > ~/.ssh/forgejo_deploy_key
+          chmod 600 ~/.ssh/forgejo_deploy_key
+
+          ssh-keyscan -p "$FORGEJO_PORT" -H "$FORGEJO_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Checkout Forgejo source
+        run: |
+          set -euo pipefail
+          export GIT_SSH_COMMAND="ssh -p $FORGEJO_PORT -i $HOME/.ssh/forgejo_deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes"
+
+          rm -rf "$SOURCE_DIR"
+          git clone --depth 1 "$FORGEJO_REPOSITORY" "$SOURCE_DIR"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Inno Setup
+        if: startsWith(matrix.platform, 'win-')
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+
+      - name: Install Linux packaging tools
+        if: startsWith(matrix.platform, 'linux-')
+        run: |
+          set -euo pipefail
+          dotnet tool install --global kuiperzone.pupnet
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL -o "$HOME/.local/bin/appimagetool" \
+            "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x "$HOME/.local/bin/appimagetool"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
+
+      - name: Publish
+        env:
+          APP: ${{ matrix.app }}
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          case "${{ matrix.platform }}" in
+            win-x64|win-x86)     .github/workflows/publish-win "$APP" "$RUNTIME" ;;
+            linux-x64|linux-arm64) .github/workflows/publish-linux "$APP" "$RUNTIME" ;;
+            macos-x64|macos-arm64) .github/workflows/publish-osx "$APP" "$RUNTIME" ;;
+            *) echo "::error::Unsupported platform: ${{ matrix.platform }}"; exit 1 ;;
+          esac
+
+      - name: Verify artifact
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(artifacts/*)
+          (( ${#files[@]} == 1 )) || { echo "::error::Expected 1 artifact, found ${#files[@]}"; exit 1; }
+          [[ -s "${files[0]}" ]] || { echo "::error::Artifact empty"; exit 1; }
+          ls -lh "${files[0]}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-${{ matrix.platform }}
+          path: artifacts/*
+          if-no-files-found: error
+
+  release:
+    if: inputs.publish_release
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download published artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-*'
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          name: v${{ needs.prepare.outputs.version }}
+          draft: true
+          files: artifacts/*
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

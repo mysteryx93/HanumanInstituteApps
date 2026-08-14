@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+
+if [[ -z "${1:-}" ]]; then
+  echo "Syntax: publish-linux AppName [runtime]"
+  echo "Runtime: linux-x64 or linux-arm64"
+  exit 1
+fi
+
+app=$1
+runtime=${2:-linux-x64}
+
+require_supported_app "$app"
+
+case "$runtime" in
+  linux-x64)
+    arch=Linux_x64
+    ;;
+  linux-arm64)
+    arch=Linux_arm64
+    ;;
+  *)
+    echo "Unsupported Linux runtime: $runtime" >&2
+    exit 1
+    ;;
+esac
+
+version=$(read_version "$app")
+
+outDir=$(output_dir "$version")
+outFile="${app}-${version}_${arch}.AppImage"
+outPath="$outDir/$outFile"
+
+conf="$repo_root/Src/App.${app}/Deploy/pupnet.conf"
+
+echo "Runtime = $runtime"
+echo "AppName = $app"
+echo "Version = $version"
+echo "Source  = $repo_root"
+echo "Output  = $outPath"
+echo
+
+[[ -f "$conf" ]] || {
+  echo "Missing pupnet configuration: $conf" >&2
+  exit 1
+}
+
+command -v pupnet >/dev/null 2>&1 || {
+  echo "pupnet is not installed." >&2
+  exit 1
+}
+
+mkdir -p "$outDir"
+
+export APPIMAGE_EXTRACT_AND_RUN=1
+
+pupnet "$conf" \
+  -y \
+  -r "$runtime" \
+  -v "$version" \
+  -o "$outPath" \
+  -k appimage
+
+rm -f -- "${outPath}.sha256.txt"
+rm -rf -- "$outDir"/Artifacts.AppImage.*
+
+[[ -s "$outPath" ]] || {
+  echo "AppImage was not created: $outPath" >&2
+  exit 1
+}
+
+echo "Created: $outPath"
