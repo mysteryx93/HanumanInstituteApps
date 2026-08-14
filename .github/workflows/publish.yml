@@ -171,7 +171,7 @@ jobs:
       - name: Install Inno Setup
         if: startsWith(matrix.platform, 'win-')
         shell: pwsh
-        run: choco install innosetup --yes --no-progress
+        run: choco install innosetup --yes --no-progress --ignore-detected-reboot --allow-downgrade
 
       - name: Install Linux packaging tools
         if: startsWith(matrix.platform, 'linux-')
