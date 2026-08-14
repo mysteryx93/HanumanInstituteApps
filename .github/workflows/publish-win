@@ -102,11 +102,11 @@ product=$(read_product "$app")
   exit 1
 }
 
-# Use product name for display, internal name for the .exe if needed
 replace_tokens \
   "$template" \
   "$issFile" \
   "__APP_NAME__" "$product" \
+  "__APP_INTERNAL__" "$app" \
   "__APP_VERSION__" "$version" \
   "__PUBLISH_DIR__" "$publishPath" \
   "__OUTPUT_DIR__" "$outDir" \
