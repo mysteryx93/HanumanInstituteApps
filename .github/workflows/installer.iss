@@ -23,8 +23,7 @@ WizardStyle=modern
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\Hanuman Institute Apps\{#AppName}"
-Filename: "{app}\{#AppName}.exe"
+Name: "{autoprograms}\Hanuman Institute Apps\{#AppName}"; Filename: "{app}\{#AppName}.exe"
 
 [Run]
 Filename: "{app}\{#AppName}.exe"
