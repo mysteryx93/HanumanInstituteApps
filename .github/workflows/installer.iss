@@ -7,7 +7,6 @@
 #define X64 "__X64__"
 
 [Setup]
-AppId={{YOUR-STABLE-APP-ID}}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#AppVersion}
@@ -16,7 +15,7 @@ UninstallDisplayName={#AppName}
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 #endif
-DefaultDirName={autopf}\Hanuman Institute\{#AppName}
+DefaultDirName={autopf}\Hanuman Institute\{#AppInternal}
 DefaultGroupName=Hanuman Institute
 OutputDir={#OutputDir}
 OutputBaseFilename={#OutputFile}
