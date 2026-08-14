@@ -18,6 +18,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 #endif
 SetupIconFile={#IconFile}
+UninstallDisplayIcon={app}\{#AppInternal}.exe
 DefaultDirName={autopf}\Hanuman Institute\{#AppInternal}
 DefaultGroupName=Hanuman Institute
 OutputDir={#OutputDir}
