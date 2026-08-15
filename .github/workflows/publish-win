@@ -3,6 +3,16 @@ set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
+to_win_path() {
+  local p=$1
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$p"
+  else
+    # fallback for pure MSYS/Git Bash
+    echo "$p" | sed 's|/|\\|g'
+  fi
+}
+
 if [[ -z "${1:-}" ]]; then
   echo "Syntax: publish-win AppName [runtime]"
   echo "Runtime: win-x64 or win-x86"
@@ -108,9 +118,13 @@ else
   x64="0"
 fi
 
+publishPath_win=$(to_win_path "$publishPath")
+outDir_win=$(to_win_path "$outDir")
+icon_file_win=$(to_win_path "$icon_file")
+
 icon_file="$repo_root/Src/App.$app/Deploy/App.ico"
 [[ -f "$icon_file" ]] || {
-  echo "Icon not found: $icon_file" >&2
+  echo "Icon not found: $icon_file_win" >&2
   exit 1
 }
 
@@ -120,10 +134,10 @@ replace_tokens \
   "__APP_NAME__" "$product" \
   "__APP_INTERNAL__" "$app" \
   "__APP_VERSION__" "$version" \
-  "__PUBLISH_DIR__" "$publishPath" \
-  "__OUTPUT_DIR__" "$outDir" \
+  "__PUBLISH_DIR__" "$publishPath_win" \
+  "__OUTPUT_DIR__" "$outDir_win" \
   "__OUTPUT_FILE__" "$outFile" \
-  "__ICON_FILE__" "$icon_file" \
+  "__ICON_FILE__" "$icon_file_win" \
   "__X64__" "$x64"
 
 "$iscc" "$issFile"
