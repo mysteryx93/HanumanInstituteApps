@@ -11,7 +11,7 @@ workflow_repo_root=$(
   pwd
 )
 
-repo_root="${SOURCE_DIR:?SOURCE_DIR must point to the Forgejo source checkout}"
+repo_root="$workflow_repo_root/source"
 publish_dir="$_workflows_dir"
 
 readonly _workflows_dir
@@ -55,10 +55,7 @@ xml_value() {
 
   [[ -f "$file" ]] || return 0
 
-  sed -n \
-    "s/.*<${key}>\\([^<]*\\)<\\/${key}>.*/\\1/p" \
-    "$file" |
-    head -n 1
+  sed -n "s/.*<${key}>\\([^<]*\\)<\\/${key}>.*/\\1/p" "$file" | head -n 1
 }
 
 desktop_csproj() {
@@ -66,8 +63,7 @@ desktop_csproj() {
 
   require_supported_app "$app"
 
-  printf '%s\n' \
-    "$repo_root/Src/App.$app/$app.Desktop/$app.Desktop.csproj"
+  printf '%s\n' "$repo_root/Src/App.$app/$app.Desktop/$app.Desktop.csproj"
 }
 
 read_project_value() {
@@ -150,7 +146,6 @@ replace_tokens() {
     token=$1
     value=$2
     shift 2
-
     text=${text//"$token"/"$value"}
   done
 

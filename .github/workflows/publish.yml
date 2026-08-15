@@ -42,7 +42,6 @@ env:
   FORGEJO_HOST: git.hanumaninstitute.com
   FORGEJO_PORT: 222
   FORGEJO_REPOSITORY: git@git.hanumaninstitute.com:hanuman/HanumanInstituteApps.git
-  SOURCE_DIR: ${{ github.workspace }}/source
   PUBLISH_OUT: ${{ github.workspace }}/artifacts
 
 jobs:
@@ -53,6 +52,7 @@ jobs:
     outputs:
       version: ${{ steps.meta.outputs.version }}
       matrix: ${{ steps.meta.outputs.matrix }}
+
     steps:
       - name: Checkout workflow repository
         uses: actions/checkout@v4
@@ -75,8 +75,8 @@ jobs:
         run: |
           set -euo pipefail
           export GIT_SSH_COMMAND="ssh -p $FORGEJO_PORT -i $HOME/.ssh/forgejo_deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes"
-          rm -rf -- "$SOURCE_DIR"
-          git clone --depth 1 "$FORGEJO_REPOSITORY" "$SOURCE_DIR"
+          rm -rf source
+          git clone --depth 1 "$FORGEJO_REPOSITORY" source
 
       - name: Resolve release metadata
         id: meta
@@ -136,7 +136,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tar --exclude='.git' -C "$SOURCE_DIR" -czf "$RUNNER_TEMP/source.tar.gz" .
+          tar --exclude='.git' -czf "$RUNNER_TEMP/source.tar.gz" -C source .
 
       - name: Upload source
         uses: actions/upload-artifact@v4
@@ -154,6 +154,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
+
     steps:
       - name: Checkout workflow repository
         uses: actions/checkout@v4
@@ -168,9 +169,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf -- "$SOURCE_DIR"
-          mkdir -p "$SOURCE_DIR"
-          tar -xzf source-archive/source.tar.gz -C "$SOURCE_DIR"
+          rm -rf source
+          mkdir -p source
+          tar -xzf source-archive/source.tar.gz -C source
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -215,7 +216,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          appBundle=$(find "$SOURCE_DIR" -type d -name "*.app" | head -n1)
+          appBundle=$(find source -type d -name "*.app" | head -n1)
           [[ -n "$appBundle" ]] || { echo "::error::No .app bundle found"; exit 1; }
           echo "Validating: $appBundle"
           [[ -d "$appBundle/Contents" ]] || { echo "::error::Missing Contents/"; exit 1; }
@@ -263,6 +264,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Download published artifacts
         uses: actions/download-artifact@v4
