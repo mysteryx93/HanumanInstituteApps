@@ -89,7 +89,7 @@ jobs:
           source .github/workflows/common.sh
 
           apps='["Player432Hz","Converter432Hz","PowerliminalsPlayer","YangDownloader"]'
-          platforms='["win-x64","win-x86","linux-x64","linux-arm64","macos-x64","macos-arm64"]'
+          platforms='["win-x64","win-x86","linux-x64","linux-arm64","macos-x64"]' #,"macos-arm64"
 
           if [[ "$REQUESTED_APP" != "All" ]]; then
             apps=$(jq -cn --arg app "$REQUESTED_APP" '[$app]')

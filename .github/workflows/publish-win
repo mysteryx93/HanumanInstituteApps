@@ -44,7 +44,7 @@ publishPath="$repo_root/Src/App.$app/$app.Desktop/bin/Publish/$runtime"
 
 outDir=$(output_dir "$version")
 outFile="${app}-${version}_${arch}_Setup"
-outPath="$outDir/$outFile"
+outPath="$outDir/${outFile}.exe"
 
 template="$publish_dir/installer.iss"
 issFile="$RUNNER_TEMP/${app}-${runtime}.iss"
@@ -118,15 +118,15 @@ else
   x64="0"
 fi
 
+icon_file="$repo_root/Src/App.$app/Deploy/App.ico"
+[[ -f "$icon_file" ]] || {
+  echo "Icon not found: $icon_file" >&2
+  exit 1
+}
+
 publishPath_win=$(to_win_path "$publishPath")
 outDir_win=$(to_win_path "$outDir")
 icon_file_win=$(to_win_path "$icon_file")
-
-icon_file="$repo_root/Src/App.$app/Deploy/App.ico"
-[[ -f "$icon_file" ]] || {
-  echo "Icon not found: $icon_file_win" >&2
-  exit 1
-}
 
 replace_tokens \
   "$template" \
