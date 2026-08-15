@@ -14,7 +14,6 @@ on:
           - Converter432Hz
           - PowerliminalsPlayer
           - YangDownloader
-
       platform:
         description: Platform
         type: choice
@@ -27,8 +26,7 @@ on:
           - linux-x64
           - linux-arm64
           - macos-x64
-#          - macos-arm64
-
+          - macos-arm64
       publish_release:
         description: Publish artifacts to GitHub Release
         type: boolean
@@ -50,14 +48,11 @@ env:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
-
     outputs:
       version: ${{ steps.meta.outputs.version }}
       matrix: ${{ steps.meta.outputs.matrix }}
-
     steps:
       - name: Checkout workflow repository
         uses: actions/checkout@v4
@@ -68,35 +63,20 @@ jobs:
           FORGEJO_SSH_KEY: ${{ secrets.FORGEJO_SSH_KEY }}
         run: |
           set -euo pipefail
-
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
-          printf '%s\n' "$(printf '%s' "$FORGEJO_SSH_KEY" | tr -d '\r')" \
-            > ~/.ssh/forgejo_deploy_key
-
+          printf '%s\n' "$(printf '%s' "$FORGEJO_SSH_KEY" | tr -d '\r')" > ~/.ssh/forgejo_deploy_key
           chmod 600 ~/.ssh/forgejo_deploy_key
-
-          ssh-keyscan \
-            -p "$FORGEJO_PORT" \
-            -H "$FORGEJO_HOST" \
-            >> ~/.ssh/known_hosts
-
+          ssh-keyscan -p "$FORGEJO_PORT" -H "$FORGEJO_HOST" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Checkout Forgejo source
         shell: bash
         run: |
           set -euo pipefail
-
           export GIT_SSH_COMMAND="ssh -p $FORGEJO_PORT -i $HOME/.ssh/forgejo_deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes"
-
           rm -rf -- "$SOURCE_DIR"
-
-          git clone \
-            --depth 1 \
-            "$FORGEJO_REPOSITORY" \
-            "$SOURCE_DIR"
+          git clone --depth 1 "$FORGEJO_REPOSITORY" "$SOURCE_DIR"
 
       - name: Resolve release metadata
         id: meta
@@ -106,7 +86,6 @@ jobs:
           REQUESTED_PLATFORM: ${{ inputs.platform }}
         run: |
           set -euo pipefail
-
           source .github/workflows/common.sh
 
           apps='["Player432Hz","Converter432Hz","PowerliminalsPlayer","YangDownloader"]'
@@ -127,33 +106,29 @@ jobs:
             --argjson platforms "$platforms" '
             {
               include: [
-                $apps[] as $app | $platforms[] as $platform |
+                $apps[] as $app |
+                $platforms[] as $platform |
                 {
                   app: $app,
                   platform: $platform,
-
-                  runner:
-                    if ($platform | startswith("win-"))
+                  runner: (if ($platform | startswith("win-"))
                     then "windows-latest"
                     elif ($platform | startswith("linux-"))
                     then "ubuntu-latest"
                     else "macos-latest"
-                    end,
-
-                  runtime:
-                    if $platform == "macos-x64"
+                    end),
+                  runtime: (if $platform == "macos-x64"
                     then "osx-x64"
                     elif $platform == "macos-arm64"
                     then "osx-arm64"
                     else $platform
-                    end
+                    end)
                 }
               ]
             }')
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-
           echo "Version: $version"
           echo "Matrix: $matrix"
 
@@ -161,12 +136,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          tar \
-            --exclude='.git' \
-            -C "$SOURCE_DIR" \
-            -czf "$RUNNER_TEMP/source.tar.gz" \
-            .
+          tar --exclude='.git' -C "$SOURCE_DIR" -czf "$RUNNER_TEMP/source.tar.gz" .
 
       - name: Upload source
         uses: actions/upload-artifact@v4
@@ -178,16 +148,12 @@ jobs:
 
   publish:
     needs: prepare
-
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
-
     runs-on: ${{ matrix.runner }}
-
     permissions:
       contents: read
-
     steps:
       - name: Checkout workflow repository
         uses: actions/checkout@v4
@@ -202,13 +168,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf -- "$SOURCE_DIR"
           mkdir -p "$SOURCE_DIR"
-
-          tar \
-            -xzf source-archive/source.tar.gz \
-            -C "$SOURCE_DIR"
+          tar -xzf source-archive/source.tar.gz -C "$SOURCE_DIR"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -218,35 +180,19 @@ jobs:
       - name: Install Inno Setup
         if: startsWith(matrix.platform, 'win-')
         shell: pwsh
-        run: |
-          choco install innosetup `
-            --yes `
-            --no-progress `
-            --ignore-detected-reboot `
-            --allow-downgrade
+        run: choco install innosetup --yes --no-progress --ignore-detected-reboot --allow-downgrade
 
       - name: Install Linux packaging tools
         if: startsWith(matrix.platform, 'linux-')
         shell: bash
         run: |
           set -euo pipefail
-
           dotnet tool install --global kuiperzone.pupnet
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
-
           mkdir -p "$HOME/.local/bin"
-
-          curl -fsSL \
-            -o "$HOME/.local/bin/appimagetool-x86_64.AppImage" \
-            "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
-
-          chmod +x \
-            "$HOME/.local/bin/appimagetool-x86_64.AppImage"
-
-          ln -sf \
-            appimagetool-x86_64.AppImage \
-            "$HOME/.local/bin/appimagetool"
-
+          curl -fsSL -o "$HOME/.local/bin/appimagetool-x86_64.AppImage" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x "$HOME/.local/bin/appimagetool-x86_64.AppImage"
+          ln -sf appimagetool-x86_64.AppImage "$HOME/.local/bin/appimagetool"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
 
@@ -257,24 +203,11 @@ jobs:
           RUNTIME: ${{ matrix.runtime }}
         run: |
           set -euo pipefail
-
           case "${{ matrix.platform }}" in
-            win-x64|win-x86)
-              bash .github/workflows/publish-win "$APP" "$RUNTIME"
-              ;;
-
-            linux-x64|linux-arm64)
-              bash .github/workflows/publish-linux "$APP" "$RUNTIME"
-              ;;
-
-            macos-x64|macos-arm64)
-              bash .github/workflows/publish-osx "$APP" "$RUNTIME"
-              ;;
-
-            *)
-              echo "::error::Unsupported platform: ${{ matrix.platform }}"
-              exit 1
-              ;;
+            win-x64|win-x86) bash .github/workflows/publish-win "$APP" "$RUNTIME" ;;
+            linux-x64|linux-arm64) bash .github/workflows/publish-linux "$APP" "$RUNTIME" ;;
+            macos-x64|macos-arm64) bash .github/workflows/publish-osx "$APP" "$RUNTIME" ;;
+            *) echo "::error::Unsupported platform: ${{ matrix.platform }}"; exit 1 ;;
           esac
 
       - name: Validate macOS app bundle
@@ -282,73 +215,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           appBundle=$(find "$SOURCE_DIR" -type d -name "*.app" | head -n1)
-
-          [[ -n "$appBundle" ]] || {
-            echo "::error::No .app bundle found"
-            exit 1
-          }
-
+          [[ -n "$appBundle" ]] || { echo "::error::No .app bundle found"; exit 1; }
           echo "Validating: $appBundle"
-          echo
-
-          [[ -d "$appBundle/Contents" ]] || {
-            echo "::error::Missing Contents/"
-            exit 1
-          }
-
-          [[ -f "$appBundle/Contents/Info.plist" ]] || {
-            echo "::error::Missing Info.plist"
-            exit 1
-          }
-
-          [[ -d "$appBundle/Contents/MacOS" ]] || {
-            echo "::error::Missing MacOS/"
-            exit 1
-          }
-
-          executable=$(find \
-            "$appBundle/Contents/MacOS" \
-            -type f \
-            -perm +111 |
-            head -n1)
-
-          [[ -n "$executable" ]] || {
-            echo "::error::No executable found in Contents/MacOS"
-            exit 1
-          }
-
+          [[ -d "$appBundle/Contents" ]] || { echo "::error::Missing Contents/"; exit 1; }
+          [[ -f "$appBundle/Contents/Info.plist" ]] || { echo "::error::Missing Info.plist"; exit 1; }
+          [[ -d "$appBundle/Contents/MacOS" ]] || { echo "::error::Missing MacOS/"; exit 1; }
+          executable=$(find "$appBundle/Contents/MacOS" -type f -perm +111 | head -n1)
+          [[ -n "$executable" ]] || { echo "::error::No executable found in Contents/MacOS"; exit 1; }
           echo "Executable: $executable"
-
           file "$executable"
           lipo -info "$executable" || true
-
           echo
           echo "=== codesign ==="
-
           codesign -dv --verbose=4 "$appBundle" 2>&1 || true
-
-          codesign --verify --deep --strict "$appBundle" 2>&1 ||
-            echo "Note: codesign verify failed (common for unsigned CI builds)"
-
+          codesign --verify --deep --strict "$appBundle" 2>&1 || echo "Note: codesign verify failed (common for unsigned CI builds)"
           echo
           echo "=== Info.plist ==="
-
           plutil -lint "$appBundle/Contents/Info.plist"
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleIdentifier" \
-            "$appBundle/Contents/Info.plist"
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleExecutable" \
-            "$appBundle/Contents/Info.plist"
-
-          /usr/libexec/PlistBuddy \
-            -c "Print :CFBundleShortVersionString" \
-            "$appBundle/Contents/Info.plist" || true
-
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$appBundle/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$appBundle/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$appBundle/Contents/Info.plist" || true
           echo
           echo "macOS app bundle structure looks valid."
 
@@ -357,20 +244,9 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
-
           files=(artifacts/*)
-
-          (( ${#files[@]} == 1 )) || {
-            echo "::error::Expected 1 artifact, found ${#files[@]}"
-            printf '%s\n' "${files[@]}"
-            exit 1
-          }
-
-          [[ -s "${files[0]}" ]] || {
-            echo "::error::Artifact is empty: ${files[0]}"
-            exit 1
-          }
-
+          (( ${#files[@]} == 1 )) || { echo "::error::Expected 1 artifact, found ${#files[@]}"; printf '%s\n' "${files[@]}"; exit 1; }
+          [[ -s "${files[0]}" ]] || { echo "::error::Artifact is empty: ${files[0]}"; exit 1; }
           echo "Artifact:"
           ls -lh "${files[0]}"
 
@@ -384,12 +260,9 @@ jobs:
   release:
     if: inputs.publish_release
     needs: [prepare, publish]
-
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-
     steps:
       - name: Download published artifacts
         uses: actions/download-artifact@v4
