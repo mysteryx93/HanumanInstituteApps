@@ -79,8 +79,6 @@ find "$publishPath" \
 if [[ -f "$hostExe" ]]; then
   if [[ "$(uname -s)" == "Darwin" ]]; then
     codesign --remove-signature "$hostExe" 2>/dev/null || true
-  elif [[ -f "$publish_dir/strip-macos-codesign.py" ]]; then
-    python3 "$publish_dir/strip-macos-codesign.py" "$hostExe"
   fi
 
   chmod +x "$hostExe"

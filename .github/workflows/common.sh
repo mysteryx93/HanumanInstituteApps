@@ -6,15 +6,12 @@ _workflows_dir=$(
   pwd
 )
 
-# Publish/workflows -> GitHub repository root.
 workflow_repo_root=$(
   cd -- "$_workflows_dir/../.." &&
   pwd
 )
 
-# Forgejo source checkout.
 repo_root="${SOURCE_DIR:?SOURCE_DIR must point to the Forgejo source checkout}"
-
 publish_dir="$_workflows_dir"
 
 readonly _workflows_dir
@@ -87,16 +84,29 @@ read_project_value() {
   printf '%s\n' "$value"
 }
 
+read_shared_version() {
+  local version
+
+  version=$(xml_value AssemblyVersion "$repo_root/Src/Directory.Build.props")
+
+  [[ -n "$version" ]] || {
+    echo "AssemblyVersion is missing from Directory.Build.props." >&2
+    exit 1
+  }
+
+  printf '%s\n' "$version"
+}
+
 read_version() {
   local app=$1
   local version
 
   version=$(read_project_value AssemblyVersion "$app")
 
-  if [[ -z "$version" ]]; then
+  [[ -n "$version" ]] || {
     echo "AssemblyVersion is missing for $app." >&2
     exit 1
-  fi
+  }
 
   printf '%s\n' "$version"
 }
@@ -125,24 +135,24 @@ replace_tokens() {
     exit 1
   }
 
-  python3 - "$source" "$destination" "$@" <<'PY'
-from pathlib import Path
-import sys
+  (( $# % 2 == 0 )) || {
+    echo "replace_tokens requires token/value pairs." >&2
+    exit 1
+  }
 
-source = Path(sys.argv[1])
-destination = Path(sys.argv[2])
-arguments = sys.argv[3:]
+  local text
+  local token
+  local value
 
-if len(arguments) % 2:
-    raise SystemExit("replace_tokens requires token/value pairs")
+  text=$(<"$source")
 
-text = source.read_text()
+  while (( $# )); do
+    token=$1
+    value=$2
+    shift 2
 
-for i in range(0, len(arguments), 2):
-    token = arguments[i]
-    value = arguments[i + 1]
-    text = text.replace(token, value)
+    text=${text//"$token"/"$value"}
+  done
 
-destination.write_text(text)
-PY
+  printf '%s' "$text" > "$destination"
 }
