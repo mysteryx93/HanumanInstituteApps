@@ -168,12 +168,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tar -czf "$RUNNER_TEMP/nuget-packages.tar.gz" -C "$NUGET_PACKAGES" .
-          [[ -s "$RUNNER_TEMP/nuget-packages.tar.gz" ]] || {
+          tar -cf "$RUNNER_TEMP/nuget-packages.tar" -C "$NUGET_PACKAGES" .
+          [[ -s "$RUNNER_TEMP/nuget-packages.tar" ]] || {
             echo "NuGet cache archive is empty." >&2
             exit 1
           }
-          ls -lh "$RUNNER_TEMP/nuget-packages.tar.gz"
+          ls -lh "$RUNNER_TEMP/nuget-packages.tar"
 
       - name: Upload source
         uses: actions/upload-artifact@v4
@@ -187,7 +187,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
-          path: ${{ runner.temp }}/nuget-packages.tar.gz
+          path: ${{ runner.temp }}/nuget-packages.tar
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
@@ -230,7 +230,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .nuget/packages
-          tar -xzf nuget-archive/nuget-packages.tar.gz -C .nuget/packages
+          tar -xf nuget-archive/nuget-packages.tar -C .nuget/packages
           echo "NuGet cache: $(du -sh .nuget/packages | cut -f1)"
 
       - name: Setup .NET
