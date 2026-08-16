@@ -66,6 +66,27 @@ desktop_csproj() {
   printf '%s\n' "$repo_root/Src/App.$app/$app.Desktop/$app.Desktop.csproj"
 }
 
+restore_desktop() {
+  local app=$1
+  local runtime=$2
+  local proj
+
+  proj=$(desktop_csproj "$app")
+
+  [[ -f "$proj" ]] || {
+    echo "Project not found: $proj" >&2
+    exit 1
+  }
+
+  echo "Restoring $app for $runtime"
+  dotnet restore "$proj" \
+    -r "$runtime" \
+    --verbosity minimal \
+    -p:SelfContained=true \
+    -p:PublishSingleFile=true \
+    -p:UseAppHost=true
+}
+
 read_project_value() {
   local key=$1
   local app=$2

@@ -43,6 +43,7 @@ env:
   FORGEJO_PORT: 222
   FORGEJO_REPOSITORY: git@git.hanumaninstitute.com:hanuman/HanumanInstituteApps.git
   PUBLISH_OUT: ${{ github.workspace }}/artifacts
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
   prepare:
@@ -132,11 +133,47 @@ jobs:
           echo "Version: $version"
           echo "Matrix: $matrix"
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore NuGet packages
+        shell: bash
+        env:
+          MATRIX: ${{ steps.meta.outputs.matrix }}
+        run: |
+          set -euo pipefail
+          source .github/workflows/common.sh
+          mkdir -p "$NUGET_PACKAGES"
+
+          mapfile -t rows < <(jq -c '.include[]' <<<"$MATRIX")
+          (( ${#rows[@]} > 0 )) || { echo "Restore matrix is empty." >&2; exit 1; }
+
+          for row in "${rows[@]}"; do
+            app=$(jq -r '.app' <<<"$row")
+            runtime=$(jq -r '.runtime' <<<"$row")
+            restore_desktop "$app" "$runtime"
+          done
+
+          echo "NuGet cache: $(du -sh "$NUGET_PACKAGES" | cut -f1)"
+
       - name: Package source
         shell: bash
         run: |
           set -euo pipefail
           tar --exclude='.git' -czf "$RUNNER_TEMP/source.tar.gz" -C source .
+
+      - name: Package NuGet cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf "$RUNNER_TEMP/nuget-packages.tar.gz" -C "$NUGET_PACKAGES" .
+          [[ -s "$RUNNER_TEMP/nuget-packages.tar.gz" ]] || {
+            echo "NuGet cache archive is empty." >&2
+            exit 1
+          }
+          ls -lh "$RUNNER_TEMP/nuget-packages.tar.gz"
 
       - name: Upload source
         uses: actions/upload-artifact@v4
@@ -145,6 +182,15 @@ jobs:
           path: ${{ runner.temp }}/source.tar.gz
           if-no-files-found: error
           retention-days: 1
+
+      - name: Upload NuGet cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ${{ runner.temp }}/nuget-packages.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
 
   publish:
     needs: prepare
@@ -172,6 +218,20 @@ jobs:
           rm -rf source
           mkdir -p source
           tar -xzf source-archive/source.tar.gz -C source
+
+      - name: Download NuGet cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: nuget-archive
+
+      - name: Restore NuGet cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .nuget/packages
+          tar -xzf nuget-archive/nuget-packages.tar.gz -C .nuget/packages
+          echo "NuGet cache: $(du -sh .nuget/packages | cut -f1)"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -269,7 +329,7 @@ jobs:
       - name: Download published artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: '*-*'
+          pattern: '*-*-*'
           path: artifacts
           merge-multiple: true
 
