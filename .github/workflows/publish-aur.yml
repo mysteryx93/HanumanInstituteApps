@@ -1,0 +1,149 @@
+name: Publish AUR
+
+# Updates the four AppImage packages on the AUR from a published GitHub Release.
+# The Linux x64 AppImage for each app must already be attached to that release.
+# NaturalGroundingPlayer is excluded until it is ready to publish.
+#
+# Required repository secret:
+#   AUR_SSH_PRIVATE_KEY — private key whose public half is on your AUR account
+# Optional repository secrets:
+#   AUR_EMAIL — defaults to mysteryx93@protonmail.com
+# Git commits use AUR username Hanuman.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without v prefix (empty = latest GitHub release)
+        required: false
+        type: string
+      pkgrel:
+        description: AUR pkgrel
+        required: false
+        type: string
+        default: '1'
+      package:
+        description: AUR package to publish
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - converter432hz-appimage
+          - player432hz-appimage
+          - powerliminalsplayer-appimage
+          - yangdownloader-appimage
+
+concurrency:
+  group: publish-aur-${{ github.repository }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Select packages
+        id: matrix
+        env:
+          PACKAGE: ${{ inputs.package || 'all' }}
+        run: |
+          set -euo pipefail
+          matrix='[
+            {"app":"Converter432Hz","pkgname":"converter432hz-appimage"},
+            {"app":"Player432Hz","pkgname":"player432hz-appimage"},
+            {"app":"PowerliminalsPlayer","pkgname":"powerliminalsplayer-appimage"},
+            {"app":"YangDownloader","pkgname":"yangdownloader-appimage"}
+          ]'
+          if [[ "$PACKAGE" != "all" ]]; then
+            matrix=$(jq -cn --argjson matrix "$matrix" --arg package "$PACKAGE" '
+              [$matrix[] | select(.pkgname == $package)]
+            ')
+            [[ "$matrix" != "[]" ]] || { echo "::error::Unknown package: $PACKAGE"; exit 1; }
+          fi
+          echo "matrix=$(jq -cn --argjson include "$matrix" '{include:$include}')" >> "$GITHUB_OUTPUT"
+          echo "Packages: $matrix"
+
+  aur-publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PKGREL: ${{ inputs.pkgrel }}
+          APP: ${{ matrix.app }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${RELEASE_TAG:-}" ]]; then
+            version="$RELEASE_TAG"
+          elif [[ -n "${INPUT_VERSION:-}" ]]; then
+            version="$INPUT_VERSION"
+          else
+            version=$(gh release view --json tagName --jq .tagName)
+          fi
+
+          version="${version#v}"
+          [[ -n "$version" ]] || { echo "::error::Could not resolve a release version."; exit 1; }
+
+          pkgrel="${INPUT_PKGREL:-1}"
+          [[ "$pkgrel" =~ ^[0-9]+$ ]] || { echo "::error::pkgrel must be an integer: $pkgrel"; exit 1; }
+
+          asset_x64="${APP}-${version}_Linux_x64.AppImage"
+          url_x64="https://github.com/${{ github.repository }}/releases/download/v${version}/${asset_x64}"
+          curl -fsILo /dev/null "$url_x64" || {
+            echo "::error::Release asset not found: $url_x64"
+            echo "Publish a GitHub Release that includes the Linux x64 AppImage first."
+            exit 1
+          }
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "pkgrel=$pkgrel" >> "$GITHUB_OUTPUT"
+          echo "Package: ${{ matrix.pkgname }}"
+          echo "Version: $version"
+          echo "pkgrel: $pkgrel"
+
+      - name: Update PKGBUILD
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          PKGREL: ${{ steps.meta.outputs.pkgrel }}
+          PKGNAME: ${{ matrix.pkgname }}
+        run: |
+          set -euo pipefail
+          pkgbuild="aur/${PKGNAME}/PKGBUILD"
+          [[ -f "$pkgbuild" ]] || { echo "::error::Missing $pkgbuild"; exit 1; }
+          sed -i "s/^pkgver=.*/pkgver=${VERSION}/" "$pkgbuild"
+          sed -i "s/^pkgrel=.*/pkgrel=${PKGREL}/" "$pkgbuild"
+          echo "Updated PKGBUILD:"
+          grep -E '^(pkgver|pkgrel)=' "$pkgbuild"
+
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v4.2.0
+        with:
+          pkgname: ${{ matrix.pkgname }}
+          pkgbuild: ./aur/${{ matrix.pkgname }}/PKGBUILD
+          updpkgsums: true
+          test: true
+          commit_username: ${{ secrets.AUR_USERNAME || 'Hanuman' }}
+          commit_email: ${{ secrets.AUR_EMAIL || 'mysteryx93@protonmail.com' }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update to v${{ steps.meta.outputs.version }}
+          ssh_keyscan_types: rsa,ecdsa,ed25519
